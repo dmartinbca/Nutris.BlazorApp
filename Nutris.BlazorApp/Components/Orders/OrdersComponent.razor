@@ -15,6 +15,45 @@
 }
 
 <!-- HEADER -->
+<!-- Language Selector -->
+<div class="language-selector-products">
+    <button class="language-button" type="button" @onclick="@ToggleLanguageMenu">
+        @if (currentLanguage == "es")
+        {
+            <span>Español</span>
+        }
+        else
+        {
+            <span>English</span>
+        }
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+        </svg>
+    </button>
+
+    @if (showLanguageMenu)
+    {
+        <div class="language-dropdown">
+            <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("en"))">
+                English
+            </button>
+            <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("es"))">
+                Español
+            </button>
+        </div>
+    }
+</div>
+
+<!-- Back Button -->
+<div class="back-button-container">
+    <button class="back-button" @onclick="@GoBack">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="32" fill="#2F5496" />
+            <path d="M47 32.126H18.608M25.7061 23L17.297 31.409C16.901 31.805 16.901 32.447 17.297 32.843L25.7061 41.252"
+                  stroke="white" stroke-width="2.3" stroke-linecap="round" />
+        </svg>
+    </button>
+</div>
 <div>
     <section>
         <div class="header-order">
@@ -903,6 +942,106 @@
     <BoteCapDataModal />
 </div>
 <style>
+    /* Language Selector */
+    .language-selector-products {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 200;
+    }
+
+    .language-button {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 140px;
+        justify-content: space-between;
+    }
+
+        .language-button:hover {
+            background: #f8f9fa;
+        }
+
+    .language-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        min-width: 150px;
+        overflow: hidden;
+    }
+
+    .dropdown-item {
+        display: block;
+        width: 100%;
+        padding: 10px 16px;
+        background: none;
+        border: none;
+        text-align: left;
+        color: #495057;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+    /* Back Button */
+    .back-button-container {
+        position: fixed;
+        top: 15%;
+        left: 270px;
+        transform: translateY(-50%);
+        z-index: 100;
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        padding: 0;
+        display: block;
+    }
+
+        .back-button:hover {
+            transform: scale(1.1);
+        }
+
+    /* Loading Overlay */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999999;
+    }
+
+    .spinner {
+        border: 5px solid rgba(0,0,0,.1);
+        border-left-color: #09f;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
     .steps-row {
         display: flex;
         justify-content: space-between;
@@ -2143,3 +2282,7 @@
 
     }
 </style>
+@code{
+    private string currentLanguage = "es";
+
+}

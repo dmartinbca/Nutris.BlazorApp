@@ -13,7 +13,7 @@ public class OrdersComponentBase : ComponentBase
     [Inject] protected IApiService Api { get; set; } = default!;
     [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] protected ILocalizationService Localization { get; set; } = default!;
-
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
     // Parámetros desde el padre (Customize.razor)
     [Parameter] public string Id { get; set; } = string.Empty;
     [Parameter] public CustomizeRG35Response? RG35 { get; set; }
@@ -138,23 +138,36 @@ public class OrdersComponentBase : ComponentBase
     protected List<AtributoOption> OptionsColorLabel { get; set; } = new();
     protected List<AtributoOption> OptionsColorBote { get; set; } = new();
     public string Logo { get; set; } = string.Empty;
+    public bool showLanguageMenu = false;
+    public string currentLanguage = "es";
     protected override async Task OnParametersSetAsync()
     {
+        currentLanguage = Localization.CurrentLanguage ?? "es";
+
+        // Suscribirse a cambios de idioma
+        Localization.OnLanguageChanged += OnLanguageChanged;
         await LoadDataAsync();
     }
-    private async Task LoadCustomerLogo()
+    public void OnLanguageChanged()
     {
-        var customerLogo = await LocalStorage.GetItemAsync<string>("Customer_logo");
-
-        if (!string.IsNullOrEmpty(customerLogo))
-        {
-            Logo = $"data:image/png;base64,{customerLogo}";
-        }
-        else
-        {
-            Logo = string.Empty;
-        }
+        currentLanguage = Localization.CurrentLanguage;
+        InvokeAsync(StateHasChanged);
     }
+
+    public void ToggleLanguageMenu()
+    {
+        showLanguageMenu = !showLanguageMenu;
+    }
+    public void GoBack()
+    {
+        Navigation.NavigateTo("/home");
+    }
+    public async Task SelectLanguage(string language)
+    {
+        showLanguageMenu = false;
+        await Localization.ChangeLanguageAsync(language);
+    }
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -183,7 +196,7 @@ public class OrdersComponentBase : ComponentBase
 
             // Calcular porcentajes
             CalculateAllPercentages();
-            var customerLogo = await LocalStorage.GetItemAsync<string>("Customer_logo");
+            var customerLogo = await LocalStorage.GetItemAsync<string>("logo");
 
             if (!string.IsNullOrEmpty(customerLogo))
             {
