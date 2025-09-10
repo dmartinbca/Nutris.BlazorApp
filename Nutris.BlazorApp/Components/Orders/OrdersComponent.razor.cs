@@ -613,6 +613,14 @@ public class OrdersComponentBase : ComponentBase
         return "#989898";
     }
 
+    protected string GetStepBorder(int step)
+    {
+        var bg = GetStepColor(step);
+        if (bg == "#90EE90")
+            return "#228B22"; // Dark green border for soft green phases
+        return "none";
+    }
+
     protected bool GetSwitchValue(int idx)
     {
         return idx switch

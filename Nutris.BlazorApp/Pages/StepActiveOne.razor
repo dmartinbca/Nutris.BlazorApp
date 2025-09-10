@@ -1,5 +1,6 @@
 ﻿@* StepActiveOne.razor *@
-@namespace NutrisBlazor.Components.Steps
+@namespace Nutris.BlazorApp.Components.Orders.Steps
+@using NutrisBlazor.Services
 
 <div class="step1 font-13 w-100">
     <svg width="100%" height="60" viewBox="0 0 228 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -29,5 +30,5 @@
     [Parameter] public string Background { get; set; } = "#8ED300";
     [Parameter] public string Color { get; set; } = "#FFFFFF";
     [Parameter] public string Border { get; set; } = "none";
-    [Inject] public ILocalizationService Localization { get; set; } = default!;
+    [Inject] protected ILocalizationService Localization { get; set; } = default!;
 }

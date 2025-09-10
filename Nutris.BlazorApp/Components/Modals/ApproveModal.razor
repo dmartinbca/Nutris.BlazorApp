@@ -12,7 +12,12 @@
 }
 else
 {
-    <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+    <div class="modal fade @(IsVisible ? "show d-block" : "")"
+         id="approveModal"
+         tabindex="-1"
+         aria-labelledby="approveModalLabel"
+         aria-hidden="@(!IsVisible)"
+         style="@(IsVisible ? "display: block; background-color: rgba(0,0,0,0.5);" : "display: none;")">
         <div class="approve-modal-container modal-dialog modal-content">
             <div class="modal-body">
                 <div class="title-approve">
@@ -28,7 +33,7 @@ else
                 <button class="btn-save-atr-approve" @onclick="AcceptFormulation">
                     @Localization["ApproveModal.Aproveandconinuewiththedesign"]
                 </button>
-                <button class="btn-cancel-atr close" data-bs-dismiss="modal" aria-label="Close">
+                <button class="btn-cancel-atr close" @onclick="CloseModal">
                     @Localization["NavBar.Cancel"]
                 </button>
             </div>
@@ -37,17 +42,19 @@ else
 }
 
 @code {
+    [Parameter] public bool IsVisible { get; set; }
     [Parameter] public string CodeRG35 { get; set; } = "";
     [Parameter] public bool CustomerAccepted { get; set; } = false;
     [Parameter] public bool TomarMuestra { get; set; } = false;
     [Parameter] public string RG37 { get; set; } = "";
-
     [Parameter] public EventCallback OnFormulationApproved { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
 
     [Inject] private IApiService ApiService { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     [Inject] private ILocalizationService Localization { get; set; } = default!;
     [Inject] private IJSRuntime JS { get; set; } = default!;
+    [Inject] private ILogger<ApproveModal> Logger { get; set; } = default!;
 
     private bool IsLoading = false;
 
@@ -64,36 +71,30 @@ else
                 Status = "Cerrado cliente"
             };
 
+            Logger.LogInformation($"Accepting formulation for RG37: {RG37}");
+
             // Llamada a la API para actualizar la formulación
             var response = await ApiService.PatchAsync($"CustomizeRG37('{RG37}')", dataForFormulation);
 
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Datos actualizados correctamente");
+                Logger.LogInformation("Formulation accepted successfully");
 
-                // Cerrar el modal usando Bootstrap
-                await JS.InvokeVoidAsync("eval", @"
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('approveModal'));
-                    if (modal) {
-                        modal.hide();
-                    }
-                ");
-
-                // Notificar al componente padre que la formulación fue aprobada
+                // Notificar al componente padre
                 await OnFormulationApproved.InvokeAsync();
 
-                // Navegar a la página de customize (opcional, dependiendo del flujo)
-                // Navigation.NavigateTo("/customize");
+                // Cerrar el modal
+                await CloseModal();
             }
             else
             {
-                Console.WriteLine($"Error en la respuesta de la API: {response.StatusCode}");
+                Logger.LogError($"Error in API response: {response.StatusCode}");
                 await JS.InvokeVoidAsync("alert", Localization["errors.ApprovalFailed"]);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al aprobar la formulación: {ex.Message}");
+            Logger.LogError(ex, "Error approving formulation");
             await JS.InvokeVoidAsync("alert", Localization["errors.GenericError"]);
         }
         finally
@@ -102,81 +103,19 @@ else
             StateHasChanged();
         }
     }
+
+    private async Task CloseModal()
+    {
+        await OnClose.InvokeAsync();
+
+        // Hide Bootstrap modal if needed
+        await JS.InvokeVoidAsync("hideBootstrapModal", "approveModal");
+    }
+
+    // Public method to show the modal programmatically
+    public async Task ShowModal()
+    {
+        IsLoading = false;
+        StateHasChanged();
+    }
 }
-
-<style>
-    .approve-modal-container {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        max-width: 689px;
-        height: 460px;
-        background-color: var(--sectionSuperior, #ffffff);
-        padding: 4.3rem 0;
-        margin: auto;
-        border-radius: 15px;
-        box-shadow: 1px 3px 20px -2px #00000021;
-        overflow: hidden;
-    }
-
-    .paragraph-approve {
-        margin: 2.82rem 0;
-        text-align: center;
-        line-height: 0.3rem;
-        font-size: 1.13em;
-        color: #000;
-    }
-
-    .title-approve h2 {
-        text-align: center;
-        font-weight: 700;
-        color: #000;
-        font-size: 1.51em;
-    }
-
-    .btn-cancel-atr {
-        display: block;
-        background-color: transparent;
-        color: var(--textButton, #007bff);
-        border: none;
-        font-size: 1.44em;
-        margin: 1.19rem auto;
-        cursor: pointer;
-    }
-
-    .btn-save-atr-approve {
-        display: block;
-        border: solid 1px var(--textButton, #007bff);
-        border-radius: 30px;
-        background-color: var(--textButton, #007bff);
-        line-height: 1rem;
-        font-size: 1.44em;
-        padding: 1.44rem 1.57rem;
-        color: #fff;
-        margin: 4.28rem auto 0;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-        .btn-save-atr-approve:hover {
-            color: var(--textButton, #007bff);
-            background: white;
-            transition: all 0.3s ease;
-        }
-
-    .loading-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: rgba(255, 255, 255, 0.8);
-        z-index: 9999;
-    }
-</style>
