@@ -1,731 +1,899 @@
-﻿@using NutrisBlazor.Components.Shared
-@using NutrisBlazor.Components.Steps
+﻿@using NutrisBlazor.Components.Steps
+@using NutrisBlazor.Models
+@using NutrisBlazor.Services
+@using System.Text.Json
 @inherits OrdersComponentBase
 @inject ILocalizationService Localization
-@using System.Text.Json
-@using NutrisBlazor.Models
-@code {
-    
-}
-
-
+@inject IJSRuntime JSRuntime
 
 @if (IsLoading)
 {
-    <div class="loading-overlay"><div class="spinner"></div></div>
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
 }
 
 <!-- HEADER -->
 <div>
-  <section>
-    <div class="header-order">
-      <div class="hcol1">
-        <div class="row1-1 row">
-          <div class="col1-rh1 col-6">
-            <img alt="logo" style="width:84px;" src="@CustomerLogoUrl">
-          </div>
-          <div class="country-rh1 col-6">
-            <p class="RalewayRegular font-18"> @Localization["orderView.Country"]</p>
-            <div class="d-flex gap-3 justify-content-end align-content-center">
-              <div class="col2-rh1 d-flex justify-content-end">
-                <img src="@CountryFlag1" />
-                <p>@Country1</p>
-              </div>
-              <div class="col2-rh1 d-flex justify-content-end">
-                <img src="@CountryFlag2" />
-                <p>@Country2</p>
-              </div>
-              <div class="col2-rh1 d-flex justify-content-end">
-                <img src="@CountryFlag3" />
-                <p>@Country3</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="row2-1">
-          <div class="col1-rh2 d-flex">
-            <p class="RalewayBold font-21-23"></p>
-            <span><p class="RalewayRegular font-21-23">@Code</p></span>
-          </div>
-        </div>
-
-        <div class="row3-1 row">
-          <div class="col2-rh3 col-6">
-            <p class="RalewayBold font-21-23">@Name</p>
-            <p class="RalewayLight font-21-23">@ProductName2</p>
-          </div>
-          <div class="col3-rh3 col-6">
-            <span class="MulishBold font-21-23"><p>MOQ @MOQ units</p></span>
-            <span><p class="MulishLight font-21-23">@UnitPrice €/ unit</p></span>
-          </div>
-        </div>
-
-        <div class="row mt-3">
-          <div class="steps-row">
-            <StepActiveOne />
-            <StepActiveNew />
-            <StepActiveTwo />
-            <StepActiveThree />
-            <StepActiveFour />
-          </div>
-        </div>
-      </div>
-
-      <!-- col2 -->
-      <div class="hcol2">
-        <div class="rowh1-2 row">
-          <div class="colh1-r1 col-4">
-            <p class="RalewayBold font-16"> @Localization["orderView.NutrisCode1"] <br/> @Localization["orderView.NutrisCode2"]</p>
-          </div>
-          <div class="colh2-r1 col-8 d-flex">
-            <p class="font-28">@NutrisCode</p>
-          </div>
-        </div>
-
-        <div class="rowh3-2 row">
-          <div class="colh2-r3 col-12 d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center justify-content-start">
-              <p class="font-16 RalewayRegular">@Localization["orderView.Estimated"]</p>
-              <div data-bs-toggle="tooltip" data-bs-placement="top">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:24px" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg>
-              </div>
-            </div>
-            <p class="MuseoSemiBold font-18">@EstimatedDateString</p>
-          </div>
-
-          <div class="colh3-r3 col-12 d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center justify-content-start">
-              <p class="font-16 RalewayRegular">@Localization["orderView.Calculated"]</p>
-              <div data-bs-toggle="tooltip" data-bs-placement="top">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:24px" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg>
-            </div>
-            <p class="MuseoSemiBold redDate font-18">@DeadlineDateString</p>
-          </div>
-        </div>
-
-        <div class="rowh4-2">
-          <div class="colh1-r4">
-            <button class="font-20 RalewayRegular" @onclick="ToggleDownloadReports">
-              @Localization["orderView.DownloadReports"]<img class="arrow-download" src="/iconbuttons/download-arrow.svg" alt="download">
-            </button>
-
-            @if (ShowReports)
-            {
-              <div id="container-toggle-h" class="download-t">
-                <ul class="RalewaySemiBold font-20">
-                  @foreach (var f in ReportFiles)
-                  {
-                    <li>
-                      <a class="a" style="cursor:pointer" @onclick="() => DownloadBase64File(f.File, f.Name)">@f.Name</a>
-                    </li>
-                  }
-                </ul>
-              </div>
-            }
-          </div>
-        </div>
-      </div>
-    </div>
-    </div>
-  </section>
-  
-  <!-- SECTION BODY -->
-  <section>
-    <div class="col-b">
-      <div class="row-b">
-
-        <!-- 1. FORMULATION -->
-        <div class="toggle-from">
-          <div class="flex-elm-from row">
-            <div class="left-from col-8 d-flex ">
-              <h2 class="RalewayBold font-24">@Localization["orderView.Formulation"]</h2>
-            </div>
-            <div class="right-from col-4 d-flex gap-1">
-              <div class="line-from"></div>
-              <div><p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledFormulation)%</p></div>
-              <img @onclick="() => ToggleSection(1)" id="id-0" class="arrow-t" src="/img/arrow-close-down.svg" alt="arrow open">
-            </div>
-          </div>
-
-          @if (IsOpen[1])
-          {
-            <div id="container-toggle-1" class="container-toggle">
-              <div class="content-toggle-header">
-                <div class="features-row">
-                  <div class="feature">
-                    <div class="img-icon-tags">
-                      <img class="w-79 h-79" alt="tag" src="@FeatureTagImg">
+    <section>
+        <div class="header-order">
+            <div class="hcol1">
+                <div class="row1-1 row">
+                    <div class="col1-rh1 col-6">
+                        @if (!string.IsNullOrEmpty(CustomerLogoUrl))
+                        {
+                            <img alt="logo" style="width:84px;" src="@CustomerLogoUrl">
+                        }
                     </div>
-                    <div class="paragraph-img-tags">
-                      <p class="font-12 RalewayRegular">@FeatureCheckTitle</p>
-                    </div>
-                    <div class="content-switch">
-                      <label class="switch">
-                        <input type="checkbox" class="check-all" disabled />
-                        <span class="slider"></span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="content-t content-t-pdb">
-                <div class="mb-4">
-                  <p class="font-16">@Localization["Selectingtheseoptions"]</p>
-                </div>
-                <div class="head-t">
-                  <h3 class="font-18 RalewayBold">@Localization["orderView.GUMMYDNA"]</h3>
-                </div>
-
-                <div class="body-t">
-                  <div class="body-td">
-                    <p class="font-18 RalewayRegular">@GummyListInputBn</p>
-                    <div class="data-t">
-                      <input class="font-20 RalewayRegular" type="text" readonly value="@GummyListInputBnValue">
-                      <div class="line-from"></div>
-                      <img src="/img/check-icon.svg" alt="check">
-                    </div>
-                  </div>
-
-                  <div class="body-td">
-                    <p class="font-18 RalewayRegular">@GummyListInputB</p>
-                    <div class="data-t">
-                      <input class="font-20 RalewayRegular" type="text" readonly value="@GummyListInputBValue">
-                      <div class="line-from"></div>
-                      <img src="/img/check-icon.svg" alt="check">
-                    </div>
-                  </div>
-
-                  <div class="body-td" id="body-td-gommy">
-                    <p class="font-18 RalewayRegular">@Localization["orderView.Shape"]</p>
-                    <div class="data-t">
-                      <div class="flex-gomi">
-                        <div class="gomi-img">
-                          <img alt="gummy" src="@GummyShapeImg">
-                        </div>
-                        <div class="gomi-content" id="important-gomi">
-                          <h3 class="font-20 MulishBold">@Shape</h3>
-                          <span><p class="font-16 RalewayRegular">@Localization["orderView.TextInfoGummy"]</p></span>
-                        </div>
-                      </div>
-                      <div class="line-from" id="line-from-gommy"></div>
-                      <img src="/img/check-icon.svg" alt="check">
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- The Recipe -->
-              <div class="content-t content-t-pdb">
-                <div class="head-t mb-3">
-                  <h3 class="font-18 RalewayBold">@Localization["orderView.TheRecipe"]</h3>
-                </div>
-                <div class="body-t-flex header-row">
-                  <div class="body-data"><p class="RalewayBold font-14">@Localization["orderView.Active"]</p></div>
-                  <div class="body-data"><p class="RalewayBold font-14">@Localization["orderView.SourceUsed"]}</p></div>
-                  <div class="body-data"><p class="RalewayBold font-14">@Localization["orderView.QuantityServing"]</p></div>
-                  <div class="body-data"><p class="RalewayBold font-14">% EU RDA</p></div>
-                </div>
-
-                @foreach (var r in RecipeRows)
-                {
-                  <div class="d-flex gap-lg-4 data-row">
-                    <div class="body-data pb-lg-4">
-                      <input type="text" readonly class="font-14 w-100" value="@r.Active">
-                    </div>
-                    <div class="body-data">
-                      <input type="text" readonly class="font-14" value="@r.SourceUsed">
-                    </div>
-                    <div class="body-data">
-                      <input type="text" readonly class="font-14" value="@r.QuantityServing">
-                    </div>
-                    <div class="body-data">
-                      <input type="text" readonly class="font-14" value="@r.RdaEu">
-                    </div>
-                  </div>
-                }
-              </div>
-
-              <!-- Nutris Comments -->
-              <div class="content-t content-t-pdb">
-                <div class="head-t"><h3 class="font-18 RalewayBold">@Localization["orderView.NutrisComments"]</h3></div>
-                <div class="comments-area">
-                  <textarea class="font-16 RalewayRegular" readonly rows="10" style="background:#f1f1f1">@NutrisComments</textarea>
-                </div>
-              </div>
-
-              <!-- Test -->
-              <div class="content-t content-t-pdb">
-                <div class="content-td">
-                  <h3 class="font-18 RalewayBold">@Localization["orderView.DoYouNeedATest"]</h3>
-                  <p class="font-16 RalewayRegular">@Localization["orderView.TextAccept"]</p>
-                  <div class="content-td-flex check-from-label">
-                    <input type="checkbox"
-                           style="cursor:pointer"
-                           @bind="TakeSample"
-                           @bind:after="OnTakeSampleChanged" />
-                    <p><span class="RalewayBold font-18">@Localization["orderView.TakeSampleInLaborator"]</span>
-                      <span class="font-18 fontWeight300">(€ @TakeSamplePrice)</span></p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="btn-atr">
-                <div class="btn-save-atr">
-                  <button class="btn-save-atr font-20 RalewayRegular">@Localization["Approved"]</button>
-                </div>
-                <div>
-                  <button data-bs-toggle="modal" data-bs-target="#approveModal" class="btn-save-atr font-20 RalewayRegular">@Localization["orderView.ApproveTheRecipe"]</button>
-                  <div class="paragraph-customize d-flex justify-content-end">
-                    <p class="font-16 RalewayRegular width384">@Localization["orderView.TextInformative"]</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-
-        <!-- 2. PACKAGING / ENVASADO -->
-        <div>
-          <div class="toggle-from m-top-toggle">
-            <div class="flex-elm-from row">
-              <div class="left-from col-8 d-flex">
-                <h2 class="RalewayBold font-24">Packaging/Envasado</h2>
-              </div>
-              <div class="right-from col-4 d-flex gap-1">
-                <div class="line-from"></div>
-                <div><p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledBottle)%</p></div>
-                <img @onclick="() => ToggleSection(2)" id="id-1" class="arrow-t" src="/img/arrow-close-down.svg" alt="arrow open">
-              </div>
-            </div>
-
-            @if (IsOpen[2])
-            {
-              <div id="container-toggle-2" class="container-toggle">
-
-                <div class="content-t content-t-pdb">
-                  <div class="body-t">
-                    <div class="body-td">
-                      <div class="d-flex gap-1">
-                        <p class="font-18 RalewayRegular">@Localization["orderView.TraddeName"]</p>
-                        <div data-bs-toggle="tooltip" data-bs-placement="top">
-                          <svg xmlns="http://www.w3.org/2000/svg" style="width:24px" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg>
-                        </div>
-                      </div>
-                      <div class="data-t">
-                        <input class="font-20 RalewayRegular" type="text" @bind="ProductName2" />
-                        <button @onclick="SaveName" class="btn-t RalewayMedium font-20" type="button">@Localization["orderView.Save"]</button>
-                        <div class="line-from d-none d-xl-block"></div>
-                        <img src="/img/check-icon.svg" alt="check" class="d-none d-xl-block">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row content-t justify-content-center">
-                  <div class="col-12 col-xl-10">
-                    <div class="content-t-pdb">
-                      <div class="head-t"><h3 class="font-18 RalewayExtraBold">@BottleType</h3></div>
-
-                      <div class="d-xl-flex gap-4 align-items-center w-100">
-                        <div class="body-t body-t-bottle">
-                          <div class="body-td">
-                            <p class="font-18 RalewayRegular">@Localization["orderView.BottleA[0]"]</p>
-                            <div class="data-t">
-                              <span><p class="font-20 RalewayBold">@BottleDesc</p></span>
-                              <div class="line-from"></div>
-                              <img src="/img/check-icon.svg" alt="check">
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="bottle-img"><img alt="bottle" src="@BottleImg"><p>-</p></div>
-
-                        <div class="d-flex d-xl-none btn-edit-bottle col-12 col-lg-2 content-t-button d-flex align-items-center w-100" style="height:180px;">
-                          <button class="btn-t RalewayMedium font-20" type="button" data-bs-toggle="modal" data-bs-target="#sidebarRightModal3">
-                            <img src="/img/pencil-icon.svg" alt="edit">@Localization["Edit"]
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div class="head-t"><h3 class="font-18 RalewayExtraBold">@Localization["orderView.FillingInstructions"]</h3></div>
-                      <div class="d-lg-flex gap-4 justify-content-center">
-
-                        <div class="body-t body-t-filling body-t-bottle">
-                          <div class="body-td">
-                            <p class="font-18 RalewayRegular">@Localization["orderView.Batch"]</p>
-                            <div class="data-t">
-                              <select class="font-20 RalewayRegular form-select" @bind="FillingBatch" @bind:after="SaveBatch">
-                                @foreach (var opt in BatchFormats)
-                                {
-                                  <option value="@opt.Format">@opt.Format</option>
-                                }
-                              </select>
-                              <input type="text" class="font-20 RalewayRegular mt-2" maxlength="12" @bind="FillingBatchOther" />
-                              <button class="btn-t RalewayMedium font-16 ml-2" type="button" @onclick="SaveBatchOther">
-                                <span>@(IsSendingBatchOther ? "Enviando..." : "Enviar")</span>
-                              </button>
-                              <div class="line-from"></div>
-                              <img src="/img/check-icon.svg" alt="check">
-                            </div>
-                          </div>
-
-                          <div class="body-td">
-                            <p class="font-18 RalewayRegular">@Localization["orderView.ExpDate"]</p>
-                            <div class="data-t">
-                              <select class="font-20 RalewayRegular form-select" @bind="FillingExpDate" @bind:after="SaveBbd">
-                                @foreach (var opt in BbdFormats)
-                                {
-                                  <option value="@opt.Format">@opt.Format</option>
-                                }
-                              </select>
-                              <input type="text" class="font-20 RalewayRegular mt-2" maxlength="12" @bind="FillingExpDateOther" />
-                              <button class="btn-t RalewayMedium font-16 ml-2" type="button" @onclick="SaveBbdOther">
-                                <span>@(IsSendingBbdOther ? "Enviando..." : "Enviar")</span>
-                              </button>
-                              <div class="line-from"></div>
-                              <img src="/img/check-icon.svg" alt="check">
-                            </div>
-                          </div>
-
-                          <div class="body-td">
-                            <p class="font-18 RalewayRegular">@Localization["orderView.Location"]</p>
-                            <div class="data-t">
-                              <input type="text" readonly class="font-20 RalewayRegular" value="@FillingLocation">
-                              <div class="line-from"></div>
-                              <img src="/img/check-icon.svg" alt="check">
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="bottle-img-1">
-                          <img src="/img/bottle-instructions.png" alt="instructions">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="d-none d-xl-flex btn-edit-bottle col-12 col-lg-2 content-t-button align-items-end" style="height:180px;">
-                    <button class="btn-t RalewayMedium font-20" type="button" data-bs-toggle="modal" data-bs-target="#sidebarRightModal3">
-                      <img src="/img/pencil-icon.svg" alt="edit"> {{ Edit }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-
-        <!-- 3. LABEL -->
-        <div class="toggle-from m-top-toggle">
-          <div class="flex-elm-from row">
-            <div class="left-from col-8 d-flex">
-              <h2 class="RalewayBold font-24">@Localization["orderView.Label"]</h2>
-              <div class="l-data-from d-flex">
-                <div class="d-flex gap-1 check-from-label-2 ml-0 justify-content-center align-items-center">
-                  <input type="checkbox" @bind="NoLabel" @bind:after="OnNoLabelChanged" />
-                  <label class="RalewayBold font-18">@Localization["orderView.NoLabel"]</label>
-                </div>
-              </div>
-            </div>
-            <div class="right-from col-4 d-flex gap-1">
-              <div class="line-from"></div>
-              <div><p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledLabel)%</p></div>
-              <img @onclick="() => ToggleSection(3)" id="id-2" class="arrow-t" src="/img/arrow-close-down.svg" alt="arrow open">
-            </div>
-          </div>
-
-          @if (IsOpen[3])
-          {
-            <div id="container-toggle-3" class="container-toggle">
-              <div class="content-t">
-                <div class="head-t">
-                  <h3 class="font-18 RalewayExtraBold">@Localization["orderView.GUMMYDNA"]</h3>
-                  <button class="btn-t RalewayMedium font-20" type="button" data-bs-toggle="modal" data-bs-target="#sidebarRightModal2">
-                    <img src="/img/pencil-icon.svg" alt="edit">@Localization["Edit"]
-                  </button>
-                </div>
-
-                <div class="body-t body-nb-t">
-                  <div class="body-td">
-                    <p class="font-18 RalewayRegular">@Localization["orderView.GUMMYDNAL[0]"]</p>
-                    <div class="data-t">
-                      <span><p class="font-20 RalewayBold">@GummyDnaDesc</p></span>
-                      <div class="line-from"></div>
-                      <img src="/img/check-icon.svg" alt="check">
-                    </div>
-                  </div>
-
-                  <div class="body-td">
-                    <p class="font-18 RalewayRegular">@Localization["orderView.Labe"]</p>
-                    <div class="data-t">
-                      <img alt="label" class="w-100" src="@LabelImageUrl">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-
-        <!-- 4. PALLETIZING -->
-        <div class="toggle-from m-top-toggle">
-          <div class="flex-elm-from row">
-            <div class="left-from col-8 d-flex">
-              <h2 class="RalewayBold font-24">@Localization["orderView.Palettizing"]</h2>
-            </div>
-            <div class="right-from col-4 d-flex gap-1">
-              <div class="line-from"></div>
-              <div><p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledPalettizing)%</p></div>
-              <img @onclick="() => ToggleSection(4)" id="id-3" class="arrow-t" src="/img/arrow-close-down.svg" alt="arrow open">
-            </div>
-          </div>
-
-          @if (IsOpen[4])
-          {
-            <div id="container-toggle-4" class="container-toggle">
-              <div class="content-t content-t-pdb">
-                <div class="head-t"><h3 class="font-18 RalewayBold">@Localization["orderView.BOXLABEL"]</h3></div>
-                <div class="body-t">
-                  <div class="body-td">
-                    <p class="font-18 RalewayRegular">@Localization["orderView.Pallet[0]"]</p>
-                    <div class="data-t">
-                      <input class="RalewayRegular font-20" type="text" readonly value="@PalletBoxName">
-                      <div class="line-from"></div>
-                      <img src="/img/check-icon.svg" alt="check">
-                    </div>
-                  </div>
-
-                  <div class="body-td" id="body-td-pallet">
-                    <p class="font-18 RalewayRegular w-100">@Localization["orderView.BoxLabel"]</p>
-                    <div class="data-t">
-                      <div class="tags-pallet">
-                        <div class="tag-flex">
-                          <div class="tag-pallet-text">
-                            <p class="RalewayRegular font-16">@Localization["orderView.Size"] A8</p>
-                          </div>
-                          <div class="tags-pallet-img">
-                            <img alt="tags" style="width:18.5rem;" src="@BoxLabelImg">
-                            <p>-</p>
-                          </div>
-                        </div>
-                        <div>
-                          <div class="btn-pallet-tag">
-                            <button class="btn-t font-20 RalewayMedium" type="button" data-bs-toggle="modal" data-bs-target="#BoxLabelImagen">
-                              <img src="/img/pencil-icon.svg" alt="edit"> @Localization["orderView.Personalize"]
-                            </button>
-                          </div>
-                          <div class="desc-pallet d-flex justify-content-end text-end">
-                            <p class="font-16 RalewayRegular">@Localization["orderView.PersonalizeText"]</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              <div class="content-t content-t-pdb">
-                <div class="head-t"><h3 class="font-18 RalewayBold">@Localization["orderView.PALLETIZING"]</h3></div>
-                <div class="body-t">
-                  <div class="body-td">
-                    <p class="font-18 RalewayRegular">@Localization["orderView.PALLETIZINGINFORMATION[0]"]</p>
-                    <div class="data-t">
-                      <input class="font-20 RalewayRegular" type="text" readonly value="@PalletizingInfo">
-                      <div class="line-from"></div>
-                      <img src="/img/check-icon.svg" alt="check">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="body-td" id="body-td-pallet">
-                  <p class="font-18 RalewayRegular">@Localization["orderView.PalletLabel"]</p>
-                  <div class="data-t">
-                    <div class="tags-pallet">
-                      <div class="tag-flex">
-                        <div class="tag-pallet-text"></div>
-                        <div class="tags-pallet-img">
-                          <img style="width:18.5rem;" alt="tags" src="@PalletLabelImg">
-                          <p>-</p>
-                        </div>
-                      </div>
-                      <div>
-                        <div class="btn-pallet-tag">
-                          <button class="btn-t font-20 RalewayMedium" type="button" data-bs-toggle="modal" data-bs-target="#PalletLabelImagen">
-                            <img src="/iconbuttons/plus-icon.svg" alt="edit">@Localization["orderView.ExtraLabel"]
-                          </button>
-                        </div>
-                        <div class="desc-pallet-1">
-                          <p class="font-16 RalewayRegular">@Localization["orderView.ExtraLabelText"]</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              <div class="content-t">
-                <div class="head-t d-flex justify-content-start gap-1 align-items-center">
-                  <h3 class="font-18 RalewayBold mb-0">@Localization["orderView.CommentsPale"]</h3>
-                  <div data-bs-toggle="tooltip" data-bs-placement="top">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:24px" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
-                    </svg>
-                  </div>
-                </div>
-                <div class="comments-area row gap-4">
-                  <textarea class="font-16 col-9" rows="10" @bind="PalletComments"></textarea>
-                  <div class="col-2">
-                    <button @onclick="SavePalletComments" class="btn-t font-20 RalewayMedium">@Localization["orderView.Send"]</button>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          }
-        </div>
-
-        <!-- 5. OTHER REQUIREMENTS -->
-        <div class="toggle-from m-top-toggle">
-          <div class="flex-elm-from row">
-            <div class="left-from col-8 d-flex">
-              <h2 class="RalewayBold font-24">@Localization["orderView.OtherRequirements"]</h2>
-              <div class="l-data-from d-flex">
-                <div class="d-flex gap-1 check-from-label-2 ml-0 justify-content-center align-items-center">
-                  <input type="checkbox" @bind="NoAnalytics" @bind:after="OnNoAnalyticsChanged" />
-                  <label class="RalewayBold font-18">@Localization["orderView.NoAnalytics"]</label>
-                </div>
-              </div>
-            </div>
-            <div class="right-from col-4 d-flex gap-1">
-              <div class="line-from"></div>
-              <div><p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledAnalytics)%</p></div>
-              <img @onclick="() => ToggleSection(5)" id="id-4" class="arrow-t" src="/img/arrow-close-down.svg" alt="arrow open">
-            </div>
-          </div>
-
-          @if (IsOpen[5])
-          {
-            <div id="container-toggle-5" class="container-toggle">
-              @if (!NoAnalytics)
-              {
-                <div class="content-t-2" id="content-t-other">
-                  <div class="head-t"><h3 class="font-18 RalewayBold">@Localization["orderView.ANALYTICS"]</h3></div>
-
-                  <div class="content-others">
-                    <div class="body-t w-full">
-                      <div class="table-responsive">
-                        <table class="table table-borderless w-100">
-                          <thead class="text-table-th">
-                            <th colspan="2" class="p-1">@Localization["orderView.Type"]</th>
-                            <th class="p-1">@Localization["orderView.Quantity"]</th>
-                            <th class="p-1">@Localization["orderView.Source"]</th>
-                            <th class="p-1">@Localization["orderView.Analitycs"]</th>
-                            <th class="p-1">@Localization["orderView.Periodicity"]</th>
-                            <th class="p-1">@Localization["orderView.Observation"]</th>
-                          </thead>
-                          <tbody>
-                          @foreach (var a in AnalyticsRows)
-                          {
-                            <tr class="text-table-td RalewayRegular">
-                              <td class="font-12" colspan="2">@a.Active</td>
-                              <td class="font-12">@a.Quantity</td>
-                              <td class="font-12">@a.Source</td>
-                              <td class="text-center font-12">
-                                <div class="check-from-label-2 ml-0 justify-content-center">
-                                  <input type="checkbox" checked="@a.Analytics" disabled />
+                    <div class="country-rh1 col-6">
+                        <p class="RalewayRegular font-18">@Localization["orderView.Country"]</p>
+                        <div class="d-flex gap-3 justify-content-end align-content-center">
+                            @if (!string.IsNullOrEmpty(Country1))
+                            {
+                                <div class="col2-rh1 d-flex justify-content-end">
+                                    <img src="@CountryFlag1" alt="@Country1" />
+                                    <p>@Country1</p>
                                 </div>
-                              </td>
-                              <td><input type="text" class="form-control font-12" readonly value="@a.Periodicity" /></td>
-                              <td><input type="text" class="form-control font-12" readonly value="@a.Observations" /></td>
-                            </tr>
-                          }
-                          </tbody>
-                        </table>
-                      </div>
-
-                      <div id="body-t-other">
-                        <div class="line-f"></div>
-                        <div class="body-td" id="body-td-other-2">
-                          <p>@Localization["orderView.TOTALPRICE"]</p>
-                          <div class="data-t" id="data-t-other">
-                            <p class="font-20">@SumAnalytics€</p>
-                          </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Country2) && Country2 != "-")
+                            {
+                                <div class="col2-rh1 d-flex justify-content-end">
+                                    <img src="@CountryFlag2" alt="@Country2" />
+                                    <p>@Country2</p>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Country3) && Country3 != "-")
+                            {
+                                <div class="col2-rh1 d-flex justify-content-end">
+                                    <img src="@CountryFlag3" alt="@Country3" />
+                                    <p>@Country3</p>
+                                </div>
+                            }
                         </div>
-                        <div class="text-f-other" id="body-td-other-f-1">
-                          <p class="font-16 RalewayBold">@Localization["orderView.TOTALPRICETEXT"]</p>
-                        </div>
-                      </div>
                     </div>
-                  </div>
                 </div>
-              }
-              else
-              {
-                <div class="content-t-2" style="min-height:40px;display:flex;align-items:center;justify-content:center;">
-                  <span class="font-16 RalewayRegular">Sin analíticas</span>
+
+                <div class="row2-1">
+                    <div class="col1-rh2 d-flex">
+                        <p class="RalewayBold font-21-23"></p>
+                        <span><p class="RalewayRegular font-21-23">@Code</p></span>
+                    </div>
                 </div>
-              }
+
+                <div class="row3-1 row">
+                    <div class="col2-rh3 col-6">
+                        <p class="RalewayBold font-21-23">@Name</p>
+                        <p class="RalewayLight font-21-23">@ProductName2</p>
+                    </div>
+                    <div class="col3-rh3 col-6">
+                        <span class="MulishBold font-21-23"><p>MOQ @MOQ units</p></span>
+                        <span><p class="MulishLight font-21-23">@UnitPrice €/ unit</p></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="steps-row">
+                        <StepActiveOne Background="@GetStepColor(1)" Color="@GetStepTextColor(1)" />
+                        <StepActiveNew Background="@GetStepColor(5)" Color="@GetStepTextColor(5)" />
+                        <StepActiveTwo Background="@GetStepColor(2)" Color="@GetStepTextColor(2)" />
+                        <StepActiveThree Background="@GetStepColor(3)" Color="@GetStepTextColor(3)" />
+                        <StepActiveFour Background="@GetStepColor(4)" Color="@GetStepTextColor(4)" />
+                    </div>
+                </div>
             </div>
-          }
+
+            <!-- col2 -->
+            <div class="hcol2">
+                @if (Status == "Cerrado Cliente" || Status == "Cerrado cliente y calidad")
+                {
+                    <div class="rowh1-2 row">
+                        <div class="colh1-r1 col-4">
+                            <p class="RalewayBold font-16">
+                                @Localization["orderView.NutrisCode1"]<br />
+                                @Localization["orderView.NutrisCode2"]
+                            </p>
+                        </div>
+                        <div class="colh2-r1 col-8 d-flex">
+                            <p class="font-28">@NutrisCode</p>
+                        </div>
+                    </div>
+                }
+
+                <div class="rowh3-2 row">
+                    <div class="colh2-r3 col-12 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center justify-content-start">
+                            <p class="font-16 RalewayRegular">@Localization["orderView.Estimated"]</p>
+                            <div data-bs-toggle="tooltip" data-bs-placement="top" title="@Localization["orderView.EstimatedTooltip"]">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:24px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="MuseoSemiBold font-18">@EstimatedDateString</p>
+                    </div>
+
+                    <div class="colh3-r3 col-12 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center justify-content-start">
+                            <p class="font-16 RalewayRegular">@Localization["orderView.Calculated"]</p>
+                            <div data-bs-toggle="tooltip" data-bs-placement="top" title="@Localization["orderView.CalculatedTooltip"]">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:24px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="MuseoSemiBold redDate font-18">@DeadlineDateString</p>
+                    </div>
+                </div>
+
+                @if (ReportFiles.Any())
+                {
+                    <div class="rowh4-2">
+                        <div class="colh1-r4">
+                            <button class="font-20 RalewayRegular" @onclick="ToggleDownloadReports">
+                                @Localization["orderView.DownloadReports"]
+                                <img class="arrow-download @(ShowReports ? "arrow-t-r" : "")" src="/iconbuttons/download-arrow.svg" alt="download">
+                            </button>
+
+                            @if (ShowReports)
+                            {
+                                <div id="container-toggle-h" class="download-t active">
+                                    <ul class="RalewaySemiBold font-20">
+                                        @foreach (var f in ReportFiles)
+                                        {
+                                            <li>
+                                                <a class="a" style="cursor:pointer" @onclick="() => DownloadBase64File(f.File, f.Name)">@f.Name</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
+    </section>
 
-      </div>
-    </div>
+    <!-- SECTION BODY -->
+    <section>
+        <div class="col-b">
+            <div class="row-b">
 
-    <div class="btn-atr-confirm d-flex justify-content-end">
-      <button data-bs-toggle="modal" data-bs-target="#confirmModal" class="RalewayRegular font-20">
-        @Localization["orderView.ConfirmProductAndSign"]
-      </button>
-    </div>
-  </section>
+                <!-- 1. FORMULATION -->
+                <div class="toggle-from">
+                    <div class="flex-elm-from row">
+                        <div class="left-from col-8 d-flex">
+                            <h2 class="RalewayBold font-24">@Localization["orderView.Formulation"]</h2>
+                        </div>
+                        <div class="right-from col-4 d-flex gap-1">
+                            <div class="line-from"></div>
+                            <div class="@(PercentFilledFormulation == 0 ? "progress-bar-from-0" : "progress-bar-from")">
+                                <p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledFormulation)%</p>
+                            </div>
+                            <img @onclick="() => ToggleSection(1)" id="id-0" 
+                                 class="arrow-t @(IsOpen[1] ? "arrow-t-r" : "")" 
+                                 src="/img/arrow-close-down.svg" alt="arrow open">
+                        </div>
+                    </div>
 
-  <!-- Modales (ya existentes en tu proyecto) -->
-  <ApproveModal />
-  <UploadTagModal />
-  <ConfirmModal OnConfirm="HandleConfirm" />
-  <thankYou/>
-  <PalletLabelImagen OnUpdated="HandlePalletLabelUpdated" />
-  <BoxLabelImagen OnUpdated="HandleBoxLabelUpdated" />
-  <ModalLabel OnLabelOptionsUpdated="HandleLabelOptionsUpdated" OnDraftLabelUpdated="HandleDraftLabelUpdated" />
-  <BoteCapData />
+                    @if (IsOpen[1])
+                    {
+                        <div id="container-toggle-1" class="container-toggle active">
+                            <div class="content-toggle-header">
+                                <div class="features-row">
+                                    @for (int i = 0; i < 4; i++)
+                                    {
+                                        var idx = i;
+                                        <div class="feature">
+                                            <div class="img-icon-tags">
+                                                <img class="w-79 h-79" alt="tag" src="@GetFeatureImage(idx)">
+                                            </div>
+                                            <div class="paragraph-img-tags">
+                                                <p class="font-12 RalewayRegular">@GetFeatureTitle(idx)</p>
+                                            </div>
+                                            <div class="content-switch">
+                                                <label class="switch">
+                                                    <input type="checkbox" class="check-all" checked="@GetSwitchValue(idx)" disabled />
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="content-t content-t-pdb">
+                                <div class="mb-4">
+                                    <p class="font-16">@Localization["Selectingtheseoptions"]</p>
+                                </div>
+                                <div class="head-t">
+                                    <h3 class="font-18 RalewayBold">@Localization["orderView.GUMMYDNA"]</h3>
+                                </div>
+
+                                <div class="body-t">
+                                    <!-- Base, Sugar, Cover -->
+                                    @foreach (var item in GummyListBn)
+                                    {
+                                        <div class="body-td">
+                                            <p class="font-18 RalewayRegular">@item.Label</p>
+                                            <div class="data-t">
+                                                <input class="font-20 RalewayRegular" type="text" readonly value="@item.Value">
+                                                <div class="line-from"></div>
+                                                @if (item.Value != "-")
+                                                {
+                                                    <img src="/img/check-icon.svg" alt="check">
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <!-- Color, Flavour, Size, Serving -->
+                                    @foreach (var item in GummyListB)
+                                    {
+                                        <div class="body-td">
+                                            <p class="font-18 RalewayRegular">@item.Label</p>
+                                            <div class="data-t">
+                                                <input class="font-20 RalewayRegular" type="text" readonly value="@item.Value">
+                                                <div class="line-from"></div>
+                                                @if (item.Value != "-")
+                                                {
+                                                    <img src="/img/check-icon.svg" alt="check">
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <!-- Shape -->
+                                    <div class="body-td" id="body-td-gommy">
+                                        <p class="font-18 RalewayRegular">@Localization["orderView.Shape"]</p>
+                                        <div class="data-t">
+                                            <div class="flex-gomi">
+                                                @if (!string.IsNullOrEmpty(GummyShapeImg))
+                                                {
+                                                    <div class="gomi-img">
+                                                        <img alt="gummy" src="@GummyShapeImg">
+                                                    </div>
+                                                }
+                                                <div class="gomi-content" id="important-gomi">
+                                                    <h3 class="font-20 MulishBold">@Shape</h3>
+                                                    <span><p class="font-16 RalewayRegular">@Localization["orderView.TextInfoGummy"]</p></span>
+                                                </div>
+                                            </div>
+                                            <div class="line-from" id="line-from-gommy"></div>
+                                            @if (!string.IsNullOrEmpty(GummyShapeImg))
+                                            {
+                                                <img src="/img/check-icon.svg" alt="check">
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- The Recipe -->
+                            <div class="content-t content-t-pdb">
+                                <div class="head-t mb-3">
+                                    <h3 class="font-18 RalewayBold">@Localization["orderView.TheRecipe"]</h3>
+                                </div>
+                                <div class="body-t-flex header-row">
+                                    <div class="body-data"><p class="RalewayBold font-14">@Localization["orderView.Active"]</p></div>
+                                    <div class="body-data"><p class="RalewayBold font-14">@Localization["orderView.SourceUsed"]</p></div>
+                                    <div class="body-data"><p class="RalewayBold font-14">@Localization["orderView.QuantityServing"]</p></div>
+                                    <div class="body-data"><p class="RalewayBold font-14">% EU RDA</p></div>
+                                </div>
+
+                                @foreach (var r in RecipeRows)
+                                {
+                                    <div class="d-flex gap-lg-4 data-row">
+                                        <div class="body-data pb-lg-4">
+                                            <input type="text" readonly class="font-14 w-100" value="@r.Active">
+                                        </div>
+                                        <div class="body-data">
+                                            <input type="text" readonly class="font-14" value="@r.SourceUsed">
+                                        </div>
+                                        <div class="body-data">
+                                            <input type="text" readonly class="font-14" value="@r.QuantityServing">
+                                        </div>
+                                        <div class="body-data">
+                                            <input type="text" readonly class="font-14" value="@r.RdaEu">
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Nutris Comments -->
+                            <div class="content-t content-t-pdb">
+                                <div class="head-t">
+                                    <h3 class="font-18 RalewayBold">@Localization["orderView.NutrisComments"]</h3>
+                                </div>
+                                <div class="comments-area">
+                                    <textarea class="font-16 RalewayRegular" readonly rows="10">@NutrisComments</textarea>
+                                </div>
+                            </div>
+
+                            <!-- Test -->
+                            <div class="content-t content-t-pdb">
+                                <div class="content-td">
+                                    <h3 class="font-18 RalewayBold">@Localization["orderView.DoYouNeedATest"]</h3>
+                                    <p class="font-16 RalewayRegular">@Localization["orderView.TextAccept"]</p>
+                                    <div class="content-td-flex check-from-label">
+                                        <input type="checkbox"
+                                               style="cursor:pointer"
+                                               @bind="TakeSample"
+                                               @bind:after="OnTakeSampleChanged"
+                                               disabled="@(CustomerAccepted || Status == "Cerrado cliente y calidad")" />
+                                        <p>
+                                            <span class="RalewayBold font-18">@Localization["orderView.TakeSampleInLaboratory"]</span>
+                                            <span class="font-18 fontWeight300">(€ @TakeSamplePrice)</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="btn-atr">
+                                @if (CustomerAccepted)
+                                {
+                                    <div class="btn-save-atr">
+                                        <button class="btn-save-atr font-20 RalewayRegular">@Localization["Approved"]</button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div>
+                                        <button data-bs-toggle="modal" data-bs-target="#approveModal" class="btn-save-atr font-20 RalewayRegular">
+                                            @Localization["orderView.ApproveTheRecipe"]
+                                        </button>
+                                        <div class="paragraph-customize d-flex justify-content-end">
+                                            <p class="font-16 RalewayRegular width384">@Localization["orderView.TextInformative"]</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (CustomerAccepted && Prefix == "RG35")
+                {
+                    <!-- 2. PACKAGING / ENVASADO -->
+                    @if (ProductType == "Bote")
+                    {
+                        <div class="toggle-from m-top-toggle">
+                            <div class="flex-elm-from row">
+                                <div class="left-from col-8 d-flex">
+                                    <h2 class="RalewayBold font-24">Packaging/Envasado</h2>
+                                </div>
+                                <div class="right-from col-4 d-flex gap-1">
+                                    <div class="line-from"></div>
+                                    <div class="@(PercentFilledBottle == 0 ? "progress-bar-from-0" : "progress-bar-from")">
+                                        <p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledBottle)%</p>
+                                    </div>
+                                    <img @onclick="() => ToggleSection(2)" id="id-1" 
+                                         class="arrow-t @(IsOpen[2] ? "arrow-t-r" : "")" 
+                                         src="/img/arrow-close-down.svg" alt="arrow open">
+                                </div>
+                            </div>
+
+                            @if (IsOpen[2])
+                            {
+                                <div id="container-toggle-2" class="container-toggle active">
+                                    <div class="content-t content-t-pdb">
+                                        <div class="body-t">
+                                            <div class="body-td">
+                                                <div class="d-flex gap-1">
+                                                    <p class="font-18 RalewayRegular">@Localization["orderView.TraddeName"]</p>
+                                                    <div data-bs-toggle="tooltip" data-bs-placement="top" title="@Localization["orderView.TraddeNameTooltip"]">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" style="width:24px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="data-t">
+                                                    <input class="font-20 RalewayRegular" type="text" @bind="ProductName2" />
+                                                    @if (!CustomerAccepted && Status == "Desarrollo")
+                                                    {
+                                                        <button @onclick="SaveName" class="btn-t RalewayMedium font-20" type="button">
+                                                            @Localization["orderView.Save"]
+                                                        </button>
+                                                    }
+                                                    <div class="line-from d-none d-xl-block"></div>
+                                                    @if (ProductName2 != "-")
+                                                    {
+                                                        <img src="/img/check-icon.svg" alt="check" class="d-none d-xl-block">
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row content-t justify-content-center">
+                                        <div class="col-12 col-xl-10">
+                                            <div class="content-t-pdb">
+                                                <div class="head-t">
+                                                    <h3 class="font-18 RalewayExtraBold">@ProductType</h3>
+                                                </div>
+                                                <div class="d-xl-flex gap-4 align-items-center w-100">
+                                                    <div class="body-t body-t-bottle">
+                                                        @foreach (var item in BottleInfo)
+                                                        {
+                                                            <div class="body-td">
+                                                                <p class="font-18 RalewayRegular">@item.Label</p>
+                                                                <div class="data-t">
+                                                                    <span><p class="font-20 RalewayBold">@item.Value</p></span>
+                                                                    @if (item.Value != "-")
+                                                                    {
+                                                                        <div class="line-from"></div>
+                                                                        <img src="/img/check-icon.svg" alt="check">
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+
+                                                    <div class="bottle-img">
+                                                        @if (!string.IsNullOrEmpty(BottleImg))
+                                                        {
+                                                            <img alt="bottle" src="@BottleImg">
+                                                        }
+                                                        else
+                                                        {
+                                                            <p>-</p>
+                                                        }
+                                                    </div>
+
+                                                    @if (Status == "Desarrollo")
+                                                    {
+                                                        <div class="d-flex d-xl-none btn-edit-bottle col-12 col-lg-2 content-t-button d-flex align-items-center w-100" style="height:180px;">
+                                                            <button class="btn-t RalewayMedium font-20" type="button" data-bs-toggle="modal" data-bs-target="#sidebarRightModal3">
+                                                                <img src="/img/pencil-icon.svg" alt="edit">@Localization["Edit"]
+                                                            </button>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div class="head-t">
+                                                    <h3 class="font-18 RalewayExtraBold">@Localization["orderView.FillingInstructions"]</h3>
+                                                </div>
+                                                <div class="d-lg-flex gap-4 justify-content-center">
+                                                    <div class="body-t body-t-filling body-t-bottle">
+                                                        <!-- Batch -->
+                                                        <div class="body-td">
+                                                            <p class="font-18 RalewayRegular">@Localization["orderView.Batch"]</p>
+                                                            <div class="data-t">
+                                                                <select class="font-20 RalewayRegular form-select" @bind="FillingBatch" @bind:after="SaveBatch">
+                                                                    @foreach (var opt in BatchFormats)
+                                                                    {
+                                                                        <option value="@opt.Format">@opt.Format</option>
+                                                                    }
+                                                                </select>
+                                                                @if (FillingBatch?.StartsWith("OTHER") == true)
+                                                                {
+                                                                    <input type="text" class="font-20 RalewayRegular mt-2" maxlength="12" 
+                                                                           @bind="FillingBatchOther" />
+                                                                    <button class="btn-t RalewayMedium font-16 ml-2" type="button" 
+                                                                            @onclick="SaveBatchOther" disabled="@IsSendingBatchOther">
+                                                                        <span>@(IsSendingBatchOther ? "Enviando..." : "Enviar")</span>
+                                                                    </button>
+                                                                }
+                                                                @if (FillingBatch != "-")
+                                                                {
+                                                                    <div class="line-from"></div>
+                                                                    <img src="/img/check-icon.svg" alt="check">
+                                                                }
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Exp Date -->
+                                                        <div class="body-td">
+                                                            <p class="font-18 RalewayRegular">@Localization["orderView.ExpDate"]</p>
+                                                            <div class="data-t">
+                                                                <select class="font-20 RalewayRegular form-select" @bind="FillingExpDate" @bind:after="SaveBbd">
+                                                                    @foreach (var opt in BbdFormats)
+                                                                    {
+                                                                        <option value="@opt.Format">@opt.Format</option>
+                                                                    }
+                                                                </select>
+                                                                @if (FillingExpDate == "OTHER")
+                                                                {
+                                                                    <input type="text" class="font-20 RalewayRegular mt-2" maxlength="12" 
+                                                                           @bind="FillingExpDateOther" />
+                                                                    <button class="btn-t RalewayMedium font-16 ml-2" type="button" 
+                                                                            @onclick="SaveBbdOther" disabled="@IsSendingBbdOther">
+                                                                        <span>@(IsSendingBbdOther ? "Enviando..." : "Enviar")</span>
+                                                                    </button>
+                                                                }
+                                                                @if (FillingExpDate != "-")
+                                                                {
+                                                                    <div class="line-from"></div>
+                                                                    <img src="/img/check-icon.svg" alt="check">
+                                                                }
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Location -->
+                                                        <div class="body-td">
+                                                            <p class="font-18 RalewayRegular">@Localization["orderView.Location"]</p>
+                                                            <div class="data-t">
+                                                                <input type="text" readonly class="font-20 RalewayRegular" value="@FillingLocation">
+                                                                @if (FillingLocation != "-")
+                                                                {
+                                                                    <div class="line-from"></div>
+                                                                    <img src="/img/check-icon.svg" alt="check">
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="bottle-img-1">
+                                                        <img src="/img/bottle-instructions.png" alt="instructions">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @if (Status == "Desarrollo")
+                                        {
+                                            <div class="d-none d-xl-flex btn-edit-bottle col-12 col-lg-2 content-t-button align-items-end" style="height:180px;">
+                                                <button class="btn-t RalewayMedium font-20" type="button" data-bs-toggle="modal" data-bs-target="#sidebarRightModal3">
+                                                    <img src="/img/pencil-icon.svg" alt="edit">@Localization["Edit"]
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <!-- 3. LABEL -->
+                    @if (ProductType == "Bote")
+                    {
+                        <div class="toggle-from m-top-toggle">
+                            <div class="flex-elm-from row">
+                                <div class="left-from col-8 d-flex">
+                                    <h2 class="RalewayBold font-24">@Localization["orderView.Label"]</h2>
+                                    <div class="l-data-from d-flex">
+                                        <div class="d-flex gap-1 check-from-label-2 ml-0 justify-content-center align-items-center">
+                                            <input type="checkbox" @bind="NoLabel" @bind:after="OnNoLabelChanged" 
+                                                   disabled="@(Status == "Cerrado cliente y calidad")" />
+                                            <label class="RalewayBold font-18">@Localization["orderView.NoLabel"]</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="right-from col-4 d-flex gap-1">
+                                    <div class="line-from"></div>
+                                    <div class="@(PercentFilledLabel == 0 ? "progress-bar-from-0" : "progress-bar-from")">
+                                        <p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledLabel)%</p>
+                                    </div>
+                                    <img @onclick="() => ToggleSection(3)" id="id-2" 
+                                         class="arrow-t @(IsOpen[3] ? "arrow-t-r" : "")" 
+                                         src="/img/arrow-close-down.svg" alt="arrow open">
+                                </div>
+                            </div>
+
+                            @if (IsOpen[3])
+                            {
+                                <div id="container-toggle-3" class="container-toggle active">
+                                    <div class="content-t">
+                                        <div class="head-t">
+                                            <h3 class="font-18 RalewayExtraBold">@Localization["orderView.GUMMYDNA"]</h3>
+                                            @if (Status == "Desarrollo" && !NoLabel)
+                                            {
+                                                <button class="btn-t RalewayMedium font-20" type="button" data-bs-toggle="modal" data-bs-target="#sidebarRightModal2">
+                                                    <img src="/img/pencil-icon.svg" alt="edit">@Localization["Edit"]
+                                                </button>
+                                            }
+                                        </div>
+
+                                        <div class="body-t body-nb-t @(NoLabel ? "disabled-section" : "")">
+                                            @foreach (var item in LabelInfo)
+                                            {
+                                                <div class="body-td">
+                                                    <p class="font-18 RalewayRegular @(NoLabel ? "disabled-text" : "")">@item.Label</p>
+                                                    <div class="data-t">
+                                                        <span><p class="font-20 RalewayBold @(NoLabel ? "disabled-text" : "")">@item.Value</p></span>
+                                                        @if (item.Value != "-" && !NoLabel)
+                                                        {
+                                                            <div class="line-from"></div>
+                                                            <img src="/img/check-icon.svg" alt="check">
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            <div class="body-td">
+                                                <p class="font-18 RalewayRegular">@Localization["orderView.Label"]</p>
+                                                <div class="data-t">
+                                                    @if (!string.IsNullOrEmpty(LabelImageUrl))
+                                                    {
+                                                        <img alt="label" class="w-100" src="@LabelImageUrl">
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <!-- 4. PALLETIZING -->
+                    <div class="toggle-from m-top-toggle">
+                        <div class="flex-elm-from row">
+                            <div class="left-from col-8 d-flex">
+                                <h2 class="RalewayBold font-24">@Localization["orderView.Palettizing"]</h2>
+                            </div>
+                            <div class="right-from col-4 d-flex gap-1">
+                                <div class="line-from"></div>
+                                <div class="@(PercentFilledPalettizing == 0 ? "progress-bar-from-0" : "progress-bar-from")">
+                                    <p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledPalettizing)%</p>
+                                </div>
+                                <img @onclick="() => ToggleSection(4)" id="id-3" 
+                                     class="arrow-t @(IsOpen[4] ? "arrow-t-r" : "")" 
+                                     src="/img/arrow-close-down.svg" alt="arrow open">
+                            </div>
+                        </div>
+
+                        @if (IsOpen[4])
+                        {
+                            <div id="container-toggle-4" class="container-toggle active">
+                                <div class="content-t content-t-pdb">
+                                    <div class="head-t">
+                                        <h3 class="font-18 RalewayBold">@Localization["orderView.BOXLABEL"]</h3>
+                                    </div>
+                                    <div class="body-t">
+                                        @foreach (var item in PalletInfo)
+                                        {
+                                            <div class="body-td">
+                                                <p class="font-18 RalewayRegular">@item.Label</p>
+                                                <div class="data-t">
+                                                    <input class="RalewayRegular font-20" type="text" readonly value="@item.Value">
+                                                    @if (item.Value != "-")
+                                                    {
+                                                        <div class="line-from"></div>
+                                                        <img src="/img/check-icon.svg" alt="check">
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+
+                                        <div class="body-td" id="body-td-pallet">
+                                            <p class="font-18 RalewayRegular w-100">@Localization["orderView.BoxLabel"]</p>
+                                            <div class="data-t">
+                                                <div class="tags-pallet">
+                                                    <div class="tag-flex">
+                                                        <div class="tag-pallet-text">
+                                                            <p class="RalewayRegular font-16">@Localization["orderView.Size"] A8</p>
+                                                        </div>
+                                                        <div class="tags-pallet-img">
+                                                            @if (!string.IsNullOrEmpty(BoxLabelImg))
+                                                            {
+                                                                <img alt="tags" style="width:18.5rem;" src="@BoxLabelImg">
+                                                            }
+                                                            else
+                                                            {
+                                                                <p>-</p>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    @if (Status == "Desarrollo")
+                                                    {
+                                                        <div>
+                                                            <div class="btn-pallet-tag">
+                                                                <button class="btn-t font-20 RalewayMedium" type="button" data-bs-toggle="modal" data-bs-target="#BoxLabelImagen">
+                                                                    <img src="/img/pencil-icon.svg" alt="edit">@Localization["orderView.Personalize"]
+                                                                </button>
+                                                            </div>
+                                                            <div class="desc-pallet d-flex justify-content-end text-end">
+                                                                <p class="font-16 RalewayRegular">@Localization["orderView.PersonalizeText"]</p>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="content-t content-t-pdb">
+                                    <div class="head-t">
+                                        <h3 class="font-18 RalewayBold">@Localization["orderView.PALLETIZING"]</h3>
+                                    </div>
+                                    <div class="body-t">
+                                        @foreach (var item in PalletizingInfo)
+                                        {
+                                            <div class="body-td">
+                                                <p class="font-18 RalewayRegular">@item.Label</p>
+                                                <div class="data-t">
+                                                    <input class="font-20 RalewayRegular" type="text" readonly value="@item.Value">
+                                                    @if (item.Value != "-")
+                                                    {
+                                                        <div class="line-from"></div>
+                                                        <img src="/img/check-icon.svg" alt="check">
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+
+                                        <div class="body-td" id="body-td-pallet">
+                                            <p class="font-18 RalewayRegular">@Localization["orderView.PalletLabel"]</p>
+                                            <div class="data-t">
+                                                <div class="tags-pallet">
+                                                    <div class="tag-flex">
+                                                        <div class="tags-pallet-img">
+                                                            @if (!string.IsNullOrEmpty(PalletLabelImg))
+                                                            {
+                                                                <img style="width:18.5rem;" alt="tags" src="@PalletLabelImg">
+                                                            }
+                                                            else
+                                                            {
+                                                                <p>-</p>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    @if (Status == "Desarrollo")
+                                                    {
+                                                        <div>
+                                                            <div class="btn-pallet-tag">
+                                                                <button class="btn-t font-20 RalewayMedium" type="button" data-bs-toggle="modal" data-bs-target="#PalletLabelImagen">
+                                                                    <img src="/iconbuttons/plus-icon.svg" alt="edit">@Localization["orderView.ExtraLabel"]
+                                                                </button>
+                                                            </div>
+                                                            <div class="desc-pallet-1">
+                                                                <p class="font-16 RalewayRegular">@Localization["orderView.ExtraLabelText"]</p>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="content-t">
+                                    <div class="head-t d-flex justify-content-start gap-1 align-items-center">
+                                        <h3 class="font-18 RalewayBold mb-0">@Localization["orderView.CommentsPale"]</h3>
+                                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="@Localization["orderView.CommentsPaleTooltip"]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="width:24px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="comments-area row gap-4">
+                                        <textarea class="font-16 col-9" rows="10" @bind="PalletComments"></textarea>
+                                        <div class="col-2">
+                                            <button @onclick="SavePalletComments" class="btn-t font-20 RalewayMedium">
+                                                @Localization["orderView.Send"]
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- 5. OTHER REQUIREMENTS -->
+                    <div class="toggle-from m-top-toggle">
+                        <div class="flex-elm-from row">
+                            <div class="left-from col-8 d-flex">
+                                <h2 class="RalewayBold font-24">@Localization["orderView.OtherRequirements"]</h2>
+                                <div class="l-data-from d-flex">
+                                    <div class="d-flex gap-1 check-from-label-2 ml-0 justify-content-center align-items-center">
+                                        <input type="checkbox" @bind="NoAnalytics" @bind:after="OnNoAnalyticsChanged" 
+                                               disabled="@(Status == "Cerrado cliente y calidad")" />
+                                        <label class="RalewayBold font-18">@Localization["orderView.NoAnalytics"]</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="right-from col-4 d-flex gap-1">
+                                <div class="line-from"></div>
+                                <div class="@(PercentFilledAnalytics == 0 ? "progress-bar-from-0" : "progress-bar-from")">
+                                    <p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledAnalytics)%</p>
+                                </div>
+                                <img @onclick="() => ToggleSection(5)" id="id-4" 
+                                     class="arrow-t @(IsOpen[5] ? "arrow-t-r" : "")" 
+                                     src="/img/arrow-close-down.svg" alt="arrow open">
+                            </div>
+                        </div>
+
+                        @if (IsOpen[5])
+                        {
+                            <div id="container-toggle-5" class="container-toggle active">
+                                @if (!NoAnalytics)
+                                {
+                                    <div class="content-t-2" id="content-t-other">
+                                        <div class="head-t">
+                                            <h3 class="font-18 RalewayBold">@Localization["orderView.ANALYTICS"]</h3>
+                                        </div>
+
+                                        <div class="content-others">
+                                            <div class="body-t w-full">
+                                                <div class="table-responsive">
+                                                    <table class="table table-borderless w-100">
+                                                        <thead class="text-table-th">
+                                                            <tr>
+                                                                <th colspan="2" class="p-1">@Localization["orderView.Type"]</th>
+                                                                <th class="p-1">@Localization["orderView.Quantity"]</th>
+                                                                <th class="p-1">@Localization["orderView.Source"]</th>
+                                                                <th class="p-1">@Localization["orderView.Analitycs"]</th>
+                                                                <th class="p-1">@Localization["orderView.Periodicity"]</th>
+                                                                <th class="p-1">@Localization["orderView.Observations"]</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var a in AnalyticsRows)
+                                                            {
+                                                                <tr class="text-table-td RalewayRegular">
+                                                                    <td class="font-12" colspan="2">@a.Active</td>
+                                                                    <td class="font-12">@a.Quantity</td>
+                                                                    <td class="font-12">@a.Source</td>
+                                                                    <td class="text-center font-12">
+                                                                        <div class="check-from-label-2 ml-0 justify-content-center">
+                                                                            <input type="checkbox" checked="@a.Analytics" disabled />
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text" class="form-control font-12" readonly value="@a.Periodicity" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text" class="form-control font-12" readonly value="@a.Observations" />
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div id="body-t-other">
+                                                    <div class="line-f"></div>
+                                                    <div class="body-td" id="body-td-other-2">
+                                                        <p>@Localization["orderView.TOTALPRICE"]</p>
+                                                        <div class="data-t" id="data-t-other">
+                                                            <p class="font-20">@SumAnalytics€</p>
+                                                        </div>
+                                                    </div>
+                                                    @if (SumAnalytics > 0)
+                                                    {
+                                                        <div class="text-f-other" id="body-td-other-f-1">
+                                                            <p class="font-16 RalewayBold">@Localization["orderView.TOTALPRICETEXT"]</p>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="content-t-2" style="min-height:40px;display:flex;align-items:center;justify-content:center;">
+                                        <span class="font-16 RalewayRegular">Sin analíticas</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Confirm Button -->
+                    <div class="btn-atr-confirm d-flex justify-content-end">
+                        <button data-bs-toggle="modal" data-bs-target="#confirmModal"
+                                class="@GetConfirmButtonClass()"
+                                disabled="@(!CanConfirmAndSign)">
+                            @Localization["orderView.ConfirmProductAndSign"]
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- Modales -->
+    <ApproveModal CustomerAccepted="@CustomerAccepted" CodeRG35="@Code" TomarMuestra="@TakeSample" RG37="@RG37Code" />
+    <UploadTagModal />
+    <ConfirmModal OnConfirm="HandleConfirm" Status="@Status" CodeRG35="@Code" RG37="@RG37Code" PalletComments="@PalletComments" />
+    <ThankYouModal />
+    <PalletLabelImagen CodeRG35="@Code" OnUpdated="HandlePalletLabelUpdated" />
+    <BoxLabelImagen CodeRG35="@Code" OnUpdated="HandleBoxLabelUpdated" />
+    <ModalLabel OnLabelOptionsUpdated="HandleLabelOptionsUpdated" OnDraftLabelUpdated="HandleDraftLabelUpdated" />
+    <BoteCapData />
 </div>
-<style>
-    
-    .loading-overlay {
-        position: fixed;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0,0,0,.35);
-        z-index: 9999
-    }
-
-    .spinner {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        border: 6px solid rgba(255,255,255,.6);
-        border-top-color: #2563eb;
-        animation: spin 1s linear infinite;
-        background: #fff;
-        box-shadow: 0 8px 24px rgba(0,0,0,.15)
-    }
-    @@keyframes spin {
-        to
-
-    {
-        transform: rotate(360deg)
-    }
-
-    }
-</style>
-
-
-

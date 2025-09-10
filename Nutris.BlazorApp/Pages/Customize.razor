@@ -1,49 +1,67 @@
 ﻿@page "/customize-edit/{Id}"
+@* @page "/customize/{Id}" *@
 @using System.Text.Json
 @using Nutris.BlazorApp.Components.Orders
 @using Nutris.BlazorApp.Features.Customize
 @using NutrisBlazor.Models
 
 @inject ICustomizeApi CustomizeApi
+@inject NavigationManager Navigation
 
-<PageTitle>Customize</PageTitle>
+<PageTitle>Customize - @Id</PageTitle>
 
-@if (IsLoading)
-{
-    <div class="loading-overlay">
-        <div class="spinner"></div>
-    </div>
-}
-else if (!string.IsNullOrEmpty(Error))
-{
-    <div class="alert alert-danger m-3">@Error</div>
-}
-else if (!IsLoading && (RG35Doc1 is not null || RG37Doc1 is not null))
-{
-    <OrdersComponent 
-                     RG35="@RG35Doc1"
-                     RG37="@RG37Doc1"
-                     HasRG35="@RG35Item.HasValue"
-                     HasRG37="@RG37Item.HasValue"
-                     Atributos="@AtributosRoot"
-                     RelacionBote="@RelacionBoteRoot"
-                     RelacionTapa="@RelacionTapaRoot"
-                     LotFormat="@LotFormatRoot"
-                     BbdFormat="@BbdFormatRoot"
-                     OnApprove="ApproveFormulationAsync"
-                     OnSaveName="SaveProductCommercialNameAsync"
-                     OnSaveLotFormat="@(x => SaveLotFormatAsync(x.format, x.other))"
-                     OnSaveBbdFormat="@(x => SaveBbdFormatAsync(x.format, x.other))"
-                     OnPatchRG35="PatchRG35Async"
-                     OnPatchRG37="PatchRG37Async"
-                     OnUploadBoxOrPallet="PostModificarImagenCabAsync" />
-}
-else
-{
-    <div class="alert alert-warning m-3">No se encontraron datos para este pedido.</div>
-}
+<div class="main-content main-content-orders" id="orders">
+    @if (IsLoading)
+    {
+        <div class="loading-overlay">
+            <div class="spinner"></div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(Error))
+    {
+        <div class="alert alert-danger m-3">
+            <h4>Error</h4>
+            <p>@Error</p>
+            <button class="btn btn-primary" @onclick="@(() => Navigation.NavigateTo("/"))">Volver al inicio</button>
+        </div>
+    }
+    else if (RG35Data is not null || RG37Data is not null)
+    {
+        <OrdersComponent 
+            Id="@Id"
+            RG35="@RG35Data"
+            RG37="@RG37Data"
+            HasRG35="@(RG35Data is not null)"
+            HasRG37="@(RG37Data is not null)"
+            Atributos="@AtributosRoot"
+            RelacionBote="@RelacionBoteRoot"
+            RelacionTapa="@RelacionTapaRoot"
+            LotFormat="@LotFormatRoot"
+            BbdFormat="@BbdFormatRoot"
+            OnApprove="ApproveFormulationAsync"
+            OnSaveName="SaveProductCommercialNameAsync"
+            OnSaveLotFormat="@(x => SaveLotFormatAsync(x.format, x.other))"
+            OnSaveBbdFormat="@(x => SaveBbdFormatAsync(x.format, x.other))"
+            OnPatchRG35="PatchRG35Async"
+            OnPatchRG37="PatchRG37Async"
+            OnUploadBoxOrPallet="PostModificarImagenCabAsync" />
+    }
+    else
+    {
+        <div class="alert alert-warning m-3">
+            <h4>Sin datos</h4>
+            <p>No se encontraron datos para el pedido: <strong>@Id</strong></p>
+            <button class="btn btn-primary" @onclick="@(() => Navigation.NavigateTo("/"))">Volver al inicio</button>
+        </div>
+    }
+</div>
 
 <style>
+    .main-content {
+        padding: 0 3.96rem;
+        margin: 0 auto !important;
+    }
+    
     .loading-overlay {
         position: fixed;
         inset: 0;
@@ -64,179 +82,345 @@ else
         background: white;
         box-shadow: 0 8px 24px rgba(0,0,0,.15);
     }
+    
     @@keyframes spin {
-        to
-
-    {
-        transform: rotate(360deg)
-    }
-
+        to { transform: rotate(360deg); }
     }
 </style>
 
 @code {
     [Parameter] public string Id { get; set; } = string.Empty;
-    CustomizeRG35Response RG35Doc1 = new();
-    CustomizeRG37Response RG37Doc1 = new();
-    // Documentos crudos
-    JsonDocument? RG35Doc, RG37Doc, AtributosDoc, RelacionBoteDoc, RelacionTapaDoc, LotFormatDoc, BbdFormatDoc;
-
-    // Elementos preparados para UI (uno de estos dos puede ser null)
-    JsonElement? RG35Item, RG37Item;
-
-    // Raíces para los catálogos
-    JsonElement AtributosRoot, RelacionBoteRoot, RelacionTapaRoot, LotFormatRoot, BbdFormatRoot;
-
-    bool IsLoading;
+    
+    // Datos principales
+    CustomizeRG35Response? RG35Data;
+    CustomizeRG37Response? RG37Data;
+    
+    // Catálogos
+    JsonDocument? AtributosDoc;
+    JsonDocument? RelacionBoteDoc;
+    JsonDocument? RelacionTapaDoc;
+    JsonDocument? LotFormatDoc;
+    JsonDocument? BbdFormatDoc;
+    
+    // Elementos JSON para pasar al componente
+    JsonElement AtributosRoot;
+    JsonElement RelacionBoteRoot;
+    JsonElement RelacionTapaRoot;
+    JsonElement LotFormatRoot;
+    JsonElement BbdFormatRoot;
+    
+    // Estado
+    bool IsLoading = true;
     string? Error;
+    string Prefix = "";
 
-    protected override async Task OnParametersSetAsync() => await LoadAllAsync();
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAllAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Si el ID cambia, recargar datos
+        await LoadAllAsync();
+    }
 
     private async Task LoadAllAsync()
     {
         IsLoading = true;
         Error = null;
+        StateHasChanged(); // Mostrar loading inmediatamente
 
         try
         {
-            // Datos principales (idéntico al VUE)
-            RG35Doc1 = await CustomizeApi.GetRG35Async(Id);
-            RG37Doc1 = await CustomizeApi.GetRG37Async(Id);
+            // Validar ID
+            if (string.IsNullOrEmpty(Id))
+            {
+                Error = "No se proporcionó un ID válido.";
+                return;
+            }
 
-            RG35Item = TryGetFirstItem(RG35Doc, out var r35) ? r35 : (JsonElement?)null;
-            RG37Item = TryGetFirstItem(RG37Doc, out var r37) ? r37 : (JsonElement?)null;
+            // Determinar el prefijo (RG35 o RG37)
+            var parts = Id.Split('-');
+            if (parts.Length == 0)
+            {
+                Error = "Formato de ID no válido.";
+                return;
+            }
+            
+            Prefix = parts[0].ToUpper();
+            Console.WriteLine($"Loading data for ID: {Id}, Prefix: {Prefix}");
 
-            // Catálogos
-            AtributosDoc = await CustomizeApi.GetAtributosAsync();
-            RelacionBoteDoc = await CustomizeApi.GetRelacionBoteAsync();
-            RelacionTapaDoc = await CustomizeApi.GetRelacionTapaAsync();
-            LotFormatDoc = await CustomizeApi.GetLotFormatAsync(Id);
-            BbdFormatDoc = await CustomizeApi.GetBbdFormatAsync(Id);
+            // Cargar datos según el prefijo
+            if (Prefix == "RG35")
+            {
+                Console.WriteLine("Loading RG35 data...");
+                RG35Data = await CustomizeApi.GetRG35Async(Id);
+                
+                if (RG35Data == null)
+                {
+                    Error = $"No se encontraron datos RG35 para el ID: {Id}";
+                    return;
+                }
+                
+                Console.WriteLine($"RG35 data loaded: Code={RG35Data.Code}, Product={RG35Data.Product_name}");
+            }
+            else if (Prefix == "RG37")
+            {
+                Console.WriteLine("Loading RG37 data...");
+                RG37Data = await CustomizeApi.GetRG37Async(Id);
+                
+                if (RG37Data == null)
+                {
+                    Error = $"No se encontraron datos RG37 para el ID: {Id}";
+                    return;
+                }
+                
+                Console.WriteLine($"RG37 data loaded: Code={RG37Data.Code}, Product={RG37Data.Product_name}");
+            }
+            else
+            {
+                Error = $"Prefijo de ID no reconocido: {Prefix}. Se esperaba RG35 o RG37.";
+                return;
+            }
 
+            // Cargar catálogos (común para ambos tipos)
+            Console.WriteLine("Loading catalogs...");
+            
+            var catalogTasks = new[]
+            {
+                CustomizeApi.GetAtributosAsync(),
+                CustomizeApi.GetRelacionBoteAsync(),
+                CustomizeApi.GetRelacionTapaAsync(),
+                CustomizeApi.GetLotFormatAsync(Id),
+                CustomizeApi.GetBbdFormatAsync(Id)
+            };
+
+            var results = await Task.WhenAll(catalogTasks);
+            
+            AtributosDoc = results[0];
+            RelacionBoteDoc = results[1];
+            RelacionTapaDoc = results[2];
+            LotFormatDoc = results[3];
+            BbdFormatDoc = results[4];
+
+            // Asignar elementos root
             AtributosRoot = AtributosDoc?.RootElement ?? default;
             RelacionBoteRoot = RelacionBoteDoc?.RootElement ?? default;
             RelacionTapaRoot = RelacionTapaDoc?.RootElement ?? default;
             LotFormatRoot = LotFormatDoc?.RootElement ?? default;
             BbdFormatRoot = BbdFormatDoc?.RootElement ?? default;
+
+            Console.WriteLine("All data loaded successfully");
+        }
+        catch (HttpRequestException httpEx)
+        {
+            Error = $"Error de conexión: {httpEx.Message}";
+            Console.WriteLine($"HTTP Error: {httpEx}");
+        }
+        catch (JsonException jsonEx)
+        {
+            Error = $"Error al procesar datos: {jsonEx.Message}";
+            Console.WriteLine($"JSON Error: {jsonEx}");
         }
         catch (Exception ex)
         {
-            Error = ex.Message;
+            Error = $"Error inesperado: {ex.Message}";
+            Console.WriteLine($"Unexpected error: {ex}");
         }
         finally
         {
             IsLoading = false;
+            StateHasChanged();
         }
     }
 
-    private static bool TryGetFirstItem(JsonDocument? doc, out JsonElement item)
-    {
-        item = default;
-        if (doc is null) return false;
-
-        var root = doc.RootElement;
-
-        // OData: { "value": [...] }
-        if (root.ValueKind == JsonValueKind.Object &&
-            root.TryGetProperty("value", out var value) &&
-            value.ValueKind == JsonValueKind.Array &&
-            value.GetArrayLength() > 0)
-        {
-            item = value[0];
-            return true;
-        }
-
-        // Array simple
-        if (root.ValueKind == JsonValueKind.Array && root.GetArrayLength() > 0)
-        {
-            item = root[0];
-            return true;
-        }
-
-        return false;
-    }
-
-    // ===== callbacks que consume OrdersComponent =====
+    // ===== Callbacks para OrdersComponent =====
 
     private async Task ApproveFormulationAsync()
     {
         try
         {
-            await CustomizeApi.PatchRG37Async(Id, new
+            IsLoading = true;
+            StateHasChanged();
+
+            if (Prefix == "RG37" && RG37Data != null)
             {
-                Customer_accepted = true,
-                Status = "Cerrado cliente"
-            });
+                await CustomizeApi.PatchRG37Async(Id, new
+                {
+                    Customer_accepted = true,
+                    Status = "Cerrado cliente"
+                });
+                Console.WriteLine("RG37 approved successfully");
+            }
+            else if (Prefix == "RG35" && RG35Data != null && !string.IsNullOrEmpty(RG35Data.RG37))
+            {
+                await CustomizeApi.PatchRG37Async(RG35Data.RG37, new
+                {
+                    Customer_accepted = true,
+                    Status = "Cerrado cliente"
+                });
+                Console.WriteLine($"RG37 {RG35Data.RG37} approved successfully");
+            }
+            
             await LoadAllAsync();
         }
-        catch (Exception ex) { Error = ex.Message; }
+        catch (Exception ex)
+        {
+            Error = $"Error al aprobar formulación: {ex.Message}";
+            Console.WriteLine($"Error in ApproveFormulationAsync: {ex}");
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
     }
 
     private async Task SaveProductCommercialNameAsync(string newName)
     {
         try
         {
+            Console.WriteLine($"Saving product name: {newName}");
             await CustomizeApi.PatchRG35Async(Id, new { Product_name_2 = newName });
-            await LoadAllAsync();
+            
+            // Actualizar el valor local sin recargar todo
+            if (RG35Data != null)
+            {
+                RG35Data.Product_name_2 = newName;
+                StateHasChanged();
+            }
         }
-        catch (Exception ex) { Error = ex.Message; }
+        catch (Exception ex)
+        {
+            Error = $"Error al guardar nombre: {ex.Message}";
+            Console.WriteLine($"Error in SaveProductCommercialNameAsync: {ex}");
+        }
     }
 
     private async Task SaveLotFormatAsync(string format, string? other = null)
     {
         try
         {
+            var value = string.IsNullOrWhiteSpace(other) ? format : other;
+            Console.WriteLine($"Saving lot format: {value}");
+            
             var payload = new Dictionary<string, object?>
             {
-                ["Filling_batch"] = string.IsNullOrWhiteSpace(other) ? format : other
+                ["Filling_batch"] = value
             };
+            
             await CustomizeApi.PatchRG35Async(Id, payload);
-            await LoadAllAsync();
+            
+            // Actualizar el valor local
+            if (RG35Data != null)
+            {
+                RG35Data.Filling_batch = value;
+                if (!string.IsNullOrWhiteSpace(other))
+                {
+                    RG35Data.Filling_batch_others = other;
+                }
+                StateHasChanged();
+            }
         }
-        catch (Exception ex) { Error = ex.Message; }
+        catch (Exception ex)
+        {
+            Error = $"Error al guardar formato de lote: {ex.Message}";
+            Console.WriteLine($"Error in SaveLotFormatAsync: {ex}");
+        }
     }
 
     private async Task SaveBbdFormatAsync(string format, string? other = null)
     {
         try
         {
+            var value = string.IsNullOrWhiteSpace(other) ? format : other;
+            Console.WriteLine($"Saving BBD format: {value}");
+            
             var payload = new Dictionary<string, object?>
             {
-                ["Filling_exp_date"] = string.IsNullOrWhiteSpace(other) ? format : other
+                ["Filling_exp_date"] = value
             };
+            
             await CustomizeApi.PatchRG35Async(Id, payload);
-            await LoadAllAsync();
+            
+            // Actualizar el valor local
+            if (RG35Data != null)
+            {
+                RG35Data.Filling_exp_date = value;
+                if (!string.IsNullOrWhiteSpace(other))
+                {
+                    RG35Data.Filling_exp_date_others = other;
+                }
+                StateHasChanged();
+            }
         }
-        catch (Exception ex) { Error = ex.Message; }
+        catch (Exception ex)
+        {
+            Error = $"Error al guardar formato BBD: {ex.Message}";
+            Console.WriteLine($"Error in SaveBbdFormatAsync: {ex}");
+        }
     }
 
     private async Task PatchRG35Async(object payload)
     {
         try
         {
+            Console.WriteLine($"Patching RG35 with payload: {JsonSerializer.Serialize(payload)}");
             await CustomizeApi.PatchRG35Async(Id, payload);
             await LoadAllAsync();
         }
-        catch (Exception ex) { Error = ex.Message; }
+        catch (Exception ex)
+        {
+            Error = $"Error al actualizar RG35: {ex.Message}";
+            Console.WriteLine($"Error in PatchRG35Async: {ex}");
+        }
     }
 
     private async Task PatchRG37Async(object payload)
     {
         try
         {
-            await CustomizeApi.PatchRG37Async(Id, payload);
+            var targetId = Prefix == "RG37" ? Id : RG35Data?.RG37;
+            
+            if (string.IsNullOrEmpty(targetId))
+            {
+                Error = "No se pudo determinar el ID de RG37 para actualizar.";
+                return;
+            }
+            
+            Console.WriteLine($"Patching RG37 ({targetId}) with payload: {JsonSerializer.Serialize(payload)}");
+            await CustomizeApi.PatchRG37Async(targetId, payload);
             await LoadAllAsync();
         }
-        catch (Exception ex) { Error = ex.Message; }
+        catch (Exception ex)
+        {
+            Error = $"Error al actualizar RG37: {ex.Message}";
+            Console.WriteLine($"Error in PatchRG37Async: {ex}");
+        }
     }
 
     private async Task PostModificarImagenCabAsync(object payload)
     {
         try
         {
-            await CustomizeApi.PostModificarImagenCabAsync(payload);
-            await LoadAllAsync();
+            Console.WriteLine($"Uploading image with payload: {JsonSerializer.Serialize(payload)}");
+            var response = await CustomizeApi.PostModificarImagenCabAsync(payload);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Image uploaded successfully");
+                await LoadAllAsync();
+            }
+            else
+            {
+                Error = $"Error al subir imagen: {response.StatusCode}";
+            }
         }
-        catch (Exception ex) { Error = ex.Message; }
+        catch (Exception ex)
+        {
+            Error = $"Error al modificar imagen: {ex.Message}";
+            Console.WriteLine($"Error in PostModificarImagenCabAsync: {ex}");
+        }
     }
 }
