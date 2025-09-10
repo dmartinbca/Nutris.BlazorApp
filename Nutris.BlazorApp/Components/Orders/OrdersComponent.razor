@@ -125,8 +125,8 @@
                     </div>
                 </div>
 
-                @if (ReportFiles.Any())
-                {
+      @*           @if (ReportFiles.Any())
+                { *@
                     <div class="rowh4-2">
                         <div class="colh1-r4">
                             <button class="font-20 RalewayRegular" @onclick="ToggleDownloadReports">
@@ -149,7 +149,7 @@
                             }
                         </div>
                     </div>
-                }
+               @*  } *@
             </div>
         </div>
     </section>
@@ -875,13 +875,18 @@
                     </div>
 
                     <!-- Confirm Button -->
-                    <div class="btn-atr-confirm d-flex justify-content-end">
-                        <button data-bs-toggle="modal" data-bs-target="#confirmModal"
-                                class="@GetConfirmButtonClass()"
-                                disabled="@(!CanConfirmAndSign)">
-                            @Localization["orderView.ConfirmProductAndSign"]
-                        </button>
-                    </div>
+                   
+                    @if (CustomerAccepted && Prefix == "RG35")
+                    {
+                        <!-- Confirm Button -->
+                        <div class="btn-atr-confirm d-flex justify-content-end">
+                            <button data-bs-toggle="modal" data-bs-target="#confirmModal"
+                                    class="@GetConfirmButtonClass() RalewayRegular font-20"
+                                    disabled="@(!CanConfirmAndSign)">
+                                @Localization["orderView.ConfirmProductAndSign"]
+                            </button>
+                        </div>
+                    }
                 }
             </div>
         </div>
