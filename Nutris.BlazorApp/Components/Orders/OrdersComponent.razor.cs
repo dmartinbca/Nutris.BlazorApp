@@ -2,12 +2,14 @@
 using Microsoft.JSInterop;
 using NutrisBlazor.Models;
 using NutrisBlazor.Services;
+using System.Net.Http;
 using System.Text.Json;
 
 namespace Nutris.BlazorApp.Components.Orders;
 
 public class OrdersComponentBase : ComponentBase
 {
+    [Inject] public ILocalStorageService LocalStorage { get; set; } = default!;
     [Inject] protected IApiService Api { get; set; } = default!;
     [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] protected ILocalizationService Localization { get; set; } = default!;
@@ -135,12 +137,24 @@ public class OrdersComponentBase : ComponentBase
     protected List<AtributoOption> OptionsLabelMaterial { get; set; } = new();
     protected List<AtributoOption> OptionsColorLabel { get; set; } = new();
     protected List<AtributoOption> OptionsColorBote { get; set; } = new();
-
+    public string Logo { get; set; } = string.Empty;
     protected override async Task OnParametersSetAsync()
     {
         await LoadDataAsync();
     }
+    private async Task LoadCustomerLogo()
+    {
+        var customerLogo = await LocalStorage.GetItemAsync<string>("Customer_logo");
 
+        if (!string.IsNullOrEmpty(customerLogo))
+        {
+            Logo = $"data:image/png;base64,{customerLogo}";
+        }
+        else
+        {
+            Logo = string.Empty;
+        }
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -169,6 +183,19 @@ public class OrdersComponentBase : ComponentBase
 
             // Calcular porcentajes
             CalculateAllPercentages();
+            var customerLogo = await LocalStorage.GetItemAsync<string>("Customer_logo");
+
+            if (!string.IsNullOrEmpty(customerLogo))
+            {
+                Logo = $"data:image/png;base64,{customerLogo}";
+            }
+            else
+            {
+                Logo = string.Empty;
+            }
+
+
+
 
             // Guardar logo del cliente si existe
             if (!string.IsNullOrEmpty(CustomerLogoUrl))
