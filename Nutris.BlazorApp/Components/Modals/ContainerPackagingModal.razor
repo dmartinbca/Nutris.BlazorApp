@@ -1,0 +1,700 @@
+﻿@namespace NutrisBlazor.Components.Modals
+@page "/components/modals/containerpackaging"
+@using System.Text.Json
+@using NutrisBlazor.Components.Shared
+@inject ILocalizationService Localization
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ILogger<ContainerPackagingModal> Logger
+
+<Loading IsVisible="@isLoading" />
+
+<div class="modal sidebar-right fade modal-overlay @(IsVisible ? "show d-block" : "")"
+     id="sidebarRightModal"
+     tabindex="-1"
+     aria-labelledby="sidebarRightModalLabel"
+     style="@(IsVisible ? "display: block;" : "display: none;")">
+    <div class="modal-dialog modal-dialog-sidebar modal-dialog-right">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="percentage">
+                    <!-- <span class="percentage-value-tapa fw-bold">100%</span> -->
+                </div>
+                <button type="button" class="b-close" @onclick="CloseModal">
+                    <img class="btn-close"
+                         aria-label="Close"
+                         src="/img/close-x.svg"
+                         alt="" />
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-body_header">
+                    <h2 class="modal-title font-32 modal-container-title MuseoSemiBold">
+                        Packaging/Envasado
+                    </h2>
+                </div>
+                
+                <div class="tabs-inline">
+                    <!-- Tabs -->
+                    <input id="tab1"
+                           class="tab-bottle_1"
+                           type="radio"
+                           name="tabs"
+                           checked="@(activeTab == "bottle")"
+                           @onchange="@(() => SetActiveTab("bottle"))" />
+                    <label for="tab1" class="label-tab-1 font-20">
+                        @Localization["modalContainer.Bottle"]
+                    </label>
+
+                    <input id="tab2"
+                           type="radio"
+                           class="tab-bottle_2"
+                           name="tabs"
+                           checked="@(activeTab == "cap")"
+                           @onchange="@(() => SetActiveTab("cap"))" />
+                    <label for="tab2" class="label-tab-2 font-20">
+                        @Localization["modalContainer.Cap"]
+                    </label>
+
+                    <!-- Bottle Section -->
+                    <section id="content1" class="content-bottle" style="@(activeTab == "bottle" ? "display: block;" : "display: none;")">
+                        <div class="parent">
+                            <div class="child-bottles">
+                                <h3 class="child-bottle-title_features font-24 RalewayMedium">
+                                    @Localization["modalContainer.Characteristics"]
+                                </h3>
+                                <div class="child_content_features-bottle">
+                                    @if (!string.IsNullOrEmpty(selectedDiameter) && diameterDetails != null)
+                                    {
+                                        <div class="product-config">
+                                            <div class="medidas-vertical">
+                                                <div class="medidas-vertical-1">
+                                                    <div class="medidads-1-1">
+                                                        <p class="p0 m-0 RalewayLight font-16">
+                                                            @(diameterDetails.Altura.ToString() ?? "N/A") mm
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="medidas-vertical-2">
+                                                    <div class="medidas-2-2">
+                                                        <div class="medidas-p1">
+                                                            <p class="p1 RalewayLight font-16">
+                                                                @(diameterDetails.Altura.ToString() ?? "N/A") mm
+                                                            </p>
+                                                        </div>
+                                                        <div class="medidas-p2">
+                                                            <p class="p2 RalewayLight font-16">
+                                                                @(diameterDetails.Altura.ToString() ?? "N/A") mm
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="produc-box">
+                                                <div class="medidas-horizontal">
+                                                    <p class="p3 RalewayLight font-16">
+                                                        @(diameterDetails.DiametroDeBoca.ToString() ?? "N/A") mm
+                                                    </p>
+                                                </div>
+                                                <div class="produc-img">
+                                                    @if (SelectedOption?.BoteForma == "SQUARE")
+                                                    {
+                                                        <BoteSquare ColorBote="@hexColor" />
+                                                    }
+                                                    else if (SelectedOption?.BoteForma == "ROUND")
+                                                    {
+                                                        <BoteRound ColorBote="@hexColor" />
+                                                    }
+                                                    else if (SelectedOption?.BoteForma == "CYLINDRICAL")
+                                                    {
+                                                        <BoteCylindrical ColorBote="@hexColor" />
+                                                    }
+                                                </div>
+                                                <div class="medidas-horizontal-base">
+                                                    <p class="p3 RalewayLight font-16">
+                                                        @(diameterDetails.DiametroBase.ToString() ?? "N/A") mm
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            
+                            <div class="child_content_info-bottle RalewayRegular">
+                                <span class="child_content_info-bottle-title font-16">
+                                    @Localization["modalContainer.Shape"]
+                                </span>
+                                <div class="comment">
+                                    <!-- Comments section if needed -->
+                                </div>
+                                <div class="child_content_select_bottle_type">
+                                    @foreach (var optionF in OptionsForma)
+                                    {
+                                        <div class="child_content_input-radio d-flex gap-1 justify-content-center">
+                                            <input type="radio"
+                                                   class="radio-block"
+                                                   name="forma"
+                                                   value="@optionF.Value"
+                                                   checked="@(SelectedOption?.BoteForma == optionF.Value)"
+                                                   @onchange="@(() => UpdateBoteForma(optionF.Value))" />
+                                            <p class="font-20 mb-0">@optionF.Value</p>
+                                        </div>
+                                    }
+                                </div>
+                                
+                                <div class="form-group-bottle p-4">
+                                    <!-- Size -->
+                                    <div class="form-grup-input-field">
+                                        <label class="form-group-label-size" for="size">
+                                            @Localization["modalContainer.Size"]
+                                        </label>
+                                        <select class="form-select Museo font-20" 
+                                                id="bote-size" 
+                                                @bind="selectedSize" 
+                                                @bind:after="ResetDiameter">
+                                            <option value="">@Localization["modalContainer.Selectasize"]</option>
+                                            @foreach (var size in boteSize.DimensionesPrincipales)
+                                            {
+                                                <option value="@size">@size</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- Diameter -->
+                                    <div class="form-grup-input-field">
+                                        <label class="form-group-label-size" for="Diameter">
+                                            @Localization["modalContainer.Diameter"]
+                                        </label>
+                                        <select class="form-select Museo font-20" 
+                                                id="bote-diameter" 
+                                                @bind="selectedDiameter">
+                                            <option value="">@Localization["modalContainer.Selectadiameter"]</option>
+                                            @foreach (var diameter in AvailableDiameters)
+                                            {
+                                                <option value="@diameter">@diameter</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- Material -->
+                                    <div class="form-grup-input-field">
+                                        <label class="form-group-label-size" for="Material">
+                                            @Localization["modalContainer.Material"]
+                                        </label>
+                                        <select class="form-select Museo font-20"
+                                                @bind="selectedMaterial">
+                                            <option value="">Select Material</option>
+                                            @foreach (var optionM in OptionsMaterial)
+                                            {
+                                                <option value="@optionM.Value">@optionM.Value</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- Color -->
+                                    <div class="form-grup-input-field">
+                                        <label class="form-group-label-size" for="Color">
+                                            @Localization["modalContainer.Color"]
+                                        </label>
+                                        <select class="form-select Museo font-20"
+                                                @bind="selectedColor"
+                                                @bind:after="UpdateHexColor">
+                                            <option value="">Select Color</option>
+                                            @foreach (var optionC in OptionsColorBote)
+                                            {
+                                                <option value="@optionC.Value">@optionC.Value</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Cap Section -->
+                    <section id="content2" style="@(activeTab == "cap" ? "display: block;" : "display: none;")">
+                        <div class="parent">
+                            <div class="child-bottles2 RalewayRegular">
+                                <h3 class="child-bottle-title_features">
+                                    @Localization["modalLabel.Characteristics"]
+                                </h3>
+                                <div class="child_content_features-taps">
+                                    <div class="product-config">
+                                        <div class="medidas-vertical">
+                                            <div class="medidas-vertical-2_tapa d-none">
+                                                <div class="medidas-2-2">
+                                                    <div class="medidas-p1">
+                                                        <p class="p1">xxxx</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="produc-box-tapa">
+                                            <div class="medidas-horizontal_tapa d-none">
+                                                <p class="tapa_p3">xxxx</p>
+                                            </div>
+                                            <div class="produc-img">
+                                                @if (SelectedOptionCap?.CapTapa == "Childproof")
+                                                {
+                                                    <CoverChildproof ColorCover="@hexColorCover" />
+                                                }
+                                                else if (SelectedOptionCap?.CapTapa == "Metal")
+                                                {
+                                                    <CoverMetal ColorCover="@hexColorCover" />
+                                                }
+                                                else if (SelectedOptionCap?.CapTapa == "Simple")
+                                                {
+                                                    <CoverSimple ColorCover="@hexColorCover" />
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="child_content_info-bottle-tap">
+                                <div class="child_content-info-bottle-heading">
+                                    <h3 class="child_title_tap RalewayBold font-16">
+                                        @Localization["modalContainer.YOURBOTTLE"]
+                                    </h3>
+                                    <div>
+                                        <span class="font-14 Museo">@Characteristics</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="child_content_info-bottle RalewayRegular">
+                                    <span>@Localization["orderView.Shape"]</span>
+                                    <div class="child_content_select_taps_type">
+                                        @foreach (var optionSC in OptionsShapecover)
+                                        {
+                                            <div class="child_content_input-radio d-flex gap-1">
+                                                <input type="radio"
+                                                       name="radio-input"
+                                                       class="radio-block"
+                                                       value="@optionSC.Value"
+                                                       checked="@(SelectedOptionCap?.CapTapa == optionSC.Value)"
+                                                       @onchange="@(() => UpdateCapTapa(optionSC.Value))" />
+                                                <span class="RalewayRegular font-20">@optionSC.Value</span>
+                                            </div>
+                                        }
+                                    </div>
+                                    
+                                    <div class="form-group-bottle">
+                                        <!-- Diameter Thread -->
+                                        <div class="form-grup-input-field">
+                                            <label class="form-group-label-size" for="size">
+                                                @Localization["modalContainer.DiameterThread"]
+                                            </label>
+                                            <select class="form-select Museo font-20"
+                                                    @bind="selectedCapBoca"
+                                                    disabled>
+                                                <option value="">Select Diameter</option>
+                                                @foreach (var optionD in OptionsDThread)
+                                                {
+                                                    <option value="@optionD.Value" disabled>@optionD.Value</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Color -->
+                                        <div class="form-grup-input-field">
+                                            <label class="form-group-label-size" for="Material">
+                                                @Localization["modalContainer.Color"]
+                                            </label>
+                                            <select class="form-select Museo font-20"
+                                                    @bind="selectedCapColor"
+                                                    @bind:after="UpdateHexColorCover">
+                                                <option value="">Select Color</option>
+                                                @foreach (var optionCC in OptionsColorcover)
+                                                {
+                                                    <option value="@optionCC.Value">@optionCC.Value</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Sleever Checkbox -->
+                                        <div class="child_content_select_taps_type justify-content-start" style="padding-left: 20px;">
+                                            <div class="child_content_input-radio d-flex justify-content-start">
+                                                <input type="checkbox"
+                                                       name="sleever"
+                                                       class="radio-block"
+                                                       @bind="capSleever" />
+                                                Sleever
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            
+            <div class="modal-footer-bts">
+                <button @onclick="CloseModal" class="modal-footer-btc-cancel RalewayBold font-20">
+                    @Localization["NavBar.Cancel"]
+                </button>
+                <button class="modal-footer-btc-save RalewayBold font-20" @onclick="UpdateSelectedOption">
+                    @Localization["NavBar.Save"]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // Parameters
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public List<Option> OptionsSize { get; set; } = new();
+    [Parameter] public List<Option> OptionsDiameter { get; set; } = new();
+    [Parameter] public List<OptionColor> OptionsColorBote { get; set; } = new();
+    [Parameter] public List<Option> OptionsMaterial { get; set; } = new();
+    [Parameter] public List<Option> OptionsBoca { get; set; } = new();
+    [Parameter] public List<Option> OptionsForma { get; set; } = new();
+    [Parameter] public List<Option> OptionsDThread { get; set; } = new();
+    [Parameter] public List<Option> OptionsShapecover { get; set; } = new();
+    [Parameter] public List<OptionColor> OptionsColorcover { get; set; } = new();
+    [Parameter] public string Characteristics { get; set; } = "";
+    [Parameter] public SelectedBoteOption? SelectedOption { get; set; }
+    [Parameter] public SelectedCapOption? SelectedOptionCap { get; set; }
+    [Parameter] public string CodeRG35 { get; set; } = "";
+    [Parameter] public string ImagenURLBote { get; set; } = "";
+    [Parameter] public string BoteImagen { get; set; } = "";
+    [Parameter] public EventCallback<UpdatedOptions> OnOptionsUpdated { get; set; }
+
+    // State variables
+    private string activeTab = "bottle";
+    private bool isLoading = false;
+    
+    // Selected values
+    private string selectedSize = "";
+    private string selectedDiameter = "";
+    private string selectedMaterial = "";
+    private string selectedColor = "";
+    private string selectedCapBoca = "";
+    private string selectedCapColor = "";
+    private bool capSleever = false;
+    
+    // Computed values
+    private string hexColor = "";
+    private string hexColorCover = "";
+    private Detalle? diameterDetails = null;
+    
+    // Static data
+    private readonly BoteSize boteSize = new()
+    {
+        DimensionesPrincipales = new[] { 150, 200, 250, 300, 400 }
+    };
+
+    private readonly Dictionary<string, Dictionary<string, Detalle>> boteDiameter = new()
+    {
+        ["150"] = new Dictionary<string, Detalle>
+        {
+            ["D38"] = new Detalle { Altura = null, DiametroBase = null, DiametroDeBoca = null },
+            ["D45"] = new Detalle { Altura = 88.3, DiametroBase = 55.3, DiametroDeBoca = 43.82 }
+        },
+        ["200"] = new Dictionary<string, Detalle>
+        {
+            ["D38"] = new Detalle { Altura = null, DiametroBase = null, DiametroDeBoca = null },
+            ["D45"] = new Detalle { Altura = 105.86, DiametroBase = 60, DiametroDeBoca = 43.82 },
+            ["D53"] = new Detalle { Altura = null, DiametroBase = null, DiametroDeBoca = null },
+            ["D70"] = new Detalle { Altura = null, DiametroBase = null, DiametroDeBoca = null }
+        },
+        ["250"] = new Dictionary<string, Detalle>
+        {
+            ["D45"] = new Detalle { Altura = 111.3, DiametroBase = 63.91, DiametroDeBoca = 43.82 }
+        },
+        ["300"] = new Dictionary<string, Detalle>
+        {
+            ["D45"] = new Detalle { Altura = 118.95, DiametroBase = 68.99, DiametroDeBoca = 43.82 },
+            ["D63"] = new Detalle { Altura = null, DiametroBase = null, DiametroDeBoca = null }
+        },
+        ["400"] = new Dictionary<string, Detalle>
+        {
+            ["D45"] = new Detalle { Altura = 130.87, DiametroBase = 72.69, DiametroDeBoca = 43.82 }
+        }
+    };
+
+    // Computed properties
+    private List<string> AvailableDiameters
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(selectedSize))
+                return new List<string>();
+            
+            if (boteDiameter.ContainsKey(selectedSize))
+                return boteDiameter[selectedSize].Keys.ToList();
+            
+            return new List<string>();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        // Initialize from SelectedOption
+        if (SelectedOption != null)
+        {
+            selectedSize = SelectedOption.BoteCapacidad ?? "";
+            selectedDiameter = SelectedOption.BoteBoca ?? "";
+            selectedMaterial = SelectedOption.BoteMaterial ?? "";
+            selectedColor = SelectedOption.BoteColor ?? "";
+            UpdateDiameterDetails();
+            UpdateHexColor();
+        }
+        
+        // Initialize from SelectedOptionCap
+        if (SelectedOptionCap != null)
+        {
+            selectedCapBoca = SelectedOptionCap.CapBoca ?? "";
+            selectedCapColor = SelectedOptionCap.CapColor ?? "";
+            capSleever = SelectedOptionCap.CapSleever;
+            UpdateHexColorCover();
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        // Update when parameters change
+        if (SelectedOption != null)
+        {
+            if (!string.IsNullOrEmpty(SelectedOption.BoteCapacidad))
+                selectedSize = SelectedOption.BoteCapacidad;
+            if (!string.IsNullOrEmpty(SelectedOption.BoteBoca))
+                selectedDiameter = SelectedOption.BoteBoca;
+            
+            selectedMaterial = SelectedOption.BoteMaterial ?? selectedMaterial;
+            selectedColor = SelectedOption.BoteColor ?? selectedColor;
+            UpdateDiameterDetails();
+            UpdateHexColor();
+        }
+        
+        if (SelectedOptionCap != null)
+        {
+            selectedCapBoca = SelectedOptionCap.CapBoca ?? selectedCapBoca;
+            selectedCapColor = SelectedOptionCap.CapColor ?? selectedCapColor;
+            capSleever = SelectedOptionCap.CapSleever;
+            UpdateHexColorCover();
+        }
+    }
+
+    private void SetActiveTab(string tab)
+    {
+        activeTab = tab;
+    }
+
+    private void UpdateBoteForma(string forma)
+    {
+        if (SelectedOption != null)
+        {
+            SelectedOption.BoteForma = forma;
+        }
+    }
+
+    private void UpdateCapTapa(string tapa)
+    {
+        if (SelectedOptionCap != null)
+        {
+            SelectedOptionCap.CapTapa = tapa;
+        }
+    }
+
+    private void ResetDiameter()
+    {
+        selectedDiameter = "";
+        UpdateDiameterDetails();
+    }
+
+    private void UpdateDiameterDetails()
+    {
+        if (!string.IsNullOrEmpty(selectedSize) && !string.IsNullOrEmpty(selectedDiameter))
+        {
+            if (boteDiameter.ContainsKey(selectedSize) && 
+                boteDiameter[selectedSize].ContainsKey(selectedDiameter))
+            {
+                diameterDetails = boteDiameter[selectedSize][selectedDiameter];
+            }
+            else
+            {
+                diameterDetails = null;
+            }
+        }
+        else
+        {
+            diameterDetails = null;
+        }
+    }
+
+    private void UpdateHexColor()
+    {
+        hexColor = GetColorHex(selectedColor);
+    }
+
+    private void UpdateHexColorCover()
+    {
+        hexColorCover = GetColorHexCover(selectedCapColor);
+    }
+
+    private string GetColorHex(string colorName)
+    {
+        if (string.IsNullOrEmpty(colorName))
+            return "";
+        
+        var colorOption = OptionsColorBote.FirstOrDefault(o => o.Value == colorName);
+        return colorOption?.ColorHex ?? "";
+    }
+
+    private string GetColorHexCover(string colorName)
+    {
+        if (string.IsNullOrEmpty(colorName))
+            return "";
+        
+        var colorOption = OptionsColorcover.FirstOrDefault(o => o.Value == colorName);
+        return colorOption?.ColorHex ?? "";
+    }
+
+    private async Task UpdateSelectedOption()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            // Ensure values are strings
+            var capacidad = selectedSize;
+            var boca = selectedDiameter;
+            
+            Logger.LogInformation($"Updating container packaging: Size={capacidad}, Diameter={boca}");
+
+            var data = new
+            {
+                Bote_forma = SelectedOption?.BoteForma ?? "",
+                Bote_capacidad = capacidad,
+                Bote_boca = boca,
+                Bote_color = selectedColor,
+                Bote_material = selectedMaterial,
+                Cap_tapa = SelectedOptionCap?.CapTapa ?? "",
+                Cap_Boca = boca,
+                Cap_color = selectedCapColor,
+                Cap_sleever = capSleever,
+                Characteristics = $"{selectedColor} {capacidad}cc {selectedMaterial} {boca}"
+            };
+
+            var response = await Http.PatchAsJsonAsync(
+                $"api/CustomizeRG35('{CodeRG35}')?$expand=Formulation,Recipe,Analytics&tenant=nutris",
+                data
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                Logger.LogInformation("Container packaging updated successfully");
+                
+                // Notify parent component
+                var updatedOptions = new UpdatedOptions
+                {
+                    BoteOption = new SelectedBoteOption
+                    {
+                        BoteForma = SelectedOption?.BoteForma ?? "",
+                        BoteCapacidad = capacidad,
+                        BoteBoca = boca,
+                        BoteColor = selectedColor,
+                        BoteMaterial = selectedMaterial
+                    },
+                    CapOption = new SelectedCapOption
+                    {
+                        CapTapa = SelectedOptionCap?.CapTapa ?? "",
+                        CapBoca = boca,
+                        CapColor = selectedCapColor,
+                        CapSleever = capSleever
+                    },
+                    Characteristics = data.Characteristics
+                };
+                
+                await OnOptionsUpdated.InvokeAsync(updatedOptions);
+                
+                // Reload page
+                Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Logger.LogError($"API error response: {errorContent}");
+                await ShowAlert("Error updating data. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error updating container packaging");
+            await ShowAlert("An error occurred. Please try again.");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CloseModal()
+    {
+        await OnClose.InvokeAsync();
+    }
+
+    private async Task ShowAlert(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
+    }
+
+    // Data models
+    public class Option
+    {
+        public int ID { get; set; }
+        public string Value { get; set; } = "";
+    }
+
+    public class OptionColor
+    {
+        public int ID { get; set; }
+        public string Value { get; set; } = "";
+        public string ColorHex { get; set; } = "";
+    }
+
+    public class SelectedBoteOption
+    {
+        public string? BoteForma { get; set; }
+        public string? BoteCapacidad { get; set; }
+        public string? BoteBoca { get; set; }
+        public string? BoteColor { get; set; }
+        public string? BoteMaterial { get; set; }
+    }
+
+    public class SelectedCapOption
+    {
+        public string? CapTapa { get; set; }
+        public string? CapBoca { get; set; }
+        public string? CapColor { get; set; }
+        public bool CapSleever { get; set; }
+    }
+
+    public class Detalle
+    {
+        public double? Altura { get; set; }
+        public double? DiametroBase { get; set; }
+        public double? DiametroDeBoca { get; set; }
+    }
+
+    public class BoteSize
+    {
+        public int[] DimensionesPrincipales { get; set; } = Array.Empty<int>();
+    }
+
+    public class UpdatedOptions
+    {
+        public SelectedBoteOption? BoteOption { get; set; }
+        public SelectedCapOption? CapOption { get; set; }
+        public string Characteristics { get; set; } = "";
+    }
+}

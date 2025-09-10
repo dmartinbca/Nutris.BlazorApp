@@ -1,0 +1,33 @@
+﻿@* StepActiveOne.razor *@
+@namespace NutrisBlazor.Components.Steps
+
+<div class="step1 font-13 w-100">
+    <svg width="100%" height="60" viewBox="0 0 228 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g filter="url(#filter0_d_35_1826)">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M2 5C2 2.79086 3.79086 1 6 1H207.679C209.114 1 210.44 1.76914 211.152 3.01544L224.866 27.0154C225.569 28.2452 225.569 29.7548 224.866 30.9846L211.152 54.9846C210.44 56.2309 209.114 57 207.679 57H6C3.79086 57 2 55.2091 2 53V5Z"
+                  fill="@Background"
+                  stroke="@Border"
+                  stroke-width="2" />
+        </g>
+        <text x="35" y="35" fill="@Color" class="font-13 RalewayBold">@Localization["Steps.Step1"]</text>
+        <defs>
+            <filter id="filter0_d_35_1826" x="0" y="0" width="227.393" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                <feOffset dy="1" />
+                <feGaussianBlur stdDeviation="1" />
+                <feColorMatrix type="matrix" values="0 0 0 0 0.215686 0 0 0 0 0.254902 0 0 0 0 0.317647 0 0 0 0.08 0" />
+                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_35_1826" />
+                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_35_1826" result="shape" />
+            </filter>
+        </defs>
+    </svg>
+</div>
+
+@code {
+    [Parameter] public string Background { get; set; } = "#8ED300";
+    [Parameter] public string Color { get; set; } = "#FFFFFF";
+    [Parameter] public string Border { get; set; } = "none";
+    [Inject] public ILocalizationService Localization { get; set; } = default!;
+}

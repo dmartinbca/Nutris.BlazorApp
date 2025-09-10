@@ -1,0 +1,973 @@
+﻿@page "/customize"
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@using System.Linq
+
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject IApiService ApiService
+@inject ILocalStorageService LocalStorage
+@inject ILocalizationService Localization
+@implements IDisposable
+
+<PageTitle>@Localization["NavBar.Customize"] - NutrisBlazor</PageTitle>
+
+<!-- Language Selector -->
+<div class="language-selector-products">
+    <button class="language-button" type="button" @onclick="ToggleLanguageMenu">
+        @if (currentLanguage == "es")
+        {
+            <span>Español</span>
+        }
+        else
+        {
+            <span>English</span>
+        }
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+        </svg>
+    </button>
+
+    @if (showLanguageMenu)
+    {
+        <div class="language-dropdown">
+            <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("en"))">
+                English
+            </button>
+            <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("es"))">
+                Español
+            </button>
+        </div>
+    }
+</div>
+
+<!-- Back Button -->
+<div class="back-button-container">
+    <button class="back-button" @onclick="GoBack">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="32" r="32" fill="#2F5496" />
+            <path d="M47 32.126H18.608M25.7061 23L17.297 31.409C16.901 31.805 16.901 32.447 17.297 32.843L25.7061 41.252"
+                  stroke="white" stroke-width="2.3" stroke-linecap="round" />
+        </svg>
+    </button>
+</div>
+
+<style>
+    /* Language Selector - Exacto como YourProducts */
+    .language-selector-products {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 200;
+    }
+
+    .language-button {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 140px;
+        justify-content: space-between;
+    }
+
+        .language-button:hover {
+            background: #f8f9fa;
+        }
+
+    .language-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        min-width: 150px;
+        overflow: hidden;
+    }
+
+    .dropdown-item {
+        display: block;
+        width: 100%;
+        padding: 10px 16px;
+        background: none;
+        border: none;
+        text-align: left;
+        color: #495057;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+    /* Back Button - Exacto como YourProducts */
+    .back-button-container {
+        position: fixed;
+        top: 15%;
+        left: 270px;
+        transform: translateY(-50%);
+        z-index: 100;
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        padding: 0;
+        display: block;
+    }
+
+        .back-button:hover {
+            transform: scale(1.1);
+        }
+
+    /* Loading Overlay */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999999;
+    }
+
+    .spinner {
+        border: 5px solid rgba(0,0,0,.1);
+        border-left-color: #09f;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Main Content - Copiado exacto de YourProducts */
+    .products-main-content {
+        padding: 2rem 3rem;
+        margin: 40px auto;
+        max-width: 2400px;
+        font-family: 'Museo', sans-serif;
+        width: calc(100% - 20px);
+        margin-left: 20px;
+    }
+
+    /* Search Container - Copiado exacto de YourProducts */
+    .products-search-container {
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        background-color: #C0CBDD;
+        padding: 0.69rem 0.94rem;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        align-items: center;
+    }
+
+    .products-search-form-grid {
+        width: 50%;
+        display: grid;
+        position: relative;
+    }
+
+    .products-search-field {
+        background-color: #F9F9FA;
+        padding: 0.37rem 0.5rem 0.37rem 3rem;
+        border-style: none;
+        border-radius: 0.5rem;
+        width: 100%;
+        height: 40px;
+        font-family: 'Museo', sans-serif;
+        font-size: 1rem;
+    }
+
+        .products-search-field:focus-visible {
+            outline: none;
+        }
+
+    .products-search-btn {
+        width: 30px;
+        height: 30px;
+        background-color: transparent;
+        background-image: url('/iconbuttons/search-icon.svg');
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+        border: none;
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .products-search-btn-filter {
+        width: 30px;
+        height: 26px;
+        cursor: pointer;
+    }
+
+    /* Table Container - Copiado exacto de YourProducts */
+    .products-table-container {
+        width: 100%;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        background-color: #F9F9FA;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+    }
+
+    table.products-customize {
+        border-collapse: separate;
+        border-spacing: 0.1rem;
+        width: 100%;
+    }
+
+    .products-customize th,
+    .products-customize td {
+        background-color: transparent;
+        border-bottom: dotted 1px black;
+        padding: 1rem;
+        text-align: left;
+    }
+
+    .products-customize th {
+        border: none;
+        font-family: 'MuseoSemiBold', sans-serif;
+        font-weight: 600;
+        color: #333;
+        font-size: 1.125rem;
+    }
+
+    .products-customize td {
+        vertical-align: middle;
+        font-family: 'RalewayRegular', sans-serif;
+        font-size: 0.95rem;
+    }
+
+        .products-customize td p {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+    .products-customize tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Status Pills - Copiado exacto de YourProducts */
+    .products-status-finish {
+        color: #fff;
+        font-weight: 700;
+        border: solid 1px #0ED88F;
+        background-color: #0ED88F;
+        border-radius: 30px;
+        line-height: 1rem;
+        padding: 0.50rem 1rem;
+        text-align: center;
+        width: max-content;
+        display: inline-block;
+        font-size: 0.875rem;
+    }
+
+    .products-status-develop {
+        color: #fff;
+        font-weight: 700;
+        border: solid 1px #F9D453;
+        background-color: #F9D453;
+        border-radius: 30px;
+        line-height: 1rem;
+        padding: 0.50rem 1rem;
+        text-align: center;
+        width: max-content;
+        display: inline-block;
+        font-size: 0.875rem;
+    }
+
+    .products-status-initial {
+        color: #fff;
+        font-weight: 700;
+        border: solid 1px #eb6710;
+        background-color: #eb6710;
+        border-radius: 30px;
+        line-height: 1rem;
+        padding: 0.50rem 1rem;
+        text-align: center;
+        width: max-content;
+        display: inline-block;
+        font-size: 0.875rem;
+    }
+
+    /* Order Button - Copiado exacto de YourProducts */
+    .products-order-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: auto;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #2F5496;
+        border: solid 2px #2F5496;
+        border-radius: 30px;
+        background-color: transparent;
+        padding: 0.5rem 1.2rem;
+        max-width: max-content;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-family: 'Museo', sans-serif;
+    }
+
+        .products-order-btn:hover {
+            color: white;
+            background-color: #2F5496;
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+            .products-order-btn:hover svg {
+                stroke: white;
+            }
+
+        .products-order-btn span {
+            white-space: nowrap;
+        }
+
+    /* Empty State - Copiado exacto de YourProducts */
+    .products-empty-container {
+        min-height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #F9F9FA;
+        border-radius: 20px;
+        margin-top: 2rem;
+    }
+
+    .products-empty-content {
+        text-align: center;
+        color: #C0CBDD;
+    }
+
+        .products-empty-content img {
+            display: block;
+            margin: 0 auto 40px;
+            width: 100px;
+            height: 100px;
+        }
+
+        .products-empty-content h2 {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: #C0CBDD;
+        }
+
+        .products-empty-content p {
+            font-size: 20px;
+            font-weight: 300;
+            color: #999A9B;
+        }
+
+    /* Filter Modal - Copiado exacto de YourProducts */
+    .products-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+    .products-filter-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        z-index: 1001;
+        width: 400px;
+        max-width: 90%;
+    }
+
+    .products-filter-modal-content {
+        padding: 0;
+    }
+
+    .products-filter-modal-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e5e5e5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .products-filter-modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #333;
+            font-family: 'Museo', sans-serif;
+        }
+
+    .products-close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #999;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .products-close-btn:hover {
+            color: #666;
+        }
+
+    .products-filter-modal-body {
+        padding: 1.5rem;
+    }
+
+    .products-filter-group {
+        margin-bottom: 1rem;
+    }
+
+        .products-filter-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .products-filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #666;
+            font-family: 'Museo', sans-serif;
+        }
+
+    .products-form-control {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+        font-family: 'Museo', sans-serif;
+        background-color: white;
+    }
+
+        .products-form-control:focus {
+            outline: none;
+            border-color: #2F5496;
+        }
+
+    .products-filter-modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e5e5e5;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    .products-btn-clear,
+    .products-btn-apply {
+        padding: 0.5rem 1.5rem;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Museo', sans-serif;
+        font-weight: 500;
+    }
+
+    .products-btn-clear {
+        background: white;
+        border: 1px solid #ddd;
+        color: #666;
+    }
+
+        .products-btn-clear:hover {
+            background: #f5f5f5;
+        }
+
+    .products-btn-apply {
+        background: #2F5496;
+        border: none;
+        color: white;
+    }
+
+        .products-btn-apply:hover {
+            background: #1e3a6f;
+        }
+
+    /* Responsive Design - Copiado exacto de YourProducts */
+    @@media (max-width: 1400px) {
+        .products-main-content {
+            max-width: 1200px;
+        }
+    }
+
+    @@media (max-width: 1200px) {
+        .products-main-content {
+            padding: 3rem 2rem;
+            max-width: 100%;
+        }
+    }
+
+    @@media (max-width: 1024px) {
+        .products-main-content {
+            padding: 2rem 1rem;
+        }
+
+        .products-search-form-grid {
+            width: 60%;
+        }
+
+        .products-customize th,
+        .products-customize td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .products-order-btn {
+            font-size: 0.875rem !important;
+            padding: 0.25rem 0.75rem;
+        }
+
+        .products-status-finish,
+        .products-status-develop,
+        .products-status-initial {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .back-button-container {
+            left: 240px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .products-main-content {
+            padding: 1rem;
+            margin-left: 320px;
+        }
+
+        .products-search-container {
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .products-search-form-grid {
+            width: 100%;
+        }
+
+        .products-table-container {
+            overflow-x: auto;
+            padding: 1rem;
+        }
+
+        .products-customize {
+            min-width: 700px;
+        }
+
+        .products-filter-modal {
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .back-button-container {
+            display: none;
+        }
+    }
+</style>
+
+@if (IsLoading)
+{
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+}
+else
+{
+    <div class="products-main-content">
+        @if (ProductList.Any())
+        {
+            <div class="products-search-container">
+                <form class="products-search-form-grid" @onsubmit:preventDefault="true">
+                    <input class="products-search-field" type="text" @bind="searchTerm" @bind:event="oninput"
+                           name="search" placeholder="@Localization["Search"]...">
+                    <button class="products-search-btn" type="submit"></button>
+                </form>
+                <div style="position: relative; display: inline-block;">
+                    <svg class="products-search-btn-filter" @onclick="OpenFilterModal"
+                         xmlns="http://www.w3.org/2000/svg" width="30" height="26" viewBox="0 0 24 24"
+                         fill="none" stroke="#2F5496" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="products-table-container">
+                <table class="products-customize">
+                    <thead>
+                        <tr>
+                            <th>@Localization["code"]</th>
+                            <th>@Localization["product_name"]</th>
+                            <th>@Localization["container"]</th>
+                            <th>@Localization["units_per_container"]</th>
+                            <th>@Localization["status"]</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in GetFilteredList())
+                        {
+                            <tr>
+                                <td><p>@item.Code</p></td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.Product_name))
+                                    {
+                                        <p>@item.Product_name</p>
+                                    }
+                                    else
+                                    {
+                                        <p>-</p>
+                                    }
+                                </td>
+                                <td><p>@item.Container</p></td>
+                                <td>
+                                    <p>@(item.Container == "Bulk" && item.Units_per_container == 0 ? "-" : item.Units_per_container.ToString())</p>
+                                </td>
+                                <td>
+                                    <p class="@GetStatusClass(item.Status)">@GetStatusKey(item.Status)</p>
+                                </td>
+                                <td>
+                                    <button class="products-order-btn" @onclick="() => NavigateToCustomize(item.Code)">
+                                        <span>@Localization["ButtonCustomize"]</span>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="products-empty-container">
+                <div class="products-empty-content">
+                    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 16V8C20.9996 7.64927 20.9071 7.30481 20.7315 7.00116C20.556 6.69751 20.3037 6.44536 20 6.27L13 2.27C12.696 2.09446 12.3511 2.00205 12 2.00205C11.6489 2.00205 11.304 2.09446 11 2.27L4 6.27C3.69626 6.44536 3.44398 6.69751 3.26846 7.00116C3.09294 7.30481 3.00036 7.64927 3 8V16C3.00036 16.3507 3.09294 16.6952 3.26846 16.9988C3.44398 17.3025 3.69626 17.5546 4 17.73L11 21.73C11.304 21.9055 11.6489 21.9979 12 21.9979C12.3511 21.9979 12.696 21.9055 13 21.73L20 17.73C20.3037 17.5546 20.556 17.3025 20.7315 16.9988C20.9071 16.6952 20.9996 16.3507 21 16Z" stroke="#C0CBDD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 12V22" stroke="#C0CBDD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <h2>@Localization["NoProducts"]</h2>
+                    <p>@Localization["NoProductsMessage"]</p>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<!-- Filter Modal -->
+@if (showFilterModal)
+{
+    <div class="products-modal-backdrop" @onclick="CloseFilterModal"></div>
+    <div class="products-filter-modal">
+        <div class="products-filter-modal-content">
+            <div class="products-filter-modal-header">
+                <h3>@Localization["Filter"]</h3>
+                <button class="products-close-btn" @onclick="CloseFilterModal">&times;</button>
+            </div>
+            <div class="products-filter-modal-body">
+                <div class="products-filter-group">
+                    <label>@Localization["container"]</label>
+                    <select @bind="filter.Container" class="products-form-control">
+                        <option value="">@Localization["All"]</option>
+                        <option value="Bote">@Localization["Bote"]</option>
+                        <option value="Bulk">@Localization["Bulk"]</option>
+                    </select>
+                </div>
+                <div class="products-filter-group">
+                    <label>@Localization["status"]</label>
+                    <select @bind="filter.Status" class="products-form-control">
+                        <option value="">@Localization["All"]</option>
+                        <option value="Cerrado cliente y calidad">@Localization["Cerrado cliente y calidad"]</option>
+                        <option value="Cerrado cliente">@Localization["Cerrado cliente"]</option>
+                        <option value="Desarrollo">@Localization["Desarrollo"]</option>
+                    </select>
+                </div>
+            </div>
+            <div class="products-filter-modal-footer">
+                <button class="products-btn-clear" @onclick="ClearFilter">@Localization["Clear"]</button>
+                <button class="products-btn-apply" @onclick="ApplyFilter">@Localization["Apply"]</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    // State Management
+    private bool IsLoading = true;
+    private List<Product> ProductList = new();
+    private string searchTerm = "";
+    private bool showFilterModal = false;
+    private bool showLanguageMenu = false;
+    private string currentLanguage = "es";
+
+    // Filter State
+    private FilterModel filter = new FilterModel();
+
+    // Options for filters
+    private readonly List<string> containerOptions = new() { "Bote", "Bulk" };
+    private readonly List<string> statusOptions = new()
+    {
+        "Cerrado cliente",
+        "Desarrollo",
+        "Cerrado cliente y calidad"
+    };
+
+    public class ApiResponseP
+    {
+        public List<Product> Value { get; set; } = new();
+    }
+
+    // Product Model
+    public class Product
+    {
+        public string Code { get; set; } = "";
+        public string Product_name { get; set; } = "";
+        public string Container { get; set; } = "";
+        public int Units_per_container { get; set; }
+        public string Status { get; set; } = "";
+        public bool Has_RG35 { get; set; }
+    }
+
+    // Filter Model
+    public class FilterModel
+    {
+        public string Container { get; set; } = "";
+        public string Status { get; set; } = "";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Obtener idioma actual
+        currentLanguage = Localization.CurrentLanguage ?? "es";
+
+        // Suscribirse a cambios de idioma
+        Localization.OnLanguageChanged += OnLanguageChanged;
+
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        try
+        {
+            IsLoading = true;
+            ProductList.Clear();
+
+            // Get customer number from localStorage
+            var customerNo = await JS.InvokeAsync<string>("localStorage.getItem", "No_");
+
+            if (string.IsNullOrEmpty(customerNo))
+            {
+                Console.WriteLine("No customer number found in localStorage");
+                return;
+            }
+
+            // Build filter strings
+            var filter37 = $"Customer eq '{customerNo}' and " +
+                          "(Status eq 'Cerrado cliente' or Status eq 'Desarrollo' or Status eq 'Cerrado cliente y calidad') " +
+                          "and Has_RG35 eq false";
+
+            var filter35 = $"Customer eq '{customerNo}' and " +
+                          "(Status eq 'Cerrado cliente' or Status eq 'Desarrollo')";
+
+            // Load RG37 products
+            var response37 = await ApiService.GetAsync<ApiResponseP>($"CustomizeList37?tenant=nutris&$filter={filter37}");
+            if (response37?.Value != null)
+            {
+                foreach (var item in response37.Value)
+                {
+                    if (item.Has_RG35 != true) // Only add if not Has_RG35
+                    {
+                        ProductList.Add(new Product
+                        {
+                            Code = item.Code ?? "",
+                            Product_name = item.Product_name ?? "",
+                            Container = item.Container ?? "",
+                            Units_per_container = item.Units_per_container,
+                            Status = item.Status ?? "",
+                            Has_RG35 = item.Has_RG35
+                        });
+                    }
+                }
+            }
+
+            // Load RG35 products
+            var response35 = await ApiService.GetAsync<ApiResponseP>($"CustomizeList?tenant=nutris&$filter={filter35}");
+            if (response35?.Value != null)
+            {
+                foreach (var item in response35.Value)
+                {
+                    if (item.Has_RG35 != true) // Only add if not Has_RG35
+                    {
+                        ProductList.Add(new Product
+                        {
+                            Code = item.Code ?? "",
+                            Product_name = item.Product_name ?? "",
+                            Container = item.Container ?? "",
+                            Units_per_container = item.Units_per_container,
+                            Status = item.Status ?? "",
+                            Has_RG35 = item.Has_RG35
+                        });
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading products: {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private List<Product> GetFilteredList()
+    {
+        var filtered = ProductList.AsEnumerable();
+
+        // Apply search filter
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var search = searchTerm.ToLower();
+            filtered = filtered.Where(item =>
+                item.Code.ToLower().Contains(search) ||
+                item.Product_name.ToLower().Contains(search) ||
+                item.Container.ToLower().Contains(search) ||
+                item.Units_per_container.ToString().Contains(search) ||
+                GetStatusKey(item.Status).ToLower().Contains(search)
+            );
+        }
+
+        // Apply container filter
+        if (!string.IsNullOrEmpty(filter.Container))
+        {
+            filtered = filtered.Where(item => item.Container == filter.Container);
+        }
+
+        // Apply status filter
+        if (!string.IsNullOrEmpty(filter.Status))
+        {
+            filtered = filtered.Where(item => item.Status == filter.Status);
+        }
+
+        return filtered.ToList();
+    }
+
+    private string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "Cerrado cliente y calidad" => "products-status-finish",
+            "Cerrado cliente" => "products-status-initial",
+            "Desarrollo" => "products-status-develop",
+            _ => ""
+        };
+    }
+
+    private string GetStatusKey(string status)
+    {
+        if (string.IsNullOrEmpty(status)) return "";
+
+        var key = status.Trim();
+        var translated = Localization[key];
+
+        // If translation exists and is different from key, return translation
+        return !string.IsNullOrEmpty(translated) && translated != key ? translated : status;
+    }
+
+    private void NavigateToCustomize(string code)
+    {
+        Navigation.NavigateTo($"/customize-edit/{code}");
+    }
+
+    // Modal Methods
+    private void OpenFilterModal()
+    {
+        showFilterModal = true;
+    }
+
+    private void CloseFilterModal()
+    {
+        showFilterModal = false;
+    }
+
+    private void ApplyFilter()
+    {
+        showFilterModal = false;
+        StateHasChanged();
+    }
+
+    private void ClearFilter()
+    {
+        filter = new FilterModel();
+        StateHasChanged();
+    }
+
+    private void OnLanguageChanged()
+    {
+        currentLanguage = Localization.CurrentLanguage;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ToggleLanguageMenu()
+    {
+        showLanguageMenu = !showLanguageMenu;
+    }
+
+    private async Task SelectLanguage(string language)
+    {
+        showLanguageMenu = false;
+        await Localization.ChangeLanguageAsync(language);
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/home");
+    }
+
+    public void Dispose()
+    {
+        Localization.OnLanguageChanged -= OnLanguageChanged;
+    }
+}

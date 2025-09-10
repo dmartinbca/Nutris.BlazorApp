@@ -1,0 +1,387 @@
+﻿@namespace NutrisBlazor.Components.Modals
+@page "/components/modals/confirm"
+@using System.Text.Json
+@using NutrisBlazor.Components.Shared
+@inject ILocalizationService Localization
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@inject ILogger<ConfirmModal> Logger
+
+<Loading IsVisible="@isLoading" />
+
+@if (!isLoading)
+{
+    <div class="modal fade modal-overlay @(IsModalVisible ? "show d-block" : "")" 
+         id="confirmModal" 
+         tabindex="-1" 
+         aria-labelledby="confirmModalLabel" 
+         aria-hidden="@(!IsModalVisible)"
+         style="@(IsModalVisible ? "display: block;" : "display: none;")">
+        <div class="confirm-modal-container modal-dialog modal-content width855 height571">
+            <div class="modal-body">
+                <div class="img-confirm">
+                    <img class="width80" src="/img/icon-confirm.svg" alt="">
+                </div>
+                
+                <div class="paragraph-confirm font-24">
+                    <span>@Localization["modalConfirm.text"]</span>
+                </div>
+
+                <button class="btn-save-atr-confirm RalewayRegular font-20" 
+                        @onclick="CloseClient"
+                        disabled="@isLoading">
+                    @Localization["modalConfirm.Confirmandsign"]
+                </button>
+                
+                <button class="btn-cancel-atr RalewayRegular font-20 close" 
+                        @onclick="CancelModal"
+                        aria-label="Close">
+                    @Localization["NavBar.Cancel"]
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    // Parameters
+    [Parameter] public string CodeRG35 { get; set; } = "";
+    [Parameter] public string Status { get; set; } = "Desarrollo";
+    [Parameter] public string RG37 { get; set; } = "";
+    [Parameter] public bool IsModalVisible { get; set; }
+    [Parameter] public string PalletComments { get; set; } = "";
+    
+    // Event Callbacks
+    [Parameter] public EventCallback<bool> IsModalVisibleChanged { get; set; }
+    [Parameter] public EventCallback OnConfirm { get; set; }
+  
+    // State variables
+    private bool isLoading = false;
+
+    protected override void OnInitialized()
+    {
+        // Initialize any required data
+        Logger.LogInformation($"ConfirmModal initialized with CodeRG35: {CodeRG35}");
+    }
+
+    protected override void OnParametersSet()
+    {
+        // Handle parameter changes if needed
+        if (IsModalVisible)
+        {
+            Logger.LogInformation($"Modal opened for CodeRG35: {CodeRG35}");
+        }
+    }
+
+    private async Task CloseClient()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var data = new
+            {
+                Status = "Cerrado cliente"
+                // Pallet_comments = PalletComments // Uncomment if needed
+            };
+
+            Logger.LogInformation($"Updating status for {CodeRG35} to 'Cerrado cliente'");
+
+            var response = await Http.PatchAsJsonAsync(
+                $"api/CustomizeRG35('{CodeRG35}')", 
+                data
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Logger.LogInformation($"Data updated successfully: {responseContent}");
+                
+                // Close this modal
+                await UpdateModalVisibility(false);
+                
+                // Notify parent component to proceed with confirmation
+                await OnConfirm.InvokeAsync();
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Logger.LogError($"API error response: {errorContent}");
+                await ShowErrorAlert("Error updating status. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error updating data for {CodeRG35}");
+            await ShowErrorAlert("An error occurred. Please try again.");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CancelModal()
+    {
+        Logger.LogInformation("Modal cancelled by user");
+        await UpdateModalVisibility(false);
+        
+        // Hide modal with Bootstrap if needed
+        await HideBootstrapModal();
+    }
+
+    private async Task UpdateModalVisibility(bool visible)
+    {
+        IsModalVisible = visible;
+        await IsModalVisibleChanged.InvokeAsync(visible);
+        StateHasChanged();
+    }
+
+    private async Task HideBootstrapModal()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                const modal = document.getElementById('confirmModal');
+                if (modal) {
+                    const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                    if (bootstrapModal) {
+                        bootstrapModal.hide();
+                    }
+                    // Remove backdrop if exists
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) {
+                        backdrop.remove();
+                    }
+                }
+            ");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error hiding Bootstrap modal");
+        }
+    }
+
+    private async Task ShowErrorAlert(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
+    }
+
+    // Public method to show the modal programmatically
+    public async Task ShowModal()
+    {
+        await UpdateModalVisibility(true);
+    }
+
+    // Public method to hide the modal programmatically
+    public async Task HideModal()
+    {
+        await UpdateModalVisibility(false);
+    }
+}
+
+<style>
+    .modal {
+        border: none;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #DEE6F38C; /* Color con transparencia (8C = 55% de opacidad) */
+        z-index: 999;
+        backdrop-filter: blur(2px); /* Efecto de desenfoque */
+    }
+
+    .confirm-modal-container {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: 689px;
+        height: 460px;
+        background-color: var(--sectionSuperior);
+        padding: 4.3rem 0;
+        margin: auto;
+        border-radius: 15px;
+        box-shadow: 1px 3px 20px -2px #00000021;
+        overflow: hidden;
+        border: none;
+    }
+
+    .modal.show .modal-dialog {
+        padding: 2.064rem;
+    }
+
+    .img-confirm {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .img-confirm img {
+        display: block;
+        margin: auto;
+    }
+
+    .width80 {
+        width: 80px;
+        height: auto;
+    }
+
+    .paragraph-confirm {
+        margin: 2.82rem 0;
+        text-align: center;
+        font-size: 1.13em;
+        color: #000;
+        padding: 0 2rem;
+        line-height: 1.6;
+    }
+
+    .btn-cancel-atr {
+        display: block;
+        background-color: transparent;
+        color: var(--textButton);
+        font-size: 1.44em;
+        margin: 1rem auto;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: 1rem 1.57rem;
+        border-radius: 30px;
+        border: none;
+    }
+
+    .btn-cancel-atr:hover {
+        color: var(--textButton);
+        background: white;
+        border: 1px solid var(--textButton);
+        transition: all 0.3s ease;
+    }
+
+    .btn-save-atr-confirm {
+        display: block;
+        border: solid 1px var(--textButton);
+        border-radius: 30px;
+        background-color: var(--textButton);
+        line-height: 1rem;
+        font-size: 1.44em;
+        padding: 1.44rem 1.57rem;
+        color: #fff;
+        margin: 3rem auto 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-save-atr-confirm:hover:not(:disabled) {
+        color: var(--textButton);
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-save-atr-confirm:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* Animation for modal appearance */
+    .modal.fade {
+        opacity: 0;
+        transition: opacity 0.3s linear;
+    }
+
+    .modal.show {
+        opacity: 1;
+    }
+
+    .modal.fade .modal-dialog {
+        transition: transform 0.3s ease-out;
+        transform: translate(0, -50px);
+    }
+
+    .modal.show .modal-dialog {
+        transform: none;
+    }
+
+    /* Responsive styles */
+    @@media (max-width: 768px) {
+        .confirm-modal-container {
+            max-width: 90%;
+            height: auto;
+            min-height: 400px;
+            padding: 3rem 1rem;
+        }
+
+        .paragraph-confirm {
+            font-size: 1em;
+            padding: 0 1rem;
+            margin: 2rem 0;
+        }
+
+        .btn-save-atr-confirm,
+        .btn-cancel-atr {
+            font-size: 1.2em;
+            padding: 0.8rem 1.2rem;
+        }
+
+        .btn-save-atr-confirm {
+            margin: 2rem auto 0;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .confirm-modal-container {
+            max-width: 95%;
+            padding: 2rem 0.5rem;
+        }
+
+        .paragraph-confirm {
+            font-size: 0.9em;
+        }
+
+        .btn-save-atr-confirm,
+        .btn-cancel-atr {
+            font-size: 1em;
+            padding: 0.7rem 1rem;
+        }
+
+        .width80 {
+            width: 60px;
+        }
+    }
+
+    /* Ensure proper stacking */
+    .modal {
+        z-index: 1050;
+    }
+
+    .modal-dialog {
+        z-index: 1055;
+    }
+
+    /* Additional utility classes */
+    .width855 {
+        max-width: 855px;
+    }
+
+    .height571 {
+        max-height: 571px;
+    }
+
+    .font-20 {
+        font-size: 20px;
+    }
+
+    .font-24 {
+        font-size: 24px;
+    }
+
+    .RalewayRegular {
+        font-family: 'RalewayRegular', sans-serif;
+    }
+</style>

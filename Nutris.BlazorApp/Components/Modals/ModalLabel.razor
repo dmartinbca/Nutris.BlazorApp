@@ -1,0 +1,635 @@
+﻿@namespace NutrisBlazor.Components.Modals
+@page "/components/modals/label"
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using NutrisBlazor.Components.Shared
+@inject ILocalizationService Localization
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ILogger<ModalLabel> Logger
+
+<Loading IsVisible="@isLoading" />
+
+@if (!isLoading)
+{
+    <div class="modal sidebar-right fade modal-overlay @(IsVisible ? "show d-block" : "")"
+         id="sidebarRightModal2"
+         tabindex="-1"
+         aria-labelledby="sidebarRightModal"
+         style="@(IsVisible ? "display: block;" : "display: none;")">
+        <div class="modal-dialog modal-dialog-sidebar modal-dialog-right">
+            <div class="modal-content">
+                <div class="modal_header justify-content-end">
+                    <button type="button" class="b-close" @onclick="CloseModal">
+                        <img class="btn-close"
+                             aria-label="Close"
+                             src="/img/close-x.svg"
+                             alt="" />
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="modal-body_header">
+                        <h2 class="modal-title font-32 modal-container-title MuseoSemiBold mb-2">
+                            @Localization["orderView.Label"]
+                        </h2>
+                    </div>
+
+                    <div class="tabs-inline">
+                        <section id="content1" class="content-bottle">
+                            <div class="parent-label">
+                                <div class="child-bottles-form">
+                                    <h3 class="child-bottle-title_features font-24 RalewaySemiBold">
+                                        @Localization["modalLabel.Characteristics"]
+                                    </h3>
+                                    
+                                    <div class="child_content_features-bottle-form">
+                                        <!-- Maximum Size -->
+                                        <div class="form-grup-input-field RalewayRegular">
+                                            <label class="form-group-label-size" for="size">
+                                                @Localization["modalLabel.Maximumsize"]
+                                            </label>
+                                            <select class="form-select-config font-16 Museo"
+                                                    @bind="labelSize"
+                                                    @bind:after="FetchPdfOnSizeChange"
+                                                    disabled>
+                                                <option value="">Select Size</option>
+                                                @foreach (var optionMX in OptionsSizeLabel)
+                                                {
+                                                    <option value="@optionMX.Value">@optionMX.Value</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Material -->
+                                        <div class="form-grup-input-field">
+                                            <label class="form-group-label-size" for="material">
+                                                @Localization["modalContainer.Material"]
+                                            </label>
+                                            <select class="form-select-config Museo"
+                                                    @bind="labelMaterial">
+                                                <option value="">Select Material</option>
+                                                @foreach (var optionLM in OptionsLabelMaterial)
+                                                {
+                                                    <option value="@optionLM.Value">@optionLM.Value</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="child_content_features-bottle-form">
+                                        <!-- Finish -->
+                                        <div class="form-grup-input-field">
+                                            <label class="form-group-label-size" for="finish">
+                                                @Localization["modalLabel.Finish"]
+                                            </label>
+                                            <select class="form-select-config Museo"
+                                                    @bind="labelFinish">
+                                                <option value="">Select Finish</option>
+                                                @foreach (var optionF in OptionsFinish)
+                                                {
+                                                    <option value="@optionF.Value">@optionF.Value</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Color -->
+                                        <div class="form-grup-input-field">
+                                            <label class="form-group-label-size" for="color">
+                                                @Localization["modalContainer.Color"]
+                                            </label>
+                                            <select class="form-select-config Museo"
+                                                    @bind="labelColors">
+                                                <option value="">Select Color</option>
+                                                @foreach (var optionC in OptionsColorLabel)
+                                                {
+                                                    <option value="@optionC.Value">@optionC.Value</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Download PDF Section -->
+                                    <div class="container-download-file">
+                                        <div class="container-download-file-button">
+                                            @if (!string.IsNullOrEmpty(pdfDownloadUrl))
+                                            {
+                                                <a href="@pdfDownloadUrl"
+                                                   download="troquel-@(labelSize).pdf"
+                                                   class="container-donload-file-text"
+                                                   style="cursor:pointer; display:inline-block;"
+                                                   target="_blank">
+                                                    <img src="/img/arrow-d.svg" alt="download" /><br />
+                                                    @Localization["ModalLabel.Downloadsample"]
+                                                </a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="child_content_info-bottle-label">
+                                    <!-- Draft Label Section -->
+                                    <div class="chil_content_info_upload">
+                                        <span class="child_content-label-info-title font-24 RalewayMedium">
+                                            @Localization["ModalLabel.DraftLabel"]
+                                        </span>
+                                        
+                                        <div class="child_content-label-button">
+                                            <InputFile id="fileInput"
+                                                       class="visually-hidden child_content-label-button-upload"
+                                                       accept="image/*"
+                                                       OnChange="HandleFileUpload" />
+                                        </div>
+                                        
+                                        <label for="fileInput" class="upload-content-btn2">
+                                            @if (string.IsNullOrEmpty(previewImage))
+                                            {
+                                                <div class="img-btn-upload">
+                                                    <span class="child_content-label-button-upload font-20 RalewayBold">
+                                                        @Localization["ModalLabel.UploadDraftVersion"]
+                                                    </span>
+                                                    <span class="RalewayRegular font-20">
+                                                        @Localization["ModalLabel.Nofileuploadyet"]
+                                                    </span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="preview-container">
+                                                    <img src="@previewImage" 
+                                                         alt="Preview" 
+                                                         class="preview-image" 
+                                                         style="width: 100px;">
+                                                </div>
+                                                
+                                                <div class="paragraph-upload">
+                                                    <button class="btn-save-atr-upload"
+                                                            @onclick="UpdatedDraftLabel"
+                                                            disabled="@(string.IsNullOrEmpty(previewImage) || isLoading)">
+                                                        @if (isLoading)
+                                                        {
+                                                            <Loading />
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@Localization["Upload"]</span>
+                                                        }
+                                                    </button>
+                                                </div>
+                                            }
+                                        </label>
+                                        
+                                        <div class="border-doted"></div>
+                                    </div>
+                                    
+                                    <!-- Final Label Section -->
+                                    <div class="chil_content_info_upload mt-2">
+                                        <span class="child_content-label-info-title font-24 RalewayMedium">
+                                            @Localization["ModalLabel.FinalLabel"]
+                                        </span>
+                                        
+                                        @if (!string.IsNullOrEmpty(FinalImagen))
+                                        {
+                                            <div class="child_content-label-button">
+                                                <span @onclick="DownloadImage" 
+                                                      class="child_content-label-button-upload cursor-pointer font-20 RalewayBold">
+                                                    @Localization["ModalLabel.DownloadLabel"]
+                                                </span>
+                                                <span class="RalewayRegular font-20">
+                                                    @Localization["ModalLabel.finalLabelmessage"]
+                                                </span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                <span class="RalewayRegular font-20">
+                                                    @Localization["ModalLabel.finalLabelmessageNot"]
+                                                </span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    
+                    <div class="modal-footer-bts">
+                        <button @onclick="CloseModal" 
+                                class="modal-footer-btc-cancel RalewayBold font-20">
+                            @Localization["NavBar.Cancel"]
+                        </button>
+                        <button class="modal-footer-btc-save RalewayBold font-20" 
+                                @onclick="UpdateSelectedOption">
+                            @Localization["NavBar.Save"]
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    // Parameters
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public List<OptionMX> OptionsSizeLabel { get; set; } = new();
+    [Parameter] public List<Option> OptionsFinish { get; set; } = new();
+    [Parameter] public List<Option> OptionsLabelMaterial { get; set; } = new();
+    [Parameter] public List<Option> OptionsColorLabel { get; set; } = new();
+    [Parameter] public SelectedLabelOptions? SelectedOptionLabels { get; set; }
+    [Parameter] public string CodeRG35 { get; set; } = "";
+    [Parameter] public string FinalImagen { get; set; } = "";
+    [Parameter] public EventCallback<LabelOptionsUpdatedEventArgs> OnLabelOptionsUpdated { get; set; }
+    [Parameter] public EventCallback<object> OnDraftLabelUpdated { get; set; }
+
+    // State variables
+    private bool isLoading = false;
+    private string? previewImage = null;
+    private string? base64Data = null;
+    private string? pdfDownloadUrl = null;
+    private long maxFileSize = 10 * 1024 * 1024; // 10MB
+
+    // Form fields
+    private string labelSize = "";
+    private string labelMaterial = "";
+    private string labelFinish = "";
+    private string labelColors = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize from SelectedOptionLabels
+        if (SelectedOptionLabels != null)
+        {
+            labelSize = SelectedOptionLabels.LabelSize ?? "";
+            labelMaterial = SelectedOptionLabels.LabelMaterial ?? "";
+            labelFinish = SelectedOptionLabels.LabelFinish ?? "";
+            labelColors = SelectedOptionLabels.LabelColors ?? "";
+            
+            if (!string.IsNullOrEmpty(labelSize))
+            {
+                await FetchPdfOnSizeChange();
+            }
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Update when parameters change
+        if (SelectedOptionLabels != null)
+        {
+            labelSize = SelectedOptionLabels.LabelSize ?? labelSize;
+            labelMaterial = SelectedOptionLabels.LabelMaterial ?? labelMaterial;
+            labelFinish = SelectedOptionLabels.LabelFinish ?? labelFinish;
+            labelColors = SelectedOptionLabels.LabelColors ?? labelColors;
+        }
+    }
+
+    private async Task FetchPdfOnSizeChange()
+    {
+        // Clean up previous URL if exists
+        if (!string.IsNullOrEmpty(pdfDownloadUrl))
+        {
+            await JSRuntime.InvokeVoidAsync("URL.revokeObjectURL", pdfDownloadUrl);
+            pdfDownloadUrl = null;
+        }
+
+        if (string.IsNullOrEmpty(labelSize))
+        {
+            return;
+        }
+
+        var data = new { numeroTroquel = labelSize };
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync(
+                "api/troquelPDF(1)/Microsoft.NAV.Download",
+                data
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var jsonDoc = JsonDocument.Parse(responseContent);
+                
+                if (jsonDoc.RootElement.TryGetProperty("data", out var dataElement) &&
+                    dataElement.TryGetProperty("value", out var valueElement))
+                {
+                    var base64 = valueElement.GetString();
+                    
+                    if (!string.IsNullOrEmpty(base64))
+                    {
+                        // Remove prefix if present
+                        if (base64.StartsWith("data:application/pdf;base64,"))
+                        {
+                            base64 = base64.Replace("data:application/pdf;base64,", "");
+                        }
+                        
+                        // Remove whitespace
+                        base64 = base64.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+                        
+                        // Create blob URL using JavaScript
+                        pdfDownloadUrl = await CreateBlobUrl(base64, "application/pdf");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error fetching PDF for troquel");
+            pdfDownloadUrl = null;
+        }
+    }
+
+    private async Task<string> CreateBlobUrl(string base64, string mimeType)
+    {
+        var url = await JSRuntime.InvokeAsync<string>("createBlobUrl", base64, mimeType);
+        return url;
+    }
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+            
+            // Validate file type
+            if (!file.ContentType.StartsWith("image/"))
+            {
+                await ShowAlert(Localization["Pleaseselectavalidimagefile"]);
+                return;
+            }
+
+            // Validate file size
+            if (file.Size > maxFileSize)
+            {
+                await ShowAlert($"File size must be less than {maxFileSize / (1024 * 1024)}MB");
+                return;
+            }
+
+            // Read file and convert to base64
+            using var stream = file.OpenReadStream(maxFileSize);
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            var bytes = memoryStream.ToArray();
+            
+            // Create base64 string
+            base64Data = Convert.ToBase64String(bytes);
+            previewImage = $"data:{file.ContentType};base64,{base64Data}";
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error uploading file");
+            await ShowAlert("Error uploading file. Please try again.");
+            previewImage = null;
+            base64Data = null;
+        }
+    }
+
+    private async Task UpdateSelectedOption()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        var data = new
+        {
+            Label_size = labelSize,
+            Label_material = labelMaterial,
+            Label_finish = labelFinish,
+            Label_Color = labelColors
+        };
+
+        Logger.LogInformation("Updating label options with data: {@Data}", data);
+
+        try
+        {
+            var response = await Http.PatchAsJsonAsync(
+                $"api/CustomizeRG35('{CodeRG35}')?$expand=Formulation,Recipe,Analytics&tenant=nutris",
+                data
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Logger.LogInformation("Label options updated successfully");
+
+                // Emit event to parent component
+                var eventData = new LabelOptionsUpdatedEventArgs
+                {
+                    Response = responseContent,
+                    SentData = data
+                };
+                
+                await OnLabelOptionsUpdated.InvokeAsync(eventData);
+                
+                // Close modal after delay
+                await Task.Delay(500);
+                await CloseModal();
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Logger.LogError("API error response: {Error}", errorContent);
+                await ShowAlert("Error updating label options. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error updating label options");
+            await ShowAlert("An error occurred. Please try again.");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task UpdatedDraftLabel()
+    {
+        if (string.IsNullOrEmpty(base64Data))
+        {
+            await ShowAlert("Please select an image first");
+            return;
+        }
+
+        isLoading = true;
+        StateHasChanged();
+
+        var data = new
+        {
+            numeroRG = CodeRG35,
+            tipoImagen = "Label_imagen",
+            imagenBase64 = base64Data
+        };
+
+        Logger.LogInformation("Updating draft label for {CodeRG35}", CodeRG35);
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync(
+                "api/modificarImagen(1)/Microsoft.NAV.modificarCab",
+                data
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Logger.LogInformation("Draft label updated successfully");
+
+                // Emit event to parent component
+                await OnDraftLabelUpdated.InvokeAsync(responseContent);
+                
+                // Close modal after delay
+                await Task.Delay(500);
+                await CloseModal();
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Logger.LogError("API error response: {Error}", errorContent);
+                await ShowAlert("Error updating draft label. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error updating draft label");
+            await ShowAlert("An error occurred. Please try again.");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DownloadImage()
+    {
+        if (string.IsNullOrEmpty(FinalImagen))
+        {
+            await ShowAlert("No image available to download");
+            return;
+        }
+
+        try
+        {
+            // Create download link using JavaScript
+            await JSRuntime.InvokeVoidAsync("downloadBase64File", 
+                FinalImagen, 
+                $"Label-Imagen-{CodeRG35}.png",
+                "image/png");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error downloading image");
+            await ShowAlert("Error downloading image. Please try again.");
+        }
+    }
+
+    private async Task CloseModal()
+    {
+        // Clean up blob URL if exists
+        if (!string.IsNullOrEmpty(pdfDownloadUrl))
+        {
+            await JSRuntime.InvokeVoidAsync("URL.revokeObjectURL", pdfDownloadUrl);
+            pdfDownloadUrl = null;
+        }
+        
+        // Reset state
+        previewImage = null;
+        base64Data = null;
+        
+        // Notify parent component
+        await OnClose.InvokeAsync();
+        
+        // Hide Bootstrap modal if needed
+        await JSRuntime.InvokeVoidAsync("hideBootstrapModal", "sidebarRightModal2");
+    }
+
+    private async Task ShowAlert(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
+    }
+
+    // Data models
+    public class OptionMX
+    {
+        public int ID { get; set; }
+        public string Value { get; set; } = "";
+        public string Imagen { get; set; } = "";
+    }
+
+    public class Option
+    {
+        public int ID { get; set; }
+        public string Value { get; set; } = "";
+    }
+
+    public class SelectedLabelOptions
+    {
+        public string? LabelSize { get; set; }
+        public string? LabelMaterial { get; set; }
+        public string? LabelFinish { get; set; }
+        public string? LabelColors { get; set; }
+    }
+
+    public class LabelOptionsUpdatedEventArgs
+    {
+        public object? Response { get; set; }
+        public object? SentData { get; set; }
+    }
+}
+
+<style>
+    .visually-hidden {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0,0,0,0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+    }
+    
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
+<script>
+    // Add these JavaScript functions to your main layout or a shared JS file
+    window.createBlobUrl = (base64, mimeType) => {
+        const byteCharacters = atob(base64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: mimeType });
+        return URL.createObjectURL(blob);
+    };
+    
+    window.downloadBase64File = (base64Data, fileName, mimeType) => {
+        const link = document.createElement('a');
+        link.href = base64Data.startsWith('data:') ? base64Data : `data:${mimeType};base64,${base64Data}`;
+        link.download = fileName;
+        link.click();
+    };
+    
+    window.hideBootstrapModal = (modalId) => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            const bootstrapModal = bootstrap.Modal.getInstance(modal);
+            if (bootstrapModal) {
+                bootstrapModal.hide();
+            }
+        }
+    };
+</script>

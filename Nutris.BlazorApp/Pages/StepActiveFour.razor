@@ -1,0 +1,40 @@
+﻿@* StepActiveFour.razor *@
+@namespace NutrisBlazor.Components.Steps
+
+<div class="step4 w-100">
+    <svg width="100%" height="60" viewBox="0 0 209 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g filter="url(#filter0_d_35_1844)">
+            <mask id="path-1-inside-1_35_1844" fill="white">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M3.41966 6.98456C1.89587 4.31793 3.82133 1 6.89263 1H203C205.209 1 207 2.79086 207 5V53C207 55.2091 205.209 57 203 57H6.89263C3.82134 57 1.89587 53.6821 3.41966 51.0154L14.8659 30.9846C15.5686 29.7548 15.5686 28.2452 14.8659 27.0154L3.41966 6.98456Z" />
+            </mask>
+            <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M3.41966 6.98456C1.89587 4.31793 3.82133 1 6.89263 1H203C205.209 1 207 2.79086 207 5V53C207 55.2091 205.209 57 203 57H6.89263C3.82134 57 1.89587 53.6821 3.41966 51.0154L14.8659 30.9846C15.5686 29.7548 15.5686 28.2452 14.8659 27.0154L3.41966 6.98456Z"
+                  fill="@Background" />
+            <path stroke="@Border" stroke-width="2"
+                  d="M14.8659 30.9846L13.9976 30.4884L14.8659 30.9846ZM14.8659 27.0154L13.9976 27.5116L14.8659 27.0154ZM3.41966 51.0154L2.55141 50.5193L3.41966 51.0154ZM3.41966 6.98456L2.55141 7.48069L3.41966 6.98456ZM203 0H6.89263V2H203V0ZM208 53V5H206V53H208ZM6.89263 58H203V56H6.89263V58ZM13.9976 30.4884L2.55141 50.5193L4.2879 51.5116L15.7341 31.4807L13.9976 30.4884ZM13.9976 27.5116C14.5247 28.4339 14.5247 29.5661 13.9976 30.4884L15.7341 31.4807C16.6125 29.9435 16.6125 28.0565 15.7341 26.5193L13.9976 27.5116ZM2.55141 7.48069L13.9976 27.5116L15.7341 26.5193L4.2879 6.48842L2.55141 7.48069ZM6.89263 56C4.58916 56 3.14506 53.5116 4.2879 51.5116L2.55141 50.5193C0.646681 53.8526 3.05352 58 6.89263 58V56ZM206 53C206 54.6569 204.657 56 203 56V58C205.761 58 208 55.7614 208 53H206ZM6.89263 0C3.05351 0 0.646682 4.14741 2.55141 7.48069L4.2879 6.48842C3.14506 4.48844 4.58916 2 6.89263 2V0ZM203 2C204.657 2 206 3.34315 206 5H208C208 2.23858 205.761 0 203 0V2Z"
+                  fill="@Color"
+                  mask="url(#path-1-inside-1_35_1844)" />
+        </g>
+        <text x="35" y="35" fill="@Color" class="font-13 RalewayBold">@Localization["Steps.Step4"]</text>
+        <defs>
+            <filter id="filter0_d_35_1844" x="0.886719" y="0" width="208.113" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                <feOffset dy="1" />
+                <feGaussianBlur stdDeviation="1" />
+                <feColorMatrix type="matrix" values="0 0 0 0 0.215686 0 0 0 0 0.254902 0 0 0 0 0.317647 0 0 0 0.08 0" />
+                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_35_1844" />
+                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_35_1844" result="shape" />
+            </filter>
+        </defs>
+    </svg>
+</div>
+
+@code {
+    [Parameter] public string Background { get; set; } = "#EBE9ED";
+    [Parameter] public string Color { get; set; } = "#989898";
+    [Parameter] public string StatusFinal { get; set; } = "";
+    [Parameter] public string Border { get; set; } = "none";
+    [Inject] public ILocalizationService Localization { get; set; } = default!;
+}

@@ -1,0 +1,41 @@
+﻿@* StepActiveTwo.razor *@
+@namespace NutrisBlazor.Components.Steps
+
+<div class="step2 w-100">
+    <svg width="100%" height="60" viewBox="0 0 225 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g filter="url(#filter0_d_35_1828)">
+            <mask id="path-1-inside-1_35_1828" fill="white">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M208.152 3.01544C207.439 1.76914 206.114 1 204.679 1H6.89263C3.82134 1 1.89587 4.31793 3.41966 6.98456L14.8659 27.0154C15.5686 28.2452 15.5686 29.7548 14.8659 30.9846L3.41966 51.0154C1.89587 53.6821 3.82133 57 6.89263 57H204.679C206.114 57 207.439 56.2309 208.152 54.9846L221.866 30.9846C222.569 29.7548 222.569 28.2452 221.866 27.0154L208.152 3.01544Z" />
+            </mask>
+            <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M208.152 3.01544C207.439 1.76914 206.114 1 204.679 1H6.89263C3.82134 1 1.89587 4.31793 3.41966 6.98456L14.8659 27.0154C15.5686 28.2452 15.5686 29.7548 14.8659 30.9846L3.41966 51.0154C1.89587 53.6821 3.82133 57 6.89263 57H204.679C206.114 57 207.439 56.2309 208.152 54.9846L221.866 30.9846C222.569 29.7548 222.569 28.2452 221.866 27.0154L208.152 3.01544Z"
+                  fill="@Background" />
+            <path stroke="@Border" stroke-width="2"
+                  d="M14.8659 27.0154L13.9976 27.5116L14.8659 27.0154ZM14.8659 30.9846L13.9976 30.4884L14.8659 30.9846ZM221.866 30.9846L222.734 31.4807V31.4807L221.866 30.9846ZM221.866 27.0154L222.734 26.5193V26.5193L221.866 27.0154ZM208.152 3.01544L209.02 2.51931L208.152 3.01544ZM208.152 54.9846L209.02 55.4807L208.152 54.9846ZM6.89263 2H204.679V0H6.89263V2ZM15.7341 26.5193L4.2879 6.48842L2.55141 7.4807L13.9976 27.5116L15.7341 26.5193ZM15.7341 31.4807C16.6125 29.9435 16.6125 28.0565 15.7341 26.5193L13.9976 27.5116C14.5247 28.4339 14.5247 29.5661 13.9976 30.4884L15.7341 31.4807ZM4.2879 51.5116L15.7341 31.4807L13.9976 30.4884L2.55141 50.5193L4.2879 51.5116ZM204.679 56H6.89263V58H204.679V56ZM220.998 30.4884L207.283 54.4884L209.02 55.4807L222.734 31.4807L220.998 30.4884ZM220.998 27.5116C221.525 28.4339 221.525 29.5661 220.998 30.4884L222.734 31.4807C223.612 29.9435 223.612 28.0565 222.734 26.5193L220.998 27.5116ZM207.283 3.51158L220.998 27.5116L222.734 26.5193L209.02 2.51931L207.283 3.51158ZM2.55141 50.5193C0.646682 53.8526 3.05351 58 6.89263 58V56C4.58916 56 3.14506 53.5116 4.2879 51.5116L2.55141 50.5193ZM204.679 2C205.755 2 206.749 2.57686 207.283 3.51158L209.02 2.51931C208.13 0.961431 206.473 0 204.679 0V2ZM204.679 58C206.473 58 208.13 57.0386 209.02 55.4807L207.283 54.4884C206.749 55.4231 205.755 56 204.679 56V58ZM6.89263 0C3.05352 0 0.646681 4.14741 2.55141 7.4807L4.2879 6.48842C3.14506 4.48845 4.58916 2 6.89263 2V0Z"
+                  fill="@Color"
+                  mask="url(#path-1-inside-1_35_1828)" />
+        </g>
+        <text x="35" y="25" fill="@Color" class="font-13 RalewayBold">@Localization["Steps.Step2[0]"]</text>
+        <text x="35" y="45" fill="@Color" class="font-13 RalewayBold">@Localization["Steps.Step2[1]"]</text>
+        <defs>
+            <filter id="filter0_d_35_1828" x="0.886719" y="0" width="223.506" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                <feOffset dy="1" />
+                <feGaussianBlur stdDeviation="1" />
+                <feColorMatrix type="matrix" values="0 0 0 0 0.215686 0 0 0 0 0.254902 0 0 0 0 0.317647 0 0 0 0.08 0" />
+                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_35_1828" />
+                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_35_1828" result="shape" />
+            </filter>
+        </defs>
+    </svg>
+</div>
+
+@code {
+    [Parameter] public string Background { get; set; } = "#EBE9ED";
+    [Parameter] public string Color { get; set; } = "#989898";
+    [Parameter] public bool CustomerAccepted { get; set; } = false;
+    [Parameter] public string Border { get; set; } = "none";
+    [Inject] public ILocalizationService Localization { get; set; } = default!;
+}

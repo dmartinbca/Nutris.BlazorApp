@@ -1,0 +1,153 @@
+﻿@namespace NutrisBlazor.Components.Cover
+@using Microsoft.AspNetCore.Components
+
+<div class="cover-container" style="width: 190px; height: 200px;">
+    <svg viewBox="0 0 200 200"
+         xmlns="http://www.w3.org/2000/svg"
+         class="cover-simple"
+         style="width: 100%; height: 100%;">
+
+        <defs>
+            <!-- Simple gradient for plastic look -->
+            <radialGradient id="@topGradientId" cx="45%" cy="35%" r="65%">
+                <stop offset="0%" style="stop-color:@GetLighterColor();stop-opacity:1" />
+                <stop offset="50%" style="stop-color:@ColorCover;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:@GetDarkerColor();stop-opacity:1" />
+            </radialGradient>
+
+            <!-- Side gradient -->
+            <linearGradient id="@sideGradientId" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:@GetDarkerColor();stop-opacity:1" />
+                <stop offset="50%" style="stop-color:@ColorCover;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:@GetDarkerColor();stop-opacity:1" />
+            </linearGradient>
+
+            <!-- Inner thread pattern -->
+            <pattern id="@threadPatternId" x="0" y="0" width="10" height="4" patternUnits="userSpaceOnUse">
+                <rect x="0" y="0" width="10" height="2" fill="@GetDarkerColor()" opacity="0.2" />
+            </pattern>
+        </defs>
+
+        <!-- Shadow -->
+        <ellipse cx="100" cy="175" rx="48" ry="8" fill="black" opacity="0.15" />
+
+        <!-- Main cap body (simple cylinder) -->
+        <rect x="52" y="95" width="96" height="45" fill="url(#@sideGradientId)" />
+
+        <!-- Top surface (smooth) -->
+        <ellipse cx="100" cy="95" rx="48" ry="17" fill="url(#@topGradientId)" />
+
+        <!-- Bottom rim -->
+        <ellipse cx="100" cy="140" rx="48" ry="17" fill="@ColorCover" />
+
+        <!-- Inner rim (visible threads hint) -->
+        <ellipse cx="100" cy="140" rx="44" ry="15" fill="none" stroke="@GetDarkerColor()" stroke-width="1" opacity="0.3" />
+        <ellipse cx="100" cy="138" rx="42" ry="14" fill="none" stroke="@GetDarkerColor()" stroke-width="0.5" opacity="0.2" />
+
+        <!-- Simple grip lines (subtle) -->
+        @for (int i = 0; i < 8; i++)
+        {
+            var x = 52 + (i * 12);
+            <line x1="@x" y1="100" x2="@x" y2="135"
+                  stroke="@GetDarkerColor()"
+                  stroke-width="0.5"
+                  opacity="0.15" />
+        }
+
+        <!-- Center depression (common in simple caps) -->
+        <ellipse cx="100" cy="95" rx="20" ry="7"
+                 fill="none"
+                 stroke="@GetDarkerColor()"
+                 stroke-width="1"
+                 opacity="0.2" />
+
+        <!-- Highlight for plastic effect -->
+        <ellipse cx="85" cy="85" rx="18" ry="7" fill="white" opacity="0.35" />
+        <ellipse cx="110" cy="100" rx="10" ry="4" fill="white" opacity="0.2" />
+
+        <!-- Thread pattern inside (subtle) -->
+        <rect x="55" y="130" width="90" height="10"
+              fill="url(#@threadPatternId)"
+              opacity="0.3"
+              mask="url(#@ellipseMaskId)" />
+
+        <!-- Mask for thread pattern -->
+        <defs>
+            <mask id="@ellipseMaskId">
+                <ellipse cx="100" cy="140" rx="44" ry="15" fill="white" />
+            </mask>
+        </defs>
+
+        <!-- Optional recycling symbol -->
+        @if (ShowRecyclingSymbol)
+        {
+            <g transform="translate(100, 95) scale(0.3)">
+                <path d="M -20,0 L -10,-17 L 0,0 L 10,-17 L 20,0 L 10,17 L 0,0 L -10,17 Z"
+                      fill="@GetDarkerColor()"
+                      opacity="0.3" />
+            </g>
+        }
+    </svg>
+</div>
+
+@code {
+    [Parameter] public string ColorCover { get; set; } = "#4169E1";
+    [Parameter] public bool ShowRecyclingSymbol { get; set; } = false;
+
+    private string topGradientId = $"top-gradient-{Guid.NewGuid():N}";
+    private string sideGradientId = $"side-gradient-{Guid.NewGuid():N}";
+    private string threadPatternId = $"thread-pattern-{Guid.NewGuid():N}";
+    private string ellipseMaskId = $"ellipse-mask-{Guid.NewGuid():N}";
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(ColorCover))
+        {
+            ColorCover = "#4169E1"; // Default blue color
+        }
+    }
+
+    private string GetDarkerColor()
+    {
+        return AdjustColorBrightness(ColorCover, 0.7);
+    }
+
+    private string GetLighterColor()
+    {
+        return AdjustColorBrightness(ColorCover, 1.3);
+    }
+
+    private string AdjustColorBrightness(string hexColor, double factor)
+    {
+        try
+        {
+            var color = hexColor.TrimStart('#');
+            if (color.Length == 6)
+            {
+                var r = Convert.ToInt32(color.Substring(0, 2), 16);
+                var g = Convert.ToInt32(color.Substring(2, 2), 16);
+                var b = Convert.ToInt32(color.Substring(4, 2), 16);
+
+                r = Math.Min(255, Math.Max(0, (int)(r * factor)));
+                g = Math.Min(255, Math.Max(0, (int)(g * factor)));
+                b = Math.Min(255, Math.Max(0, (int)(b * factor)));
+
+                return $"#{r:X2}{g:X2}{b:X2}";
+            }
+        }
+        catch { }
+
+        return hexColor;
+    }
+}
+
+<style>
+    .cover-container {
+        display: inline-block;
+        position: relative;
+    }
+
+    .cover-simple {
+        filter: drop-shadow(1px 3px 5px rgba(0, 0, 0, 0.15));
+    }
+</style>

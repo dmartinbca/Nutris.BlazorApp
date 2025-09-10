@@ -1,0 +1,437 @@
+﻿@page "/"
+@inject IAuthService AuthService
+@inject ILocalizationService Localization
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@using System.Text.RegularExpressions
+@using NutrisBlazor.Services
+@using NutrisBlazor.Components.Shared
+@implements IDisposable
+
+<div class="fondo">
+    @if (isLoading)
+    {
+        <Loading LoadingText="@GetTranslation("message.Loading", "Loading...")" />
+    }
+
+    <!-- Language Selector - Visible and positioned -->
+    <div class="language-selector-container">
+        <button class="language-button" type="button" @onclick="ToggleLanguageMenu">
+            @if (currentLanguage == "es")
+            {
+               
+                <span>Español</span>
+            }
+            else
+            {
+              
+                <span>English</span>
+            }
+            <i class="bi bi-chevron-down ms-2"></i>
+        </button>
+
+        @if (showLanguageMenu)
+        {
+            <div class="language-dropdown">
+                <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("en"))">
+                    
+                    English
+                </button>
+                <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("es"))">
+                     
+                    Español
+                </button>
+            </div>
+        }
+    </div>
+
+    <div class="container-fluid d-flex align-items-center justify-content-center">
+        <div class="card shadow-sm form-container px-4">
+            <div class="card-body">
+                <!-- Formulario de inicio de sesión -->
+                <div class="d-flex flex-column justify-content-center h-100">
+                    <div>
+                        <a href="#">
+                            <img src="/img/arrow.png" alt="" />
+                        </a>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-center">
+                        <img src="/img/users.png" alt="users">
+                    </div>
+                    <form @onsubmit="HandleSubmit" @onsubmit:preventDefault="true" class="px-sm-5 mx-5">
+                        <div class="mb-3 @(HasError ? "has-error" : "")">
+                            <div class="position-relative">
+                                <input type="text"
+                                       value="@loginModel.Username"
+                                       @oninput="@((e) => OnUsernameChange(e))"
+                                       class="form-control w-full"
+                                       id="nameUser"
+                                       placeholder="@GetTranslation("message.Username", "Username")" />
+                                @if (!string.IsNullOrEmpty(loginModel.Username) || !string.IsNullOrEmpty(loginModel.Password))
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="svg" @onclick="ResetFields">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>
+                                }
+                            </div>
+                            <div class="position-relative">
+                                <input type="@passwordType"
+                                       value="@loginModel.Password"
+                                       @oninput="@((e) => OnPasswordChange(e))"
+                                       class="form-control mt-2 w-full"
+                                       id="password"
+                                       placeholder="@GetTranslation("message.Password", "Password")" />
+                                @if (passwordType == "password")
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="svg" @onclick="TogglePasswordVisibility">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    </svg>
+                                }
+                                else
+                                {
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="svg" @onclick="TogglePasswordVisibility">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                    </svg>
+                                }
+                            </div>
+                            @if (showError && (!IsUsernameValid || !IsPasswordValid))
+                            {
+                                <span class="error-message">@GetTranslation("message.Your account name or password is incorrect", "Your account name or password is incorrect")</span>
+                            }
+                            @if (showErrorServer)
+                            {
+                                <span class="error-message">@GetTranslation("message.Incorrect credentials Please verify your username and password", "Incorrect credentials. Please verify your username and password")</span>
+                            }
+                        </div>
+                        <div class="mb-3 d-flex flex-column flex-sm-row justify-content-center justify-content-sm-between">
+                            <div class="form-check">
+                                <input type="checkbox" @bind="rememberMe" class="form-check-input" id="exampleCheck1" />
+                                <label class="form-check-label" for="exampleCheck1">@GetTranslation("message.Rememberme", "Remember me")</label>
+                            </div>
+                            <div>
+                                <a href="/restore-password" class="a">@GetTranslation("message.Forgot your password", "Forgot your password?")</a>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="button-color">@GetTranslation("message.Log in", "Log in")</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fondo {
+        height: 100vh;
+        background-image: url('/img/fondo.png');
+        background-repeat: no-repeat;
+        width: 100vw;
+        background-size: cover;
+        position: relative;
+    }
+
+    .language-selector-container {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+    }
+
+    .language-button {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 50px;
+        padding: 8px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        min-width: 140px;
+    }
+
+        .language-button:hover {
+            background: #f8f9fa;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+    .language-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        min-width: 150px;
+        overflow: hidden;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        color: #495057;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item:not(:last-child) {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+    .flag-emoji {
+        font-size: 1.2rem;
+    }
+
+    html, body, .container-fluid, .row, .col {
+        height: 100%;
+    }
+
+    .svg {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        width: 5%;
+        cursor: pointer;
+    }
+
+    @@media screen and (max-width: 1280px) {
+        .form-container {
+            width: 45rem !important;
+            height: 30rem !important;
+        }
+    }
+
+    .form-container {
+        width: 53rem;
+        height: 35rem;
+    }
+
+    input {
+        background: var(--spaceWrite);
+        border-color: transparent;
+    }
+
+    .px-10 {
+        padding-left: 6rem;
+        padding-right: 6rem;
+    }
+
+    .a {
+        color: var(--textButton);
+        text-decoration: none;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 0.8rem;
+    }
+
+    .has-error input {
+        border-color: red !important;
+    }
+
+    .button-color {
+        background: var(--textButton);
+        color: #fff;
+        border-radius: 50px;
+        width: 10.188rem;
+        height: 3.375rem;
+        border: 0;
+        transition: all 0.3s ease;
+    }
+
+        .button-color:hover {
+            transition: all 0.3s ease;
+            background: transparent;
+            color: var(--textButton);
+            border: 1px solid var(--textButton)
+        }
+</style>
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+    private bool showError = false;
+    private bool showErrorServer = false;
+    private string passwordType = "password";
+    private bool isLoading = false;
+    private bool rememberMe = false;
+    private bool showLanguageMenu = false;
+    private string currentLanguage = "en";
+
+    private bool HasError => showErrorServer || (showError && (!IsUsernameValid || !IsPasswordValid));
+
+    private bool IsUsernameValid
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(loginModel.Username))
+                return false;
+
+            var usernameRegex = @"^[a-zA-Z0-9 ]+$";
+            var emailRegex = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+
+            return Regex.IsMatch(loginModel.Username, usernameRegex) ||
+                   Regex.IsMatch(loginModel.Username, emailRegex);
+        }
+    }
+
+    private bool IsPasswordValid => !string.IsNullOrEmpty(loginModel.Password) && loginModel.Password.Length >= 3;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Obtener el idioma actual
+            currentLanguage = Localization.CurrentLanguage ?? "en";
+            Console.WriteLine($"Login initialized with language: {currentLanguage}");
+
+            // Suscribirse a cambios de idioma
+            Localization.OnLanguageChanged += OnLanguageChanged;
+
+            await base.OnInitializedAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in Login OnInitializedAsync: {ex.Message}");
+        }
+    }
+
+    private void OnLanguageChanged()
+    {
+        try
+        {
+            Console.WriteLine("OnLanguageChanged: Language change event received");
+            currentLanguage = Localization.CurrentLanguage;
+            Console.WriteLine($"OnLanguageChanged: New language is {currentLanguage}");
+            InvokeAsync(() =>
+            {
+                StateHasChanged();
+                Console.WriteLine("OnLanguageChanged: UI updated");
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"OnLanguageChanged: Error - {ex.Message}");
+        }
+    }
+
+    private void ToggleLanguageMenu()
+    {
+        showLanguageMenu = !showLanguageMenu;
+        Console.WriteLine($"Language menu toggled: {showLanguageMenu}");
+    }
+
+    private async Task SelectLanguage(string language)
+    {
+        Console.WriteLine($"Changing language to: {language}");
+        showLanguageMenu = false;
+        currentLanguage = language;
+        await Localization.ChangeLanguageAsync(language);
+        StateHasChanged();
+    }
+
+    private string GetTranslation(string key, string defaultValue)
+    {
+        var translation = Localization[key];
+        return string.IsNullOrEmpty(translation) || translation == key ? defaultValue : translation;
+    }
+
+    private async Task HandleSubmit()
+    {
+        showError = true;
+        isLoading = true;
+        StateHasChanged();
+
+        if (!IsUsernameValid || !IsPasswordValid)
+        {
+            isLoading = false;
+            StateHasChanged();
+            return;
+        }
+
+        try
+        {
+            var success = await AuthService.LoginAsync(loginModel.Username, loginModel.Password, rememberMe);
+
+            if (!success)
+            {
+                showErrorServer = true;
+                Console.WriteLine("Login failed - incorrect credentials");
+            }
+            else
+            {
+                Console.WriteLine("Login successful, navigating to /home");
+                Navigation.NavigateTo("/home", true);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Login error: {ex.Message}");
+            showErrorServer = true;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OnUsernameChange(ChangeEventArgs e)
+    {
+        loginModel.Username = e.Value?.ToString() ?? "";
+        ValidateFields();
+    }
+
+    private void OnPasswordChange(ChangeEventArgs e)
+    {
+        loginModel.Password = e.Value?.ToString() ?? "";
+        ValidateFields();
+    }
+
+    private void ValidateFields()
+    {
+        showError = false;
+        showErrorServer = false;
+    }
+
+    private void ResetFields()
+    {
+        loginModel.Username = "";
+        loginModel.Password = "";
+        ValidateFields();
+    }
+
+    private void TogglePasswordVisibility()
+    {
+        passwordType = passwordType == "password" ? "text" : "password";
+    }
+
+    public void Dispose()
+    {
+        Localization.OnLanguageChanged -= OnLanguageChanged;
+    }
+
+    public class LoginModel
+    {
+        public string Username { get; set; } = "";
+        public string Password { get; set; } = "";
+    }
+}

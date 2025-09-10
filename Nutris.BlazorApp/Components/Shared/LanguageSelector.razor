@@ -1,0 +1,57 @@
+﻿@using NutrisBlazor.Services
+@inject ILocalizationService LocalizationService
+
+<div class="language-selector">
+    <select class="custom-select" @onchange="OnLanguageChanged">
+        <option value="en" selected="@(LocalizationService.CurrentLanguage == "en")">English</option>
+        <option value="es" selected="@(LocalizationService.CurrentLanguage == "es")">Español</option>
+    </select>
+</div>
+
+<style>
+    .language-selector {
+        position: fixed;
+        right: 10px;
+        top: 10px;
+        z-index: 1000;
+    }
+
+    .custom-select {
+        background-color: white;
+        font-size: 1.13em;
+        font-weight: 700;
+        color: #2F5496;
+        border: solid 2px #2F5496;
+        border-radius: 30px;
+        padding: 0.37rem 1.26rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .custom-select:hover {
+            color: white;
+            background-color: #2F5496;
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+</style>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Inicializar el servicio de localización
+        if (LocalizationService is LocalizationService service)
+        {
+            await service.InitializeAsync();
+        }
+    }
+
+    private async Task OnLanguageChanged(ChangeEventArgs e)
+    {
+        if (e.Value != null)
+        {
+            await LocalizationService.ChangeLanguageAsync(e.Value.ToString());
+            StateHasChanged();
+        }
+    }
+}

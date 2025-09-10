@@ -1,0 +1,994 @@
+﻿@namespace NutrisBlazor.Components.Modals
+@page "/components/modals/botecapdata"
+@using System.Text.Json
+@inject ILocalizationService Localization
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+@inject HttpClient Http
+
+
+<Loading IsVisible="@isLoading" />
+
+<div class="modal sidebar-right fade modal-overlay @(IsVisible ? "show d-block" : "")" 
+     id="sidebarRightModal3" 
+     tabindex="-1" 
+     aria-labelledby="sidebarRightModalLabel"
+     style="@(IsVisible ? "display: block;" : "display: none;")">
+    <div class="modal-dialog modal-dialog-sidebar modal-dialog-right">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="percentage">
+                    <!-- <span class="percentage-value-tapa fw-bold">100%</span> -->
+                </div>
+                <button type="button" class="b-close" @onclick="CloseModal">
+                    <img class="btn-close"
+                         aria-label="Close"
+                         src="/img/close-x.svg"
+                         alt="" />
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-body_header">
+                    <h2 class="modal-title font-32 modal-container-title MuseoSemiBold">
+                        Packaging/Envasado
+                    </h2>
+                </div>
+                
+                <div class="tabs-inline">
+                    <!-- Tabs -->
+                    <input id="tab1"
+                           class="tab-bottle_1"
+                           type="radio"
+                           name="tabs"
+                           checked="@(activeTab == "bottle")"
+                           @onchange="@(() => SetActiveTab("bottle"))" />
+                    <label for="tab1" class="label-tab-1 font-20">
+                        @Localization["modalContainer.Bottle"]
+                    </label>
+
+                    <input id="tab2"
+                           type="radio"
+                           class="tab-bottle_2"
+                           name="tabs"
+                           checked="@(activeTab == "cap")"
+                           @onchange="@(() => SetActiveTab("cap"))" />
+                    <label for="tab2" class="label-tab-2 font-20">
+                        @Localization["modalContainer.Cap"]
+                    </label>
+
+                    <!-- Reset Button -->
+                    <button class="btn btn-secondary mb-3 button-reset gap-1"
+                            @onclick="ResetFilters"
+                            title="@Localization["modalContainer.Resetfilter"]">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w25">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                        <span>@Localization["modalContainer.Resetfilter"]</span>
+                    </button>
+
+                    <!-- Bottle Section -->
+                    <section id="content1" class="content-bottle" style="@(activeTab == "bottle" ? "display: block;" : "display: none;")">
+                        <div class="parent">
+                            <div class="child-bottles">
+                                <h3 class="child-bottle-title_features font-24 RalewayMedium">
+                                    @Localization["modalContainer.Characteristics"]
+                                </h3>
+                                <div class="child_content_features-bottle">
+                                    @if (!string.IsNullOrEmpty(selectedDiametro) && !string.IsNullOrEmpty(selectedForma))
+                                    {
+                                        <div class="product-config">
+                                            <div class="medidas-vertical">
+                                                <div class="medidas-vertical-1">
+                                                    <div class="medidads-1-1">
+                                                        <p class="p0 m-0 RalewayLight font-16">
+                                                            @(diameterDetails?.Altura.ToString() ?? "N/A") mm
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="produc-box">
+                                                <div class="medidas-horizontal">
+                                                    <p class="p3 RalewayLight font-16">
+                                                        @(diameterDetails?.DiametroDeBoca.ToString() ?? "N/A") mm
+                                                    </p>
+                                                </div>
+                                                <div class="produc-img">
+                                                    @if (selectedForma == "SQUARE")
+                                                    {
+                                                        <BoteSquare ColorBote="@hexColor" />
+                                                    }
+                                                    else if (selectedForma == "ROUND")
+                                                    {
+                                                        <BoteRound ColorBote="@hexColor" />
+                                                    }
+                                                    else if (selectedForma == "CYLINDRICAL")
+                                                    {
+                                                        <BoteCylindrical ColorBote="@hexColor" />
+                                                    }
+                                                </div>
+                                                <div class="medidas-horizontal-base">
+                                                    <p class="p3 RalewayLight font-16">
+                                                        @(diameterDetails?.DiametroBase.ToString() ?? "N/A") mm
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            
+                            <div class="child_content_info-bottle RalewayRegular">
+                                <span class="child_content_info-bottle-title font-16">
+                                    @Localization["modalContainer.Shape"]
+                                </span>
+                                <div class="child_content_select_bottle_type gap-4 p-4">
+                                    @foreach (var forma in UniqueFormas)
+                                    {
+                                        <div class="child_content_input-radio d-flex gap-2 justify-content-center">
+                                            <input type="radio"
+                                                   class="radio-block"
+                                                   name="forma"
+                                                   value="@forma"
+                                                   checked="@(selectedForma == forma)"
+                                                   @onchange="@(() => { selectedForma = forma; FilterData(); })" />
+                                            <p class="font-20 mb-0">
+                                                @(char.ToUpper(forma[0]) + forma.Substring(1).ToLower())
+                                            </p>
+                                        </div>
+                                    }
+                                </div>
+                                @if (showFormaError && string.IsNullOrEmpty(selectedForma))
+                                {
+                                    <div class="error-message font-12 my-1" style="padding-left: 20px;">
+                                        @Localization["boteCap.Youmustselectone"] @Localization["boteCap.Shape"]
+                                    </div>
+                                }
+                                
+                                <div class="form-group-bottle pt-0 p-4">
+                                    <!-- Size -->
+                                    <div class="form-grup-input-field">
+                                        <label class="form-group-label-size" for="size">
+                                            @Localization["modalContainer.Size"]
+                                        </label>
+                                        <select class="form-select Museo font-20" @bind="selectedCapacidad" @bind:after="FilterData">
+                                            <option value="">@Localization["modalContainer.Selectasize"]</option>
+                                            @foreach (var capacidad in UniqueCapacidades)
+                                            {
+                                                <option value="@capacidad">@capacidad</option>
+                                            }
+                                        </select>
+                                        @if (showCapacidadError && string.IsNullOrEmpty(selectedCapacidad))
+                                        {
+                                            <div class="error-message font-12 mb-1">
+                                                @Localization["boteCap.Youmustselectone"] @Localization["boteCap.Ability"]
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <!-- Diameter -->
+                                    <div class="form-grup-input-field">
+                                        <label class="form-group-label-size" for="Diameter">
+                                            @Localization["modalContainer.Diameter"]
+                                        </label>
+                                        <select class="form-select Museo font-20" 
+                                                @bind="selectedDiametro" 
+                                                @bind:after="FilterData"
+                                                disabled="@isBoteDiametroDisabled">
+                                            <option value="">@Localization["modalContainer.Selectadiameter"]</option>
+                                            @foreach (var diametro in UniqueDiametros)
+                                            {
+                                                <option value="@diametro">@diametro</option>
+                                            }
+                                        </select>
+                                        @if (showDiametroError && string.IsNullOrEmpty(selectedDiametro))
+                                        {
+                                            <div class="error-message font-12 mb-1">
+                                                @Localization["boteCap.Youmustselectone"] @Localization["boteCap.Diameter"]
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <!-- Material -->
+                                    <div class="form-grup-input-field">
+                                        <label class="form-group-label-size" for="Material">
+                                            @Localization["modalContainer.Material"]
+                                        </label>
+                                        <select class="form-select Museo font-20" @bind="selectedMaterial" @bind:after="FilterData">
+                                            <option value="">@Localization["modalContainer.Selectmaterial"]</option>
+                                            @foreach (var material in UniqueMateriales)
+                                            {
+                                                <option value="@material">@material</option>
+                                            }
+                                        </select>
+                                        @if (showMaterialError && string.IsNullOrEmpty(selectedMaterial))
+                                        {
+                                            <div class="error-message font-12 mb-1">
+                                                @Localization["boteCap.youmustselecta"] Material
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <!-- Color -->
+                                    <div class="form-grup-input-field">
+                                        <label class="form-group-label-size" for="Material">
+                                            @Localization["modalContainer.Color"]
+                                        </label>
+                                        <select class="form-select Museo font-20" @bind="selectedColor" @bind:after="FilterData">
+                                            <option value="">@Localization["modalContainer.Selectacolor"]</option>
+                                            @foreach (var color in UniqueColores)
+                                            {
+                                                <option value="@color">@PrettifyColorName(color)</option>
+                                            }
+                                        </select>
+                                        @if (showColorError && string.IsNullOrEmpty(selectedColor))
+                                        {
+                                            <div class="error-message font-12 mb-1">
+                                                @Localization["boteCap.youmustselecta"] Color
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Cap Section -->
+                    <section id="content2" style="@(activeTab == "cap" ? "display: block;" : "display: none;")">
+                        <div class="parent">
+                            <div class="child-bottles2 RalewayRegular">
+                                <h3 class="child-bottle-title_features">
+                                    @Localization["modalLabel.Characteristics"]
+                                </h3>
+                                <div class="child_content_features-taps">
+                                    @if (!string.IsNullOrEmpty(selectedCapForma) && !string.IsNullOrEmpty(selectedCapDiametro))
+                                    {
+                                        <div class="product-config">
+                                            <div class="medidas-vertical">
+                                                <div class="medidas-vertical-2_tapa">
+                                                    <div class="medidas-2-2">
+                                                        <div class="medidas-p1">
+                                                            <p class="p1 RalewayLight font-16">
+                                                                @(diameterDetailsCap?.AlturaExterior.ToString() ?? "N/A") mm
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="produc-box-tapa">
+                                                <div class="medidas-horizontal_tapa">
+                                                    <p class="tapa_p3 RalewayLight font-16">
+                                                        @(diameterDetailsCap?.DiametroExterior.ToString() ?? "N/A") mm
+                                                    </p>
+                                                </div>
+
+                                                <div class="produc-img">
+                                                    @if (selectedCapForma == "Childproof")
+                                                    {
+                                                        <CoverChildproof ColorCover="@hexColorCover" />
+                                                    }
+                                                    else if (selectedCapForma == "Metal")
+                                                    {
+                                                        <CoverMetal ColorCover="@hexColorCover" />
+                                                    }
+                                                    else if (selectedCapForma == "Simple")
+                                                    {
+                                                        <CoverSimple ColorCover="@hexColorCover" />
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            
+                            <div class="child_content_info-bottle-tap">
+                                <div class="child_content_info-bottle RalewayRegular">
+                                    <span>@Localization["orderView.Shape"]</span>
+                                    <div class="child_content_select_taps_type gap-4 mb-2">
+                                        @foreach (var forma in UniqueCapFormas)
+                                        {
+                                            <div class="child_content_input-radio d-flex gap-1 justify-content-center">
+                                                <input type="radio"
+                                                       class="radio-block"
+                                                       value="@forma"
+                                                       name="capforma"
+                                                       checked="@(selectedCapForma == forma)"
+                                                       @onchange="@(() => { selectedCapForma = forma; FilterCapData(); })" />
+                                                <p class="font-20 mb-0">@forma</p>
+                                            </div>
+                                        }
+                                    </div>
+                                    @if (showCapFormaError && string.IsNullOrEmpty(selectedCapForma))
+                                    {
+                                        <div class="error-message font-12 mb-1" style="padding-left: 20px;">
+                                            @Localization["boteCap.Youmustselectone"] @Localization["boteCap.Cover"]
+                                        </div>
+                                    }
+                                    
+                                    <div class="form-group-bottle">
+                                        <!-- Diameter Thread -->
+                                        <div class="form-grup-input-field">
+                                            <label class="form-group-label-size" for="size">
+                                                @Localization["modalContainer.DiameterThread"]
+                                            </label>
+                                            <select class="form-select Museo font-20" 
+                                                    @bind="selectedCapDiametro" 
+                                                    @bind:after="@(() => { ResetBote(); })"
+                                                    disabled="@isCapDiametroDisabled">
+                                                <option value="">@Localization["modalContainer.Selectadiameter"]</option>
+                                                @foreach (var diametro in UniqueCapDiametros)
+                                                {
+                                                    <option value="@diametro">@diametro</option>
+                                                }
+                                            </select>
+                                            @if (showCapDiametroError && string.IsNullOrEmpty(selectedCapDiametro))
+                                            {
+                                                <div class="error-message font-12 mb-1">
+                                                    @Localization["boteCap.Youmustselectone"] @Localization["boteCap.Diameter"]
+                                                </div>
+                                            }
+                                        </div>
+                                        
+                                        <!-- Color -->
+                                        <div class="form-grup-input-field">
+                                            <label class="form-group-label-size" for="Material">
+                                                @Localization["modalContainer.Color"]
+                                            </label>
+                                            <select class="form-select Museo font-20" @bind="selectedCapColor" @bind:after="FilterCapData">
+                                                <option value="">@Localization["modalContainer.Selectacolor"]</option>
+                                                @foreach (var color in UniqueCapColores)
+                                                {
+                                                    <option value="@color">@PrettifyColorName(color)</option>
+                                                }
+                                            </select>
+                                            @if (showCapColorError && string.IsNullOrEmpty(selectedCapColor))
+                                            {
+                                                <div class="error-message font-12 mb-1">
+                                                    @Localization["boteCap.youmustselecta"] Color
+                                                </div>
+                                            }
+                                        </div>
+                                        
+                                        <!-- Sleever Checkbox -->
+                                        <div class="child_content_select_taps_type justify-content-start mb-2 gap-2">
+                                            <div class="child_content_input-radio d-flex justify-content-center align-items-center gap-1">
+                                                <input type="checkbox" 
+                                                       name="sleever" 
+                                                       class="radio-block" 
+                                                       @bind="sleeverProxy" />
+                                                <span>Sleever</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            
+            <div class="modal-footer-bts">
+                <button @onclick="CloseModal" class="modal-footer-btc-cancel RalewayBold font-20">
+                    @Localization["NavBar.Cancel"]
+                </button>
+                <button class="modal-footer-btc-save RalewayBold font-20" @onclick="UpdateSelectedOption">
+                    @Localization["NavBar.Save"]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // Parameters
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public BoteDataItem? SelectedOption { get; set; }
+    [Parameter] public CapDataItem? SelectedOptionCap { get; set; }
+    [Parameter] public List<BoteDataItem> BoteData { get; set; } = new();
+    [Parameter] public List<CapDataItem> CapData { get; set; } = new();
+    [Parameter] public string CodeRG35 { get; set; } = "";
+    [Parameter] public List<OptionColor> OptionsColorBote { get; set; } = new();
+    [Parameter] public List<OptionColor> OptionsColorCover { get; set; } = new();
+    [Parameter] public string Characteristics { get; set; } = "";
+    [Parameter] public Action<int, int>? SetAccordionOpen { get; set; }
+
+    // State variables
+    private string activeTab = "bottle";
+    private bool isLoading = false;
+    private List<string> errorMessages = new();
+    private bool isSyncing = false;
+
+    // Bote selections
+    private string selectedForma = "";
+    private string selectedCapacidad = "";
+    private string selectedDiametro = "";
+    private string selectedMaterial = "";
+    private string selectedColor = "";
+
+    // Cap selections
+    private string selectedCapForma = "";
+    private string selectedCapDiametro = "";
+    private string selectedCapColor = "";
+    private bool sleeverProxy = false;
+
+    // Error flags (Bote)
+    private bool showFormaError = false;
+    private bool showCapacidadError = false;
+    private bool showDiametroError = false;
+    private bool showMaterialError = false;
+    private bool showColorError = false;
+
+    // Error flags (Cap)
+    private bool showCapFormaError = false;
+    private bool showCapDiametroError = false;
+    private bool showCapColorError = false;
+
+    // Diameter details
+    private Detalle? diameterDetails = null;
+    private DiametroDetalleCap? diameterDetailsCap = null;
+
+    // Filtered data
+    private List<BoteDataItem> filteredBoteData = new();
+    private List<CapDataItem> filteredCapData = new();
+
+    // Computed properties
+    private string hexColor => GetColorHex(selectedColor);
+    private string hexColorCover => GetColorHexCover(selectedCapColor);
+    private bool isCapDiametroDisabled => !string.IsNullOrEmpty(selectedDiametro);
+    private bool isBoteDiametroDisabled => !string.IsNullOrEmpty(selectedCapDiametro);
+
+    // Diameter configurations
+    private readonly Dictionary<string, Dictionary<string, Detalle>> boteDiameter = new()
+    {
+        ["150"] = new Dictionary<string, Detalle>
+        {
+            ["D45"] = new Detalle { Altura = 88.3, DiametroBase = 55.3, DiametroDeBoca = 43.82 }
+        },
+        ["200"] = new Dictionary<string, Detalle>
+        {
+            ["D45"] = new Detalle { Altura = 105.86, DiametroBase = 60, DiametroDeBoca = 43.82 }
+        },
+        ["250"] = new Dictionary<string, Detalle>
+        {
+            ["D45"] = new Detalle { Altura = 111.3, DiametroBase = 63.91, DiametroDeBoca = 43.82 }
+        },
+        ["300"] = new Dictionary<string, Detalle>
+        {
+            ["D45"] = new Detalle { Altura = 118.95, DiametroBase = 68.99, DiametroDeBoca = 43.82 }
+        },
+        ["400"] = new Dictionary<string, Detalle>
+        {
+            ["D45"] = new Detalle { Altura = 130.87, DiametroBase = 72.69, DiametroDeBoca = 43.82 }
+        }
+    };
+
+    private readonly Dictionary<string, Dictionary<string, DiametroDetalleCap>> tapaDiameters = new()
+    {
+        ["Childproof"] = new Dictionary<string, DiametroDetalleCap>
+        {
+            ["D45"] = new DiametroDetalleCap { DiametroExterior = 51.99, AlturaExterior = 17.306 },
+            ["D38"] = new DiametroDetalleCap { DiametroExterior = 45.21, AlturaExterior = 17.3 }
+        },
+        ["Simple"] = new Dictionary<string, DiametroDetalleCap>
+        {
+            ["D38"] = new DiametroDetalleCap { DiametroExterior = 40.2, AlturaExterior = 11.7 },
+            ["D45"] = new DiametroDetalleCap { DiametroExterior = 47.37, AlturaExterior = 11.7 }
+        },
+        ["Cilíndrico"] = new Dictionary<string, DiametroDetalleCap>
+        {
+            ["D53"] = new DiametroDetalleCap { DiametroExterior = 60, AlturaExterior = 17.5 },
+            ["D63"] = new DiametroDetalleCap { DiametroExterior = 69.5, AlturaExterior = 16.9 },
+            ["D70"] = new DiametroDetalleCap { DiametroExterior = 71.5, AlturaExterior = 11.8 }
+        }
+    };
+
+    // Computed Lists
+    private List<string> UniqueFormas => GetUniqueFormas();
+    private List<string> UniqueCapacidades => GetUniqueCapacidades();
+    private List<string> UniqueDiametros => GetUniqueDiametros();
+    private List<string> UniqueMateriales => GetUniqueMateriales();
+    private List<string> UniqueColores => GetUniqueColores();
+    private List<string> UniqueCapFormas => GetUniqueCapFormas();
+    private List<string> UniqueCapDiametros => GetUniqueCapDiametros();
+    private List<string> UniqueCapColores => GetUniqueCapColores();
+
+    protected override void OnInitialized()
+    {
+        filteredBoteData = new List<BoteDataItem>(BoteData);
+        filteredCapData = new List<CapDataItem>(CapData);
+        
+        if (SelectedOption != null)
+        {
+            selectedForma = SelectedOption.Forma ?? "";
+            selectedCapacidad = SelectedOption.Capacidad ?? "";
+            selectedDiametro = SelectedOption.Diametro ?? "";
+            selectedMaterial = SelectedOption.Material ?? "";
+            selectedColor = SelectedOption.Color ?? "";
+        }
+        
+        if (SelectedOptionCap != null)
+        {
+            selectedCapForma = SelectedOptionCap.Forma ?? "";
+            selectedCapDiametro = SelectedOptionCap.Diametro ?? "";
+            selectedCapColor = SelectedOptionCap.Color ?? "";
+            sleeverProxy = SelectedOptionCap.Sleever;
+        }
+        
+        FilterData();
+        FilterCapData();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (SelectedOption != null)
+        {
+            selectedForma = SelectedOption.Forma ?? "";
+            selectedCapacidad = SelectedOption.Capacidad ?? "";
+            selectedDiametro = SelectedOption.Diametro ?? "";
+            selectedMaterial = SelectedOption.Material ?? "";
+            selectedColor = SelectedOption.Color ?? "";
+        }
+        
+        if (SelectedOptionCap != null)
+        {
+            selectedCapForma = SelectedOptionCap.Forma ?? "";
+            selectedCapDiametro = SelectedOptionCap.Diametro ?? "";
+            selectedCapColor = SelectedOptionCap.Color ?? "";
+            sleeverProxy = SelectedOptionCap.Sleever;
+        }
+        
+        FilterData();
+        FilterCapData();
+    }
+
+    private void SetActiveTab(string tab)
+    {
+        activeTab = tab;
+    }
+
+    private void FilterData()
+    {
+        if (string.IsNullOrEmpty(selectedForma) && 
+            string.IsNullOrEmpty(selectedCapacidad) && 
+            string.IsNullOrEmpty(selectedDiametro) && 
+            string.IsNullOrEmpty(selectedMaterial) && 
+            string.IsNullOrEmpty(selectedColor))
+        {
+            filteredBoteData = new List<BoteDataItem>(BoteData);
+        }
+        else
+        {
+            filteredBoteData = BoteData.Where(item =>
+                (string.IsNullOrEmpty(selectedForma) || item.Forma == selectedForma) &&
+                (string.IsNullOrEmpty(selectedCapacidad) || item.Capacidad == selectedCapacidad) &&
+                (string.IsNullOrEmpty(selectedDiametro) || item.Diametro == selectedDiametro) &&
+                (string.IsNullOrEmpty(selectedMaterial) || item.Material == selectedMaterial) &&
+                (string.IsNullOrEmpty(selectedColor) || 
+                 NormalizeColorKey(item.Color) == NormalizeColorKey(selectedColor))
+            ).ToList();
+        }
+
+        // Update diameter details
+        if (!string.IsNullOrEmpty(selectedCapacidad) && !string.IsNullOrEmpty(selectedDiametro))
+        {
+            if (boteDiameter.ContainsKey(selectedCapacidad) && 
+                boteDiameter[selectedCapacidad].ContainsKey(selectedDiametro))
+            {
+                diameterDetails = boteDiameter[selectedCapacidad][selectedDiametro];
+            }
+            else
+            {
+                diameterDetails = null;
+            }
+        }
+        else
+        {
+            diameterDetails = null;
+        }
+
+        // Sync diameters if not already syncing
+        if (!isSyncing && !string.IsNullOrEmpty(selectedDiametro))
+        {
+            isSyncing = true;
+            selectedCapDiametro = selectedDiametro;
+            FilterCapData();
+            isSyncing = false;
+        }
+    }
+
+    private void FilterCapData()
+    {
+        if (string.IsNullOrEmpty(selectedCapForma) && 
+            string.IsNullOrEmpty(selectedCapDiametro) && 
+            string.IsNullOrEmpty(selectedCapColor))
+        {
+            filteredCapData = new List<CapDataItem>(CapData);
+        }
+        else
+        {
+            filteredCapData = CapData.Where(item =>
+                (string.IsNullOrEmpty(selectedCapForma) || item.Forma == selectedCapForma) &&
+                (string.IsNullOrEmpty(selectedCapDiametro) || item.Diametro == selectedCapDiametro) &&
+                (string.IsNullOrEmpty(selectedCapColor) || 
+                 NormalizeColorKey(item.Color) == NormalizeColorKey(selectedCapColor))
+            ).ToList();
+        }
+
+        // Update cap diameter details
+        if (!string.IsNullOrEmpty(selectedCapForma) && !string.IsNullOrEmpty(selectedCapDiametro))
+        {
+            if (tapaDiameters.ContainsKey(selectedCapForma) && 
+                tapaDiameters[selectedCapForma].ContainsKey(selectedCapDiametro))
+            {
+                diameterDetailsCap = tapaDiameters[selectedCapForma][selectedCapDiametro];
+            }
+            else
+            {
+                diameterDetailsCap = null;
+            }
+        }
+        else
+        {
+            diameterDetailsCap = null;
+        }
+
+        // Sync diameters if not already syncing
+        if (!isSyncing && !string.IsNullOrEmpty(selectedCapDiametro))
+        {
+            isSyncing = true;
+            selectedDiametro = selectedCapDiametro;
+            FilterData();
+            isSyncing = false;
+        }
+    }
+
+    private void ResetFilters()
+    {
+        selectedForma = "";
+        selectedCapacidad = "";
+        selectedDiametro = "";
+        selectedMaterial = "";
+        selectedColor = "";
+        selectedCapForma = "";
+        selectedCapDiametro = "";
+        selectedCapColor = "";
+        sleeverProxy = false;
+        
+        FilterData();
+        FilterCapData();
+    }
+
+    private void ResetBote()
+    {
+        selectedForma = "";
+        selectedCapacidad = "";
+        selectedMaterial = "";
+        selectedColor = "";
+        
+        FilterCapData();
+    }
+
+    private string NormalizeColorKey(string? str)
+    {
+        if (string.IsNullOrEmpty(str)) return "";
+        
+        return str.Replace(" ", "")
+                  .Replace("-", "")
+                  .Replace("_", "")
+                  .ToLower();
+    }
+
+    private string GetColorHex(string colorName)
+    {
+        if (string.IsNullOrEmpty(colorName)) return "";
+        
+        var normalizedKey = NormalizeColorKey(colorName);
+        var colorOption = OptionsColorBote.FirstOrDefault(o => 
+            NormalizeColorKey(o.Value) == normalizedKey);
+        
+        return colorOption?.ColorHex?.Trim() ?? "";
+    }
+
+    private string GetColorHexCover(string colorName)
+    {
+        if (string.IsNullOrEmpty(colorName)) return "";
+        
+        var normalizedKey = NormalizeColorKey(colorName);
+        var colorOption = OptionsColorCover.FirstOrDefault(o => 
+            NormalizeColorKey(o.Value) == normalizedKey);
+        
+        return colorOption?.ColorHex?.Trim() ?? "";
+    }
+
+    private string PrettifyColorName(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "";
+        return System.Text.RegularExpressions.Regex.Replace(name, "([a-z])([A-Z])", "$1 $2");
+    }
+
+    private async Task UpdateSelectedOption()
+    {
+        isLoading = true;
+        
+        // Reset error messages
+        showFormaError = false;
+        showCapacidadError = false;
+        showDiametroError = false;
+        showMaterialError = false;
+        showColorError = false;
+        showCapFormaError = false;
+        showCapDiametroError = false;
+        showCapColorError = false;
+        errorMessages.Clear();
+
+        bool hasErrors = false;
+
+        // Validate Bote fields
+        if (string.IsNullOrEmpty(selectedForma))
+        {
+            showFormaError = true;
+            hasErrors = true;
+            errorMessages.Add("Debe seleccionar una forma");
+        }
+
+        if (string.IsNullOrEmpty(selectedCapacidad))
+        {
+            showCapacidadError = true;
+            hasErrors = true;
+            errorMessages.Add("Debe seleccionar una Capacidad");
+        }
+
+        if (string.IsNullOrEmpty(selectedDiametro))
+        {
+            showDiametroError = true;
+            hasErrors = true;
+            errorMessages.Add("Debe seleccionar un Diametro");
+        }
+
+        if (string.IsNullOrEmpty(selectedMaterial))
+        {
+            showMaterialError = true;
+            hasErrors = true;
+            errorMessages.Add("Debe seleccionar un Material");
+        }
+
+        if (string.IsNullOrEmpty(selectedColor))
+        {
+            showColorError = true;
+            hasErrors = true;
+            errorMessages.Add("Debe seleccionar un Color");
+        }
+
+        // Validate Cap fields
+        if (string.IsNullOrEmpty(selectedCapForma))
+        {
+            showCapFormaError = true;
+            hasErrors = true;
+            errorMessages.Add("Debe seleccionar una tapa");
+        }
+
+        if (string.IsNullOrEmpty(selectedCapDiametro))
+        {
+            showCapDiametroError = true;
+            hasErrors = true;
+            errorMessages.Add("Debe seleccionar una boca");
+        }
+
+        if (string.IsNullOrEmpty(selectedCapColor))
+        {
+            showCapColorError = true;
+            hasErrors = true;
+            errorMessages.Add("Debe seleccionar un color de tapa");
+        }
+
+        if (hasErrors)
+        {
+            isLoading = false;
+            return;
+        }
+
+        // Create data object
+        var data = new
+        {
+            Bote_forma = selectedForma,
+            Bote_capacidad = selectedCapacidad,
+            Bote_boca = selectedDiametro,
+            Bote_color = selectedColor,
+            Bote_material = selectedMaterial,
+            Cap_tapa = selectedCapForma,
+            Cap_Boca = selectedCapDiametro,
+            Cap_color = selectedCapColor,
+            Cap_sleever = sleeverProxy,
+            Characteristics = $"{selectedColor} {selectedCapacidad}cc {selectedMaterial} {selectedDiametro}"
+        };
+
+        try
+        {
+            // API call
+            var response = await Http.PatchAsJsonAsync(
+                $"api/CustomizeRG35('{CodeRG35}')?$expand=Formulation,Recipe,Analytics&tenant=nutris",
+                data
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                SetAccordionOpen?.Invoke(2, 4);
+                await LocalStorage.SetItemAsync("accordion-keep", "true");
+                
+                // Reload after a delay
+                await Task.Delay(100);
+                Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+            }
+            else
+            {
+                throw new Exception("API response is not successful");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating data: {ex.Message}");
+            errorMessages.Add("Error updating data. Please try again.");
+            errorMessages.Add(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void CloseModal()
+    {
+        OnClose.InvokeAsync();
+    }
+
+    // Computed property methods
+    private List<string> GetUniqueFormas()
+    {
+        return BoteData
+            .Where(item =>
+                (string.IsNullOrEmpty(selectedCapacidad) || item.Capacidad == selectedCapacidad) &&
+                (string.IsNullOrEmpty(selectedDiametro) || item.Diametro == selectedDiametro) &&
+                (string.IsNullOrEmpty(selectedMaterial) || item.Material == selectedMaterial) &&
+                (string.IsNullOrEmpty(selectedColor) || item.Color == selectedColor))
+            .Select(item => item.Forma)
+            .Where(f => !string.IsNullOrEmpty(f))
+            .Distinct()
+            .ToList();
+    }
+
+    private List<string> GetUniqueCapacidades()
+    {
+        return BoteData
+            .Where(item =>
+                (string.IsNullOrEmpty(selectedForma) || item.Forma == selectedForma) &&
+                (string.IsNullOrEmpty(selectedDiametro) || item.Diametro == selectedDiametro) &&
+                (string.IsNullOrEmpty(selectedMaterial) || item.Material == selectedMaterial) &&
+                (string.IsNullOrEmpty(selectedColor) || item.Color == selectedColor))
+            .Select(item => item.Capacidad)
+            .Where(c => !string.IsNullOrEmpty(c))
+            .Distinct()
+            .ToList();
+    }
+
+    private List<string> GetUniqueDiametros()
+    {
+        return BoteData
+            .Where(item =>
+                (string.IsNullOrEmpty(selectedForma) || item.Forma == selectedForma) &&
+                (string.IsNullOrEmpty(selectedCapacidad) || item.Capacidad == selectedCapacidad) &&
+                (string.IsNullOrEmpty(selectedMaterial) || item.Material == selectedMaterial) &&
+                (string.IsNullOrEmpty(selectedColor) || item.Color == selectedColor))
+            .Select(item => item.Diametro)
+            .Where(d => !string.IsNullOrEmpty(d))
+            .Distinct()
+            .ToList();
+    }
+
+    private List<string> GetUniqueMateriales()
+    {
+        return BoteData
+            .Where(item =>
+                (string.IsNullOrEmpty(selectedForma) || item.Forma == selectedForma) &&
+                (string.IsNullOrEmpty(selectedCapacidad) || item.Capacidad == selectedCapacidad) &&
+                (string.IsNullOrEmpty(selectedDiametro) || item.Diametro == selectedDiametro) &&
+                (string.IsNullOrEmpty(selectedColor) || item.Color == selectedColor))
+            .Select(item => item.Material)
+            .Where(m => !string.IsNullOrEmpty(m))
+            .Distinct()
+            .ToList();
+    }
+
+    private List<string> GetUniqueColores()
+    {
+        return BoteData
+            .Where(item =>
+                (string.IsNullOrEmpty(selectedForma) || item.Forma == selectedForma) &&
+                (string.IsNullOrEmpty(selectedCapacidad) || item.Capacidad == selectedCapacidad) &&
+                (string.IsNullOrEmpty(selectedDiametro) || item.Diametro == selectedDiametro) &&
+                (string.IsNullOrEmpty(selectedMaterial) || item.Material == selectedMaterial))
+            .Select(item => item.Color)
+            .Where(c => !string.IsNullOrEmpty(c))
+            .Distinct()
+            .ToList();
+    }
+
+    private List<string> GetUniqueCapFormas()
+    {
+        return CapData
+            .Where(item =>
+                (string.IsNullOrEmpty(selectedCapDiametro) || item.Diametro == selectedCapDiametro) &&
+                (string.IsNullOrEmpty(selectedCapColor) || item.Color == selectedCapColor))
+            .Select(item => item.Forma)
+            .Where(f => !string.IsNullOrEmpty(f))
+            .Distinct()
+            .ToList();
+    }
+
+    private List<string> GetUniqueCapDiametros()
+    {
+        return CapData
+            .Where(item =>
+                (string.IsNullOrEmpty(selectedCapForma) || item.Forma == selectedCapForma) &&
+                (string.IsNullOrEmpty(selectedCapColor) || item.Color == selectedCapColor))
+            .Select(item => item.Diametro)
+            .Where(d => !string.IsNullOrEmpty(d))
+            .Distinct()
+            .ToList();
+    }
+
+    private List<string> GetUniqueCapColores()
+    {
+        return CapData
+            .Where(item =>
+                (string.IsNullOrEmpty(selectedCapForma) || item.Forma == selectedCapForma) &&
+                (string.IsNullOrEmpty(selectedCapDiametro) || item.Diametro == selectedCapDiametro))
+            .Select(item => item.Color)
+            .Where(c => !string.IsNullOrEmpty(c))
+            .Distinct()
+            .ToList();
+    }
+
+    // Data models
+    public class BoteDataItem
+    {
+        public int ID { get; set; }
+        public string? Forma { get; set; }
+        public string? Capacidad { get; set; }
+        public string? Diametro { get; set; }
+        public string? Material { get; set; }
+        public string? Color { get; set; }
+    }
+
+    public class CapDataItem
+    {
+        public int ID { get; set; }
+        public string? Forma { get; set; }
+        public string? Diametro { get; set; }
+        public string? Color { get; set; }
+        public bool Sleever { get; set; }
+    }
+
+    public class OptionColor
+    {
+        public int ID { get; set; }
+        public string Value { get; set; } = "";
+        public string ColorHex { get; set; } = "";
+    }
+
+    public class Detalle
+    {
+        public double? Altura { get; set; }
+        public double? DiametroBase { get; set; }
+        public double? DiametroDeBoca { get; set; }
+    }
+
+    public class DiametroDetalleCap
+    {
+        public double DiametroExterior { get; set; }
+        public double AlturaExterior { get; set; }
+    }
+}

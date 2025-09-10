@@ -1,0 +1,45 @@
+﻿ 
+@using NutrisBlazor.Services
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+@if (IsAuthenticated)
+{
+    @ChildContent
+}
+else if (IsLoading)
+{
+    <Loading />
+}
+else
+{
+    <div class="container mt-5">
+        <div class="alert alert-info">
+            <p>Redirecting to login...</p>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool IsAuthenticated { get; set; }
+    private bool IsLoading { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            IsAuthenticated = await AuthService.IsAuthenticatedAsync();
+
+            if (!IsAuthenticated)
+            {
+                Navigation.NavigateTo("/", true);
+            }
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}

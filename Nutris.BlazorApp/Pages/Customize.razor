@@ -1,0 +1,242 @@
+﻿@page "/customize-edit/{Id}"
+@using System.Text.Json
+@using Nutris.BlazorApp.Components.Orders
+@using Nutris.BlazorApp.Features.Customize
+@using NutrisBlazor.Models
+
+@inject ICustomizeApi CustomizeApi
+
+<PageTitle>Customize</PageTitle>
+
+@if (IsLoading)
+{
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+}
+else if (!string.IsNullOrEmpty(Error))
+{
+    <div class="alert alert-danger m-3">@Error</div>
+}
+else if (!IsLoading && (RG35Doc1 is not null || RG37Doc1 is not null))
+{
+    <OrdersComponent 
+                     RG35="@RG35Doc1"
+                     RG37="@RG37Doc1"
+                     HasRG35="@RG35Item.HasValue"
+                     HasRG37="@RG37Item.HasValue"
+                     Atributos="@AtributosRoot"
+                     RelacionBote="@RelacionBoteRoot"
+                     RelacionTapa="@RelacionTapaRoot"
+                     LotFormat="@LotFormatRoot"
+                     BbdFormat="@BbdFormatRoot"
+                     OnApprove="ApproveFormulationAsync"
+                     OnSaveName="SaveProductCommercialNameAsync"
+                     OnSaveLotFormat="@(x => SaveLotFormatAsync(x.format, x.other))"
+                     OnSaveBbdFormat="@(x => SaveBbdFormatAsync(x.format, x.other))"
+                     OnPatchRG35="PatchRG35Async"
+                     OnPatchRG37="PatchRG37Async"
+                     OnUploadBoxOrPallet="PostModificarImagenCabAsync" />
+}
+else
+{
+    <div class="alert alert-warning m-3">No se encontraron datos para este pedido.</div>
+}
+
+<style>
+    .loading-overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,.35);
+        z-index: 9999;
+    }
+
+    .spinner {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 6px solid rgba(255,255,255,.6);
+        border-top-color: #2563eb;
+        animation: spin 1s linear infinite;
+        background: white;
+        box-shadow: 0 8px 24px rgba(0,0,0,.15);
+    }
+    @@keyframes spin {
+        to
+
+    {
+        transform: rotate(360deg)
+    }
+
+    }
+</style>
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+    CustomizeRG35Response RG35Doc1 = new();
+    CustomizeRG37Response RG37Doc1 = new();
+    // Documentos crudos
+    JsonDocument? RG35Doc, RG37Doc, AtributosDoc, RelacionBoteDoc, RelacionTapaDoc, LotFormatDoc, BbdFormatDoc;
+
+    // Elementos preparados para UI (uno de estos dos puede ser null)
+    JsonElement? RG35Item, RG37Item;
+
+    // Raíces para los catálogos
+    JsonElement AtributosRoot, RelacionBoteRoot, RelacionTapaRoot, LotFormatRoot, BbdFormatRoot;
+
+    bool IsLoading;
+    string? Error;
+
+    protected override async Task OnParametersSetAsync() => await LoadAllAsync();
+
+    private async Task LoadAllAsync()
+    {
+        IsLoading = true;
+        Error = null;
+
+        try
+        {
+            // Datos principales (idéntico al VUE)
+            RG35Doc1 = await CustomizeApi.GetRG35Async(Id);
+            RG37Doc1 = await CustomizeApi.GetRG37Async(Id);
+
+            RG35Item = TryGetFirstItem(RG35Doc, out var r35) ? r35 : (JsonElement?)null;
+            RG37Item = TryGetFirstItem(RG37Doc, out var r37) ? r37 : (JsonElement?)null;
+
+            // Catálogos
+            AtributosDoc = await CustomizeApi.GetAtributosAsync();
+            RelacionBoteDoc = await CustomizeApi.GetRelacionBoteAsync();
+            RelacionTapaDoc = await CustomizeApi.GetRelacionTapaAsync();
+            LotFormatDoc = await CustomizeApi.GetLotFormatAsync(Id);
+            BbdFormatDoc = await CustomizeApi.GetBbdFormatAsync(Id);
+
+            AtributosRoot = AtributosDoc?.RootElement ?? default;
+            RelacionBoteRoot = RelacionBoteDoc?.RootElement ?? default;
+            RelacionTapaRoot = RelacionTapaDoc?.RootElement ?? default;
+            LotFormatRoot = LotFormatDoc?.RootElement ?? default;
+            BbdFormatRoot = BbdFormatDoc?.RootElement ?? default;
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private static bool TryGetFirstItem(JsonDocument? doc, out JsonElement item)
+    {
+        item = default;
+        if (doc is null) return false;
+
+        var root = doc.RootElement;
+
+        // OData: { "value": [...] }
+        if (root.ValueKind == JsonValueKind.Object &&
+            root.TryGetProperty("value", out var value) &&
+            value.ValueKind == JsonValueKind.Array &&
+            value.GetArrayLength() > 0)
+        {
+            item = value[0];
+            return true;
+        }
+
+        // Array simple
+        if (root.ValueKind == JsonValueKind.Array && root.GetArrayLength() > 0)
+        {
+            item = root[0];
+            return true;
+        }
+
+        return false;
+    }
+
+    // ===== callbacks que consume OrdersComponent =====
+
+    private async Task ApproveFormulationAsync()
+    {
+        try
+        {
+            await CustomizeApi.PatchRG37Async(Id, new
+            {
+                Customer_accepted = true,
+                Status = "Cerrado cliente"
+            });
+            await LoadAllAsync();
+        }
+        catch (Exception ex) { Error = ex.Message; }
+    }
+
+    private async Task SaveProductCommercialNameAsync(string newName)
+    {
+        try
+        {
+            await CustomizeApi.PatchRG35Async(Id, new { Product_name_2 = newName });
+            await LoadAllAsync();
+        }
+        catch (Exception ex) { Error = ex.Message; }
+    }
+
+    private async Task SaveLotFormatAsync(string format, string? other = null)
+    {
+        try
+        {
+            var payload = new Dictionary<string, object?>
+            {
+                ["Filling_batch"] = string.IsNullOrWhiteSpace(other) ? format : other
+            };
+            await CustomizeApi.PatchRG35Async(Id, payload);
+            await LoadAllAsync();
+        }
+        catch (Exception ex) { Error = ex.Message; }
+    }
+
+    private async Task SaveBbdFormatAsync(string format, string? other = null)
+    {
+        try
+        {
+            var payload = new Dictionary<string, object?>
+            {
+                ["Filling_exp_date"] = string.IsNullOrWhiteSpace(other) ? format : other
+            };
+            await CustomizeApi.PatchRG35Async(Id, payload);
+            await LoadAllAsync();
+        }
+        catch (Exception ex) { Error = ex.Message; }
+    }
+
+    private async Task PatchRG35Async(object payload)
+    {
+        try
+        {
+            await CustomizeApi.PatchRG35Async(Id, payload);
+            await LoadAllAsync();
+        }
+        catch (Exception ex) { Error = ex.Message; }
+    }
+
+    private async Task PatchRG37Async(object payload)
+    {
+        try
+        {
+            await CustomizeApi.PatchRG37Async(Id, payload);
+            await LoadAllAsync();
+        }
+        catch (Exception ex) { Error = ex.Message; }
+    }
+
+    private async Task PostModificarImagenCabAsync(object payload)
+    {
+        try
+        {
+            await CustomizeApi.PostModificarImagenCabAsync(payload);
+            await LoadAllAsync();
+        }
+        catch (Exception ex) { Error = ex.Message; }
+    }
+}

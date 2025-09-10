@@ -1,0 +1,620 @@
+﻿@namespace NutrisBlazor.Components.Modals
+@page "/components/modals/uploadtag"
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using NutrisBlazor.Components.Shared
+@inject ILocalizationService Localization
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@inject ILogger<UploadTagModal> Logger
+
+<Loading IsVisible="@isLoading" />
+
+<div class="modal fade @(IsVisible ? "show d-block" : "")" 
+     id="uploadmodal" 
+     tabindex="-1" 
+     aria-labelledby="uploadmodallabel" 
+     aria-hidden="@(!IsVisible)"
+     style="@(IsVisible ? "display: block; background-color: rgba(0,0,0,0.5);" : "display: none;")">
+    <div class="upload-modal-container modal-dialog modal-content">
+        <div class="modal-body">
+            <!-- Close button -->
+            <button type="button" 
+                    class="btn-close-custom" 
+                    @onclick="CloseModal"
+                    aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            
+            <div class="title-upload">
+                <h2 class="font-24 MuseoSemiBold">
+                    @Localization["UploadTagModal.Title"]
+                </h2>
+            </div>
+            
+            <div class="upload-content-btn">
+                <!-- Hidden file input -->
+                <InputFile id="fileInputTag"
+                           class="visually-hidden"
+                           accept="@AcceptedFileTypes"
+                           OnChange="HandleFileUpload" />
+                
+                <!-- Upload area (clickable label) -->
+                <label for="fileInputTag" class="upload-label-area">
+                    @if (string.IsNullOrEmpty(previewContent))
+                    {
+                        <div class="img-btn-upload">
+                            <img src="/iconbuttons/upload-icon.svg" alt="Upload icon">
+                        </div>
+                        <div class="paragraph-upload">
+                            <p>@Localization["UploadTagModal.UploadDocument"]</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="preview-content">
+                            @if (isImageFile)
+                            {
+                                <img src="@previewContent" 
+                                     alt="Preview" 
+                                     class="preview-image">
+                            }
+                            else
+                            {
+                                <div class="file-preview">
+                                    <i class="file-icon">📄</i>
+                                    <p class="file-name">@fileName</p>
+                                </div>
+                            }
+                            <p class="change-file-text">
+                                @Localization["UploadTagModal.ClickToChange"]
+                            </p>
+                        </div>
+                    }
+                </label>
+            </div>
+            
+            <div class="accepted-formats">
+                @Localization["Acceptedfileformat"]
+            </div>
+            
+            <button class="btn-save-atr-upload @(string.IsNullOrEmpty(base64Data) ? "disabled" : "")"
+                    @onclick="UploadTag"
+                    disabled="@(string.IsNullOrEmpty(base64Data) || isLoading)">
+                @if (isLoading)
+                {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    @Localization["Uploading"] 
+                }
+                else
+                {
+                    @Localization["Upload"]
+                }
+            </button>
+            
+            @if (ShowCancelButton)
+            {
+                <button class="btn-cancel-atr" 
+                        @onclick="CloseModal">
+                    @Localization["NavBar.Cancel"]
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    // Parameters
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<TagUploadResponse> OnTagUploaded { get; set; }
+    [Parameter] public string? CodeRG35 { get; set; }
+    [Parameter] public string AcceptedFileTypes { get; set; } = "image/*,.pdf,.doc,.docx";
+    [Parameter] public bool ShowCancelButton { get; set; } = false;
+    [Parameter] public string? UploadEndpoint { get; set; }
+    [Parameter] public string? TagType { get; set; } = "pallet_tag";
+
+    // State variables
+    private bool isLoading = false;
+    private string? previewContent = null;
+    private string? base64Data = null;
+    private string? fileName = null;
+    private string? fileType = null;
+    private bool isImageFile = false;
+    private long maxFileSize = 10 * 1024 * 1024; // 10MB max file size
+
+    protected override void OnInitialized()
+    {
+        Logger.LogInformation("UploadTagModal initialized");
+    }
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+            fileName = file.Name;
+            fileType = file.ContentType;
+            
+            // Validate file size
+            if (file.Size > maxFileSize)
+            {
+                await ShowAlert($"File size must be less than {maxFileSize / (1024 * 1024)}MB");
+                ResetFileSelection();
+                return;
+            }
+
+            // Check if it's an image file
+            isImageFile = file.ContentType.StartsWith("image/");
+            
+            // Read file and convert to base64
+            using var stream = file.OpenReadStream(maxFileSize);
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            var bytes = memoryStream.ToArray();
+            
+            // Create base64 string
+            base64Data = Convert.ToBase64String(bytes);
+            
+            // Set preview content
+            if (isImageFile)
+            {
+                previewContent = $"data:{file.ContentType};base64,{base64Data}";
+            }
+            else
+            {
+                previewContent = "file-loaded"; // Just a flag to show file preview UI
+            }
+            
+            Logger.LogInformation("File selected: {FileName}, Type: {FileType}, Size: {FileSize}", 
+                fileName, fileType, file.Size);
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error handling file upload");
+            await ShowAlert("Error selecting file. Please try again.");
+            ResetFileSelection();
+        }
+    }
+
+    private async Task UploadTag()
+    {
+        if (string.IsNullOrEmpty(base64Data))
+        {
+            await ShowAlert("Please select a file first");
+            return;
+        }
+
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            // Prepare data based on configuration
+            var data = new
+            {
+                numeroRG = CodeRG35 ?? "",
+                tipoImagen = TagType,
+                imagenBase64 = base64Data,
+                fileName = fileName,
+                fileType = fileType
+            };
+
+            Logger.LogInformation("Uploading tag for {CodeRG35}, Type: {TagType}", CodeRG35, TagType);
+
+            // Use configured endpoint or default
+            var endpoint = UploadEndpoint ?? "api/uploadTag";
+            
+            var response = await Http.PostAsJsonAsync(endpoint, data);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Logger.LogInformation("Tag uploaded successfully");
+
+                // Parse response
+                var uploadResponse = JsonSerializer.Deserialize<TagUploadResponse>(
+                    responseContent, 
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                ) ?? new TagUploadResponse();
+                
+                // Add uploaded data to response
+                uploadResponse.UploadedFileName = fileName;
+                uploadResponse.UploadedFileType = fileType;
+                uploadResponse.Base64Data = base64Data;
+                
+                // Emit event to parent component
+                await OnTagUploaded.InvokeAsync(uploadResponse);
+                
+                // Show success message
+                await ShowAlert("File uploaded successfully!");
+                
+                // Close modal
+                await CloseModal();
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Logger.LogError("API error response: {Error}", errorContent);
+                await ShowAlert("Error uploading file. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error uploading tag");
+            await ShowAlert("An error occurred. Please try again.");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ResetFileSelection()
+    {
+        previewContent = null;
+        base64Data = null;
+        fileName = null;
+        fileType = null;
+        isImageFile = false;
+        StateHasChanged();
+    }
+
+    private async Task CloseModal()
+    {
+        // Reset state
+        ResetFileSelection();
+        
+        // Notify parent component
+        await OnClose.InvokeAsync();
+        
+        // Hide Bootstrap modal if needed
+        await HideBootstrapModal();
+    }
+
+    private async Task HideBootstrapModal()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                const modal = document.getElementById('uploadmodal');
+                if (modal) {
+                    const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                    if (bootstrapModal) {
+                        bootstrapModal.hide();
+                    }
+                    // Remove backdrop
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) {
+                        backdrop.remove();
+                    }
+                }
+            ");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "Could not hide Bootstrap modal");
+        }
+    }
+
+    private async Task ShowAlert(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
+    }
+
+    // Response model
+    public class TagUploadResponse
+    {
+        public string? Id { get; set; }
+        public string? Status { get; set; }
+        public string? Message { get; set; }
+        public string? UploadedFileName { get; set; }
+        public string? UploadedFileType { get; set; }
+        public string? Base64Data { get; set; }
+        // Add other properties as needed
+    }
+}
+
+<style>
+    .upload-modal-container {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: 689px;
+        height: 470px;
+        background-color: var(--sectionSuperior);
+        padding: 4.3rem 0;
+        margin: auto;
+        border-radius: 15px;
+        box-shadow: 1px 3px 20px -2px #00000021;
+        overflow: hidden;
+        border: none;
+    }
+
+    .modal-body {
+        position: relative;
+        padding: 2rem;
+    }
+
+    .btn-close-custom {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        color: #666;
+        cursor: pointer;
+        padding: 0.5rem;
+        line-height: 1;
+        transition: color 0.3s ease;
+    }
+
+    .btn-close-custom:hover {
+        color: #000;
+    }
+
+    .title-upload {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .title-upload h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #000;
+        font-size: 1.51em;
+        margin: 0;
+        padding: 0 2rem;
+    }
+
+    .paragraph-upload {
+        margin: 0.945rem 0;
+        text-align: center;
+        line-height: 1.2;
+        font-size: 0.9em;
+        color: var(--textButton);
+    }
+
+    .paragraph-upload p {
+        margin: 0;
+    }
+
+    .btn-cancel-atr {
+        display: block;
+        background-color: transparent;
+        color: var(--textButton);
+        border: none;
+        font-size: 1.2em;
+        margin: 1rem auto;
+        cursor: pointer;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel-atr:hover {
+        text-decoration: underline;
+    }
+
+    .btn-save-atr-upload {
+        display: block;
+        border: solid 1px var(--textButton);
+        border-radius: 30px;
+        background-color: var(--textButton);
+        line-height: 1rem;
+        font-size: 1.44em;
+        padding: 1.44rem 1.57rem;
+        color: #fff;
+        margin: 2.2rem auto 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 200px;
+    }
+
+    .btn-save-atr-upload:hover:not(:disabled) {
+        color: var(--textButton);
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-save-atr-upload:disabled,
+    .btn-save-atr-upload.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .upload-content-btn {
+        width: 395px;
+        height: 170px;
+        margin: 40px auto 0;
+        border: dotted 2px var(--textNotFeatured);
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .upload-label-area {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .upload-label-area:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .img-btn-upload {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .upload-content-btn img {
+        display: block;
+        margin: 0;
+        cursor: pointer;
+        width: 48px;
+        height: 48px;
+    }
+
+    .accepted-formats {
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.85em;
+        color: #666;
+    }
+
+    .visually-hidden {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0,0,0,0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+    }
+
+    /* Preview styles */
+    .preview-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 1rem;
+    }
+
+    .preview-image {
+        max-width: 120px;
+        max-height: 100px;
+        object-fit: contain;
+        margin-bottom: 10px;
+    }
+
+    .file-preview {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .file-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .file-name {
+        font-size: 0.9em;
+        color: #666;
+        text-align: center;
+        word-break: break-word;
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .change-file-text {
+        font-size: 0.75em;
+        color: #999;
+        margin-top: 10px;
+    }
+
+    /* Spinner */
+    .spinner-border {
+        width: 1rem;
+        height: 1rem;
+        border-width: 0.15em;
+    }
+
+    .spinner-border-sm {
+        width: 0.875rem;
+        height: 0.875rem;
+    }
+
+    .me-2 {
+        margin-right: 0.5rem;
+    }
+
+    /* Modal backdrop */
+    .modal.show {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal {
+        z-index: 1050;
+    }
+
+    .modal-dialog {
+        z-index: 1055;
+    }
+
+    /* Font classes */
+    .font-24 {
+        font-size: 24px;
+    }
+
+    .MuseoSemiBold {
+        font-family: 'MuseoSemiBold', sans-serif;
+    }
+
+    /* Responsive styles */
+    @@media (max-width: 768px) {
+        .upload-modal-container {
+            max-width: 90%;
+            height: auto;
+            min-height: 450px;
+            padding: 3rem 1rem;
+        }
+
+        .upload-content-btn {
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .title-upload h2 {
+            font-size: 1.3em;
+            padding: 0 1rem;
+        }
+
+        .btn-save-atr-upload {
+            padding: 1rem 1.5rem;
+            font-size: 1.2em;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .upload-modal-container {
+            max-width: 95%;
+            padding: 2rem 0.5rem;
+            min-height: 400px;
+        }
+
+        .upload-content-btn {
+            width: 100%;
+            max-width: 280px;
+            height: 150px;
+        }
+
+        .title-upload h2 {
+            font-size: 1.1em;
+        }
+
+        .btn-save-atr-upload {
+            padding: 0.8rem 1.2rem;
+            font-size: 1em;
+            min-width: 150px;
+        }
+    }
+</style>

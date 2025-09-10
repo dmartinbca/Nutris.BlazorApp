@@ -1,0 +1,31 @@
+﻿/* Estilos para banderas placeholder si no tienes las imágenes */
+.flag-placeholder {
+    width: 20px;
+    height: 15px;
+    display: inline-block;
+    margin-right: 8px;
+    border: 1px solid #dee2e6;
+    position: relative;
+}
+
+.flag-en {
+    background: linear-gradient( to bottom, #012169 0%, #012169 33%, white 33%, white 66%, #C8102E 66%, #C8102E 100% );
+}
+
+.flag-es {
+    background: linear-gradient( to bottom, #C8102E 0%, #C8102E 25%, #FFC400 25%, #FFC400 75%, #C8102E 75%, #C8102E 100% );
+}
+
+/* Si no tienes las imágenes, puedes usar emojis */
+.flag-emoji {
+    font-size: 1.2rem;
+    margin-right: 8px;
+}
+
+.flag-emoji-en::before {
+    content: "🇬🇧";
+}
+
+.flag-emoji-es::before {
+    content: "🇪🇸";
+}

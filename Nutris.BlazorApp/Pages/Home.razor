@@ -1,0 +1,290 @@
+﻿@page "/home"
+@inject IAuthService AuthService
+@inject ILocalizationService Localization
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+@implements IDisposable
+
+<PageTitle>Home - Nutris</PageTitle>
+
+<!-- Language Selector -->
+<div class="language-selector-home">
+    <button class="language-button" type="button" @onclick="ToggleLanguageMenu">
+        @if (currentLanguage == "es")
+        {
+            <span>Español</span>
+        }
+        else
+        {
+            <span>English</span>
+        }
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+        </svg>
+    </button>
+
+    @if (showLanguageMenu)
+    {
+        <div class="language-dropdown">
+            <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("en"))">
+                English
+            </button>
+            <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("es"))">
+                Español
+            </button>
+        </div>
+    }
+</div>
+
+<!-- Home Content -->
+<div class="main-content" id="home">
+    <div class="text-home position-absolute z-10 top-0">
+        <h1 class="font-82 MuseoSemiBold">@Localization["Home.Welcome"]</h1>
+        <div class="pagraph-home font-20 RalewayRegular">
+            <span>@Localization["Home.Text1"]</span>
+            <span>@Localization["Home.Text2"]</span>
+            <span>@Localization["Home.Text3"]</span>
+            <span>@Localization["Home.Text4"]</span>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Variables CSS */
+    :root {
+        --blackBlue: #2F5496;
+    }
+
+    /* Resetear márgenes y padding del contenedor principal */
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100%;
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Home Content - Estilos idénticos a Vue */
+    #home {
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: relative;
+        height: 100vh;
+        width: 100%;
+    }
+
+        /* Imagen de fondo con opacidad */
+        #home::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('/img/home-background.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        #home > * {
+            position: relative;
+            z-index: 2;
+        }
+
+    /* Language Selector */
+    .language-selector-home {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 200;
+    }
+
+    .language-button {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 140px;
+        justify-content: space-between;
+    }
+
+        .language-button:hover {
+            background: #f8f9fa;
+        }
+
+    .language-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        min-width: 150px;
+        overflow: hidden;
+    }
+
+    .dropdown-item {
+        display: block;
+        width: 100%;
+        padding: 10px 16px;
+        background: none;
+        border: none;
+        text-align: left;
+        color: #495057;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+    /* Posicionamiento Bootstrap-like */
+    .position-absolute {
+        position: absolute !important;
+    }
+
+    .z-10 {
+        z-index: 10 !important;
+    }
+
+    .top-0 {
+        top: 0 !important;
+    }
+
+    /* Textos del Home */
+    .text-home {
+        color: var(--blackBlue);
+        padding: 3.96rem;
+    }
+
+        .text-home h1 {
+            font-size: 5.16em;
+            font-weight: 700;
+            margin: 0;
+        }
+
+    /* Clases de fuente específicas */
+    .font-82 {
+        font-size: 5.16em;
+        font-weight: 700;
+    }
+
+    .MuseoSemiBold {
+        font-family: 'Museo', sans-serif;
+        font-weight: 700;
+    }
+
+    .pagraph-home {
+        font-size: 1.26em;
+        font-weight: 300;
+        margin-top: 2.58rem;
+        text-shadow: 0.2px 0px 0px;
+    }
+
+    .font-20 {
+        font-size: 1.26em;
+        font-weight: 300;
+    }
+
+    .RalewayRegular {
+        font-family: 'Raleway', sans-serif;
+        font-weight: 300;
+    }
+
+    /* Responsive */
+    @@media (max-width: 1024px) {
+        .text-home h1,
+        .font-82 {
+            font-size: 3.5rem;
+        }
+
+        .pagraph-home,
+        .font-20 {
+            font-size: 1.1rem;
+        }
+
+        .text-home {
+            padding: 2rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .text-home h1,
+        .font-82 {
+            font-size: 2.5rem;
+        }
+
+        .pagraph-home,
+        .font-20 {
+            font-size: 1rem;
+        }
+
+        .language-selector-home {
+            top: 10px;
+            right: 10px;
+        }
+
+        .text-home {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+@code {
+    private bool showLanguageMenu = false;
+    private string currentLanguage = "en";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Verificar autenticación
+        var isAuthenticated = await AuthService.IsAuthenticatedAsync();
+        if (!isAuthenticated)
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+
+        // Obtener idioma actual
+        currentLanguage = Localization.CurrentLanguage ?? "en";
+
+        // Suscribirse a cambios de idioma
+        Localization.OnLanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged()
+    {
+        currentLanguage = Localization.CurrentLanguage;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ToggleLanguageMenu()
+    {
+        showLanguageMenu = !showLanguageMenu;
+    }
+
+    private async Task SelectLanguage(string language)
+    {
+        showLanguageMenu = false;
+        await Localization.ChangeLanguageAsync(language);
+    }
+
+    public void Dispose()
+    {
+        Localization.OnLanguageChanged -= OnLanguageChanged;
+    }
+}
