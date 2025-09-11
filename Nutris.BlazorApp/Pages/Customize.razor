@@ -3,19 +3,18 @@
 @using System.Text.Json
 @using Nutris.BlazorApp.Components.Orders
 @using Nutris.BlazorApp.Features.Customize
+@using NutrisBlazor.Components.Shared
 @using NutrisBlazor.Models
-
+@inject ILocalizationService Localization
 @inject ICustomizeApi CustomizeApi
 @inject NavigationManager Navigation
-
+<link href="css/Customize.css" rel="stylesheet" />
 <PageTitle>Customize - @Id</PageTitle>
 
 <div class="main-content main-content-orders" id="orders">
     @if (IsLoading)
     {
-        <div class="loading-overlay">
-            <div class="spinner"></div>
-        </div>
+        <Loading LoadingText="@GetTranslation("Message.Loading", "Loading...")" />
     }
     else if (!string.IsNullOrEmpty(Error))
     {
@@ -56,37 +55,7 @@
     }
 </div>
 
-<style>
-    .main-content {
-        padding: 0 3.96rem;
-        margin: 0 auto !important;
-    }
-    
-    .loading-overlay {
-        position: fixed;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0,0,0,.35);
-        z-index: 9999;
-    }
-
-    .spinner {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        border: 6px solid rgba(255,255,255,.6);
-        border-top-color: #2563eb;
-        animation: spin 1s linear infinite;
-        background: white;
-        box-shadow: 0 8px 24px rgba(0,0,0,.15);
-    }
-    
-    @@keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-</style>
+ 
 
 @code {
     [Parameter] public string Id { get; set; } = string.Empty;
@@ -124,7 +93,11 @@
         // Si el ID cambia, recargar datos
         await LoadAllAsync();
     }
-
+    private string GetTranslation(string key, string defaultValue)
+    {
+        var translation = Localization[key];
+        return string.IsNullOrEmpty(translation) || translation == key ? defaultValue : translation;
+    }
     private async Task LoadAllAsync()
     {
         IsLoading = true;

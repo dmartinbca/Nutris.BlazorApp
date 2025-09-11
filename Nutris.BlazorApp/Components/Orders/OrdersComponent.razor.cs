@@ -72,7 +72,7 @@ public class OrdersComponentBase : ComponentBase
     // Control de secciones abiertas
     protected Dictionary<int, bool> IsOpen { get; set; } = new()
     {
-        { 1, true }, { 2, false }, { 3, false }, { 4, false }, { 5, false }
+        { 1, false }, { 2, false }, { 3, false }, { 4, false }, { 5, false }
     };
 
     // FORMULATION
@@ -161,9 +161,9 @@ public class OrdersComponentBase : ComponentBase
     {
         showLanguageMenu = !showLanguageMenu;
     }
-    public void GoBack()
+    public async void GoBack()
     {
-        Navigation.NavigateTo("/home");
+        await JS.InvokeVoidAsync("history.back");
     }
     public async Task SelectLanguage(string language)
     {

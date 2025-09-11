@@ -142,10 +142,7 @@
   "ButtonOrders": "Orden",
   "Steps": {
     "Step1": "Listo para la formulación",
-    "Step2": [
-      "Listo para finalizar ",
-      "diseño de envasado"
-    ],
+    "Step2": "Listo para diseño de envasado",
     "Step3": "Realizando la última revisión",
     "Step4": "Listo para producción ",
     "Step5": "Pendiente aprobación calidad"
@@ -297,5 +294,8 @@
   "Status": "Estatus",
   "All": "Todos",
   "Apply": "Aplicar",
-  "Clear": "Limpiar"
+  "Clear": "Limpiar",
+  "Message": {
+    "Loading": "Cargando Datos, por favor espere...!"
+  }
 }

@@ -1,0 +1,164 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.page-layout {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 300px;
+    height: 100vh;
+    background-color: #DAE7F5;
+    flex-shrink: 0;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+.content-sidebar {
+    width: 95%;
+    height: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo {
+    padding: 1rem;
+    margin: 25px 0;
+}
+
+    .logo img {
+        display: block;
+        margin: auto;
+    }
+
+.w-75 {
+    width: 75%;
+}
+
+.navgrid {
+    display: grid;
+    grid-template-columns: 20px auto;
+    gap: 0.69rem;
+    align-items: center;
+}
+
+.nav-container nav a {
+    display: block;
+    margin: 20px 0;
+    padding: 0 1rem;
+    text-decoration: none;
+    font-size: 1.125rem;
+    font-weight: 300;
+    color: #2F5496;
+}
+
+    .nav-container nav a.active {
+        background-color: #C5D9EC;
+        font-weight: 700;
+        border-radius: 30px;
+        padding: 10px 20px;
+    }
+
+.font-20 {
+    font-size: 1.125rem;
+}
+
+.lineb {
+    margin-top: 34px;
+    border-top: 1px dashed #2F5496;
+}
+
+.avatar-container {
+    width: 90%;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.avatar {
+    width: 85px;
+    height: 85px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.text-titles h2 {
+    font-weight: 700;
+    font-size: 14px;
+    margin: 12px 0 0;
+    color: #2c3e50;
+}
+
+.icons-acount {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+    border-top: solid 1px #dee2e6;
+    padding: 1.57rem;
+    position: relative;
+}
+
+    .icons-acount img {
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+    }
+
+.tooltip-custom {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    font-size: 12px;
+    width: 200px;
+    margin-bottom: 10px;
+    z-index: 1000;
+}
+
+    .tooltip-custom p {
+        margin: 0;
+        text-align: center;
+    }
+
+.content-area {
+    flex: 1;
+    height: 100vh;
+    overflow-y: auto;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+/* Modal */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    opacity: 0.5;
+}
+
+.modal {
+    z-index: 1050;
+}

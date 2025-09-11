@@ -141,10 +141,7 @@
   "ButtonOrders": "Order",
   "Steps": {
     "Step1": "Ready for Formulation",
-    "Step2": [
-      "Ready to finish",
-      "packaging design"
-    ],
+    "Step2": "Ready to packaging design",
     "Step3": "Performing the final review",
     "Step4": "Ready for production",
     "Step5": "Pending quality approval"
@@ -293,5 +290,9 @@
   "Clear": "Clear",
   "Cerrado cliente y calidad": "Closed by client and quality",
   "Cerrado cliente": "Closed by client",
-  "Desarrollo": "Development"
+  "Desarrollo": "Development",
+
+  "Message": {
+    "Loading": "Loading Data, Please Wait!"
+  }
 }

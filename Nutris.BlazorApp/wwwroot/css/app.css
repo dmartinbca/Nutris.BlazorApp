@@ -371,6 +371,12 @@ html, body {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+.step-component .step-text {
+    font-family: 'Raleway', sans-serif !important;
+    font-weight: 700 !important; /* Negrita */
+    font-size: 14px !important; /* Un poco más grande */
+    letter-spacing: 0.5px; /* Mejor espaciado */
+}
 /* Importar otros CSS */
 @import url('loading.css');
 @import url('ordersbody.css');
