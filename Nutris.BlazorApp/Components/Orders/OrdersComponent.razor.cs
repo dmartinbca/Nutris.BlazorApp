@@ -196,9 +196,9 @@ public class OrdersComponentBase : ComponentBase
 
         // Pequeño delay
         await Task.Delay(200);
-
+         CalculateAllPercentages();
         // Navegar a home
-        Navigation.NavigateTo("/home", forceLoad: true);
+        // Navigation.NavigateTo("/home", forceLoad: true);
     }
     private async Task LoadDataAsync()
     {
