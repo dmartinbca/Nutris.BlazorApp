@@ -92,7 +92,12 @@ namespace NutrisBlazor.Models
         public string Product_name { get; set; } = "";
         public string Product_name_2 { get; set; } = "";
         public string Status { get; set; } = "";
-
+        public string Country { get; set; } = "";
+        public string Country_2 { get; set; } = "";
+        public string Country_3 { get; set; } = "";
+        public string Logo_Pais { get; set; } = "";
+        public string Logo_Pais_2 { get; set; } = "";
+        public string Logo_Pais_3 { get; set; } = "";
         // Formulation
         [JsonConverter(typeof(FlexibleBoolConverter))]
         public bool Suitable_vegetarians { get; set; }
@@ -128,6 +133,7 @@ namespace NutrisBlazor.Models
 
         // Recipe
         public List<RecipeItem> Recipe { get; set; } = new();
+        public List<FileItem> Files { get; set; } = new();
     }
 
     public class FormulationItem

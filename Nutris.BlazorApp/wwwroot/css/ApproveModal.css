@@ -1,0 +1,95 @@
+﻿/* Contenedor principal del modal - MÁS ANCHO */
+.approve-modal-container {
+    background-color: #fff;
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 850px; /* Aumentado de 700px a 850px */
+    width: 90%; /* Para que sea responsive */
+    margin: 0 auto;
+}
+
+.modal-body {
+    padding: 60px 80px 40px; /* Más padding horizontal */
+    text-align: center;
+}
+
+/* Párrafos - ajustados para más ancho */
+.paragraph-approve {
+    margin: 30px auto 40px;
+    max-width: 700px; /* Aumentado de 500px a 700px */
+}
+
+    .paragraph-approve p {
+        font-size: 16px;
+        line-height: 1.8; /* Mejor espaciado entre líneas */
+        color: #333;
+        margin: 0;
+        font-family: 'Raleway', sans-serif;
+        white-space: normal; /* Permite que el texto fluya naturalmente */
+    }
+
+/* Botón principal - más ancho también */
+.btn-save-atr-approve {
+    background-color: #4B7BCD;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 18px 50px;
+    font-size: 18px;
+    font-weight: 500;
+    font-family: 'Raleway', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    min-width: 450px; /* Aumentado de 350px */
+}
+
+/* Ajuste del diálogo del modal para Bootstrap */
+.modal-dialog {
+    max-width: 850px; /* Coincide con el contenedor */
+    margin: 1.75rem auto;
+}
+
+/* Responsive para pantallas más pequeñas */
+@media (max-width: 992px) {
+    .approve-modal-container {
+        max-width: 95%;
+    }
+
+    .modal-body {
+        padding: 40px 40px 30px;
+    }
+
+    .paragraph-approve {
+        max-width: 100%;
+    }
+}
+/* Prevenir que el backdrop quede pegado */
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+
+.modal {
+    z-index: 1050 !important;
+}
+
+    /* Cuando el modal está oculto */
+    .modal:not(.show) {
+        display: none !important;
+    }
+@media (max-width: 768px) {
+    .modal-body {
+        padding: 40px 20px 30px;
+    }
+
+    .btn-save-atr-approve {
+        min-width: 280px;
+        font-size: 16px;
+        padding: 15px 30px;
+    }
+
+    .paragraph-approve p {
+        font-size: 14px;
+    }
+}

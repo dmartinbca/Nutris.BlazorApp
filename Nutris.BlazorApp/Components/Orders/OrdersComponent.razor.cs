@@ -9,6 +9,7 @@ namespace Nutris.BlazorApp.Components.Orders;
 
 public class OrdersComponentBase : ComponentBase
 {
+    [Inject] protected IJSRuntime JS { get; set; } = default!; // Agregar esta línea
     [Inject] public ILocalStorageService LocalStorage { get; set; } = default!;
     [Inject] protected IApiService Api { get; set; } = default!;
     [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
@@ -140,6 +141,8 @@ public class OrdersComponentBase : ComponentBase
     public string Logo { get; set; } = string.Empty;
     public bool showLanguageMenu = false;
     public string currentLanguage = "es";
+
+    public int i = 0;
     protected override async Task OnParametersSetAsync()
     {
         currentLanguage = Localization.CurrentLanguage ?? "es";
@@ -167,7 +170,12 @@ public class OrdersComponentBase : ComponentBase
         showLanguageMenu = false;
         await Localization.ChangeLanguageAsync(language);
     }
-    
+    protected string GetListTranslation(string baseKey, int index)
+    {
+        // Construye la clave como "orderView.ListInputBn[0]" 
+        var key = $"{baseKey}[{index}]";
+        return Localization[key];
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -177,7 +185,21 @@ public class OrdersComponentBase : ComponentBase
             await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.restoreContainerStates");
         }
     }
+    protected async Task HandleFormulationApproved()
+    {
+        // Actualizar el estado local
+        CustomerAccepted = true;
+        Status = "Cerrado cliente";
 
+        // Limpiar modals
+        await JS.InvokeVoidAsync("modalHelper.cleanupModals");
+
+        // Pequeño delay
+        await Task.Delay(200);
+
+        // Navegar a home
+        Navigation.NavigateTo("/home", forceLoad: true);
+    }
     private async Task LoadDataAsync()
     {
         try
@@ -395,6 +417,17 @@ public class OrdersComponentBase : ComponentBase
         if (!string.IsNullOrEmpty(data.Imagen))
             GummyShapeImg = $"data:image/png;base64,{data.Imagen}";
 
+        // Países y banderas
+        Country1 = data.Country ?? "-";
+        Country2 = data.Country_2 ?? "-";
+        Country3 = data.Country_3 ?? "-";
+
+        if (!string.IsNullOrEmpty(data.Logo_Pais))
+            CountryFlag1 = $"data:image/png;base64,{data.Logo_Pais}";
+        if (!string.IsNullOrEmpty(data.Logo_Pais_2))
+            CountryFlag2 = $"data:image/png;base64,{data.Logo_Pais_2}";
+        if (!string.IsNullOrEmpty(data.Logo_Pais_3))
+            CountryFlag3 = $"data:image/png;base64,{data.Logo_Pais_3}";
         // Gummy DNA lists
         GummyListBn = new List<InputItem>
         {
@@ -419,6 +452,8 @@ public class OrdersComponentBase : ComponentBase
             QuantityServing = r.Quantity_of_active_per_serving ?? "-",
             RdaEu = r.EU_RDA ?? "-"
         }).ToList() ?? new List<RecipeRow>();
+
+        ReportFiles = data.Files ?? new List<FileItem>();
     }
 
     private void LoadCatalogOptions()

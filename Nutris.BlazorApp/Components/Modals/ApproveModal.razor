@@ -1,7 +1,7 @@
 ﻿@namespace NutrisBlazor.Components.Modals
 @using Microsoft.AspNetCore.Components
 @using Microsoft.JSInterop
-
+<link href="css/ApproveModal.css" rel="stylesheet" />
 @if (IsLoading)
 {
     <div class="loading-container">
@@ -12,30 +12,31 @@
 }
 else
 {
-    <div class="modal fade @(IsVisible ? "show d-block" : "")"
+    <div class="modal fade"
          id="approveModal"
          tabindex="-1"
          aria-labelledby="approveModalLabel"
-         aria-hidden="@(!IsVisible)"
-         style="@(IsVisible ? "display: block; background-color: rgba(0,0,0,0.5);" : "display: none;")">
-        <div class="approve-modal-container modal-dialog modal-content">
-            <div class="modal-body">
-                <div class="title-approve">
-                    <h2>@Localization["ApproveModal.Wouldyouliketoconfirmtheformula"]</h2>
-                </div>
-                <div class="paragraph-approve">
-                    <p>@Localization["ApproveModal.Weneedyourconfirmation"]</p>
-                    <p>@Localization["ApproveModal.rememberthatonceconfirmed"]</p>
-                    <p>@Localization["ApproveModal.makefurtheradjustments"]</p>
-                    <p>@Localization["ApproveModal.finalizingtheproduct"]</p>
-                </div>
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content approve-modal-container">
+                <div class="modal-body">
+                    <div class="title-approve">
+                        <h2>@Localization["ApproveModal.Wouldyouliketoconfirmtheformula"]</h2>
+                    </div>
+                    <div class="paragraph-approve">
+                        <p>@Localization["ApproveModal.Weneedyourconfirmation"]</p>
+                        <p>@Localization["ApproveModal.rememberthatonceconfirmed"]</p>
+                        <p>@Localization["ApproveModal.makefurtheradjustments"]</p>
+                        <p>@Localization["ApproveModal.finalizingtheproduct"]</p>
+                    </div>
 
-                <button class="btn-save-atr-approve" @onclick="AcceptFormulation">
-                    @Localization["ApproveModal.Aproveandconinuewiththedesign"]
-                </button>
-                <button class="btn-cancel-atr close" @onclick="CloseModal">
-                    @Localization["NavBar.Cancel"]
-                </button>
+                    <button class="btn-save-atr-approve" @onclick="AcceptFormulation">
+                        @Localization["ApproveModal.Aproveandconinuewiththedesign"]
+                    </button>
+                    <button class="btn-cancel-atr close" data-bs-dismiss="modal">
+                        @Localization["NavBar.Cancel"]
+                    </button>
+                </div>
             </div>
         </div>
     </div>

@@ -75,7 +75,7 @@ namespace Nutris.BlazorApp.Features.Customize
             try
             {
                 // Para RG37, también usamos la sintaxis correcta
-                var response = await _api.GetAsync<JsonDocument>($"CustomizeRG37('{id}')?$expand=Recipe&tenant=nutris");
+                var response = await _api.GetAsync<JsonDocument>($"CustomizeRG37('{id}')?$expand=Recipe,Files&tenant=nutris");
 
                 if (response?.RootElement.ValueKind == JsonValueKind.Object)
                 {
@@ -94,13 +94,13 @@ namespace Nutris.BlazorApp.Features.Customize
         }
 
         public Task<JsonDocument> GetAtributosAsync() =>
-            _api.GetAsync<JsonDocument>("Atributos?tenant=nutris&$expand=valoresAtributos");
+            _api.GetAsync<JsonDocument>("Atributos?$expand=valoresAtributos&tenant=nutris");
 
         public Task<JsonDocument> GetRelacionBoteAsync() =>
-            _api.GetAsync<JsonDocument>("RelacionBote");
+            _api.GetAsync<JsonDocument>("RelacionBote?tenant=nutris");
 
         public Task<JsonDocument> GetRelacionTapaAsync() =>
-            _api.GetAsync<JsonDocument>("RelacionTapa");
+            _api.GetAsync<JsonDocument>("RelacionTapa?tenant=nutris");
 
         public Task<JsonDocument> GetLotFormatAsync(string rg37) =>
             _api.GetAsync<JsonDocument>("LotFormat?tenant=nutris");
@@ -115,7 +115,7 @@ namespace Nutris.BlazorApp.Features.Customize
             _api.PatchAsync($"CustomizeRG37('{id}')?$expand=Recipe&tenant=nutris", payload);
 
         public Task PatchFormulationAsync(string rg37, object payload) =>
-            _api.PatchAsync($"Formulation('{rg37}')", payload);
+            _api.PatchAsync($"Formulation('{rg37}')?tenant=nutris", payload);
 
         public Task<HttpResponseMessage> PostModificarImagenCabAsync(object payload) =>
             _api.PostAsync("modificarImagen(1)/Microsoft.NAV.modificarCab", payload);

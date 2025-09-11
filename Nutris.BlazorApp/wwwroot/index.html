@@ -21,6 +21,28 @@
     <script src="~/js/orders-component-helper.js"></script>
     <!-- Orders Component Helper -->
     <script src="/js/ordersComponent.js"></script>
+    <script>
+        window.modalHelper = {
+            cleanupModals: function () {
+                // Cerrar todos los modals de Bootstrap
+                document.querySelectorAll('.modal.show').forEach(modal => {
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    if (bsModal) {
+                        bsModal.hide();
+                    }
+                });
+
+                // Forzar limpieza completa
+                setTimeout(() => {
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    document.querySelectorAll('.modal').forEach(el => el.classList.remove('show'));
+                    document.body.classList.remove('modal-open');
+                    document.body.style.removeProperty('overflow');
+                    document.body.style.removeProperty('padding-right');
+                }, 100);
+            }
+        };
+    </script>
     <!-- Custom CSS -->
     <link href="css/app.css" rel="stylesheet" />
     <link href="css/flags.css" rel="stylesheet" />

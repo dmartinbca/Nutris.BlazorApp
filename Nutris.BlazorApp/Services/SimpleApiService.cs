@@ -97,13 +97,13 @@ namespace NutrisBlazor.Services
                 var json = JsonSerializer.Serialize(data);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                // Agregar If-Match header
-                content.Headers.Add("If-Match", "*");
-
                 var request = new HttpRequestMessage(HttpMethod.Patch, fullUrl)
                 {
                     Content = content
                 };
+
+                // Agregar el header a la request, no al content
+                request.Headers.Add("If-Match", "*");
 
                 Console.WriteLine($"API PATCH: {fullUrl}");
                 return await _httpClient.SendAsync(request);
