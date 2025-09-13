@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using NutrisBlazor.Models;
 using NutrisBlazor.Services;
@@ -183,7 +184,9 @@ public class OrdersComponentBase : ComponentBase
             // Inicializar tooltips y restaurar estados
             await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.initializeTooltips");
             await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.restoreContainerStates");
+           
         }
+      //  await JSRuntime.InvokeVoidAsync("cleanupModals");
     }
     protected async Task HandleFormulationApproved()
     {
@@ -853,10 +856,64 @@ public class OrdersComponentBase : ComponentBase
         StateHasChanged();
     }
 
-    protected void HandlePalletLabelUpdated(string newUrl)
+    protected async Task HandlePalletLabelUpdated(dynamic response)
     {
-        PalletLabelImg = newUrl;
-        StateHasChanged();
+        try
+        {
+            if (response != null)
+            {
+                // Si el response tiene la imagen en base64
+                string? base64Image = null;
+
+                // Intentar obtener la imagen del response
+                if (response is IDictionary<string, object> dict)
+                {
+                    if (dict.ContainsKey("Pallet_label_imagen"))
+                    {
+                        base64Image = dict["Pallet_label_imagen"]?.ToString();
+                    }
+                }
+                else
+                {
+                    // Intentar deserializar si es un objeto anónimo
+                    var json = JsonSerializer.Serialize(response);
+                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                    if (data?.ContainsKey("Pallet_label_imagen") == true)
+                    {
+                        base64Image = data["Pallet_label_imagen"]?.ToString();
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(base64Image))
+                {
+                    // Actualizar la imagen del pallet
+                    PalletLabelImg = $"data:image/png;base64,{base64Image}";
+
+                    // Actualizar la lista de palletizing info si es necesario
+                    if (PalletizingInfo != null && PalletizingInfo.Count > 0)
+                    {
+                        // Buscar el item de Pallet Label y actualizarlo
+                        var palletLabelItem = PalletizingInfo.FirstOrDefault(p => p.Label == Localization["orderView.PalletLabel"]);
+                        if (palletLabelItem != null)
+                        {
+                            palletLabelItem.Value = "Uploaded";
+                        }
+                    }
+
+                    // Recalcular porcentajes
+                    CalculatePalletizingPercentage();
+
+                    // Forzar actualización de la UI
+                    await InvokeAsync(StateHasChanged);
+
+                    Console.WriteLine("Pallet label image updated successfully in UI");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message, "Error handling pallet label update");
+        }
     }
 
     protected void HandleBoxLabelUpdated(string newUrl)

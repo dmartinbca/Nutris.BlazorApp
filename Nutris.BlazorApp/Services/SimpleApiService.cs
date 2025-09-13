@@ -75,10 +75,7 @@ namespace NutrisBlazor.Services
                 var fullUrl = path.StartsWith("http") ? path : $"{_baseUrl}{path}";
                 var json = JsonSerializer.Serialize(data);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                // Agregar If-Match header
-                content.Headers.Add("If-Match", "*");
-
+ 
                 Console.WriteLine($"API POST: {fullUrl}");
                 return await _httpClient.PostAsync(fullUrl, content);
             }

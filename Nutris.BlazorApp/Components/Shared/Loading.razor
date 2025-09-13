@@ -3,8 +3,8 @@
 <div class="loading-overlay">
     <div class="loading-container">
         <div class="spinner-wrapper">
-            <div class="spinner-circle"></div>
             <img src="@ImageSrc" alt="Loading" class="center-logo" />
+            <div class="spinner-circle"/> 
         </div>
         <p class="loading-text mt-3">@LoadingText</p>
     </div>
@@ -14,5 +14,5 @@
 
 @code {
     [Parameter] public string LoadingText { get; set; } = "Cargando Datos, por favor espere...";
-    [Parameter] public string ImageSrc { get; set; } = "/img/logo-nutris.png"; // Ajusta la ruta de tu logo
+    [Parameter] public string ImageSrc { get; set; } = "/img/logo-nutris.jpg"; // Ajusta la ruta de tu logo
 }

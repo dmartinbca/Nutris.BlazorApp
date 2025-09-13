@@ -43,6 +43,39 @@
             }
         };
     </script>
+    <script>
+        window.bootstrapHideModalById = function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const modal = bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el);
+            modal.hide();
+        };
+    </script>
+    <script>
+        // Función global para limpiar modals
+        window.cleanupModals = function () {
+            // Cerrar todos los modals abiertos
+            document.querySelectorAll('.modal.show').forEach(modal => {
+                const bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                }
+            });
+
+            // Limpiar backdrops
+            setTimeout(() => {
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            }, 100);
+        };
+
+        // Limpiar al cargar la página
+        document.addEventListener('DOMContentLoaded', function () {
+            window.cleanupModals();
+        });
+    </script>
     <!-- Custom CSS -->
     <link href="css/app.css" rel="stylesheet" />
     <link href="css/flags.css" rel="stylesheet" />
