@@ -1,0 +1,97 @@
+﻿@namespace NutrisBlazor.Components.Shared.Bottles
+
+<svg width="200" height="250" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <filter id="bottleShadowCyl">
+            <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.2"/>
+        </filter>
+        <linearGradient id="bottleGradientCyl" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:@LightenColor(ColorBote);stop-opacity:1" />
+            <stop offset="50%" style="stop-color:@ColorBote;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:@DarkenColor(ColorBote);stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    
+    <!-- Tapa cilíndrica -->
+    <ellipse cx="100" cy="25" rx="30" ry="10" fill="#333" />
+    <rect x="70" y="25" width="60" height="15" fill="#555" />
+    <ellipse cx="100" cy="40" rx="30" ry="10" fill="#666" />
+    
+    <!-- Cuello estrecho -->
+    <rect x="90" y="40" width="20" height="25" fill="url(#bottleGradientCyl)" />
+    
+    <!-- Transición al cuerpo -->
+    <path d="M 90 65 Q 90 75, 60 75 L 60 75 L 140 75 Q 140 75, 110 65 Z" 
+          fill="url(#bottleGradientCyl)" />
+    
+    <!-- Cuerpo cilíndrico principal -->
+    <ellipse cx="100" cy="75" rx="40" ry="12" fill="url(#bottleGradientCyl)" />
+    <rect x="60" y="75" width="80" height="145" fill="url(#bottleGradientCyl)" 
+          filter="url(#bottleShadowCyl)" />
+    <ellipse cx="100" cy="220" rx="40" ry="12" fill="url(#bottleGradientCyl)" />
+    
+    <!-- Reflejos verticales -->
+    <rect x="70" y="85" width="20" height="120" rx="10" fill="white" opacity="0.25" />
+    <rect x="75" y="90" width="10" height="100" rx="5" fill="white" opacity="0.4" />
+    
+    @if (ShowLabel)
+    {
+        <rect x="65" y="120" width="70" height="70" rx="5" 
+              fill="white" opacity="0.9" />
+        <svg x="65" y="120" width="70" height="70">
+            <text x="35" y="40" text-anchor="middle" 
+                  font-family="Arial, sans-serif" 
+                  font-size="11" fill="#333">
+                @LabelText
+            </text>
+        </svg>
+    }
+</svg>
+
+@code {
+    [Parameter] public string ColorBote { get; set; } = "#4B7BCD";
+    [Parameter] public bool ShowLabel { get; set; } = false;
+    [Parameter] public string LabelText { get; set; } = "";
+    
+    private string LightenColor(string hex)
+    {
+        if (string.IsNullOrEmpty(hex)) return "#ffffff";
+        try
+        {
+            hex = hex.TrimStart('#');
+            if (hex.Length != 6) return "#ffffff";
+            
+            int r = Convert.ToInt32(hex.Substring(0, 2), 16);
+            int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+            int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+            
+            r = Math.Min(255, (int)(r + (255 - r) * 0.25));
+            g = Math.Min(255, (int)(g + (255 - g) * 0.25));
+            b = Math.Min(255, (int)(b + (255 - b) * 0.25));
+            
+            return $"#{r:X2}{g:X2}{b:X2}";
+        }
+        catch { return "#ffffff"; }
+    }
+    
+    private string DarkenColor(string hex)
+    {
+        if (string.IsNullOrEmpty(hex)) return "#000000";
+        try
+        {
+            hex = hex.TrimStart('#');
+            if (hex.Length != 6) return "#000000";
+            
+            int r = Convert.ToInt32(hex.Substring(0, 2), 16);
+            int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+            int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+            
+            r = (int)(r * 0.75);
+            g = (int)(g * 0.75);
+            b = (int)(b * 0.75);
+            
+            return $"#{r:X2}{g:X2}{b:X2}";
+        }
+        catch { return "#000000"; }
+    }
+}
