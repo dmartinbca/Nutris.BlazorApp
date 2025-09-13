@@ -1,120 +1,108 @@
 ﻿@namespace NutrisBlazor.Components.Modals
-@page "/components/modals/boxlabelimagen"
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
 @using System.Text.Json
-@using Microsoft.AspNetCore.Components.Forms
 @using NutrisBlazor.Components.Shared
-@inject ILocalizationService Localization
-@inject IJSRuntime JSRuntime
-@inject HttpClient Http
-@inject ILogger<BoxLabelImagenModal> Logger
+@using NutrisBlazor.Services
 
-<Loading IsVisible="@isLoading" />
+<link href="css/BoxLabelImagen.css" rel="stylesheet" />
 
-@if (!isLoading)
+@if (IsLoading)
 {
-    <div class="modal fade @(IsVisible ? "show d-block" : "")" 
-         id="BoxLabelImagen" 
-         tabindex="-1" 
-         aria-labelledby="BoxLabelImagenlabel" 
-         aria-hidden="@(!IsVisible)"
-         style="@(IsVisible ? "display: block; background-color: rgba(0,0,0,0.5);" : "display: none;")">
-        <div class="upload-modal-container modal-dialog modal-content">
+    <Loading LoadingText="@GetTranslation("Message.Loading", "Loading...")" />
+}
+
+<div class="modal fade"
+     id="BoxLabelImagen"
+     tabindex="-1"
+     aria-labelledby="BoxLabelImagenlabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content upload-modal-container">
             <div class="modal-body">
-                <div>
-                    <button class="oculto-derecha" 
-                            @onclick="CloseModal">
-                        x
-                    </button>
-                </div>
-                
-                <div class="title-upload">
-                    <h2 class="font-24 MuseoSemiBold">
-                        @Localization["Wouldyoulike"]
-                    </h2>
-                </div>
-                
-                <div class="upload-content-btn">
-                    <!-- Input de archivo y área de drop -->
-                    <InputFile id="fileInputBoxLabel"
-                               class="visually-hidden"
-                               accept="image/*"
-                               OnChange="HandleFileUpload" />
-                    
-                    <!-- Área de preview y upload -->
-                    <label for="fileInputBoxLabel" class="upload-content-btn2">
-                        @if (string.IsNullOrEmpty(previewImage))
+                <h2 class="modal-title">@Localization["Wouldyoulike"]</h2>
+
+                <div class="upload-content">
+                    <InputFile @ref="fileInput"
+                               id="fileInputBox"
+                               class="d-none"
+                               OnChange="@HandleFileUpload"
+                               accept="image/*" />
+
+                    <label for="fileInputBox" class="upload-area">
+                        @if (string.IsNullOrEmpty(PreviewImage))
                         {
-                            <div class="img-btn-upload">
-                                <img src="/iconbuttons/upload-icon.svg" alt="Upload icon">
-                            </div>
-                            <div class="paragraph-upload">
-                                <p class="font-10 RalewayLight">
-                                    @Localization["Uploadadocument"]
-                                </p>
-                            </div>
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" class="mb-2">
+                                <path d="M12 2L12 14M12 14L17 9M12 14L7 9" stroke="#4B7BCD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M2 17L2 19C2 20.1046 2.89543 21 4 21L20 21C21.1046 21 22 20.1046 22 19L22 17" stroke="#4B7BCD" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                            <p class="upload-text">@Localization["Uploadadocument"]</p>
                         }
                         else
                         {
-                            <div class="preview-container w-100 h-100 overflow-hidden">
-                                <img src="@previewImage" 
-                                     alt="Preview" 
-                                     class="preview-image w-100 h-100 object-fit-contain">
+                            <div class="preview-box">
+                                <img src="@PreviewImage" alt="Preview" class="preview-image">
+                                <button type="button" class="btn-delete" @onclick="RemoveImage" @onclick:stopPropagation="true">
+                                    &times;
+                                </button>
                             </div>
                         }
                     </label>
-                    
-                    <div class="text-center">
-                        @Localization["Acceptedfileformat"]
-                    </div>
-                    
-                    <button class="btn-save-atr-upload font-20 RalewayRegular"
-                            @onclick="BoxLabelImagenUpload"
-                            disabled="@(string.IsNullOrEmpty(previewImage) || isLoading)">
-                        @if (isLoading)
+
+                    <p class="format-info">@Localization["Acceptedfileformat"]</p>
+
+                    <button type="button"
+                            class="btn-submit"
+                            @onclick="UploadImage"
+                            disabled="@(string.IsNullOrEmpty(PreviewImage) || IsLoading)">
+                        @if (IsLoading)
                         {
-                            <Loading />
+                            <span class="spinner-border spinner-border-sm me-2"></span>
                         }
-                        else
-                        {
-                            <span>@Localization["Upload"]</span>
-                        }
+                        @Localization["Upload"]
                     </button>
                 </div>
             </div>
         </div>
     </div>
-}
+</div>
 
 @code {
-    // Parameters
-    [Parameter] public bool IsVisible { get; set; }
     [Parameter] public string CodeRG35 { get; set; } = "";
-    [Parameter] public string TypeImage { get; set; } = "";
-    [Parameter] public string ImageBoxLabel { get; set; } = "";
-    [Parameter] public EventCallback<BoxLabelResponse> OnBoxLabelUpdated { get; set; }
-    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<dynamic> OnUpdated { get; set; }
 
-    // State variables
-    private bool isLoading = false;
-    private string? previewImage = null;
-    private string? base64Data = null;
-    private long maxFileSize = 10 * 1024 * 1024; // 10MB max file size
+    [Inject] private IApiService ApiService { get; set; } = default!;
+    [Inject] private ILocalizationService Localization { get; set; } = default!;
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+    [Inject] private ILogger<BoxLabelImagenModal> Logger { get; set; } = default!;
 
-    protected override void OnInitialized()
+    private bool IsLoading = false;
+    private string? PreviewImage = null;
+    private string? Base64Data = null;
+    private InputFile? fileInput;
+    private IBrowserFile? selectedFile;
+
+    private string GetTranslation(string key, string defaultValue)
     {
-        // Initialize with existing image if provided
-        if (!string.IsNullOrEmpty(ImageBoxLabel))
+        var translation = Localization[key];
+        return string.IsNullOrEmpty(translation) || translation == key ? defaultValue : translation;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            previewImage = ImageBoxLabel;
-            // If ImageBoxLabel is already a data URL or base64, extract the base64 part
-            if (ImageBoxLabel.Contains(","))
-            {
-                base64Data = ImageBoxLabel.Split(',')[1];
-            }
-            else
-            {
-                base64Data = ImageBoxLabel;
-            }
+            // Limpiar cualquier modal residual
+            await JS.InvokeVoidAsync("eval", @"
+                document.querySelectorAll('.modal.show').forEach(modal => {
+                    modal.classList.remove('show');
+                    modal.style.display = 'none';
+                });
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            ");
         }
     }
 
@@ -122,339 +110,118 @@
     {
         try
         {
-            var file = e.File;
-            
-            // Validate file type
-            if (!file.ContentType.StartsWith("image/"))
-            {
-                await ShowAlert(Localization["Pleaseselectavalidimagefile"]);
-                return;
-            }
+            selectedFile = e.File;
 
-            // Validate file size
-            if (file.Size > maxFileSize)
+            if (selectedFile != null && selectedFile.ContentType.StartsWith("image/"))
             {
-                await ShowAlert($"File size must be less than {maxFileSize / (1024 * 1024)}MB");
-                return;
-            }
+                using var stream = selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+                using var ms = new MemoryStream();
+                await stream.CopyToAsync(ms);
+                var bytes = ms.ToArray();
 
-            // Read file and convert to base64
-            using var stream = file.OpenReadStream(maxFileSize);
-            using var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream);
-            var bytes = memoryStream.ToArray();
-            
-            // Create base64 string
-            base64Data = Convert.ToBase64String(bytes);
-            previewImage = $"data:{file.ContentType};base64,{base64Data}";
-            
-            StateHasChanged();
+                Base64Data = Convert.ToBase64String(bytes);
+                PreviewImage = $"data:{selectedFile.ContentType};base64,{Base64Data}";
+
+                StateHasChanged();
+            }
+            else
+            {
+                PreviewImage = null;
+                Base64Data = null;
+                await JS.InvokeVoidAsync("alert", Localization["Please select a valid image file"]);
+            }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error uploading file");
-            await ShowAlert("Error uploading file. Please try again.");
-            previewImage = null;
-            base64Data = null;
+            Logger.LogError(ex, "Error handling file upload");
+            await JS.InvokeVoidAsync("alert", Localization["errors.FileUploadError"]);
         }
     }
 
-    private async Task BoxLabelImagenUpload()
+    private async Task UploadImage()
     {
-        if (string.IsNullOrEmpty(base64Data))
+        if (string.IsNullOrEmpty(Base64Data))
         {
-            await ShowAlert("Please select an image first");
+            await JS.InvokeVoidAsync("alert", Localization["Please select an image first"]);
             return;
         }
 
-        isLoading = true;
-        StateHasChanged();
-
         try
         {
+            IsLoading = true;
+            StateHasChanged();
+
             var data = new
             {
                 numeroRG = CodeRG35,
                 tipoImagen = "Box_label_imagen",
-                imagenBase64 = base64Data
+                imagenBase64 = Base64Data
             };
 
-            var response = await Http.PostAsJsonAsync(
-                "api/modificarImagen(1)/Microsoft.NAV.modificarCab", 
-                data
-            );
+            var response = await ApiService.PostAsync("modificarImagen(1)/Microsoft.NAV.modificarCab?$tenant=nutris", data);
 
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                Logger.LogInformation("Data updated successfully: {Response}", responseContent);
+                Logger.LogInformation("Box label image uploaded successfully");
 
-                // Parse response
-                var updatedResponse = JsonSerializer.Deserialize<BoxLabelResponse>(responseContent);
-                
-                if (updatedResponse != null)
+                var updatedResponse = new
                 {
-                    // Add the base64 data to the response
-                    updatedResponse.BoxLabelImagen = base64Data;
-                    
-                    // Emit event to parent component
-                    await OnBoxLabelUpdated.InvokeAsync(updatedResponse);
-                }
+                    Box_label_imagen = Base64Data
+                };
 
-                // Close modal
+                await OnUpdated.InvokeAsync(updatedResponse);
+
+                await JS.InvokeVoidAsync("eval", @"
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('BoxLabelImagen'));
+                    if (modal) { modal.hide(); }
+                ");
+
+                await Task.Delay(300);
                 await CloseModal();
             }
             else
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                Logger.LogError("API error response: {Error}", errorContent);
-                await ShowAlert("Error updating image. Please try again.");
+                Logger.LogError($"Error uploading image: {response.StatusCode}");
+                await JS.InvokeVoidAsync("alert", Localization["errors.UploadFailed"]);
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error updating box label image");
-            await ShowAlert("Error updating image. Please try again.");
+            Logger.LogError(ex, "Error uploading box label image");
+            await JS.InvokeVoidAsync("alert", Localization["errors.GenericError"]);
         }
         finally
         {
-            isLoading = false;
+            IsLoading = false;
             StateHasChanged();
         }
     }
 
+    private void RemoveImage()
+    {
+        PreviewImage = null;
+        Base64Data = null;
+        selectedFile = null;
+        StateHasChanged();
+    }
+
     private async Task CloseModal()
     {
-        // Reset state
-        previewImage = null;
-        base64Data = null;
-        
-        // Notify parent component
-        await OnClose.InvokeAsync();
-        
-        // Hide modal with Bootstrap if needed
-        await JSRuntime.InvokeVoidAsync("eval", @"
-            const modal = bootstrap.Modal.getInstance(document.getElementById('BoxLabelImagen'));
-            if (modal) {
-                modal.hide();
-            }
+        PreviewImage = null;
+        Base64Data = null;
+        selectedFile = null;
+
+        await JS.InvokeVoidAsync("eval", @"
+            var modal = bootstrap.Modal.getInstance(document.getElementById('BoxLabelImagen'));
+            if (modal) { modal.hide(); }
+            setTimeout(() => {
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('padding-right');
+            }, 300);
         ");
-    }
 
-    private async Task ShowAlert(string message)
-    {
-        await JSRuntime.InvokeVoidAsync("alert", message);
-    }
-
-    // Response model
-    public class BoxLabelResponse
-    {
-        public string? BoxLabelImagen { get; set; }
-        public string? Status { get; set; }
-        public string? Message { get; set; }
-        // Add other properties as needed based on your API response
+        StateHasChanged();
     }
 }
-
-<style>
-    .oculto-derecha {
-        position: absolute;
-        right: 10px;
-        top: -50px;
-        cursor: pointer;
-        background: transparent;
-        border: 0;
-        font-size: 1.5rem;
-    }
-
-    .upload-modal-container {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        max-width: 689px;
-        height: 470px;
-        background-color: var(--sectionSuperior);
-        padding: 4.3rem 0;
-        margin: auto;
-        border-radius: 15px;
-        box-shadow: 1px 3px 20px -2px #00000021;
-        overflow: hidden;
-        border: none;
-    }
-
-    .paragraph-upload {
-        margin: 0.945rem 0;
-        text-align: center;
-        line-height: 0.3rem;
-        font-size: 0.8em;
-        color: var(--textButton);
-    }
-
-    .title-upload h2 {
-        text-align: center;
-        font-weight: 700;
-        color: #000;
-        font-size: 1.51em;
-    }
-
-    .btn-cancel-atr {
-        display: block;
-        background-color: transparent;
-        color: var(--textButton);
-        border: none;
-        font-size: 1.44em;
-        margin: 1.19rem auto;
-    }
-
-    .btn-save-atr-upload {
-        display: block;
-        border: solid 1px var(--textButton);
-        border-radius: 30px;
-        background-color: var(--textButton);
-        line-height: 1rem;
-        font-size: 1.44em;
-        padding: 1.44rem 1.57rem;
-        color: #fff;
-        margin: 1rem auto 0;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .btn-save-atr-upload:hover:not(:disabled) {
-        color: var(--textButton);
-        background: white;
-        transition: all 0.3s ease;
-    }
-
-    .btn-save-atr-upload:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    .upload-content-btn {
-        width: 395px;
-        height: 170px;
-        margin: 40px auto 0;
-        border: dotted 1px var(--textNotFeatured);
-    }
-
-    .upload-content-btn2 {
-        width: 395px;
-        height: 200px;
-        margin: auto;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        cursor: pointer;
-    }
-
-    .upload-content-btn2:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-    }
-
-    .cambiar {
-        position: absolute;
-        top: 0;
-        right: 15px;
-        z-index: 10;
-        background: white;
-        padding: 10px;
-        border-radius: 5px;
-    }
-
-    .upload-content-btn img {
-        display: block;
-        cursor: pointer;
-    }
-
-    .preview-container {
-        padding: 10px;
-    }
-
-    .preview-image {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-
-    .visually-hidden {
-        position: absolute !important;
-        width: 1px !important;
-        height: 1px !important;
-        padding: 0 !important;
-        margin: -1px !important;
-        overflow: hidden !important;
-        clip: rect(0,0,0,0) !important;
-        white-space: nowrap !important;
-        border: 0 !important;
-    }
-
-    .img-btn-upload {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    /* Modal backdrop effect when visible */
-    .modal.show {
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    /* Ensure proper z-index for modal */
-    .modal {
-        z-index: 1050;
-    }
-
-    .modal-dialog {
-        z-index: 1055;
-    }
-
-    /* Responsive styles */
-    @@media (max-width: 768px) {
-        .upload-modal-container {
-            max-width: 90%;
-            height: auto;
-            padding: 2rem 1rem;
-        }
-
-        .upload-content-btn,
-        .upload-content-btn2 {
-            width: 100%;
-            max-width: 350px;
-        }
-
-        .btn-save-atr-upload {
-            padding: 1rem 1.5rem;
-            font-size: 1.2em;
-        }
-    }
-
-    @@media (max-width: 480px) {
-        .upload-modal-container {
-            max-width: 95%;
-            padding: 1.5rem 0.5rem;
-        }
-
-        .upload-content-btn,
-        .upload-content-btn2 {
-            width: 100%;
-            max-width: 280px;
-        }
-
-        .title-upload h2 {
-            font-size: 1.2em;
-        }
-
-        .btn-save-atr-upload {
-            padding: 0.8rem 1.2rem;
-            font-size: 1em;
-        }
-    }
-</style>

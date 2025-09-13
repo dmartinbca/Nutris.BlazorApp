@@ -1,6 +1,7 @@
 ﻿@namespace NutrisBlazor.Components.Modals
 @page "/components/modals/botecapdata"
 @using System.Text.Json
+@using NutrisBlazor.Components.Shared
 @inject ILocalizationService Localization
 @inject IJSRuntime JSRuntime
 @inject NavigationManager Navigation
@@ -8,8 +9,8 @@
 @inject HttpClient Http
 
 
-<Loading IsVisible="@isLoading" />
-
+@* <Loading LoadingText="@GetTranslation("Message.Loading", "Loading...")" />
+ *@
 <div class="modal sidebar-right fade modal-overlay @(IsVisible ? "show d-block" : "")" 
      id="sidebarRightModal3" 
      tabindex="-1" 
@@ -521,7 +522,11 @@
         FilterData();
         FilterCapData();
     }
-
+    private string GetTranslation(string key, string defaultValue)
+    {
+        var translation = Localization[key];
+        return string.IsNullOrEmpty(translation) || translation == key ? defaultValue : translation;
+    }
     protected override void OnParametersSet()
     {
         if (SelectedOption != null)

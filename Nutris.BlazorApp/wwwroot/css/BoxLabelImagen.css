@@ -1,0 +1,161 @@
+﻿/* Usar los mismos estilos que PalletLabelImagen.css */
+/* Modal centrado */
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 60px);
+}
+
+/* Contenedor principal */
+.upload-modal-container {
+    background-color: #E8F4F8;
+    border-radius: 20px;
+    border: none;
+    position: relative;
+    max-width: 650px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+/* Body */
+.modal-body {
+    padding: 60px 50px 50px;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: visible;
+}
+
+/* Título */
+.modal-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 35px 0;
+}
+
+/* Contenido de upload */
+.upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Área de upload */
+.upload-area {
+    width: 100%;
+    max-width: 450px;
+    height: 200px;
+    border: 2px dashed #B8D4E8;
+    border-radius: 12px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .upload-area:hover {
+        border-color: #4B7BCD;
+        background: #F8FBFF;
+    }
+
+.upload-text {
+    color: #4B7BCD;
+    font-size: 15px;
+    margin: 0;
+}
+
+/* Preview */
+.preview-box {
+    position: relative;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-image {
+    max-width: 100%;
+    max-height: 160px;
+    object-fit: contain;
+}
+
+.btn-delete {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #FF4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-delete:hover {
+        background: #CC0000;
+    }
+
+/* Texto formato */
+.format-info {
+    font-size: 14px;
+    color: #666;
+    margin: 15px 0;
+    text-align: center;
+}
+
+/* Botón submit */
+.btn-submit {
+    padding: 12px 45px;
+    background: #4B7BCD;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .btn-submit:hover:not(:disabled) {
+        background: #3A5FA8;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(75,123,205,0.3);
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+/* Ocultar input */
+.d-none {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .modal-body {
+        padding: 50px 30px 40px;
+    }
+
+    .upload-area {
+        height: 180px;
+    }
+
+    .upload-modal-container {
+        max-width: 90%;
+    }
+}

@@ -7,8 +7,8 @@
 @inject HttpClient Http
 @inject ILogger<ConfirmModal> Logger
 
-<Loading IsVisible="@isLoading" />
-
+@* <Loading IsVisible="@isLoading" />
+ *@
 @if (!isLoading)
 {
     <div class="modal fade modal-overlay @(IsModalVisible ? "show d-block" : "")" 

@@ -915,7 +915,45 @@ public class OrdersComponentBase : ComponentBase
             Console.WriteLine(ex.Message, "Error handling pallet label update");
         }
     }
+    protected async Task HandleBoxLabelUpdated(dynamic response)
+    {
+        try
+        {
+            if (response != null)
+            {
+                string? base64Image = null;
 
+                if (response is IDictionary<string, object> dict)
+                {
+                    if (dict.ContainsKey("Box_label_imagen"))
+                    {
+                        base64Image = dict["Box_label_imagen"]?.ToString();
+                    }
+                }
+                else
+                {
+                    var json = JsonSerializer.Serialize(response);
+                    var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                    if (data?.ContainsKey("Box_label_imagen") == true)
+                    {
+                        base64Image = data["Box_label_imagen"]?.ToString();
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(base64Image))
+                {
+                    BoxLabelImg = $"data:image/png;base64,{base64Image}";
+                    CalculatePalletizingPercentage();
+                    await InvokeAsync(StateHasChanged);
+                    Console.WriteLine("Box label image updated successfully");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message, "Error handling box label update");
+        }
+    }
     protected void HandleBoxLabelUpdated(string newUrl)
     {
         BoxLabelImg = newUrl;

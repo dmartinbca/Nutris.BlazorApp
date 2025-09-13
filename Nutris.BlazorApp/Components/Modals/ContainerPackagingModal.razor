@@ -8,9 +8,8 @@
 @inject NavigationManager Navigation
 @inject ILogger<ContainerPackagingModal> Logger
 
-<Loading IsVisible="@isLoading" />
-
-<div class="modal sidebar-right fade modal-overlay @(IsVisible ? "show d-block" : "")"
+@* <Loading LoadingText="@GetTranslation("Message.Loading", "Loading...")" />
+ *@<div class="modal sidebar-right fade modal-overlay @(IsVisible ? "show d-block" : "")"
      id="sidebarRightModal"
      tabindex="-1"
      aria-labelledby="sidebarRightModalLabel"
@@ -538,7 +537,11 @@
     {
         hexColorCover = GetColorHexCover(selectedCapColor);
     }
-
+    private string GetTranslation(string key, string defaultValue)
+    {
+        var translation = Localization[key];
+        return string.IsNullOrEmpty(translation) || translation == key ? defaultValue : translation;
+    }
     private string GetColorHex(string colorName)
     {
         if (string.IsNullOrEmpty(colorName))

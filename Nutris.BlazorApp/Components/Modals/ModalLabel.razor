@@ -9,8 +9,8 @@
 @inject NavigationManager Navigation
 @inject ILogger<ModalLabel> Logger
 
-<Loading IsVisible="@isLoading" />
-
+@* <Loading IsVisible="@isLoading" />
+ *@
 @if (!isLoading)
 {
     <div class="modal sidebar-right fade modal-overlay @(IsVisible ? "show d-block" : "")"

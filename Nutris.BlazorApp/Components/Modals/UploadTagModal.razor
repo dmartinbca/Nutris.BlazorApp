@@ -8,8 +8,8 @@
 @inject HttpClient Http
 @inject ILogger<UploadTagModal> Logger
 
-<Loading IsVisible="@isLoading" />
-
+@* <Loading IsVisible="@isLoading" />
+ *@
 <div class="modal fade @(IsVisible ? "show d-block" : "")" 
      id="uploadmodal" 
      tabindex="-1" 
