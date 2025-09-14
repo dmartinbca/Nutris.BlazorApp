@@ -1,6 +1,19 @@
 @* Auto-generated from VUE BoteCylindrical.vue *@
+@* Auto-generated from VUE BoteCylindrical.vue *@
 @code {
     [Parameter] public string ColorBote { get; set; } = "#CCCCCC";
+
+    // El siguiente código genera errores porque:
+    // - Console.writeLine no existe (debe ser Console.WriteLine y solo se usa en C# de servidor, no en Blazor).
+    // - No se puede tener sentencias como Console.WriteLine en el bloque @code de un componente Razor fuera de métodos.
+    // - ColorBote sí existe como propiedad, pero su uso debe ser dentro de métodos o en la parte de la interfaz.
+
+    // Si necesitas depurar el valor de ColorBote, usa el ciclo de vida de Blazor:
+    protected override void OnInitialized()
+    {
+        // Puedes usar Console.WriteLine aquí si ejecutas en Blazor Server, pero no en Blazor WebAssembly.
+         Console.WriteLine(ColorBote);
+    }
 }
 
 <div class="svg-wrap" style="width:190px;">
@@ -14,7 +27,7 @@
         </foreignObject>
     <g i:extraneous="self">
     <g id="Color">
-    <path :fill="@ColorBote" fill-opacity=".03"  d="M745.6,800.4c0,0,0-522.5,0-567.7c0-45.2-41.6-58.3-26.6-84.5c15-26.2,0-40.5,0-40.5
+    <path :fill="@ColorBote" fill-opacity=".01"  d="M745.6,800.4c0,0,0-522.5,0-567.7c0-45.2-41.6-58.3-26.6-84.5c15-26.2,0-40.5,0-40.5
                     C712,1.7,376.6,11.1,376.6,11.1S41.3,1.7,34.3,107.7c0,0-15,14.3,0,40.5c15,26.2-26.6,39.3-26.6,84.5c0,45.2,0,567.7,0,567.7
                     S2,874.2,63.2,895.6c61.3,21.4,157.3,42.8,313.4,42.8c156.1,0,252.1-21.4,313.4-42.8C751.3,874.2,745.6,800.4,745.6,800.4z" />
             </g>
@@ -4698,3 +4711,4 @@
     </i:aipgf>
 </svg>
 </div>
+ 

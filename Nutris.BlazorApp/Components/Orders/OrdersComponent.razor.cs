@@ -6,6 +6,8 @@ using NutrisBlazor.Models;
 using NutrisBlazor.Services;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using static Nutris.BlazorApp.Components.Modals.BoteCapDataModal;
 
 namespace Nutris.BlazorApp.Components.Orders;
 
@@ -147,7 +149,9 @@ public class OrdersComponentBase : ComponentBase
     public string currentLanguage = "es";
 
     public int i = 0;
-
+    public List<string> capacidades = new();
+    public Dictionary<string, List<string>> capacidadToDiametros = new();
+    public List<string> materiales = new();
 
     protected List<BoteCapDataModal.BoteDataItem> boteDataList = new();
     protected List<BoteCapDataModal.CapDataItem> capDataList = new();
@@ -157,11 +161,24 @@ public class OrdersComponentBase : ComponentBase
     protected BoteCapDataModal.BoteDataItem? selectedBoteOption;
     protected BoteCapDataModal.CapDataItem? selectedCapOption;
     protected string characteristics = "";
-    protected Task HandleSave()
+
+    private string? _boteResumen;
+    private string? _tapaResumen;
+    protected Task HandleSave(BoteDataItem bote, CapDataItem tapa)
     {
         // lo que necesites al guardar
         return Task.CompletedTask;
     }
+    protected async Task HandleSaveData(BoteCapDataModal.BoteDataItem bote,
+                                      BoteCapDataModal.CapDataItem cap)
+    {
+        selectedBoteOption = bote;
+        selectedCapOption = cap;
+
+        // TODO: persistir en tu modelo si aplica
+        await InvokeAsync(StateHasChanged);
+    }
+ 
     protected Task HandleAccordionOpen((int tabIndex, int stepIndex) indexes)
     {
         // Lógica para manejar el accordion
@@ -176,32 +193,217 @@ public class OrdersComponentBase : ComponentBase
 
     protected async Task LoadBoteData()
     {
-        // Load from API
+         
     }
 
     protected async Task LoadCapData()
     {
-        // Load from API
+         
     }
 
     protected async Task LoadColorOptions()
     {
-        // Load from API
+         
     }
+
     protected override async Task OnParametersSetAsync()
     {
         currentLanguage = Localization.CurrentLanguage ?? "es";
+        BuildBoteLookups(RelacionBote, out capacidades, out capacidadToDiametros, out materiales);
 
+        boteColorOptions = BuildColorOptionsFromRelacion(RelacionBote, isCap: false);
+        capColorOptions = BuildColorOptionsFromRelacion(RelacionTapa, isCap: true);
+        if (boteColorOptions.Count == 0)
+            boteColorOptions = new()
+        {
+            new() { ID=1, Value="Clear",  ColorHex="#CCCCCC" },
+            new() { ID=2, Value="Amber",  ColorHex="#FFBF00" },
+            new() { ID=3, Value="Black",  ColorHex="#000000" },
+            new() { ID=4, Value="White",  ColorHex="#FFFFFF" },
+            new() { ID=5, Value="Blue",   ColorHex="#0D6EFD" },
+        };
+        if (capColorOptions.Count == 0)
+            capColorOptions = new()
+        {
+            new() { ID=1, Value="White",  ColorHex="#FFFFFF" },
+            new() { ID=2, Value="Black",  ColorHex="#000000" },
+            new() { ID=3, Value="Gold",   ColorHex="#D4AF37" },
+            new() { ID=4, Value="Silver", ColorHex="#C0C0C0" },
+        };
         // Suscribirse a cambios de idioma
         Localization.OnLanguageChanged += OnLanguageChanged;
         await LoadDataAsync();
+    }
+    private static void BuildBoteLookups(
+    JsonElement relacionBote,
+    out List<string> caps,
+    out Dictionary<string, List<string>> capToDia,
+    out List<string> mats)
+    {
+        caps = new(); mats = new(); capToDia = new();
+
+        if (!relacionBote.TryGetProperty("value", out var arr) || arr.ValueKind != JsonValueKind.Array)
+            return;
+
+        var capSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var matSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var map = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var it in arr.EnumerateArray())
+        {
+            if (TryGetString(it, "Capacidad", out var cap) && !string.IsNullOrWhiteSpace(cap))
+            {
+                capSet.Add(cap);
+
+                if (!map.TryGetValue(cap, out var dias))
+                {
+                    dias = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    map[cap] = dias;
+                }
+
+                if (TryGetString(it, "Diametro", out var dia) && !string.IsNullOrWhiteSpace(dia))
+                    dias.Add(dia);
+            }
+
+            if (TryGetString(it, "Material", out var mat) && !string.IsNullOrWhiteSpace(mat))
+                matSet.Add(mat);
+        }
+
+        // Ordena capacidades por número si es posible
+        caps = capSet
+            .OrderBy(c => int.TryParse(c, out var n) ? n : int.MaxValue)
+            .ThenBy(c => c, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        mats = matSet.OrderBy(m => m, StringComparer.OrdinalIgnoreCase).ToList();
+
+        capToDia = map.ToDictionary(
+            kv => kv.Key,
+            kv => kv.Value.OrderBy(d => d, StringComparer.OrdinalIgnoreCase).ToList(),
+            StringComparer.OrdinalIgnoreCase);
+    }
+    private static bool TryGetString(JsonElement obj, string prop, out string value)
+    {
+        value = "";
+        if (obj.TryGetProperty(prop, out var el))
+        {
+            value = el.ValueKind == JsonValueKind.String ? (el.GetString() ?? "") : el.ToString();
+            return true;
+        }
+        return false;
     }
     public void OnLanguageChanged()
     {
         currentLanguage = Localization.CurrentLanguage;
         InvokeAsync(StateHasChanged);
     }
+    private static List<BoteCapDataModal.ColorOption> BuildColorOptionsFromRelacion(JsonElement relacion, bool isCap)
+    {
+        var result = new List<BoteCapDataModal.ColorOption>();
+        if (relacion.ValueKind != JsonValueKind.Object) return result;
+        if (!relacion.TryGetProperty("value", out var arr) || arr.ValueKind != JsonValueKind.Array) return result;
 
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        int id = 1;
+
+        foreach (var item in arr.EnumerateArray())
+        {
+            if (!item.TryGetProperty("Color", out var colEl) || colEl.ValueKind != JsonValueKind.String) continue;
+            var raw = colEl.GetString() ?? "";
+            var norm = NormalizeColorName(raw);   // p.ej. "yellow (O)" -> "yellow"; "Purple/Violet" -> "purple"
+
+            // dedupe por nombre normalizado
+            if (!seen.Add(norm)) continue;
+
+            var hex = ColorToHex(norm, isCap ? "#FFFFFF" : "#CCCCCC"); // fallback diferente para tapa/bote
+            result.Add(new BoteCapDataModal.ColorOption
+            {
+                ID = id++,
+                Value = ToTitle(raw),   // mostramos el original bonito (con mayúsculas)
+                ColorHex = hex
+            });
+        }
+
+        // orden alfabético por etiqueta
+        result = result.OrderBy(o => o.Value, StringComparer.CurrentCultureIgnoreCase).ToList();
+        // re-asigna IDs consecutivos tras ordenar
+        for (int i = 0; i < result.Count; i++) result[i].ID = i + 1;
+
+        return result;
+    }
+    private static string NormalizeColorName(string s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return "";
+        s = s.Trim();
+
+        // quita paréntesis: "white (O)" -> "white"
+        s = Regex.Replace(s, @"\s*\([^)]*\)\s*", "", RegexOptions.CultureInvariant);
+
+        // normaliza separadores y espacios
+        s = s.Replace(" / ", "/").Replace("  ", " ");
+        s = Regex.Replace(s, @"\s+", " ");
+
+        // normaliza variantes habituales
+        s = s.Replace("LightBlue", "Light Blue", StringComparison.OrdinalIgnoreCase)
+             .Replace("LightGreen", "Light Green", StringComparison.OrdinalIgnoreCase)
+             .Replace("Purple/Violet", "Purple", StringComparison.OrdinalIgnoreCase);
+
+        return s.Trim().ToLowerInvariant();
+    }
+    private static string ColorToHex(string name, string fallback)
+    {
+        // mapa de colores que aparecen en tus JSON (puedes ampliar cuando quieras)
+        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["clear"] = "#CCCCCC",
+            ["white"] = "#FFFFFF",
+            ["black"] = "#000000",
+            ["amber"] = "#FFBF00",
+            ["blue"] = "#0D6EFD",
+            ["light blue"] = "#ADD8E6",
+            ["dark blue"] = "#00008B",
+            ["harbor blue"] = "#1A4876",
+            ["blue stress"] = "#1E90FF",
+            ["blue mens"] = "#1E90FF",
+            ["green"] = "#008000",
+            ["light green"] = "#90EE90",
+            ["emerald green"] = "#50C878",
+            ["pale green"] = "#98FB98",
+            ["turquoise"] = "#40E0D0",
+            ["red"] = "#FF0000",
+            ["salmon"] = "#FA8072",
+            ["orange"] = "#FFA500",
+            ["pastel orange"] = "#FFD8B1",
+            ["pink"] = "#FFC0CB",
+            ["pastel pink"] = "#FFD1DC",
+            ["hot pink"] = "#FF69B4",
+            ["purple"] = "#800080",
+            ["violet"] = "#8A2BE2",
+            ["light purple"] = "#D8BFD8",
+            ["lila"] = "#C8A2C8",
+            ["magenta"] = "#FF00FF",
+            ["anthracite"] = "#30363D",
+            ["gold"] = "#D4AF37",
+            ["silver"] = "#C0C0C0",
+            ["yellow"] = "#FFFF00"
+        };
+
+        if (map.TryGetValue(name, out var hex)) return hex;
+
+        // si venía "purple/violet", "orange/..." etc → prueba por partes
+        if (name.Contains('/'))
+            foreach (var part in name.Split('/'))
+                if (map.TryGetValue(part.Trim(), out hex)) return hex;
+
+        return fallback;
+    }
+    private static string ToTitle(string s)
+    {
+        s = s?.Trim() ?? "";
+        if (string.IsNullOrEmpty(s)) return s;
+        // deja tal cual si ya viene capitalizado con espacios; solo corrige todo minúscula
+        return char.ToUpperInvariant(s[0]) + s.Substring(1);
+    }
     public void ToggleLanguageMenu()
     {
         showLanguageMenu = !showLanguageMenu;

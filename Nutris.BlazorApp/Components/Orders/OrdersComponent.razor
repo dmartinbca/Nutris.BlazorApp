@@ -955,8 +955,11 @@
                       OptionsColorCover="@capColorOptions"
                       Characteristics="@characteristics"
                       SetAccordionOpen="OnSetAccordionOpen"
-                      OnSave="OnBoteCapSaved"
-                      OnClose="OnBoteCapClosed" />
+                      OnSaveData="@(data => HandleSaveData(data.Bote, data.Cap))"
+                      OnClose="OnBoteCapClosed" 
+                      Capacidades="@capacidades"
+                      CapacidadToDiametros="@capacidadToDiametros"
+                      Materiales="@materiales" />
 
 </div>
  
