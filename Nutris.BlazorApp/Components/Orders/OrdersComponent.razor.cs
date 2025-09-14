@@ -235,7 +235,7 @@ public class OrdersComponentBase : ComponentBase
     protected async Task OpenBoteCapModal()
     {
         isBoteCapOpen = true;
-        if (modalRef != null)
+        if (modalRef is not null)
         {
             await modalRef.ShowModal();
         }
@@ -246,19 +246,23 @@ public class OrdersComponentBase : ComponentBase
         StateHasChanged();
         return Task.CompletedTask;
     }
-    private async Task CloseBoteCapModal()
+    protected async Task CloseBoteCapModal()
     {
         isBoteCapOpen = false;
         if (modalRef != null)
             await modalRef.HideModal();
     }
-    private Task OnBoteCapClosed()
+    protected Task OnBoteCapClosed()
 {
     isBoteCapOpen = false;
     StateHasChanged();
     return Task.CompletedTask;
 }
-
+    protected Task OnBoteCapSaved()
+    {
+        // lo que necesites tras guardar
+        return Task.CompletedTask;
+    }
     protected async Task HandleFormulationApproved()
     {
         // Actualizar el estado local

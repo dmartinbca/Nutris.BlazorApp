@@ -526,9 +526,7 @@ body.modal-open {
         display: block;
     }
 
-    .svg-wrap * {
-        fill: var(--dynamic-color) !important;
-    }
+    
 
 .actions {
     display: flex;
@@ -627,9 +625,7 @@ body.modal-open {
         display: block;
     }
 
-    .svg-wrap * {
-        fill: var(--dynamic-color) !important;
-    }
+   
 
 .actions {
     display: flex;
@@ -696,6 +692,10 @@ body.modal-open {
     height: 200px;
     color: #6c757d;
 }
- 
+/* neutraliza cualquier fill forzado heredado */
+.bottle-visual-wrapper svg * {
+    fill: initial;
+}
+
 
 

@@ -6,8 +6,10 @@
 @using System.Collections.Generic
 @using System.Linq
 
-@using NutrisBlazor.Components.Shared.Bottles
-@using NutrisBlazor.Components.Cover
+@using Nutris.BlazorApp.Components.Shared.Bote
+@using Nutris.BlazorApp.Components.Shared.Cover
+@using NutrisBlazor.Components.Shared
+ 
 <link href="css/BoteCapDataModal.css" rel="stylesheet" />
 
 @if (IsVisible)
@@ -447,11 +449,23 @@
     }
 
     private string GetBoteHexColor()
-        => OptionsColorBoteUI.FirstOrDefault(c => c.Label == BoteConfig.Color)?.Hex ?? "#FFFFFF";
-
+    {
+        var key = (BoteConfig.Color ?? "").Trim();
+        // Busca por Label o Value (por si vienen de OrdersComponent con Value/ColorHex)
+        var c = OptionsColorBoteUI.FirstOrDefault(x =>
+            string.Equals((x.Label ?? x.Value), key, StringComparison.OrdinalIgnoreCase));
+        // Si te pasan directamente un HEX en el select, úsalo tal cual
+        if (key.StartsWith("#") && key.Length >= 4) return key;
+        return c?.Hex ?? c?.ColorHex ?? "#CCCCCC";
+    }
     private string GetCapHexColor()
-        => OptionsColorCoverUI.FirstOrDefault(c => c.Label == CapConfig.Color)?.Hex ?? "#000000";
-
+    {
+        var key = (CapConfig.Color ?? "").Trim();
+        var c = OptionsColorCoverUI.FirstOrDefault(x =>
+            string.Equals((x.Label ?? x.Value), key, StringComparison.OrdinalIgnoreCase));
+        if (key.StartsWith("#") && key.Length >= 4) return key;
+        return c?.Hex ?? c?.ColorHex ?? "#FFFFFF";
+    }
     private string GetAlturaText() => (CurrentBoteDimension?.Altura ?? 88.3).ToString("0.0") + " mm";
     private string GetDiamBaseText() => (CurrentBoteDimension?.DiametroBase ?? 55.3).ToString("0.0") + " mm";
     private string GetDiamBocaText() => (CurrentBoteDimension?.DiametroBoca ?? 43.82).ToString("0.00") + " mm";
