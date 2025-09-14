@@ -8,7 +8,7 @@ using Nutris.BlazorApp.Features.Customize;
 using NutrisBlazor;
 using NutrisBlazor.Services;
 using System.Net.Http;
- 
+
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -108,10 +108,6 @@ builder.Services.AddScoped<IAuthService>(sp =>
     return new AuthService(apiClient, jsRuntime, configuration, localStorage);
 });
 builder.Services.AddScoped<IBoteCapService, BoteCapApiService>();
-
-// En WASM:
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://TU_BASE/") });
-
 // Agregar soporte para autorización
 builder.Services.AddAuthorizationCore();
 

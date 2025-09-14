@@ -40,7 +40,8 @@ public class OrdersComponentBase : ComponentBase
 
     // Estado de carga
     protected bool IsLoading { get; set; } = false;
-
+    private bool isBoteCapOpen;
+    private bool accordionOpen;
     // Propiedades del Header
     protected string Prefix => Id?.Split('-')[0]?.ToUpper() ?? "";
     protected string Code { get; set; } = "-";
@@ -156,10 +157,10 @@ public class OrdersComponentBase : ComponentBase
     protected BoteCapDataModal.BoteDataItem? selectedBoteOption;
     protected BoteCapDataModal.CapDataItem? selectedCapOption;
     protected string characteristics = "";
-    protected async Task HandleSave(BoteCapDataModal.BoteCapConfiguration config)
+    protected Task HandleSave()
     {
-        // Handle saved configuration
-        Console.WriteLine($"Configuration saved: {config.Characteristics}");
+        // lo que necesites al guardar
+        return Task.CompletedTask;
     }
     protected Task HandleAccordionOpen((int tabIndex, int stepIndex) indexes)
     {
@@ -167,10 +168,10 @@ public class OrdersComponentBase : ComponentBase
         Console.WriteLine($"Accordion: Tab {indexes.tabIndex}, Step {indexes.stepIndex}");
         return Task.CompletedTask;
     }
-    protected Task HandleClose()
+    protected async Task HandleClose()
     {
-        // Handle modal close
-        return Task.CompletedTask;
+        isBoteCapOpen = false;
+        if (modalRef != null) await modalRef.HideModal();
     }
 
     protected async Task LoadBoteData()
@@ -233,11 +234,31 @@ public class OrdersComponentBase : ComponentBase
     }
     protected async Task OpenBoteCapModal()
     {
+        isBoteCapOpen = true;
         if (modalRef != null)
         {
             await modalRef.ShowModal();
         }
     }
+    protected Task OnSetAccordionOpen(bool open)
+    {
+        accordionOpen = open;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    private async Task CloseBoteCapModal()
+    {
+        isBoteCapOpen = false;
+        if (modalRef != null)
+            await modalRef.HideModal();
+    }
+    private Task OnBoteCapClosed()
+{
+    isBoteCapOpen = false;
+    StateHasChanged();
+    return Task.CompletedTask;
+}
+
     protected async Task HandleFormulationApproved()
     {
         // Actualizar el estado local
@@ -297,7 +318,7 @@ public class OrdersComponentBase : ComponentBase
             Console.WriteLine($"Error loading data: {ex.Message}");
         }
     }
-
+     
     private void LoadFromRG35(CustomizeRG35Response data)
     {
         // Header
@@ -1031,15 +1052,15 @@ public class OrdersComponentBase : ComponentBase
             // Inicializar con datos de ejemplo
             boteDataList = new List<BoteCapDataModal.BoteDataItem>
             {
-                new() { ID = 1, Forma = "ROUND", Capacidad = "150", Diametro = "D45", Material = "PET", Color = "Clear" },
-                new() { ID = 2, Forma = "SQUARE", Capacidad = "200", Diametro = "D45", Material = "PET", Color = "Amber" },
+                new() { Forma = "ROUND", Capacidad = "150", Diametro = "D45", Material = "PET", Color = "Clear" },
+                new() { Forma = "SQUARE", Capacidad = "200", Diametro = "D45", Material = "PET", Color = "Amber" },
                 // Agregar más datos según necesites
             };
 
             capDataList = new List<BoteCapDataModal.CapDataItem>
             {
-                new() { ID = 1, Forma = "Simple", Diametro = "D45", Color = "White" },
-                new() { ID = 2, Forma = "Childproof", Diametro = "D45", Color = "Black" },
+                new() { Forma = "Simple", Diametro = "D45", Color = "White" },
+                new() { Forma = "Childproof", Diametro = "D45", Color = "Black" },
                 // Agregar más datos según necesites
             };
 
