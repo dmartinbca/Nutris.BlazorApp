@@ -107,12 +107,11 @@ builder.Services.AddScoped<IAuthService>(sp =>
 
     return new AuthService(apiClient, jsRuntime, configuration, localStorage);
 });
-builder.Services.AddScoped<IBoteCapService, BoteCapService>();
-builder.Services.AddHttpClient<IBoteCapService, BoteCapService>(client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"] ?? "https://your-api-url.com/");
-    client.DefaultRequestHeaders.Add("Accept", "application/json");
-});
+builder.Services.AddScoped<IBoteCapService, BoteCapApiService>();
+
+// En WASM:
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://TU_BASE/") });
+
 // Agregar soporte para autorización
 builder.Services.AddAuthorizationCore();
 

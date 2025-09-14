@@ -1,170 +1,91 @@
-﻿using System.Net.Http.Json;
+﻿using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace NutrisBlazor.Services
 {
-    public interface IBoteCapService
+    public class BoteCapApiService : IBoteCapService
     {
-        Task<List<BoteDataItem>> GetBoteDataAsync(string tenant = "nutris");
-        Task<List<CapDataItem>> GetCapDataAsync(string tenant = "nutris");
-        Task<List<ColorOption>> GetBoteColorsAsync();
-        Task<List<ColorOption>> GetCapColorsAsync();
-        Task<bool> SaveConfigurationAsync(string codeRG35, BoteCapConfiguration configuration);
-    }
+        private readonly HttpClient _http;
+        public BoteCapApiService(HttpClient http) => _http = http;
 
-    public class BoteCapService : IBoteCapService
-    {
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<BoteCapService> _logger;
-
-        public BoteCapService(HttpClient httpClient, ILogger<BoteCapService> logger)
-        {
-            _httpClient = httpClient;
-            _logger = logger;
-        }
-
-        public async Task<List<BoteDataItem>> GetBoteDataAsync(string tenant = "nutris")
+        public async Task<BoteCapLookups> LoadLookupsAsync()
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/BoteData?tenant={tenant}");
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<List<BoteDataItem>>() ?? new List<BoteDataItem>();
+                // AJUSTA estos endpoints a tu API real
+                var lookups = await _http.GetFromJsonAsync<BoteCapLookups>("/api/bote/lookups");
+                if (lookups != null) return lookups;
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching bote data");
-                return new List<BoteDataItem>();
-            }
+            catch { /* fallback */ }
+            return FallbackLookups();
         }
 
-        public async Task<List<CapDataItem>> GetCapDataAsync(string tenant = "nutris")
+        public async Task<Dictionary<string, Dictionary<string, BoteDimension>>> LoadDimensionsAsync()
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/CapData?tenant={tenant}");
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<List<CapDataItem>>() ?? new List<CapDataItem>();
+                var dims = await _http.GetFromJsonAsync<Dictionary<string, Dictionary<string, BoteDimension>>>("/api/bote/dimensions");
+                if (dims != null) return dims;
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching cap data");
-                return new List<CapDataItem>();
-            }
+            catch { /* fallback */ }
+            return FallbackDimensions();
         }
 
-        public async Task<List<ColorOption>> GetBoteColorsAsync()
+        public async Task<bool> SaveConfigurationAsync(BoteCapConfiguration config, string codeRG35)
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/BoteColors");
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<List<ColorOption>>() ?? new List<ColorOption>();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching bote colors");
-                return new List<ColorOption>();
-            }
-        }
-
-        public async Task<List<ColorOption>> GetCapColorsAsync()
-        {
-            try
-            {
-                var response = await _httpClient.GetAsync("api/CapColors");
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<List<ColorOption>>() ?? new List<ColorOption>();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching cap colors");
-                return new List<ColorOption>();
-            }
-        }
-
-        public async Task<bool> SaveConfigurationAsync(string codeRG35, BoteCapConfiguration configuration)
-        {
-            try
-            {
-                var url = $"api/CustomizeRG35('{codeRG35}')?$expand=Formulation,Recipe,Analytics&tenant=nutris";
-                var response = await _httpClient.PatchAsJsonAsync(url, configuration);
-
-                if (response.IsSuccessStatusCode)
+                var url = $"CustomizeRG35('{codeRG35}')";
+                var payload = JsonSerializer.Serialize(config);
+                var req = new HttpRequestMessage(HttpMethod.Patch, url)
                 {
-                    return true;
-                }
-
-                var error = await response.Content.ReadAsStringAsync();
-                _logger.LogError($"Error saving configuration: {error}");
-                return false;
+                    Content = new StringContent(payload, Encoding.UTF8, "application/json")
+                };
+                var resp = await _http.SendAsync(req);
+                return resp.IsSuccessStatusCode;
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error saving configuration");
-                return false;
-            }
+            catch { return false; }
         }
-    }
 
-    // Model classes
-    public class BoteDataItem
-    {
-        public int ID { get; set; }
-        public string Forma { get; set; } = "";
-        public string Capacidad { get; set; } = "";
-        public string Diametro { get; set; } = "";
-        public string Material { get; set; } = "";
-        public string Color { get; set; } = "";
-    }
+        // Fallbacks por si la API no responde
+        private static BoteCapLookups FallbackLookups() => new()
+        {
+            Capacidades = new() { "150", "200", "250", "300", "400", "500", "600", "1000" },
+            CapacidadToDiametros = new()
+            {
+                ["150"] = new() { "D45" },
+                ["200"] = new() { "D45" },
+                ["250"] = new() { "D45" },
+                ["300"] = new() { "D45" },
+                ["400"] = new() { "D45" },
+                ["500"] = new() { "D45" },
+                ["600"] = new() { "D45" },
+                ["1000"] = new() { "D45" },
+            },
+            Materiales = new() { "PET", "HDPE", "PP" },
+            ColoresBote = new()
+            {
+                new ColorOption{ Label="Clear", Hex="#CCCCCC" },
+                new ColorOption{ Label="Amber", Hex="#7A4E1D" },
+                new ColorOption{ Label="Black", Hex="#000000" },
+            },
+            ColoresTapa = new()
+            {
+                new ColorOption{ Label="White", Hex="#FFFFFF" },
+                new ColorOption{ Label="Black", Hex="#000000" },
+                new ColorOption{ Label="Blue",  Hex="#0D6EFD" },
+            }
+        };
 
-    public class CapDataItem
-    {
-        public int ID { get; set; }
-        public string Forma { get; set; } = "";
-        public string Diametro { get; set; } = "";
-        public string Color { get; set; } = "";
-        public bool Sleever { get; set; }
-    }
-
-    public class ColorOption
-    {
-        public int ID { get; set; }
-        public string Value { get; set; } = "";
-        public string ColorHex { get; set; } = "";
-    }
-
-    public class BoteCapConfiguration
-    {
-        [JsonPropertyName("Bote_forma")]
-        public string BoteForma { get; set; } = "";
-
-        [JsonPropertyName("Bote_capacidad")]
-        public string BoteCapacidad { get; set; } = "";
-
-        [JsonPropertyName("Bote_boca")]
-        public string BoteBoca { get; set; } = "";
-
-        [JsonPropertyName("Bote_color")]
-        public string BoteColor { get; set; } = "";
-
-        [JsonPropertyName("Bote_material")]
-        public string BoteMaterial { get; set; } = "";
-
-        [JsonPropertyName("Cap_tapa")]
-        public string CapTapa { get; set; } = "";
-
-        [JsonPropertyName("Cap_Boca")]
-        public string CapBoca { get; set; } = "";
-
-        [JsonPropertyName("Cap_color")]
-        public string CapColor { get; set; } = "";
-
-        [JsonPropertyName("Cap_sleever")]
-        public bool CapSleever { get; set; }
-
-        [JsonPropertyName("Characteristics")]
-        public string Characteristics { get; set; } = "";
+        private static Dictionary<string, Dictionary<string, BoteDimension>> FallbackDimensions() => new()
+        {
+            ["150"] = new() { ["D45"] = new BoteDimension { Altura = 88.3, DiametroBase = 55.3, DiametroBoca = 43.82 } },
+            ["200"] = new() { ["D45"] = new BoteDimension { Altura = 105.86, DiametroBase = 60.0, DiametroBoca = 43.82 } },
+            ["250"] = new() { ["D45"] = new BoteDimension { Altura = 111.3, DiametroBase = 63.91, DiametroBoca = 43.82 } },
+        };
     }
 }
