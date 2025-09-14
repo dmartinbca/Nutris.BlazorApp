@@ -1,524 +1,64 @@
-﻿/* Modal Structure */
-.modal-dialog-sidebar {
+﻿@import url('/src/assets/fonts.css');
+
+/* Modal personalizado - Base del original Vue */
+.modal-backdrop-custom {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #DEE6F38C; /* Color original Vue con transparencia */
+    z-index: 999;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.3s;
+}
+
+.modal-custom {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100%;
+    z-index: 1050;
+    display: none;
+    overflow: hidden;
+    --bs-modal-width: 1263px !important;
+    --bs-modal-header-border-color: transparent !important;
+}
+
+    .modal-custom.show {
+        display: block !important;
+    }
+
+/* Dialog - mantener estilo original Vue sidebar-right */
+.modal-dialog-custom {
     position: fixed;
     margin: 0;
     top: 0;
     right: 0;
     height: 100%;
     width: 1300px;
-    max-width: 90vw;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1051;
 }
 
-.modal-content {
+.modal-custom.show .modal-dialog-custom {
+    transform: translateX(0);
+}
+
+/* Content - estilo original Vue */
+.modal-content-custom {
     height: 100%;
     border-top-left-radius: 40px;
     border-bottom-left-radius: 40px;
     border: none;
-    background: #ffffff;
-    overflow-y: auto;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem 3rem;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.modal-title {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin: 0;
-}
-
-.btn-close {
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    color: #6c757d;
-    cursor: pointer;
-    padding: 0.5rem;
-    transition: color 0.3s ease;
-}
-
-    .btn-close:hover {
-        color: #2c3e50;
-    }
-
-/* Loading Overlay */
-.loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.9);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-/* Tabs */
-.tabs-container {
-    position: relative;
-    padding: 1rem 3rem;
-}
-
-.custom-tabs {
-    border-bottom: 1px solid #dee2e6;
-    margin-bottom: 2rem;
-}
-
-.nav-link {
-    color: #6c757d;
-    border: 1px solid transparent;
-    border-bottom: none;
-    border-radius: 10px 10px 0 0;
-    padding: 0.75rem 2rem;
-    font-weight: 500;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-    .nav-link:hover {
-        color: #495057;
-        background: #f8f9fa;
-    }
-
-    .nav-link.active {
-        color: #2c3e50;
-        background: #ede9fe;
-        border-color: #dee2e6;
-        border-bottom: 1px solid white;
-        font-weight: 700;
-    }
-
-/* Reset Button */
-.btn-reset {
-    position: absolute;
-    right: 3rem;
-    top: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-    .btn-reset:hover {
-        background: #5a6268;
-    }
-
-/* Configuration Container */
-.config-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    min-height: 500px;
-}
-
-/* Preview Section */
-.preview-section {
-    padding: 2rem;
+    background: #fff;
     display: flex;
     flex-direction: column;
-}
-
-.bottle-preview {
-    background: #ede9fe;
-    border-radius: 25px 0 0 25px;
-}
-
-.cap-preview {
-    background: #ffe8e8;
-    border-radius: 25px 0 0 25px;
-}
-
-.section-title {
-    font-size: 1.5rem;
-    font-weight: 500;
-    margin-bottom: 2rem;
-    color: #2c3e50;
-}
-
-.preview-content {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Dimensions Display */
-.dimensions-display {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    position: relative;
-}
-
-.dimension-vertical {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    border-left: 1px solid #c4c2c2;
-    border-right: 1px solid #c4c2c2;
-    padding: 1rem 0.5rem;
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9rem;
-    color: #495057;
-}
-
-.dimension-horizontal {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    font-size: 0.9rem;
-    color: #495057;
-}
-
-.dim-top,
-.dim-bottom {
-    border-top: 1px solid #c4c2c2;
-    padding-top: 0.5rem;
-    text-align: center;
-    min-width: 100px;
-}
-
-.bottle-visual,
-.cap-visual {
-    width: 150px;
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Form Section */
-.form-section {
-    background: #faf5ff;
-    padding: 2rem;
-    border-radius: 0 25px 25px 0;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: #495057;
-    }
-
-.form-select {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #c2c2c2;
-    border-radius: 5px;
-    font-size: 1rem;
-    background: white;
-    cursor: pointer;
-    transition: border-color 0.3s ease;
-}
-
-    .form-select:focus {
-        outline: none;
-        border-color: #7c3aed;
-        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-    }
-
-/* Shape Selector */
-.shape-selector {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.shape-option {
-    display: flex;
-    align-items: center;
-    background: #f0e7f9;
-    border: 1px solid #a7bde3;
-    border-radius: 25px;
-    padding: 0.5rem 1rem;
-    transition: all 0.3s ease;
-}
-
-    .shape-option:hover {
-        background: #e5d5f5;
-    }
-
-    .shape-option input[type="radio"] {
-        margin-right: 0.5rem;
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-    }
-
-    .shape-option label {
-        margin: 0;
-        cursor: pointer;
-        font-weight: 400;
-    }
-
-    .shape-option:has(input:checked) {
-        background: #7c3aed;
-        color: white;
-        border-color: #7c3aed;
-    }
-
-/* Checkbox */
-.form-check {
-    display: flex;
-    align-items: center;
-}
-
-.form-check-input {
-    width: 20px;
-    height: 20px;
-    margin-right: 0.5rem;
-    cursor: pointer;
-}
-
-.form-check-label {
-    cursor: pointer;
-    user-select: none;
-}
-
-/* Error Messages */
-.error-message {
-    color: #dc3545;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
-
-/* Modal Footer */
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    padding: 1.5rem 3rem;
-    border-top: 1px solid #dee2e6;
-}
-
-.btn {
-    padding: 0.75rem 2rem;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-}
-
-.btn-primary {
-    background: #2c3e50;
-    color: white;
-    border-color: #2c3e50;
-}
-
-    .btn-primary:hover {
-        background: white;
-        color: #2c3e50;
-    }
-
-.btn-outline-primary {
-    background: white;
-    color: #2c3e50;
-    border-color: #2c3e50;
-}
-
-    .btn-outline-primary:hover {
-        background: #2c3e50;
-        color: white;
-    }
-
-/* Responsive Design */
-@media (max-width: 1400px) {
-    .modal-dialog-sidebar {
-        width: 100%;
-        max-width: 100%;
-    }
-}
-
-@media (max-width: 768px) {
-    .modal-content {
-        border-radius: 0;
-    }
-
-    .config-container {
-        grid-template-columns: 1fr;
-    }
-
-    .preview-section {
-        border-radius: 0;
-        min-height: 300px;
-    }
-
-    .form-section {
-        border-radius: 0;
-    }
-
-    .shape-selector {
-        flex-direction: column;
-    }
-
-    .btn-reset {
-        position: static;
-        margin-bottom: 1rem;
-        width: 100%;
-    }
-
-    .modal-footer {
-        flex-direction: column;
-    }
-
-    .btn {
-        width: 100%;
-    }
-}
-
-/* Animations */
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-    }
-
-    to {
-        transform: translateX(0);
-    }
-}
-
-.modal.show .modal-dialog {
-    animation: slideIn 0.3s ease-out;
-}
-
-/* Custom Scrollbar */
-.modal-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.modal-content::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-}
-
-    .modal-content::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-/* En BoteCapDataModal.razor.css */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1050;
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    outline: 0;
-}
-
-    .modal.fade {
-        opacity: 0;
-        transition: opacity 0.3s linear;
-    }
-
-    .modal.show {
-        opacity: 1;
-    }
-
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1040;
-    width: 100vw;
-    height: 100vh;
-    background-color: #000;
-}
-
-    .modal-backdrop.fade {
-        opacity: 0;
-        transition: opacity 0.3s linear;
-    }
-
-    .modal-backdrop.show {
-        opacity: 0.5;
-    }
-
-body.modal-open {
-    overflow: hidden;
-    /* Modal personalizado sin Bootstrap */
-    .custom-modal
-
-{
-    display: none;
-    position: fixed;
-    z-index: 1050;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-}
-
-.custom-modal.show {
-    display: block;
-    animation: fadeIn 0.3s;
-}
-
-.custom-modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1040;
-    animation: fadeIn 0.3s;
-}
-
-.custom-modal-dialog {
-    position: fixed;
-    margin: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 1300px;
-    max-width: 90vw;
-    z-index: 1050;
-    animation: slideInRight 0.3s;
-}
-
-.custom-modal-content {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid rgba(0,0,0,.2);
-    border-radius: 40px 0 0 40px;
-    outline: 0;
-    overflow-y: auto;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+    max-height: calc(120vh) !important;
+    overflow-y: auto !important;
 }
 
 @keyframes fadeIn {
@@ -531,16 +71,325 @@ body.modal-open {
     }
 }
 
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-    }
-
-    to {
-        transform: translateX(0);
-    }
+/* Header del modal - estilo original Vue */
+.modal-header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    padding: var(--bs-modal-header-padding);
+    border-bottom: var(--bs-modal-header-border-width) solid var(--bs-modal-header-border-color);
+    border-top-left-radius: var(--bs-modal-inner-border-radius);
+    border-top-right-radius: var(--bs-modal-inner-border-radius);
+    justify-content: space-between;
+    padding-left: 50px;
+    padding-right: 30px;
 }
 
+.modal-container-title {
+    font-size: 2rem;
+}
+
+.modal-title {
+    margin-bottom: 15px;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.b-close, .btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.5;
+    padding: 0;
+}
+
+    .b-close:hover, .btn-close:hover {
+        opacity: 1;
+    }
+
+/* Body del modal */
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 5px 50px;
+    overflow-y: auto;
+}
+
+.modal-body_header {
+    padding: 5px 50px;
+}
+
+/* Tabs - estilo original Vue */
+.tabs-inline {
+    min-width: 320px;
+    max-width: 1100px;
+    padding: 10px;
+    margin: 0 auto;
+    background: #fff;
+}
+
+.custom-tabs {
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 2rem;
+}
+
+    .custom-tabs .nav-link {
+        display: inline-block;
+        margin: 0 0 -1px;
+        padding: 10px 5px;
+        font-weight: 600;
+        text-align: center;
+        color: #bbb;
+        border: 1px solid transparent;
+        background: transparent;
+        cursor: pointer;
+        width: 150px;
+        font-family: 'RalewayMedium', sans-serif;
+        font-weight: 500;
+    }
+
+        .custom-tabs .nav-link.active.bottle-tab {
+            color: #555;
+            border: 1px solid #ddd;
+            border-bottom: 1px solid #fff;
+            background-color: #ede9fe;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-family: "RalewayBold", sans-serif !important;
+            font-weight: 800;
+        }
+
+        .custom-tabs .nav-link.active.cap-tab {
+            color: #555;
+            border: 1px solid #ddd;
+            border-bottom: 1px solid #fff;
+            background-color: #ffe8e8;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-family: "RalewayBold", sans-serif !important;
+            font-weight: 800;
+        }
+
+/* Reset button */
+.btn-reset, .button-reset {
+    position: absolute;
+    right: 100px;
+    top: -40px;
+}
+
+/* Content tabs - estilo original Vue */
+.parent {
+    display: flex;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    width: 1107px;
+}
+
+.config-container {
+    display: flex;
+    gap: 2rem;
+    padding: 20px;
+}
+
+/* Preview section - basado en child-bottles original */
+.preview-section {
+    background-color: #ede9fe;
+    border-radius: 1.75rem;
+    padding: 20px 25px;
+    width: 50%;
+    min-height: 500px;
+}
+
+    .preview-section.cap-preview {
+        background-color: #ffe8e8;
+    }
+
+/* Form section - basado en child_content_info-bottle */
+.form-section {
+    padding: 20px 25px;
+    width: 50%;
+    background: #faf5ff;
+    border-radius: 1.75rem;
+}
+
+.section-title {
+    padding: 10px 0 10px 30px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Form elements - estilo original Vue */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    width: 100%;
+    padding: 0 !important;
+    text-align: left;
+    font-weight: 400;
+    margin-bottom: 10px;
+}
+
+    .form-label.required::after {
+        content: " *";
+        color: red;
+    }
+
+.form-select {
+    width: 100%;
+    max-width: 327px;
+    height: 60px;
+    border: 1px solid #c2c2c2;
+    border-radius: 5px;
+    padding-left: 20px;
+    background-image: linear-gradient(45deg, transparent 50%, rgb(17, 17, 17) 60%), linear-gradient(135deg, rgb(17, 17, 17) 40%, transparent 50%) !important;
+    background-position: calc(100% - 15px) 25px, calc(100% - 6px) 25px, 100% 0;
+    background-size: 10px 10px, 10px 10px;
+    background-repeat: no-repeat;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* Shape selector - estilo original Vue */
+.shape-selector {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.shape-option {
+    border: 2px solid #aeabae;
+    border-radius: 5px;
+    text-align: center;
+    position: relative;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+    .shape-option.selected {
+        background: #1c7298;
+        color: #fff;
+        border-color: #1c7298;
+    }
+
+    .shape-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .shape-option label {
+        cursor: pointer;
+        margin: 0;
+        padding: 0;
+    }
+
+/* Product config - estilo original Vue */
+.product-config {
+    width: 600px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    height: 500px;
+}
+
+/* Medidas - estilo original Vue */
+.medidas-vertical {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.medidas-vertical-1 {
+    width: 120px;
+    height: 350px;
+    border-top: 1px solid #C4C2C2;
+    border-bottom: 1px solid #C4C2C2;
+    position: relative;
+    top: -32px;
+    display: flex;
+}
+
+.medidas-horizontal {
+    width: 100%;
+    max-width: 123px;
+    margin: 0 auto;
+    border-left: 1px solid #C4C2C2;
+    border-right: 1px solid #C4C2C2;
+    position: relative;
+    top: -40px;
+}
+
+.medidas-horizontal-base {
+    width: 100%;
+    max-width: 190px;
+    margin: 0 auto;
+    border-left: 1px solid #C4C2C2;
+    border-right: 1px solid #C4C2C2;
+    position: relative;
+    bottom: -40px;
+}
+
+/* Bottle image */
+.bottle {
+    width: 310px;
+    margin: 0 auto;
+    height: 425px;
+}
+
+/* Footer - estilo original Vue */
+.modal-footer {
+    justify-content: flex-end;
+    display: flex;
+    padding: 30px;
+    border-top: 1px solid #dee2e6;
+    gap: 1rem;
+}
+
+.modal-footer-btc-cancel {
+    margin-right: 30px;
+    border-radius: 25px;
+    border: 2px solid var(--blackBlue, #2F5496);
+    color: var(--blackBlue, #2F5496);
+    width: 163px;
+    text-align: center;
+    padding: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: white;
+    cursor: pointer;
+}
+
+    .modal-footer-btc-cancel:hover {
+        background: var(--blackBlue, #2F5496);
+        transition: all 0.3s ease;
+        color: white;
+    }
+
+.modal-footer-btc-save, .btn-primary {
+    border-radius: 25px;
+    border: 2px solid var(--blackBlue, #2F5496);
+    background-color: var(--blackBlue, #2F5496);
+    color: #fff;
+    width: 163px;
+    text-align: center;
+    padding: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+    .modal-footer-btc-save:hover, .btn-primary:hover {
+        background: white;
+        transition: all 0.3s ease;
+        color: var(--blackBlue, #2F5496);
+    }
+
+/* Loading overlay */
 .loading-overlay {
     position: absolute;
     top: 0;
@@ -554,198 +403,47 @@ body.modal-open {
     z-index: 2000;
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem 3rem;
-    border-bottom: 1px solid #dee2e6;
+/* Error message */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
 }
 
-.modal-body {
-    position: relative;
-    flex: 1 1 auto;
-    padding: 1rem 3rem;
-    overflow-y: auto;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 1rem 3rem;
-    border-top: 1px solid #dee2e6;
-    gap: 1rem;
-}
-
-.btn-close {
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.2s;
-}
-
-    .btn-close:hover {
-        opacity: 1;
-    }
-
-/* Responsive */
-@media (max-width: 768px) {
-    .custom-modal-dialog {
-        width: 100%;
-        max-width: 100%;
-    }
-
-    .custom-modal-content {
-        border-radius: 0;
-    }
-}
-
-/* Backdrop */
-.modal-backdrop-custom {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1040;
-}
-
-/* Modal container */
-.modal-custom {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1050;
-    overflow: hidden;
-}
-
-/* Dialog - slide desde la derecha */
-.modal-dialog-custom {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 1300px;
-    max-width: 85vw;
-    margin: 0;
-    transform: translateX(100%);
-    transition: transform 0.3s ease-out;
-    z-index: 1050;
-}
-
-/* Cuando está visible */
-.modal-custom.show .modal-dialog-custom {
-    transform: translateX(0);
-}
-
-/* Content */
-.modal-content-custom {
-    height: 100%;
-    background: #fff;
-    border: none;
-    border-radius: 40px 0 0 40px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.3);
-}
-
-/* Header */
-.modal-header {
-    padding: 2rem 3rem;
-    border-bottom: 1px solid #dee2e6;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-title {
-    font-size: 2rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.btn-close {
-    background: transparent;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    opacity: 0.5;
-    padding: 0;
-    width: 2rem;
-    height: 2rem;
-}
-
-    .btn-close:hover {
-        opacity: 1;
-    }
-
-/* Body */
-.modal-body {
-    flex: 1;
-    padding: 2rem 3rem;
-    overflow-y: auto;
-}
-
-/* Footer */
-.modal-footer {
-    padding: 1.5rem 3rem;
-    border-top: 1px solid #dee2e6;
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-}
-
-/* Tabs personalizados */
-.custom-tabs {
-    border-bottom: 1px solid #dee2e6;
-    margin-bottom: 2rem;
-}
-
-    .custom-tabs .nav-link {
-        background: transparent;
-        border: 1px solid transparent;
-        border-bottom: none;
-        color: #6c757d;
-        padding: 0.75rem 2rem;
-        cursor: pointer;
-        border-radius: 10px 10px 0 0;
-    }
-
-        .custom-tabs .nav-link.active {
-            background: #ede9fe;
-            color: #333;
-            border: 1px solid #dee2e6;
-            border-bottom: 1px solid white;
-            font-weight: 600;
-        }
-
-/* Reset button */
-.btn-reset {
-    position: absolute;
-    right: 3rem;
-    top: 1rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
+/* Responsive - estilo original Vue */
+@media (max-width: 767px) {
     .modal-dialog-custom {
         width: 100%;
-        max-width: 100%;
-        border-radius: 0;
+        transform: none;
     }
 
     .modal-content-custom {
         border-radius: 0;
     }
+
+    .modal-header {
+        padding: 15px;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .config-container {
+        flex-direction: column;
+    }
+
+    .preview-section,
+    .form-section {
+        width: 100%;
+    }
+
+    .form-select {
+        width: 100% !important;
+    }
 }
 
-/* Prevenir scroll del body cuando el modal está abierto */
+/* Ensure body scroll is hidden when modal is open */
 body.modal-open {
     overflow: hidden !important;
 }

@@ -13,8 +13,7 @@
 }
 <div class="modal-custom @(IsVisible ? "show" : "")"
      id="boteCapModal"
-     tabindex="-1"
-     @onclick="HandleBackdropClick">
+     tabindex="-1">
     <div class="modal-dialog-custom" @onclick:stopPropagation="true">
         <div class="modal-content-custom">
             @if (IsLoading)
@@ -488,11 +487,11 @@
         IsVisible = false;
         StateHasChanged();
 
-        // Remover clase del body
+        // Restaurar scroll del body
         await JSRuntime.InvokeVoidAsync("eval", @"
-            document.body.classList.remove('modal-open');
-            document.body.style.paddingRight = '';
-        ");
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+    ");
 
         await OnClose.InvokeAsync();
     }
@@ -501,11 +500,14 @@
         IsVisible = true;
         StateHasChanged();
 
+        // Pequeño delay para asegurar que el DOM esté listo
+        await Task.Delay(50);
+
         // Agregar clase al body para prevenir scroll
         await JSRuntime.InvokeVoidAsync("eval", @"
-            document.body.classList.add('modal-open');
-            document.body.style.paddingRight = '17px';
-        ");
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+    ");
     }
     private async Task Close()
     {
