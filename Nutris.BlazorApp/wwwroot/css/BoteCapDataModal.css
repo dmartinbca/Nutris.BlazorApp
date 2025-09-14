@@ -1,4 +1,4 @@
-﻿@import url('/src/assets/fonts.css');
+﻿@import url('css/fonts.css');
 
 /* Modal personalizado - Base del original Vue */
 .modal-backdrop-custom {
@@ -7,9 +7,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #DEE6F38C; /* Color original Vue con transparencia */
-    z-index: 999;
-    backdrop-filter: blur(2px);
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
     animation: fadeIn 0.3s;
 }
 
@@ -17,27 +16,25 @@
     position: fixed !important;
     top: 0;
     left: 0;
-    width: 100% !important;
+    width: 100%;
     height: 100%;
     z-index: 1050;
-    display: none;
-    overflow: hidden;
-    --bs-modal-width: 1263px !important;
-    --bs-modal-header-border-color: transparent !important;
+    pointer-events: none;
 }
 
     .modal-custom.show {
-        display: block !important;
+        pointer-events: auto;
     }
 
 /* Dialog - mantener estilo original Vue sidebar-right */
 .modal-dialog-custom {
     position: fixed;
-    margin: 0;
     top: 0;
     right: 0;
-    height: 100%;
-    width: 1300px;
+    height: 100vh;
+    width: 1100px;
+    max-width: 90vw;
+    margin: 0;
     transform: translateX(100%);
     transition: transform 0.3s ease-in-out;
     z-index: 1051;
@@ -50,15 +47,12 @@
 /* Content - estilo original Vue */
 .modal-content-custom {
     height: 100%;
-    border-top-left-radius: 40px;
-    border-bottom-left-radius: 40px;
-    border: none;
     background: #fff;
+    border-radius: 40px 0 0 40px;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
     display: flex;
     flex-direction: column;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.3);
-    max-height: calc(120vh) !important;
-    overflow-y: auto !important;
+    overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -73,26 +67,24 @@
 
 /* Header del modal - estilo original Vue */
 .modal-header {
+    padding: 30px 50px;
+    border-bottom: 1px solid #e9ecef;
     display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    padding: var(--bs-modal-header-padding);
-    border-bottom: var(--bs-modal-header-border-width) solid var(--bs-modal-header-border-color);
-    border-top-left-radius: var(--bs-modal-inner-border-radius);
-    border-top-right-radius: var(--bs-modal-inner-border-radius);
     justify-content: space-between;
-    padding-left: 50px;
-    padding-right: 30px;
+    align-items: center;
+    flex-shrink: 0;
 }
+
 
 .modal-container-title {
     font-size: 2rem;
 }
 
 .modal-title {
-    margin-bottom: 15px;
-    font-size: 2rem;
-    font-weight: 600;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    color: #2F5496;
 }
 
 .b-close, .btn-close {
@@ -104,10 +96,9 @@
     padding: 0;
 }
 
-    .b-close:hover, .btn-close:hover {
+    .btn-close:hover {
         opacity: 1;
     }
-
 /* Body del modal */
 .modal-body {
     display: flex;
@@ -118,7 +109,7 @@
 }
 
 .modal-body_header {
-    padding: 5px 50px;
+    padding: 0 50px;
 }
 
 /* Tabs - estilo original Vue */
@@ -131,46 +122,32 @@
 }
 
 .custom-tabs {
-    border-bottom: 1px solid #dee2e6;
-    margin-bottom: 2rem;
+    display: flex;
+    gap: 10px;
+    padding: 20px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+.nav-link {
+    padding: 10px 30px;
+    border: none;
+    background: #f8f9fa;
+    color: #6c757d;
+    font-weight: 600;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
-    .custom-tabs .nav-link {
-        display: inline-block;
-        margin: 0 0 -1px;
-        padding: 10px 5px;
-        font-weight: 600;
-        text-align: center;
-        color: #bbb;
-        border: 1px solid transparent;
-        background: transparent;
-        cursor: pointer;
-        width: 150px;
-        font-family: 'RalewayMedium', sans-serif;
-        font-weight: 500;
+    .nav-link.active.bottle-tab {
+        background: #ede9fe;
+        color: #2F5496;
+        font-weight: 700;
     }
-
-        .custom-tabs .nav-link.active.bottle-tab {
-            color: #555;
-            border: 1px solid #ddd;
-            border-bottom: 1px solid #fff;
-            background-color: #ede9fe;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            font-family: "RalewayBold", sans-serif !important;
-            font-weight: 800;
-        }
-
-        .custom-tabs .nav-link.active.cap-tab {
-            color: #555;
-            border: 1px solid #ddd;
-            border-bottom: 1px solid #fff;
-            background-color: #ffe8e8;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            font-family: "RalewayBold", sans-serif !important;
-            font-weight: 800;
-        }
+    .nav-link.active.cap-tab {
+        background: #ffe8e8;
+        color: #2F5496;
+        font-weight: 700;
+    }
 
 /* Reset button */
 .btn-reset, .button-reset {
@@ -225,12 +202,42 @@
     margin-bottom: 20px;
 }
 
-.form-label {
+.form-select {
     width: 100%;
-    padding: 0 !important;
-    text-align: left;
-    font-weight: 400;
-    margin-bottom: 10px;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+}
+.segmented {
+    display: flex;
+    gap: 10px;
+}
+.segmented-item {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #ced4da;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+    .segmented-item.active {
+        background: #2F5496;
+        color: white;
+        border-color: #2F5496;
+    }
+
+.modal-footer {
+    padding: 20px 50px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    flex-shrink: 0;
 }
 
     .form-label.required::after {
@@ -426,18 +433,31 @@
     }
 
     .modal-body {
-        padding: 15px;
+        flex: 1;
+        overflow-y: auto;
+        padding: 30px 50px;
     }
 
     .config-container {
-        flex-direction: column;
+        display: flex;
+        gap: 30px;
     }
-
-    .preview-section,
-    .form-section {
-        width: 100%;
+    .preview-section, .form-section {
+        flex: 1;
+        background: #f5f0ff;
+        border-radius: 20px;
+        padding: 30px;
+        position: relative;
     }
-
+        .preview-section.cap-preview {
+            background: #ffe8e8;
+        }
+    .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #2F5496;
+    }
     .form-select {
         width: 100% !important;
     }
@@ -460,29 +480,30 @@ body.modal-open {
     min-height: 360px;
 }
 
+
 .reset-filters-btn {
-    position: absolute;
-    top: 14px;
+    position: relative;
+    top: 10px;
     right: 20px;
     display: flex;
-    gap: .5rem;
     align-items: center;
-    padding: .45rem .8rem;
-    border-radius: 10px;
-    background: #6d7688;
-    color: #fff;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #6c757d;
+    color: white;
     border: none;
-    font-weight: 600;
-    box-shadow: 0 1px 2px rgba(0,0,0,.08);
-    z-index: 3;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: 600;
+    z-index: 10;
 }
 
     .reset-filters-btn img {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         filter: brightness(0) invert(1);
     }
+
 
 .bottle-visual-wrapper {
     display: flex;
@@ -529,13 +550,13 @@ body.modal-open {
         filter: brightness(1.05);
     }
 
-.btn-cancel {
-    background: #fff;
-    color: #0C2340;
-    border: 2px solid #E1E5EE;
-    border-radius: 999px;
-    padding: .78rem 1.5rem;
+.btn-cancel, .btn-primary {
+    padding: 12px 40px;
+    border-radius: 25px;
     font-weight: 700;
+    border: 2px solid #2F5496;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
     .btn-cancel:hover {
@@ -551,7 +572,10 @@ body.modal-open {
 
 .preview-content {
     position: relative;
-    min-height: 360px;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .reset-filters-btn {
@@ -579,12 +603,16 @@ body.modal-open {
     }
 
 .bottle-visual-wrapper {
+    position: relative;
+    width: 100%;
+    height: 350px;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 320px;
 }
-
+.field {
+    margin-bottom: 25px;
+}
     .bottle-visual-wrapper svg {
         width: 260px;
         height: auto;
@@ -622,16 +650,52 @@ body.modal-open {
     .btn-primary:hover {
         filter: brightness(1.05);
     }
-
 .btn-cancel {
-    background: #fff;
-    color: #0C2340;
-    border: 2px solid #E1E5EE;
-    border-radius: 999px;
-    padding: .78rem 1.5rem;
-    font-weight: 700;
+    background: white;
+    color: #2F5496;
 }
 
     .btn-cancel:hover {
-        background: #f6f8fc;
+        background: #f8f9fa;
     }
+
+.btn-primary {
+    background: #2F5496;
+    color: white;
+}
+
+    .btn-primary:hover {
+        background: #1e3a6f;
+        border-color: #1e3a6f;
+    }
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+    .checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+.hint {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.empty-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: #6c757d;
+}
+ 
+
+
