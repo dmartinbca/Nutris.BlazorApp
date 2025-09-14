@@ -6,13 +6,17 @@
 @inject IJSRuntime JSRuntime
 @inject ILogger<BoteCapDataModal> Logger
 @inject IBoteCapService BoteCapService
-
-<div class="custom-modal @(IsVisible ? "show" : "")"
+<link href="css/BoteCapDataModal.css" rel="stylesheet" />
+@if (IsVisible)
+{
+    <div class="modal-backdrop-custom fade show" @onclick="HandleBackdropClick"></div>
+}
+<div class="modal-custom @(IsVisible ? "show" : "")"
      id="boteCapModal"
      tabindex="-1"
      @onclick="HandleBackdropClick">
-    <div class="custom-modal-dialog" @onclick:stopPropagation="true">
-        <div class="custom-modal-content">
+    <div class="modal-dialog-custom" @onclick:stopPropagation="true">
+        <div class="modal-content-custom">
             @if (IsLoading)
             {
                 <div class="loading-overlay">
@@ -390,10 +394,7 @@
     </div>
 </div>
 
-@if (IsVisible)
-{
-    <div class="custom-modal-backdrop" @onclick="HandleBackdropClick"></div>
-}
+
 
 @code {
     [Parameter] public BoteDataItem? SelectedOption { get; set; }
@@ -485,22 +486,27 @@
     public async Task CloseModal()
     {
         IsVisible = false;
+        StateHasChanged();
 
-        // Restaurar scroll del body
-        await JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = 'auto';");
+        // Remover clase del body
+        await JSRuntime.InvokeVoidAsync("eval", @"
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+        ");
 
         await OnClose.InvokeAsync();
-        await InvokeAsync(StateHasChanged);
     }
     public async Task ShowModal()
     {
         IsVisible = true;
-        await InvokeAsync(StateHasChanged);
+        StateHasChanged();
 
-        // Prevenir scroll del body
-        await JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = 'hidden';");
+        // Agregar clase al body para prevenir scroll
+        await JSRuntime.InvokeVoidAsync("eval", @"
+            document.body.classList.add('modal-open');
+            document.body.style.paddingRight = '17px';
+        ");
     }
-
     private async Task Close()
     {
         await JSRuntime.InvokeVoidAsync("modalHelper.hide", "boteCapModal");
@@ -1026,14 +1032,4 @@
     }
 }
 
-// Extension method (put in a separate file: StringExtensions.cs)
-public static class StringExtensions
-{
-    public static string ToTitleCase(this string str)
-    {
-        if (string.IsNullOrEmpty(str))
-            return str;
-        
-        return char.ToUpper(str[0]) + str.Substring(1).ToLower();
-    }
-}
+ 

@@ -487,8 +487,8 @@
 
                                                     @if (Status == "Desarrollo")
                                                     {
-                                                        <div class="d-flex d-xl-none btn-edit-bottle col-12 col-lg-2 content-t-button d-flex align-items-center w-100" style="height:180px;">
-                                                            <button class="btn-t RalewayMedium font-20" type="button" data-bs-toggle="modal" data-bs-target="#sidebarRightModal3">
+                                                        <div class="d-flex btn-edit-bottle col-12 col-lg-2">
+                                                            <button class="btn-t RalewayMedium font-20" type="button" @onclick="OpenBoteCapModal">
                                                                 <img src="/img/pencil-icon.svg" alt="edit">@Localization["Edit"]
                                                             </button>
                                                         </div>
@@ -945,14 +945,6 @@
     <PalletLabelImagenModal CodeRG35="@Code" OnUpdated="HandlePalletLabelUpdated" IsVisible=false  />
     <BoxLabelImagenModal CodeRG35="@Code" OnUpdated="HandleBoxLabelUpdated" />
     <ModalLabel OnLabelOptionsUpdated="HandleLabelOptionsUpdated" OnDraftLabelUpdated="HandleDraftLabelUpdated" />
-    <BoteCapDataModal @ref="modalRef" CodeRG35="@Code"
-                      BoteData="@boteDataList"
-                      CapData="@capDataList"
-                      BoteColors="@boteColorOptions"
-                      CapColors="@capColorOptions"
-                      OnSave="HandleSave"
-                      OnClose="HandleClose" IsVisible=false />
-
     <BoteCapDataModal @ref="modalRef"
                       SelectedOption="@selectedBoteOption"
                       SelectedOptionCap="@selectedCapOption"

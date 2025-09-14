@@ -231,6 +231,13 @@ public class OrdersComponentBase : ComponentBase
         }
       //  await JSRuntime.InvokeVoidAsync("cleanupModals");
     }
+    protected async Task OpenBoteCapModal()
+    {
+        if (modalRef != null)
+        {
+            await modalRef.ShowModal();
+        }
+    }
     protected async Task HandleFormulationApproved()
     {
         // Actualizar el estado local

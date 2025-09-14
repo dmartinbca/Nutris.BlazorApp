@@ -602,3 +602,150 @@ body.modal-open {
         border-radius: 0;
     }
 }
+
+/* Backdrop */
+.modal-backdrop-custom {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+}
+
+/* Modal container */
+.modal-custom {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1050;
+    overflow: hidden;
+}
+
+/* Dialog - slide desde la derecha */
+.modal-dialog-custom {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 1300px;
+    max-width: 85vw;
+    margin: 0;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-out;
+    z-index: 1050;
+}
+
+/* Cuando está visible */
+.modal-custom.show .modal-dialog-custom {
+    transform: translateX(0);
+}
+
+/* Content */
+.modal-content-custom {
+    height: 100%;
+    background: #fff;
+    border: none;
+    border-radius: 40px 0 0 40px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+}
+
+/* Header */
+.modal-header {
+    padding: 2rem 3rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    opacity: 0.5;
+    padding: 0;
+    width: 2rem;
+    height: 2rem;
+}
+
+    .btn-close:hover {
+        opacity: 1;
+    }
+
+/* Body */
+.modal-body {
+    flex: 1;
+    padding: 2rem 3rem;
+    overflow-y: auto;
+}
+
+/* Footer */
+.modal-footer {
+    padding: 1.5rem 3rem;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* Tabs personalizados */
+.custom-tabs {
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 2rem;
+}
+
+    .custom-tabs .nav-link {
+        background: transparent;
+        border: 1px solid transparent;
+        border-bottom: none;
+        color: #6c757d;
+        padding: 0.75rem 2rem;
+        cursor: pointer;
+        border-radius: 10px 10px 0 0;
+    }
+
+        .custom-tabs .nav-link.active {
+            background: #ede9fe;
+            color: #333;
+            border: 1px solid #dee2e6;
+            border-bottom: 1px solid white;
+            font-weight: 600;
+        }
+
+/* Reset button */
+.btn-reset {
+    position: absolute;
+    right: 3rem;
+    top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-dialog-custom {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+    }
+
+    .modal-content-custom {
+        border-radius: 0;
+    }
+}
+
+/* Prevenir scroll del body cuando el modal está abierto */
+body.modal-open {
+    overflow: hidden !important;
+}
