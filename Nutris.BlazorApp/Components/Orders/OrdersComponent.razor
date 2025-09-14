@@ -1,4 +1,5 @@
 ﻿ 
+@using Nutris.BlazorApp.Components.Modals
 @using Nutris.BlazorApp.Components.Orders.Steps
 @using NutrisBlazor.Models
 @using NutrisBlazor.Services
@@ -944,6 +945,26 @@
     <PalletLabelImagenModal CodeRG35="@Code" OnUpdated="HandlePalletLabelUpdated" IsVisible=false  />
     <BoxLabelImagenModal CodeRG35="@Code" OnUpdated="HandleBoxLabelUpdated" />
     <ModalLabel OnLabelOptionsUpdated="HandleLabelOptionsUpdated" OnDraftLabelUpdated="HandleDraftLabelUpdated" />
-    <BoteCapDataModal />
+    <BoteCapDataModal @ref="modalRef" CodeRG35="@Code"
+                      BoteData="@boteDataList"
+                      CapData="@capDataList"
+                      BoteColors="@boteColorOptions"
+                      CapColors="@capColorOptions"
+                      OnSave="HandleSave"
+                      OnClose="HandleClose" IsVisible=false />
+
+    <BoteCapDataModal @ref="modalRef"
+                      SelectedOption="@selectedBoteOption"
+                      SelectedOptionCap="@selectedCapOption"
+                      BoteData="@boteDataList"
+                      CapData="@capDataList"
+                      CodeRG35="@Code"
+                      OptionsColorBote="@boteColorOptions"
+                      OptionsColorCover="@capColorOptions"
+                      Characteristics="@characteristics"
+                      SetAccordionOpen="HandleAccordionOpen"
+                      OnSave="HandleSave"
+                      OnClose="HandleClose" />
+
 </div>
  

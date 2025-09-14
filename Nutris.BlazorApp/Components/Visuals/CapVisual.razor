@@ -1,0 +1,136 @@
+﻿@namespace YourApp.Components.Visuals
+
+<div class="cap-visual-container">
+    @switch(Forma)
+    {
+        case "Childproof":
+            <svg viewBox="0 0 150 100" class="cap-svg">
+                <defs>
+                    <linearGradient id="@($"child-gradient-{Id}")" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:@Color;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:@Color;stop-opacity:0.8" />
+                    </linearGradient>
+                </defs>
+                <!-- Cap top -->
+                <ellipse cx="75" cy="30" rx="50" ry="25" fill="url(#@($"child-gradient-{Id}"))" />
+                <!-- Cap side -->
+                <rect x="25" y="30" width="100" height="40" fill="@Color" opacity="0.9" />
+                <!-- Safety ridges -->
+                @for(int i = 0; i < 8; i++)
+                {
+                    <rect x="@(30 + i * 12)" y="35" width="8" height="30" fill="@Color" opacity="0.7" />
+                }
+                <!-- Bottom ellipse -->
+                <ellipse cx="75" cy="70" rx="50" ry="10" fill="@Color" opacity="0.8" />
+                <!-- Child safety indicator -->
+                <circle cx="75" cy="30" r="15" fill="none" stroke="white" stroke-width="2" opacity="0.5" />
+                <text x="75" y="35" text-anchor="middle" fill="white" font-size="12" opacity="0.7">CR</text>
+            </svg>
+            break;
+            
+        case "Simple":
+            <svg viewBox="0 0 150 100" class="cap-svg">
+                <defs>
+                    <linearGradient id="@($"simple-gradient-{Id}")" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:@Color;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:@Color;stop-opacity:0.8" />
+                    </linearGradient>
+                </defs>
+                <!-- Cap top -->
+                <ellipse cx="75" cy="35" rx="45" ry="20" fill="url(#@($"simple-gradient-{Id}"))" />
+                <!-- Cap side -->
+                <rect x="30" y="35" width="90" height="25" fill="@Color" opacity="0.9" />
+                <!-- Bottom ellipse -->
+                <ellipse cx="75" cy="60" rx="45" ry="8" fill="@Color" opacity="0.8" />
+                <!-- Highlight -->
+                <ellipse cx="65" cy="35" rx="20" ry="10" fill="white" opacity="0.3" />
+            </svg>
+            break;
+            
+        case "Metal":
+            <svg viewBox="0 0 150 100" class="cap-svg">
+                <defs>
+                    <linearGradient id="@($"metal-gradient-{Id}")" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:@Color;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:@Color;stop-opacity:0.9" />
+                        <stop offset="100%" style="stop-color:@Color;stop-opacity:0.7" />
+                    </linearGradient>
+                    <pattern id="@($"metal-pattern-{Id}")" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+                        <rect width="10" height="10" fill="@Color" />
+                        <circle cx="5" cy="5" r="1" fill="white" opacity="0.3" />
+                    </pattern>
+                </defs>
+                <!-- Cap top -->
+                <ellipse cx="75" cy="30" rx="48" ry="22" fill="url(#@($"metal-gradient-{Id}"))" />
+                <!-- Cap side with pattern -->
+                <rect x="27" y="30" width="96" height="35" fill="url(#@($"metal-pattern-{Id}"))" opacity="0.9" />
+                <!-- Bottom ellipse -->
+                <ellipse cx="75" cy="65" rx="48" ry="9" fill="@Color" opacity="0.8" />
+                <!-- Metal shine -->
+                <rect x="40" y="40" width="70" height="2" fill="white" opacity="0.5" />
+                <rect x="40" y="45" width="70" height="1" fill="white" opacity="0.3" />
+            </svg>
+            break;
+            
+        case "Cilíndrico":
+            <svg viewBox="0 0 150 100" class="cap-svg">
+                <defs>
+                    <linearGradient id="@($"cil-gradient-{Id}")" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:@Color;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:@Color;stop-opacity:0.8" />
+                    </linearGradient>
+                </defs>
+                <!-- Cap top -->
+                <ellipse cx="75" cy="25" rx="55" ry="20" fill="url(#@($"cil-gradient-{Id}"))" />
+                <!-- Cap side -->
+                <rect x="20" y="25" width="110" height="50" fill="@Color" opacity="0.9" />
+                <!-- Bottom ellipse -->
+                <ellipse cx="75" cy="75" rx="55" ry="12" fill="@Color" opacity="0.8" />
+                <!-- Vertical lines for grip -->
+                @for(int i = 0; i < 10; i++)
+                {
+                    <line x1="@(25 + i * 11)" y1="30" x2="@(25 + i * 11)" y2="70" 
+                          stroke="@Color" stroke-width="1" opacity="0.6" />
+                }
+            </svg>
+            break;
+            
+        default:
+            <div class="no-visual">
+                <i class="fas fa-circle"></i>
+            </div>
+            break;
+    }
+</div>
+
+@code {
+    [Parameter] public string Forma { get; set; } = "";
+    [Parameter] public string Color { get; set; } = "#CCCCCC";
+    
+    private string Id => Guid.NewGuid().ToString("N").Substring(0, 8);
+}
+
+<style>
+    .cap-visual-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .cap-svg {
+        width: 100%;
+        height: 100%;
+        max-width: 150px;
+        max-height: 100px;
+    }
+    
+    .no-visual {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #ccc;
+    }
+</style>

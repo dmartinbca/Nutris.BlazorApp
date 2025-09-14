@@ -79,7 +79,43 @@
     <!-- Custom CSS -->
     <link href="css/app.css" rel="stylesheet" />
     <link href="css/flags.css" rel="stylesheet" />
+    <script>
+        window.modalHelper = {
+            show: function (modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.style.display = 'block';
+                    modal.classList.add('show');
+                    document.body.classList.add('modal-open');
 
+                    // Crear backdrop si no existe
+                    let backdrop = document.querySelector('.modal-backdrop');
+                    if (!backdrop) {
+                        backdrop = document.createElement('div');
+                        backdrop.className = 'modal-backdrop fade show';
+                        document.body.appendChild(backdrop);
+                    }
+                }
+            },
+            hide: function (modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.remove('show');
+                    document.body.classList.remove('modal-open');
+
+                    // Remover backdrop
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) {
+                        backdrop.remove();
+                    }
+
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 300);
+                }
+            }
+        };
+    </script>
     <!-- Loading CSS -->
     <style>
         #app-loading {

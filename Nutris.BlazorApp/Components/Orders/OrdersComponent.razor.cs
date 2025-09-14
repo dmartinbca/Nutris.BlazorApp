@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
+using Nutris.BlazorApp.Components.Modals;
 using NutrisBlazor.Models;
 using NutrisBlazor.Services;
 using System.Net.Http;
@@ -57,6 +58,7 @@ public class OrdersComponentBase : ComponentBase
     protected string RG37Code { get; set; } = "-";
     protected string ProductType { get; set; } = "Bote";
 
+    protected BoteCapDataModal modalRef;
     // Países y logos
     protected string CustomerLogoUrl { get; set; } = "";
     protected string Country1 { get; set; } = "-";
@@ -75,7 +77,7 @@ public class OrdersComponentBase : ComponentBase
     {
         { 1, false }, { 2, false }, { 3, false }, { 4, false }, { 5, false }
     };
-
+    private bool isDataLoaded = false;
     // FORMULATION
     protected int PercentFilledFormulation { get; set; }
     protected bool CustomerAccepted { get; set; }
@@ -144,6 +146,47 @@ public class OrdersComponentBase : ComponentBase
     public string currentLanguage = "es";
 
     public int i = 0;
+
+
+    protected List<BoteCapDataModal.BoteDataItem> boteDataList = new();
+    protected List<BoteCapDataModal.CapDataItem> capDataList = new();
+    protected List<BoteCapDataModal.ColorOption> boteColorOptions = new();
+    protected List<BoteCapDataModal.ColorOption> capColorOptions = new();
+
+    protected BoteCapDataModal.BoteDataItem? selectedBoteOption;
+    protected BoteCapDataModal.CapDataItem? selectedCapOption;
+    protected string characteristics = "";
+    protected async Task HandleSave(BoteCapDataModal.BoteCapConfiguration config)
+    {
+        // Handle saved configuration
+        Console.WriteLine($"Configuration saved: {config.Characteristics}");
+    }
+    protected Task HandleAccordionOpen((int tabIndex, int stepIndex) indexes)
+    {
+        // Lógica para manejar el accordion
+        Console.WriteLine($"Accordion: Tab {indexes.tabIndex}, Step {indexes.stepIndex}");
+        return Task.CompletedTask;
+    }
+    protected Task HandleClose()
+    {
+        // Handle modal close
+        return Task.CompletedTask;
+    }
+
+    protected async Task LoadBoteData()
+    {
+        // Load from API
+    }
+
+    protected async Task LoadCapData()
+    {
+        // Load from API
+    }
+
+    protected async Task LoadColorOptions()
+    {
+        // Load from API
+    }
     protected override async Task OnParametersSetAsync()
     {
         currentLanguage = Localization.CurrentLanguage ?? "es";
@@ -970,6 +1013,49 @@ public class OrdersComponentBase : ComponentBase
     {
         // Actualizar borrador de etiqueta
         StateHasChanged();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Simular carga de datos
+            await Task.Delay(100); // Simular llamada API
+
+            // Inicializar con datos de ejemplo
+            boteDataList = new List<BoteCapDataModal.BoteDataItem>
+            {
+                new() { ID = 1, Forma = "ROUND", Capacidad = "150", Diametro = "D45", Material = "PET", Color = "Clear" },
+                new() { ID = 2, Forma = "SQUARE", Capacidad = "200", Diametro = "D45", Material = "PET", Color = "Amber" },
+                // Agregar más datos según necesites
+            };
+
+            capDataList = new List<BoteCapDataModal.CapDataItem>
+            {
+                new() { ID = 1, Forma = "Simple", Diametro = "D45", Color = "White" },
+                new() { ID = 2, Forma = "Childproof", Diametro = "D45", Color = "Black" },
+                // Agregar más datos según necesites
+            };
+
+            boteColorOptions = new List<BoteCapDataModal.ColorOption>
+            {
+                new() { ID = 1, Value = "Clear", ColorHex = "#FFFFFF" },
+                new() { ID = 2, Value = "Amber", ColorHex = "#FFBF00" },
+                // Agregar más colores
+            };
+
+            capColorOptions = new List<BoteCapDataModal.ColorOption>
+            {
+                new() { ID = 1, Value = "White", ColorHex = "#FFFFFF" },
+                new() { ID = 2, Value = "Black", ColorHex = "#000000" },
+                // Agregar más colores
+            };
+
+            isDataLoaded = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading data: {ex.Message}");
+        }
     }
 
     // Modelos internos
