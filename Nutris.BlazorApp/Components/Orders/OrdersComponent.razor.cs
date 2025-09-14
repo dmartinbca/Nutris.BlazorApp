@@ -1256,33 +1256,33 @@ public class OrdersComponentBase : ComponentBase
             await Task.Delay(100); // Simular llamada API
 
             // Inicializar con datos de ejemplo
-            boteDataList = new List<BoteCapDataModal.BoteDataItem>
-            {
-                new() { Forma = "ROUND", Capacidad = "150", Diametro = "D45", Material = "PET", Color = "Clear" },
-                new() { Forma = "SQUARE", Capacidad = "200", Diametro = "D45", Material = "PET", Color = "Amber" },
-                // Agregar más datos según necesites
-            };
+            //boteDataList = new List<BoteCapDataModal.BoteDataItem>
+            //{
+            //    new() { Forma = "ROUND", Capacidad = "150", Diametro = "D45", Material = "PET", Color = "Clear" },
+            //    new() { Forma = "SQUARE", Capacidad = "200", Diametro = "D45", Material = "PET", Color = "Amber" },
+            //    // Agregar más datos según necesites
+            //};
 
-            capDataList = new List<BoteCapDataModal.CapDataItem>
-            {
-                new() { Forma = "Simple", Diametro = "D45", Color = "White" },
-                new() { Forma = "Childproof", Diametro = "D45", Color = "Black" },
-                // Agregar más datos según necesites
-            };
+            //capDataList = new List<BoteCapDataModal.CapDataItem>
+            //{
+            //    new() { Forma = "Simple", Diametro = "D45", Color = "White" },
+            //    new() { Forma = "Childproof", Diametro = "D45", Color = "Black" },
+            //    // Agregar más datos según necesites
+            //};
 
-            boteColorOptions = new List<BoteCapDataModal.ColorOption>
-            {
-                new() { ID = 1, Value = "Clear", ColorHex = "#FFFFFF" },
-                new() { ID = 2, Value = "Amber", ColorHex = "#FFBF00" },
-                // Agregar más colores
-            };
+            //boteColorOptions = new List<BoteCapDataModal.ColorOption>
+            //{
+            //    new() { ID = 1, Value = "Clear", ColorHex = "#FFFFFF" },
+            //    new() { ID = 2, Value = "Amber", ColorHex = "#FFBF00" },
+            //    // Agregar más colores
+            //};
 
-            capColorOptions = new List<BoteCapDataModal.ColorOption>
-            {
-                new() { ID = 1, Value = "White", ColorHex = "#FFFFFF" },
-                new() { ID = 2, Value = "Black", ColorHex = "#000000" },
-                // Agregar más colores
-            };
+            //capColorOptions = new List<BoteCapDataModal.ColorOption>
+            //{
+            //    new() { ID = 1, Value = "White", ColorHex = "#FFFFFF" },
+            //    new() { ID = 2, Value = "Black", ColorHex = "#000000" },
+            //    // Agregar más colores
+            //};
 
             isDataLoaded = true;
         }

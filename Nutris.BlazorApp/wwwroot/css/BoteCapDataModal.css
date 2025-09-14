@@ -1,4 +1,10 @@
-﻿@import url('css/fonts.css');
+﻿@import url('fonts.css');
+
+/* Variables CSS */
+:root {
+    --blackBlue: #2F5496;
+    --textButton: #2F5496;
+}
 
 /* Modal personalizado - Base del original Vue */
 .modal-backdrop-custom {
@@ -7,8 +13,9 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1040;
+    background-color: #DEE6F38C;
+    backdrop-filter: blur(2px);
+    z-index: 999;
     animation: fadeIn 0.3s;
 }
 
@@ -26,15 +33,15 @@
         pointer-events: auto;
     }
 
-/* Dialog - mantener estilo original Vue sidebar-right */
+/* Dialog - sidebar derecho */
 .modal-dialog-custom {
     position: fixed;
+    margin: 0;
     top: 0;
     right: 0;
-    height: 100vh;
-    width: 1100px;
+    height: 100%;
+    width: 1300px;
     max-width: 90vw;
-    margin: 0;
     transform: translateX(100%);
     transition: transform 0.3s ease-in-out;
     z-index: 1051;
@@ -44,11 +51,13 @@
     transform: translateX(0);
 }
 
-/* Content - estilo original Vue */
+/* Content */
 .modal-content-custom {
     height: 100%;
     background: #fff;
-    border-radius: 40px 0 0 40px;
+    border-top-left-radius: 40px;
+    border-bottom-left-radius: 40px;
+    border: none;
     box-shadow: -5px 0 15px rgba(0,0,0,0.2);
     display: flex;
     flex-direction: column;
@@ -65,193 +74,205 @@
     }
 }
 
-/* Header del modal - estilo original Vue */
+/* Header del modal */
 .modal-header {
-    padding: 30px 50px;
-    border-bottom: 1px solid #e9ecef;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     flex-shrink: 0;
-}
-
-
-.modal-container-title {
-    font-size: 2rem;
+    align-items: center;
+    padding: 30px 50px;
+    border-bottom: none;
+    justify-content: space-between;
 }
 
 .modal-title {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
     margin: 0;
-    color: #2F5496;
+    color: var(--blackBlue);
+    font-family: 'MuseoSemiBold', sans-serif;
 }
 
-.b-close, .btn-close {
+.btn-close {
     background: transparent;
     border: none;
-    font-size: 1.5rem;
     cursor: pointer;
-    opacity: 0.5;
     padding: 0;
+    font-size: 1.5rem;
+    opacity: 0.5;
 }
 
     .btn-close:hover {
         opacity: 1;
     }
-/* Body del modal */
+
+/* Body del modal - nueva estructura */
 .modal-body {
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding: 5px 50px;
-    overflow-y: auto;
+    overflow-y: hidden;
+    padding: 10px 0 0 0;
+    position: relative;
 }
 
-.modal-body_header {
-    padding: 0 50px;
+/* Reset button - posicionado absolutamente */
+.reset-filters-btn {
+    position: absolute !important;
+    right: 50px !important;
+    top: 10px !important;
+    z-index: 100 !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
 }
 
-/* Tabs - estilo original Vue */
-.tabs-inline {
-    min-width: 320px;
-    max-width: 1100px;
-    padding: 10px;
-    margin: 0 auto;
-    background: #fff;
-}
+    .reset-filters-btn img {
+        width: 16px;
+        height: 16px;
+        filter: brightness(0) invert(1);
+    }
 
+    .reset-filters-btn:hover {
+        background: #5a6268;
+    }
+
+/* Tabs directamente en el body */
 .custom-tabs {
     display: flex;
-    gap: 10px;
-    padding: 20px 0;
-    border-bottom: 1px solid #e9ecef;
+    gap: 0;
+    padding: 0;
+    margin: 0 0 0 50px;
+    position: relative;
+    height: 40px;
+    z-index: 2;
 }
+
 .nav-link {
-    padding: 10px 30px;
-    border: none;
-    background: #f8f9fa;
-    color: #6c757d;
+    padding: 10px 5px;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    background: #fff;
+    color: #bbb;
     font-weight: 600;
+    font-size: 20px;
+    font-family: 'RalewayMedium', sans-serif;
     border-radius: 10px 10px 0 0;
     cursor: pointer;
     transition: all 0.3s;
+    width: 150px;
+    text-align: center;
+    position: relative;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+    .nav-link:hover {
+        color: #888;
+    }
 
     .nav-link.active.bottle-tab {
         background: #ede9fe;
-        color: #2F5496;
-        font-weight: 700;
+        color: #555;
+        font-family: "RalewayBold", sans-serif !important;
+        font-weight: 800;
+        border: 1px solid #ddd;
+        border-bottom: none;
+        z-index: 2;
+        position: relative;
+        height: 41px;
     }
+
     .nav-link.active.cap-tab {
         background: #ffe8e8;
-        color: #2F5496;
-        font-weight: 700;
+        color: #555;
+        font-family: "RalewayBold", sans-serif !important;
+        font-weight: 800;
+        border: 1px solid #ddd;
+        border-bottom: none;
+        z-index: 2;
+        position: relative;
+        height: 41px;
     }
 
-/* Reset button */
-.btn-reset, .button-reset {
-    position: absolute;
-    right: 100px;
-    top: -40px;
-}
-
-/* Content tabs - estilo original Vue */
-.parent {
-    display: flex;
-    grid-column-gap: 0px;
-    grid-row-gap: 0px;
-    width: 1107px;
-}
-
+/* Config container - conectado con las tabs */
 .config-container {
     display: flex;
-    gap: 2rem;
-    padding: 20px;
+    gap: 0;
+    padding: 0;
+    width: 1107px;
+    max-width: calc(100% - 100px);
+    margin: -1px auto 0 auto;
+    border-top: 1px solid #ddd;
+    position: relative;
 }
 
-/* Preview section - basado en child-bottles original */
+/* Preview section */
 .preview-section {
     background-color: #ede9fe;
-    border-radius: 1.75rem;
+    border-bottom-left-radius: 1.75rem;
     padding: 20px 25px;
     width: 50%;
     min-height: 500px;
+    position: relative;
 }
 
     .preview-section.cap-preview {
         background-color: #ffe8e8;
     }
 
-/* Form section - basado en child_content_info-bottle */
+/* Form section */
 .form-section {
-    padding: 20px 25px;
+    padding: 20px 25px 0 25px;
     width: 50%;
     background: #faf5ff;
-    border-radius: 1.75rem;
+    border-bottom-right-radius: 0 0 1.75rem 0;
+    border-top-right-radius: 0;
 }
 
 .section-title {
     padding: 10px 0 10px 30px;
-    font-size: 18px;
+    font-size: 24px;
     font-weight: 600;
+    font-family: 'RalewayMedium', sans-serif;
 }
 
-/* Form elements - estilo original Vue */
-.form-group {
-    margin-bottom: 20px;
+/* Form elements */
+.field {
+    margin-bottom: 25px;
 }
 
-.form-select {
+.form-label {
+    display: block;
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ced4da;
-    border-radius: 8px;
+    padding: 0 !important;
+    padding-left: 20px;
+    text-align: left;
+    font-weight: 400;
     font-size: 16px;
-    background: white;
-}
-.segmented {
-    display: flex;
-    gap: 10px;
-}
-.segmented-item {
-    flex: 1;
-    padding: 12px;
-    border: 2px solid #ced4da;
-    background: white;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-weight: 600;
+    margin-bottom: 10px;
+    font-family: 'RalewayRegular', sans-serif;
 }
 
-    .segmented-item.active {
-        background: #2F5496;
-        color: white;
-        border-color: #2F5496;
-    }
-
-.modal-footer {
-    padding: 20px 50px;
-    border-top: 1px solid #e9ecef;
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    flex-shrink: 0;
-}
-
-    .form-label.required::after {
-        content: " *";
-        color: red;
-    }
-
-.form-select {
+select, .form-select {
     width: 100%;
     max-width: 327px;
     height: 60px;
     border: 1px solid #c2c2c2;
     border-radius: 5px;
     padding-left: 20px;
+    font-size: 20px;
+    font-family: 'Museo', sans-serif;
+    background: white;
     background-image: linear-gradient(45deg, transparent 50%, rgb(17, 17, 17) 60%), linear-gradient(135deg, rgb(17, 17, 17) 40%, transparent 50%) !important;
     background-position: calc(100% - 15px) 25px, calc(100% - 6px) 25px, 100% 0;
     background-size: 10px 10px, 10px 10px;
@@ -260,141 +281,186 @@
     -moz-appearance: none;
 }
 
-/* Shape selector - estilo original Vue */
-.shape-selector {
+/* Segmented controls */
+.segmented {
     display: flex;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 4px;
+    padding: 0 20px;
+    margin-top: 30px;
 }
 
-.shape-option {
-    border: 2px solid #aeabae;
-    border-radius: 5px;
-    text-align: center;
-    position: relative;
-    padding: 10px 20px;
+.segmented-item {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #A7BDE3;
+    background: #F0E7F9;
+    border-radius: 25px;
     cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
 }
 
-    .shape-option.selected {
+    .segmented-item.active {
         background: #1c7298;
-        color: #fff;
+        color: white;
         border-color: #1c7298;
     }
 
-    .shape-option input[type="radio"] {
-        position: absolute;
-        opacity: 0;
-    }
-
-    .shape-option label {
-        cursor: pointer;
-        margin: 0;
-        padding: 0;
-    }
-
-/* Product config - estilo original Vue */
-.product-config {
-    width: 600px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    height: 500px;
+.radio-icon {
+    width: 19px;
+    height: 19px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    display: inline-block;
 }
 
-/* Medidas - estilo original Vue */
-.medidas-vertical {
+.segmented-item.active .radio-icon::after {
+    content: '';
+    display: block;
+    width: 9px;
+    height: 9px;
+    background: white;
+    border-radius: 50%;
+    margin: 3px;
+}
+
+/* Preview content */
+.preview-content {
+    position: relative;
+    min-height: 400px;
     display: flex;
     align-items: center;
-    position: relative;
+    justify-content: center;
 }
 
-.medidas-vertical-1 {
-    width: 120px;
+/* Bottle visual */
+.bottle-visual-wrapper {
+    position: relative;
+    width: 100%;
     height: 350px;
-    border-top: 1px solid #C4C2C2;
-    border-bottom: 1px solid #C4C2C2;
-    position: relative;
-    top: -32px;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.medidas-horizontal {
-    width: 100%;
-    max-width: 123px;
-    margin: 0 auto;
-    border-left: 1px solid #C4C2C2;
-    border-right: 1px solid #C4C2C2;
-    position: relative;
-    top: -40px;
+    .bottle-visual-wrapper svg {
+        width: 260px;
+        height: auto;
+        display: block;
+    }
+
+/* Dimension indicators */
+.dimension-vertical {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-.medidas-horizontal-base {
-    width: 100%;
-    max-width: 190px;
-    margin: 0 auto;
-    border-left: 1px solid #C4C2C2;
-    border-right: 1px solid #C4C2C2;
-    position: relative;
-    bottom: -40px;
-}
+    .dimension-vertical span {
+        position: absolute;
+        left: -50px;
+        top: 50%;
+        transform: translateY(-50%) rotate(270deg);
+        font-size: 16px;
+        font-family: 'RalewayLight', sans-serif;
+    }
 
-/* Bottle image */
-.bottle {
-    width: 310px;
-    margin: 0 auto;
-    height: 425px;
-}
-
-/* Footer - estilo original Vue */
+/* Footer */
 .modal-footer {
     justify-content: flex-end;
     display: flex;
     padding: 30px;
     border-top: 1px solid #dee2e6;
     gap: 1rem;
+    flex-shrink: 0;
 }
 
-.modal-footer-btc-cancel {
-    margin-right: 30px;
+.btn-cancel {
     border-radius: 25px;
-    border: 2px solid var(--blackBlue, #2F5496);
-    color: var(--blackBlue, #2F5496);
+    border: 2px solid var(--blackBlue);
+    color: var(--blackBlue);
     width: 163px;
     text-align: center;
     padding: 10px;
     font-weight: 700;
+    font-size: 20px;
+    font-family: 'RalewayBold', sans-serif;
     text-decoration: none;
     transition: all 0.3s ease;
     background: white;
     cursor: pointer;
 }
 
-    .modal-footer-btc-cancel:hover {
-        background: var(--blackBlue, #2F5496);
-        transition: all 0.3s ease;
+    .btn-cancel:hover {
+        background: var(--blackBlue);
         color: white;
     }
 
-.modal-footer-btc-save, .btn-primary {
+.btn-primary {
     border-radius: 25px;
-    border: 2px solid var(--blackBlue, #2F5496);
-    background-color: var(--blackBlue, #2F5496);
+    border: 2px solid var(--blackBlue);
+    background-color: var(--blackBlue);
     color: #fff;
     width: 163px;
     text-align: center;
     padding: 10px;
     font-weight: 700;
+    font-size: 20px;
+    font-family: 'RalewayBold', sans-serif;
     text-decoration: none;
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
-    .modal-footer-btc-save:hover, .btn-primary:hover {
+    .btn-primary:hover {
         background: white;
-        transition: all 0.3s ease;
-        color: var(--blackBlue, #2F5496);
+        color: var(--blackBlue);
     }
+
+/* Checkbox */
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding-left: 20px;
+}
+
+    .checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .checkbox span {
+        font-size: 16px;
+        font-family: 'RalewayRegular', sans-serif;
+    }
+
+/* Hint text */
+.hint {
+    display: block;
+    margin-top: 5px;
+    padding-left: 20px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* Error message */
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    padding-left: 20px;
+    font-family: 'RalewayRegular', sans-serif;
+}
 
 /* Loading overlay */
 .loading-overlay {
@@ -410,14 +476,37 @@
     z-index: 2000;
 }
 
-/* Error message */
-.error-message {
-    color: red;
-    font-size: 14px;
-    margin-top: 5px;
+/* Utility classes */
+.font-12 {
+    font-size: 12px;
 }
 
-/* Responsive - estilo original Vue */
+.font-14 {
+    font-size: 14px;
+}
+
+.font-16 {
+    font-size: 16px;
+}
+
+.font-20 {
+    font-size: 20px;
+}
+
+.font-24 {
+    font-size: 24px;
+}
+
+.font-32 {
+    font-size: 32px;
+}
+
+/* Ensure body scroll is hidden when modal is open */
+body.modal-open {
+    overflow: hidden !important;
+}
+
+/* Responsive */
 @media (max-width: 767px) {
     .modal-dialog-custom {
         width: 100%;
@@ -435,267 +524,42 @@
     .modal-body {
         flex: 1;
         overflow-y: auto;
-        padding: 30px 50px;
+        padding: 10px 15px;
     }
 
     .config-container {
-        display: flex;
-        gap: 30px;
-    }
-    .preview-section, .form-section {
-        flex: 1;
-        background: #f5f0ff;
-        border-radius: 20px;
-        padding: 30px;
-        position: relative;
-    }
-        .preview-section.cap-preview {
-            background: #ffe8e8;
-        }
-    .section-title {
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 20px;
-        color: #2F5496;
-    }
-    .form-select {
+        flex-direction: column;
         width: 100% !important;
     }
-}
 
-/* Ensure body scroll is hidden when modal is open */
-body.modal-open {
-    overflow: hidden !important;
-}
-
-.modal-body .preview-section,
-.modal-body .form-section {
-    background: #f5f0ff;
-    border-radius: 18px;
-    padding: 24px;
-}
-
-.preview-content {
-    position: relative;
-    min-height: 360px;
-}
-
-
-.reset-filters-btn {
-    position: relative;
-    top: 10px;
-    right: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    z-index: 10;
-}
-
-    .reset-filters-btn img {
-        width: 16px;
-        height: 16px;
-        filter: brightness(0) invert(1);
+    .preview-section,
+    .form-section {
+        width: 100%;
+        border-radius: 20px;
+        margin-bottom: 20px;
     }
 
-
-.bottle-visual-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 320px;
-}
-
-    .bottle-visual-wrapper svg {
-        width: 260px;
-        height: auto;
-        display: block;
+    .form-select, select {
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-.svg-wrap {
-    line-height: 0;
-}
-
-    .svg-wrap svg {
-        display: block;
+    .segmented {
+        flex-wrap: wrap;
     }
 
-    
-
-.actions {
-    display: flex;
-    gap: 16px;
-    justify-content: flex-end;
-    padding: 20px 24px;
-}
-
-.btn-primary {
-    background: #0C2340;
-    border-color: #0C2340;
-    color: #fff;
-    border-radius: 999px;
-    padding: .8rem 1.6rem;
-    font-weight: 700;
-}
-
-    .btn-primary:hover {
-        filter: brightness(1.05);
+    .reset-filters-btn {
+        position: relative !important;
+        right: auto !important;
+        top: auto !important;
+        margin-bottom: 10px;
+        width: 100%;
     }
 
-.btn-cancel, .btn-primary {
-    padding: 12px 40px;
-    border-radius: 25px;
-    font-weight: 700;
-    border: 2px solid #2F5496;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-    .btn-cancel:hover {
-        background: #f6f8fc;
+    .custom-tabs {
+        margin-left: 0;
+        justify-content: center;
     }
 
-.modal-body .preview-section,
-.modal-body .form-section {
-    background: #f5f0ff;
-    border-radius: 18px;
-    padding: 24px;
+       
 }
-
-.preview-content {
-    position: relative;
-    min-height: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.reset-filters-btn {
-    position: absolute;
-    top: 14px;
-    right: 20px;
-    display: flex;
-    gap: .5rem;
-    align-items: center;
-    padding: .45rem .8rem;
-    border-radius: 10px;
-    background: #6d7688;
-    color: #fff;
-    border: none;
-    font-weight: 600;
-    box-shadow: 0 1px 2px rgba(0,0,0,.08);
-    z-index: 3;
-    cursor: pointer;
-}
-
-    .reset-filters-btn img {
-        width: 18px;
-        height: 18px;
-        filter: brightness(0) invert(1);
-    }
-
-.bottle-visual-wrapper {
-    position: relative;
-    width: 100%;
-    height: 350px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.field {
-    margin-bottom: 25px;
-}
-    .bottle-visual-wrapper svg {
-        width: 260px;
-        height: auto;
-        display: block;
-    }
-
-.svg-wrap {
-    line-height: 0;
-}
-
-    .svg-wrap svg {
-        display: block;
-    }
-
-   
-
-.actions {
-    display: flex;
-    gap: 16px;
-    justify-content: flex-end;
-    padding: 20px 24px;
-}
-
-.btn-primary {
-    background: #0C2340;
-    border-color: #0C2340;
-    color: #fff;
-    border-radius: 999px;
-    padding: .8rem 1.6rem;
-    font-weight: 700;
-}
-
-    .btn-primary:hover {
-        filter: brightness(1.05);
-    }
-.btn-cancel {
-    background: white;
-    color: #2F5496;
-}
-
-    .btn-cancel:hover {
-        background: #f8f9fa;
-    }
-
-.btn-primary {
-    background: #2F5496;
-    color: white;
-}
-
-    .btn-primary:hover {
-        background: #1e3a6f;
-        border-color: #1e3a6f;
-    }
-
-.checkbox {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-}
-
-    .checkbox input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-    }
-
-.hint {
-    display: block;
-    margin-top: 5px;
-    font-size: 14px;
-    color: #6c757d;
-}
-
-.empty-preview {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-    color: #6c757d;
-}
-/* neutraliza cualquier fill forzado heredado */
-.bottle-visual-wrapper svg * {
-    fill: initial;
-}
-
-
-

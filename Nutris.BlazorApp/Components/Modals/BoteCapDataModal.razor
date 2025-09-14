@@ -31,8 +31,15 @@
                     </button>
                 </div>
 
-                <!-- Tabs -->
-                <div class="modal-body_header">
+                <!-- Body que contiene TODO -->
+                <div class="modal-body">
+                    <!-- Botón reset posicionado absolutamente -->
+                    <button class="reset-filters-btn" @onclick="ResetFilters">
+                        <img src="img/refresh.svg" alt="" aria-hidden="true" />
+                        Resetear filtro
+                    </button>
+
+                    <!-- Tabs directamente en el body -->
                     <div class="custom-tabs">
                         <button class="nav-link @(IsBottleTab ? "active bottle-tab" : "")"
                                 @onclick="() => IsBottleTab = true">
@@ -43,21 +50,14 @@
                             TAPA
                         </button>
                     </div>
-                </div>
 
-                <!-- Body -->
-                <div class="modal-body">
+                    <!-- Contenido directamente después de las tabs -->
                     @if (IsBottleTab)
                     {
                         <!-- BOTE TAB -->
                         <div class="config-container">
                             <div class="preview-section">
                                 <h3 class="section-title">Características</h3>
-
-                                <button class="reset-filters-btn" @onclick="ResetFilters">
-                                    <img src="img/refresh.svg" alt="" aria-hidden="true" />
-                                    Resetear filtro
-                                </button>
 
                                 <div class="preview-content">
                                     <!-- Dimensiones verticales -->
@@ -192,7 +192,6 @@
                                                 <CoverChildproff @key="(CapConfig.Forma, CapConfig.Color, CapConfig.Diametro)" ColorCover="@GetCapHexColor()" />
                                                 break;
                                         }
-
                                     </div>
                                 </div>
                             </div>
@@ -267,7 +266,13 @@
         </div>
     </div>
 }
-
+<style>
+    /* Ajuste fino de posición de tabs */
+    .custom-tabs .nav-link:first-child {
+        margin-left: 48px !important;
+    }
+    
+</style>
 @code {
     // ===== Props =====
     [Parameter] public bool IsVisible { get; set; } = false;
@@ -296,20 +301,11 @@
     private CapConfigModel CapConfig { get; set; } = new();
 
     // Fallbacks UI por defecto (si no llegan datos/colores)
-    private List<string> CapacidadOptionsUI { get; set; } = new() { "150", "200", "250", "300", "400", "500", "600", "1000" };
-    private Dictionary<string, List<string>> CapacidadToDiametrosUI { get; set; } = new()
-    {
-        ["150"] = new() { "D45" },
-        ["200"] = new() { "D45" },
-        ["250"] = new() { "D45" },
-        ["300"] = new() { "D45" },
-        ["400"] = new() { "D45" },
-        ["500"] = new() { "D45" },
-        ["600"] = new() { "D45" },
-        ["1000"] = new() { "D45" },
-    };
-    private List<string> DiametroOptionsUI { get; set; } = new() { "D45" };
-    private List<string> MaterialOptionsUI { get; set; } = new() { "PET", "HDPE", "PP" };
+    private List<string> CapacidadOptionsUI { get; set; } = new();
+    private Dictionary<string, List<string>> CapacidadToDiametrosUI { get; set; } = new();
+
+    private List<string> DiametroOptionsUI { get; set; } = new();
+    private List<string> MaterialOptionsUI { get; set; } = new() ;
 
     private List<ColorOption> OptionsColorBoteUI { get; set; } = new()
     {
