@@ -588,7 +588,7 @@
             };
 
             var response = await Http.PatchAsJsonAsync(
-                $"api/CustomizeRG35('{CodeRG35}')?$expand=Formulation,Recipe,Analytics&tenant=nutris",
+                $"CustomizeRG35('{CodeRG35}')?$expand=Formulation,Recipe,Analytics&tenant=nutris",
                 data
             );
 

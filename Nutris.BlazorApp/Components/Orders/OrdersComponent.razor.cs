@@ -164,6 +164,105 @@ public class OrdersComponentBase : ComponentBase
 
     private string? _boteResumen;
     private string? _tapaResumen;
+    public readonly OptionLookups _opts = new();
+    // Agregar después de la línea 173 (después de: protected string characteristics = "";)
+    //public Dictionary<string, List<string>> capacidadToDiametros =>
+    //(boteDataList ?? Enumerable.Empty<BoteCapDataModal.BoteDataItem>())
+    //    .Where(b => !string.IsNullOrWhiteSpace(b.Capacidad) && !string.IsNullOrWhiteSpace(b.Diametro))
+    //    .GroupBy(b => b.Capacidad!.Trim())
+    //    .ToDictionary(
+    //        g => g.Key,
+    //        g => g.Select(x => x.Diametro!.Trim())
+    //              .Distinct(StringComparer.OrdinalIgnoreCase)
+    //              .OrderBy(d => d, StringComparer.OrdinalIgnoreCase)
+    //              .ToList()
+    //    );
+
+    private void LoadBoteAndCapData()
+    {
+        // Convertir RelacionBote a List<BoteDataItem>
+        if (RelacionBote.TryGetProperty("value", out var boteArray) &&
+            boteArray.ValueKind == JsonValueKind.Array)
+        {
+            boteDataList = boteArray.EnumerateArray()
+                .Select(item => new BoteCapDataModal.BoteDataItem
+                {
+                    Forma = item.TryGetProperty("Forma", out var f) ? f.GetString() : null,
+                    Capacidad = item.TryGetProperty("Capacidad", out var c) ? c.GetString() : null,
+                    Diametro = item.TryGetProperty("Diametro", out var d) ? d.GetString() : null,
+                    Material = item.TryGetProperty("Material", out var m) ? m.GetString() : null,
+                    Color = item.TryGetProperty("Color", out var col) ? col.GetString() : null
+                })
+                .Where(b => b.Forma != null)
+                .ToList();
+        }
+
+        // Convertir RelacionTapa a List<CapDataItem>
+        if (RelacionTapa.TryGetProperty("value", out var tapaArray) &&
+            tapaArray.ValueKind == JsonValueKind.Array)
+        {
+            capDataList = tapaArray.EnumerateArray()
+                .Select(item => new BoteCapDataModal.CapDataItem
+                {
+                    Forma = item.TryGetProperty("Forma", out var f) ? f.GetString() : null,
+                    Diametro = item.TryGetProperty("Diametro", out var d) ? d.GetString() : null,
+                    Color = item.TryGetProperty("Color", out var c) ? c.GetString() : null,
+                    Sleeve = item.TryGetProperty("Sleeve", out var s) && s.ValueKind == JsonValueKind.True
+                })
+                .Where(c => c.Forma != null)
+                .ToList();
+        }
+    }
+
+    private void InitializeSelectedOptions()
+    {
+        if (HasRG35 && RG35 != null)
+        {
+            selectedBoteOption = new BoteCapDataModal.BoteDataItem
+            {
+                Forma = RG35.Bote_forma,
+                Capacidad = RG35.Bote_capacidad,
+                Diametro = RG35.Bote_boca,
+                Material = RG35.Bote_material,
+                Color = RG35.Bote_color
+            };
+
+            selectedCapOption = new BoteCapDataModal.CapDataItem
+            {
+                Forma = RG35.Cap_tapa,
+                Diametro = RG35.Cap_Boca,
+                Color = RG35.Cap_color,
+                Sleeve = RG35.Cap_sleever ?? false
+            };
+
+            characteristics = RG35.Characteristics ?? "";
+        }
+    }
+    public void HandlePackagingUpdated(BoteCapDataModal.UpdatedOptions u)
+    {
+        // Si quieres reflejar la selección en la pantalla antes del reload:
+        selectedBoteOption = new BoteCapDataModal.BoteDataItem
+        {
+            Forma = u.BoteOption?.BoteForma,
+            Capacidad = u.BoteOption?.BoteCapacidad,
+            Diametro = u.BoteOption?.BoteBoca,
+            Material = u.BoteOption?.BoteMaterial,
+            Color = u.BoteOption?.BoteColor
+        };
+
+        selectedCapOption = new BoteCapDataModal.CapDataItem
+        {
+            Forma = u.CapOption?.CapTapa,
+            Diametro = u.CapOption?.CapBoca,
+            Color = u.CapOption?.CapColor,
+            Sleeve = u.CapOption?.CapSleever ?? false
+        };
+
+        characteristics = u.Characteristics;
+
+        StateHasChanged();
+    }
+
     protected Task HandleSave(BoteDataItem bote, CapDataItem tapa)
     {
         // lo que necesites al guardar
@@ -209,8 +308,9 @@ public class OrdersComponentBase : ComponentBase
     protected override async Task OnParametersSetAsync()
     {
         currentLanguage = Localization.CurrentLanguage ?? "es";
-        BuildBoteLookups(RelacionBote, out capacidades, out capacidadToDiametros, out materiales);
-
+         BuildBoteLookups(RelacionBote, out capacidades, out capacidadToDiametros, out materiales);
+        LoadBoteAndCapData();  // <-- NUEVA LÍNEA
+        InitializeSelectedOptions();
         boteColorOptions = BuildColorOptionsFromRelacion(RelacionBote, isCap: false);
         capColorOptions = BuildColorOptionsFromRelacion(RelacionTapa, isCap: true);
         if (boteColorOptions.Count == 0)
@@ -234,7 +334,7 @@ public class OrdersComponentBase : ComponentBase
         Localization.OnLanguageChanged += OnLanguageChanged;
         await LoadDataAsync();
     }
-    private static void BuildBoteLookups(
+    private  void BuildBoteLookups(
     JsonElement relacionBote,
     out List<string> caps,
     out Dictionary<string, List<string>> capToDia,
@@ -281,6 +381,122 @@ public class OrdersComponentBase : ComponentBase
             kv => kv.Key,
             kv => kv.Value.OrderBy(d => d, StringComparer.OrdinalIgnoreCase).ToList(),
             StringComparer.OrdinalIgnoreCase);
+
+        if (Atributos.ValueKind == JsonValueKind.Object)
+            BuildOptionLookupsFromAtributos(Atributos);
+    }
+    private void BuildOptionLookupsFromAtributos(JsonElement atributos)
+    {
+        try
+        {
+            if (!atributos.TryGetProperty("value", out var valueArr) || valueArr.ValueKind != JsonValueKind.Array)
+                return;
+
+            // Helpers
+            List<string> ListFromIndex(int idx)
+            {
+                if (idx < 0 || idx >= valueArr.GetArrayLength()) return new();
+                var arr = valueArr[idx].GetProperty("valoresAtributos");
+                return arr.EnumerateArray()
+                          .Select(v => v.TryGetProperty("Value", out var ve) ? ve.GetString() : null)
+                          .Where(s => !string.IsNullOrWhiteSpace(s))
+                          .Select(s => s!.Trim())
+                          .Distinct(StringComparer.OrdinalIgnoreCase)
+                          .ToList();
+            }
+
+            List<BoteCapDataModal.ColorOption> ColorListFromIndex(int idx)
+            {
+                var list = new List<BoteCapDataModal.ColorOption>();
+                if (idx < 0 || idx >= valueArr.GetArrayLength()) return list;
+
+                var arr = valueArr[idx].GetProperty("valoresAtributos");
+                int id = 1;
+                foreach (var v in arr.EnumerateArray())
+                {
+                    var label = v.TryGetProperty("Value", out var ve) ? ve.GetString() ?? "" : "";
+                    if (string.IsNullOrWhiteSpace(label)) continue;
+                    var hex = v.TryGetProperty("Color_HEX", out var he) ? (he.GetString() ?? "") : "";
+                    if (string.IsNullOrWhiteSpace(hex)) hex = ColorToHexFallback(label);
+
+                    list.Add(new BoteCapDataModal.ColorOption
+                    {
+                        ID = id++,
+                        Value = label.Trim(),
+                        ColorHex = hex.Trim()
+                    });
+                }
+
+                // distinct por Value
+                return list.GroupBy(c => c.Value, StringComparer.OrdinalIgnoreCase)
+                           .Select(g => g.First())
+                           .ToList();
+            }
+
+            // Índices iguales a tu VUE (fetchOptions)
+            //   optionsSize            = value[23]
+            //   optionsSizeLabel       = value[16]  (no lo usamos aquí)
+            //   optionsDiameter        = value[5]
+            //   optionsMaterial        = value[21]
+            //   optionsBoca / DThread  = value[22]  (si lo necesitas, úsalo igual)
+            //   optionsForma (bote)    = value[24]
+            //   optionsFinish          = value[8]   (no lo usamos aquí)
+            //   optionsLabelMaterial   = value[9]   (no lo usamos aquí)
+            //   optionsColorLabel      = value[10]  (no lo usamos aquí)
+            //   optionsColorBote       = value[20]  + Color_HEX
+            //   optionsShapecover      = value[19]  (formas tapa)
+            //   optionsColorcover      = value[18]
+
+            _opts.Capacidades = ListFromIndex(23);
+            _opts.Diametros = ListFromIndex(5);
+            _opts.Materiales = ListFromIndex(21);
+            _opts.FormasBote = ListFromIndex(24);     // por si quieres usarlas
+            _opts.Bocas = ListFromIndex(22);     // idem
+            _opts.FormasTapa = ListFromIndex(19);
+
+            _opts.ColorBote = ColorListFromIndex(20);
+            _opts.ColorCover = ColorListFromIndex(18);
+        }
+        catch
+        {
+            // Silencioso: si algo falla dejamos listas vacías y el modal usa sus defaults.
+        }
+    }
+    private static string ColorToHexFallback(string name)
+    {
+        var n = (name ?? "").Trim().ToLowerInvariant();
+        return n switch
+        {
+            "clear" => "#CCCCCC",
+            "white" => "#FFFFFF",
+            "black" => "#000000",
+            "amber" => "#FFBF00",
+            "red" => "#FF0000",
+            "orange" => "#FFA500",
+            "blue" or "light blue" => "#0D6EFD",
+            "dark blue" => "#00008B",
+            "green" or "light green" => "#90EE90",
+            "emerald green" => "#50C878",
+            "pale green" => "#98FB98",
+            "turquoise" => "#40E0D0",
+            "purple" or "violet" or "light purple" => "#800080",
+            "gold" => "#D4AF37",
+            "silver" => "#C0C0C0",
+            _ => "#CCCCCC"
+        };
+    }
+    public sealed class OptionLookups
+    {
+        public List<string> Capacidades { get; set; } = new();
+        public List<string> Diametros { get; set; } = new();
+        public List<string> Materiales { get; set; } = new();
+
+        public List<string> FormasBote { get; set; } = new();
+        public List<string> FormasTapa { get; set; } = new();
+        public List<string> Bocas { get; set; } = new();
+
+        public List<BoteCapDataModal.ColorOption> ColorBote { get; set; } = new();
+        public List<BoteCapDataModal.ColorOption> ColorCover { get; set; } = new();
     }
     private static bool TryGetString(JsonElement obj, string prop, out string value)
     {
@@ -672,6 +888,7 @@ public class OrdersComponentBase : ComponentBase
         }).ToList() ?? new List<AnalyticsRow>();
 
         SumAnalytics = AnalyticsRows.FirstOrDefault()?.Price ?? 0;
+        characteristics = data.Characteristics ?? "";
     }
 
     private void LoadFromRG37(CustomizeRG37Response data)

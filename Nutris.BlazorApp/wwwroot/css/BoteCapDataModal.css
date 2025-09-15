@@ -561,5 +561,8 @@ body.modal-open {
         justify-content: center;
     }
 
-       
+    .segmented-item:disabled {
+        opacity: .35;
+        cursor: not-allowed
+    }
 }

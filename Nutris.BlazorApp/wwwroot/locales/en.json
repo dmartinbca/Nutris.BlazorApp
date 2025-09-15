@@ -258,6 +258,7 @@
     "Frequency": "Frequency",
     "JustOn1stBatch": "Just on 1st batch",
     "AllBatches": "All batches",
+    "Batch": "Lot",
     "MUM": "Microbiology european market",
     "MicrobiologyLysteria": "Microbiology lysteria",
     "HeavyMetals": "Heavy Metals",
@@ -293,6 +294,6 @@
   "Desarrollo": "Development",
 
   "Message": {
-    "Loading": "Loading Data, Please Wait!"
+    "Loading": "Loading Data..."
   }
 }

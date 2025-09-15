@@ -951,15 +951,16 @@
                       BoteData="@boteDataList"
                       CapData="@capDataList"
                       CodeRG35="@Code"
-                      OptionsColorBote="@boteColorOptions"
-                      OptionsColorCover="@capColorOptions"
+                      OptionsColorBote="@_opts.ColorBote"
+                      OptionsColorCover="@_opts.ColorCover"
                       Characteristics="@characteristics"
                       SetAccordionOpen="OnSetAccordionOpen"
                       OnSaveData="@(data => HandleSaveData(data.Bote, data.Cap))"
                       OnClose="OnBoteCapClosed" 
-                      Capacidades="@capacidades"
+                      Capacidades="@_opts.Capacidades"
                       CapacidadToDiametros="@capacidadToDiametros"
-                      Materiales="@materiales" />
+                      OnOptionsUpdated="HandlePackagingUpdated"
+                      Materiales="@_opts.Materiales" />
 
 </div>
  
