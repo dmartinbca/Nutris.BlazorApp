@@ -565,4 +565,120 @@ body.modal-open {
         opacity: .35;
         cursor: not-allowed
     }
+    /* El lienzo donde ubicamos las reglas */
+    .bottle-visual-wrapper {
+        position: relative;
+        min-height: 420px; /* ajusta a tu alto real de SVG */
+    }
+
+    /* -------- Brackets superior/inferior -------- */
+    .dim-top,
+    .dim-bottom {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 240px; /* ancho total del bracket */
+        height: 24px;
+        text-align: center;
+        line-height: 24px;
+        color: #6B6B83;
+        font-size: 14px;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .dim-top {
+        top: 14px;
+    }
+
+    .dim-bottom {
+        bottom: 22px;
+    }
+
+        .dim-top::before,
+        .dim-top::after,
+        .dim-bottom::before,
+        .dim-bottom::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            height: 1px;
+            background: #CFC7E2;
+            width: calc(50% - 55px); /* deja hueco para el texto */
+        }
+
+    .dim-top::before {
+        left: 0;
+    }
+
+    .dim-top::after {
+        right: 0;
+    }
+
+    .dim-bottom::before {
+        left: 0;
+    }
+
+    .dim-bottom::after {
+        right: 0;
+    }
+
+    /* -------- Regla vertical izquierda (altura) -------- */
+    .dim-left {
+        position: absolute;
+        left: 36px; /* distancia al borde del lienzo */
+        top: 80px; /* ajusta estos dos para centrar */
+        bottom: 100px; /* con tu ilustración */
+        width: 28px;
+        color: #6B6B83;
+        font-size: 14px;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+        /* línea vertical */
+        .dim-left::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: #CFC7E2;
+        }
+
+        /* “orejas” arriba/abajo */
+        .dim-left .tick {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px; /* largo de las orejas */
+            height: 1px;
+            background: #CFC7E2;
+        }
+
+        .dim-left .tick-top {
+            top: 0;
+        }
+
+        .dim-left .tick-bottom {
+            bottom: 0;
+        }
+
+        /* texto de altura girado en el centro de la regla */
+        .dim-left span {
+            position: absolute;
+            left: -26px; /* separa del eje vertical */
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            white-space: nowrap;
+        }
+
+    /* En la pestaña TAPA solo usamos el de arriba, un pelín más abajo */
+    .cap-preview .dim-top {
+        top: 22px;
+    }
+
+
 }

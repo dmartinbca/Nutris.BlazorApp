@@ -64,21 +64,18 @@
                                     @Localization["modalContainer.Characteristics"]</h3>
 
                                 <div class="preview-content">
-                                    <!-- Dimensiones verticales -->
-                                    <div class="dimension-vertical" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%);">
-                                        <div style="height: 280px; border-left: 1px solid #ccc; position: relative;">
-                                            <span style="position: absolute; left: -50px; top: 50%; transform: translateY(-50%); font-size: 14px;">
-                                                @GetAlturaText()
-                                            </span>
-                                        </div>
-                                    </div>
+                                  
 
                                     <div class="bottle-visual-wrapper">
-                                        <!-- Dimensión superior -->
-                                        <div style="position: absolute; top: 20px; width: 100%; text-align: center;">
-                                            <span style="font-size: 14px;">@GetDiamBocaText()</span>
+                                        @* BRACKET superior (diámetro de boca) *@
+                                        <div class="dim-top"><span>@GetDiamBocaText()</span></div>
+                                        @* REGLA vertical izquierda (altura) *@
+                                        <div class="dim-left">
+                                            <i class="tick tick-top"></i>
+                                            <i class="tick tick-bottom"></i>
+                                            <span>@GetAlturaText()</span>
                                         </div>
-
+                                        
                                         <!-- Botella según forma -->
                                         @switch (BoteConfig.Forma?.ToUpper())
                                         {
@@ -96,10 +93,8 @@
                                                 break;
                                         }
 
-                                        <!-- Dimensión inferior -->
-                                        <div style="position: absolute; bottom: 20px; width: 100%; text-align: center;">
-                                            <span style="font-size: 14px;">@GetDiamBaseText()</span>
-                                        </div>
+                                        @* BRACKET inferior (diámetro base) *@
+                                        <div class="dim-bottom"><span>@GetDiamBaseText()</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -207,6 +202,9 @@
 
                                 <div class="preview-content">
                                     <div class="bottle-visual-wrapper">
+                                        <div class="dim-top">
+                                            <span>@GetDiamBocaText()</span>
+                                        </div>
                                         @{
                                             var currentCapHexColor = GetCapHexColor();
                                             var capFormaUpper = CapConfig.Forma?.ToUpper();
