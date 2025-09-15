@@ -64,37 +64,49 @@
                                     @Localization["modalContainer.Characteristics"]</h3>
 
                                 <div class="preview-content">
-                                  
 
-                                    <div class="bottle-visual-wrapper">
-                                        @* BRACKET superior (diámetro de boca) *@
-                                        <div class="dim-top"><span>@GetDiamBocaText()</span></div>
-                                        @* REGLA vertical izquierda (altura) *@
-                                        <div class="dim-left">
-                                            <i class="tick tick-top"></i>
-                                            <i class="tick tick-bottom"></i>
-                                            <span>@GetAlturaText()</span>
+
+                                    <div class="bottle-visual-wrapper" data-size="@BoteConfig.Capacidad">
+                                        <div class="dimension-lines-container" id="dimension-lines-@(ComponentId)">
+                                            @* Dimensión superior (diámetro de boca) *@
+                                            <div class="dimension-top">
+                                                <span class="dimension-text">@GetDiamBocaText()</span>
+                                            </div>
+
+                                            @* Dimensión izquierda (altura) - se ajustará dinámicamente *@
+                                            <div class="dimension-left" id="dim-left-@(ComponentId)">
+                                                <span class="dimension-text">@GetAlturaText()</span>
+                                            </div>
+
+                                            @* Dimensión inferior (diámetro base) *@
+                                            <div class="dimension-bottom">
+                                                <span class="dimension-text">@GetDiamBaseText()</span>
+                                            </div>
                                         </div>
                                         
                                         <!-- Botella según forma -->
-                                        @switch (BoteConfig.Forma?.ToUpper())
-                                        {
-                                            case "ROUND":
-                                                <BoteRound @key="@($"{BoteConfig.Forma}_{BoteConfig.Color}_{DateTime.Now.Ticks}")"
-                                                           ColorBote="@GetBoteHexColor()" />
-                                                break;
-                                            case "SQUARE":
-                                                <BoteSquare @key="@($"{BoteConfig.Forma}_{BoteConfig.Color}_{DateTime.Now.Ticks}")"
-                                                            ColorBote="@GetBoteHexColor()" />
-                                                break;
-                                            case "CYLINDRICAL":
-                                                <BoteCylindrical @key="@($"{BoteConfig.Forma}_{BoteConfig.Color}_{DateTime.Now.Ticks}")"
-                                                                 ColorBote="@GetBoteHexColor()" />
-                                                break;
-                                        }
+                                        <div class="bottle-svg-container" id="bottle-container-@(ComponentId)">
+                                            @switch (BoteConfig.Forma?.ToUpper())
+                                            {
+                                                case "ROUND":
+                                                    <BoteRound @key="@($"{BoteConfig.Forma}_{BoteConfig.Color}_{DateTime.Now.Ticks}")"
+                                                               ColorBote="@GetBoteHexColor()" />
+                                                    break;
+                                                case "SQUARE":
+                                                    <BoteSquare @key="@($"{BoteConfig.Forma}_{BoteConfig.Color}_{DateTime.Now.Ticks}")"
+                                                                ColorBote="@GetBoteHexColor()" />
+                                                    break;
+                                                case "CYLINDRICAL":
+                                                    <BoteCylindrical @key="@($"{BoteConfig.Forma}_{BoteConfig.Color}_{DateTime.Now.Ticks}")"
+                                                                     ColorBote="@GetBoteHexColor()" />
+                                                    break;
+                                                default:
+                                                    <BoteRound ColorBote="#CCCCCC" />
+                                                    break;
+                                            }
+                                        </div>
 
-                                        @* BRACKET inferior (diámetro base) *@
-                                        <div class="dim-bottom"><span>@GetDiamBaseText()</span></div>
+                                       
                                     </div>
                                 </div>
                             </div>
@@ -201,9 +213,14 @@
                                 <h3 class="section-title">@Localization["modalLabel.Characteristics"]</h3>
 
                                 <div class="preview-content">
-                                    <div class="bottle-visual-wrapper">
-                                        <div class="dim-top">
-                                            <span>@GetDiamBocaText()</span>
+                                    <div class="cap-visual-wrapper" id="cap-wrapper-@(ComponentId)">
+                                        @* Dimensiones para la tapa *@
+                                        <div class="cap-dimension-top">
+                                            <span class="dimension-text">@GetCapDiameterText()</span>
+                                        </div>
+
+                                        <div class="cap-dimension-left">
+                                            <span class="dimension-text">@GetCapHeightText()</span>
                                         </div>
                                         @{
                                             var currentCapHexColor = GetCapHexColor();
@@ -211,20 +228,23 @@
                                             Console.WriteLine($"Renderizando tapa: Forma={capFormaUpper}, Color={CapConfig.Color}, Hex={currentCapHexColor}");
                                         }
 
-                                        @if (capFormaUpper == "SIMPLE")
+                                        @switch (capFormaUpper)
                                         {
-                                            <CoverSimple @key="@($"simple_{currentCapHexColor}_{CapConfig.Diametro}")"
-                                                         ColorCover="@currentCapHexColor" />
-                                        }
-                                        else if (capFormaUpper == "METAL")
-                                        {
-                                            <CoverMetal @key="@($"metal_{currentCapHexColor}_{CapConfig.Diametro}")"
-                                                        ColorCover="@currentCapHexColor" />
-                                        }
-                                        else if (capFormaUpper == "CHILDPROFF")
-                                        {
-                                            <CoverChildproff @key="@($"child_{currentCapHexColor}_{CapConfig.Diametro}")"
+                                            case "SIMPLE":
+                                                <CoverSimple @key="@($"simple_{currentCapHexColor}_{CapConfig.Diametro}")"
                                                              ColorCover="@currentCapHexColor" />
+                                                break;
+                                            case "METAL":
+                                                <CoverMetal @key="@($"metal_{currentCapHexColor}_{CapConfig.Diametro}")"
+                                                            ColorCover="@currentCapHexColor" />
+                                                break;
+                                            case "CHILDPROFF":
+                                                <CoverChildproff @key="@($"childproff_{currentCapHexColor}_{CapConfig.Diametro}")"
+                                                                 ColorCover="@currentCapHexColor" />
+                                                break;
+                                            default:
+                                                <CoverSimple ColorCover="#FFFFFF" />
+                                                break;
                                         }
                                     </div>
                                 </div>
@@ -292,7 +312,7 @@
                                 <div class="field">
                                     <label class="checkbox">
                                         <input type="checkbox" @bind="CapConfig.Sleeve" />
-                                        <span>Sleeve</span>
+                                        <span>Sleever</span>
                                     </label>
                                 </div>
 
@@ -310,12 +330,348 @@
         </div>
     </div>
 }
-<style>
+ <style>
     /* Ajuste fino de posición de tabs */
     .custom-tabs .nav-link:first-child {
         margin-left: 48px !important;
     }
+
+ 
+    /* ========================================
+       DIMENSIONES FINALES AJUSTADAS
+       ======================================== */
+    .bottle-visual-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        height: 450px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .bottle-visual-wrapper > svg {
+        width: 220px;
+        height: auto;
+        max-height: 300px;
+        position: relative;
+        z-index: 5;
+    }
+
+    /* Dimensión superior del bote - 40px a la derecha y 30px más arriba */
+    .dimension-top {
+        position: absolute;
+        top: 35px; /* 30px más arriba (era 65px) */
+        left: calc(50% + 40px); /* 40px a la derecha del centro */
+        transform: translateX(-50%);
+        width: 100px;
+        height: 20px;
+    }
+
+        .dimension-top::before {
+            content: '';
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #C4C2C2;
+        }
+
+        .dimension-top::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            left: 0;
+            right: 0;
+            height: 10px;
+            border-left: 1px solid #C4C2C2;
+            border-right: 1px solid #C4C2C2;
+        }
+
+        .dimension-top .dimension-text {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ede9fe;
+            padding: 2px 8px;
+            color: #6B6B83;
+            font-size: 13px;
+            font-family: 'RalewayLight', sans-serif;
+            white-space: nowrap;
+            z-index: 2;
+        }
+
+    /* Dimensión izquierda - ajustada para no salir del área */
+    .dimension-left {
+        position: absolute;
+        left: 80px;
+        top: 75px; /* Ajustado para empezar dentro del área */
+        height: 285px; /* Altura ajustada */
+        width: 20px;
+    }
+
+        .dimension-left::before {
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: #C4C2C2;
+        }
+
+        .dimension-left::after {
+            content: '';
+            position: absolute;
+            right: 3px;
+            top: 0;
+            bottom: 0;
+            width: 10px;
+            border-top: 1px solid #C4C2C2;
+            border-bottom: 1px solid #C4C2C2;
+        }
+
+        .dimension-left .dimension-text {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            transform-origin: center;
+            background: #ede9fe;
+            padding: 2px 8px;
+            color: #6B6B83;
+            font-size: 13px;
+            font-family: 'RalewayLight', sans-serif;
+            white-space: nowrap;
+            z-index: 2;
+        }
+
+    /* Dimensión inferior - 40px a la derecha y 25px más abajo */
+    .dimension-bottom {
+        position: absolute;
+        bottom: 40px; /* 25px más abajo (era 65px) */
+        left: calc(50% + 40px); /* 40px a la derecha del centro */
+        transform: translateX(-50%);
+        width: 160px;
+        height: 20px;
+    }
+
+        .dimension-bottom::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #C4C2C2;
+        }
+
+        .dimension-bottom::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 0;
+            right: 0;
+            height: 10px;
+            border-left: 1px solid #C4C2C2;
+            border-right: 1px solid #C4C2C2;
+        }
+
+        .dimension-bottom .dimension-text {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ede9fe;
+            padding: 2px 8px;
+            color: #6B6B83;
+            font-size: 13px;
+            font-family: 'RalewayLight', sans-serif;
+            white-space: nowrap;
+            z-index: 2;
+        }
+
+    /* ========================================
+       AJUSTES PARA DIFERENTES TAMAÑOS
+       ======================================== */
+
+    /* Botes pequeños (100-150cc) */
+    .bottle-visual-wrapper[data-size="100"] .dimension-left,
+    .bottle-visual-wrapper[data-size="150"] .dimension-left {
+        height: 240px;
+        top: 95px;
+    }
+
+    .bottle-visual-wrapper[data-size="100"] .dimension-top,
+    .bottle-visual-wrapper[data-size="150"] .dimension-top {
+        top: 55px;
+        left: calc(50% + 40px);
+    }
+
+    .bottle-visual-wrapper[data-size="100"] .dimension-bottom,
+    .bottle-visual-wrapper[data-size="150"] .dimension-bottom {
+        bottom: 60px;
+        left: calc(50% + 40px);
+    }
+
+    /* Botes medianos (200-300cc) */
+    .bottle-visual-wrapper[data-size="200"] .dimension-left,
+    .bottle-visual-wrapper[data-size="250"] .dimension-left,
+    .bottle-visual-wrapper[data-size="300"] .dimension-left {
+        height: 270px;
+        top: 80px;
+    }
+
+    .bottle-visual-wrapper[data-size="200"] .dimension-top,
+    .bottle-visual-wrapper[data-size="250"] .dimension-top,
+    .bottle-visual-wrapper[data-size="300"] .dimension-top {
+        top: 45px;
+        left: calc(50% + 40px);
+    }
+
+    .bottle-visual-wrapper[data-size="200"] .dimension-bottom,
+    .bottle-visual-wrapper[data-size="250"] .dimension-bottom,
+    .bottle-visual-wrapper[data-size="300"] .dimension-bottom {
+        bottom: 50px;
+        left: calc(50% + 40px);
+    }
+
+    /* Botes grandes (400-500cc) */
+    .bottle-visual-wrapper[data-size="400"] .dimension-left,
+    .bottle-visual-wrapper[data-size="500"] .dimension-left {
+        height: 300px;
+        top: 70px;
+    }
+
+    .bottle-visual-wrapper[data-size="400"] .dimension-top,
+    .bottle-visual-wrapper[data-size="500"] .dimension-top {
+        top: 30px;
+        left: calc(50% + 40px);
+    }
+
+    .bottle-visual-wrapper[data-size="400"] .dimension-bottom,
+    .bottle-visual-wrapper[data-size="500"] .dimension-bottom {
+        bottom: 35px;
+        left: calc(50% + 40px);
+    }
+ 
+    /* ========================================
+       DIMENSIONES DE TAPA - MÁS CORTAS Y MÁS ARRIBA
+       ======================================== */
+    .cap-visual-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        height: 400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .cap-visual-wrapper > svg {
+        width: auto;
+        height: 80px;
+        max-width: 180px;
+        position: relative;
+        z-index: 5;
+    }
+
+    /* Dimensión superior de la tapa - MÁS CORTA Y UN POCO MÁS ARRIBA */
+    .cap-dimension-top {
+        position: absolute;
+        top:0;
+        left: calc(60%);
+        transform: translateX(-60%);
+        width: 40px; /* Reducido de 100px a 80px */
+        height: 10px;
+    }
+
+        .cap-dimension-top::before {
+            content: '';
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #C4C2C2;
+        }
+
+        .cap-dimension-top::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            left: 0;
+            right: 0;
+            height: 10px;
+            border-left: 1px solid #C4C2C2;
+            border-right: 1px solid #C4C2C2;
+        }
+
+        .cap-dimension-top .dimension-text {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffe8e8;
+            padding: 2px 8px;
+            color: #6B6B83;
+            font-size: 13px;
+            font-family: 'RalewayLight', sans-serif;
+            white-space: nowrap;
+            z-index: 2;
+        }
+
+    /* Dimensión izquierda de la tapa - MÁS CORTA Y UN POCO MÁS ARRIBA */
+    .cap-dimension-left {
+        position: absolute;
+        left: 120px;
+        top: 180px; /* Subido 10px (era 190px) */
+        height: 35px; /* Reducido de 60px a 45px */
+        width: 20px;
+    }
+
+        .cap-dimension-left::before {
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: #C4C2C2;
+        }
+
+        .cap-dimension-left::after {
+            content: '';
+            position: absolute;
+            right: 3px;
+            top: 0;
+            bottom: 0;
+            width: 10px;
+            border-top: 1px solid #C4C2C2;
+            border-bottom: 1px solid #C4C2C2;
+        }
+
+        .cap-dimension-left .dimension-text {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            transform-origin: center;
+            background: #ffe8e8;
+            padding: 2px 8px;
+            color: #6B6B83;
+            font-size: 13px;
+            font-family: 'RalewayLight', sans-serif;
+            white-space: nowrap;
+            z-index: 2;
+        }
+ 
     
+ 
 </style>
 @code {
     // ===== Props =====
@@ -339,7 +695,111 @@
     [Parameter] public string Characteristics { get; set; } = string.Empty;
 
     [Parameter] public EventCallback<bool> SetAccordionOpen { get; set; }
+    private readonly Dictionary<string, Dictionary<string, (double Diameter, double Height)>> CapDimensionsMap = new()
+    {
+        ["SIMPLE"] = new()
+        {
+            ["D38"] = (40.2, 11.7),
+            ["D45"] = (47.37, 11.7),
+            ["D53"] = (55.0, 12.0),
+            ["D63"] = (65.0, 12.5),
+            ["D70"] = (72.0, 13.0)
+        },
+        ["METAL"] = new()
+        {
+            ["D38"] = (41.0, 12.5),
+            ["D45"] = (48.0, 12.5),
+            ["D53"] = (56.0, 13.0),
+            ["D63"] = (66.0, 13.5),
+            ["D70"] = (73.0, 14.0)
+        },
+        ["CHILDPROFF"] = new()
+        {
+            ["D38"] = (45.21, 17.3),
+            ["D45"] = (51.99, 17.306),
+            ["D53"] = (60.0, 18.0),
+            ["D63"] = (70.0, 18.5),
+            ["D70"] = (77.0, 19.0)
+        }
+    };
 
+    private readonly Dictionary<string, Dictionary<string, BoteDimension>> DimensionsMap = new()
+    {
+        ["150"] = new()
+        {
+            ["D45"] = new(88.3, 55.3, 43.82),
+            ["D38"] = new(85.0, 52.0, 38.0)
+        },
+        ["200"] = new()
+        {
+            ["D45"] = new(105.86, 60.0, 43.82),
+            ["D38"] = new(102.0, 57.0, 38.0),
+            ["D53"] = new(98.0, 62.0, 53.0),
+            ["D70"] = new(95.0, 65.0, 70.0)
+        },
+        ["250"] = new()
+        {
+            ["D45"] = new(111.3, 63.91, 43.82),
+            ["D38"] = new(108.0, 60.0, 38.0)
+        },
+        ["300"] = new()
+        {
+            ["D45"] = new(118.95, 68.99, 43.82),
+            ["D63"] = new(115.0, 72.0, 63.0)
+        },
+        ["400"] = new()
+        {
+            ["D45"] = new(130.87, 72.69, 43.82),
+            ["D63"] = new(127.0, 75.0, 63.0)
+        },
+        ["500"] = new()
+        {
+            ["D45"] = new(155.0, 80.0, 43.82),
+            ["D63"] = new(150.0, 83.0, 63.0)
+        }
+    };
+    private void UpdateCurrentDimensions()
+    {
+        Console.WriteLine($"UpdateCurrentDimensions - Capacidad: {BoteConfig.Capacidad}, Diametro: {BoteConfig.Diametro}");
+
+        if (!string.IsNullOrEmpty(BoteConfig.Capacidad) && !string.IsNullOrEmpty(BoteConfig.Diametro))
+        {
+            if (DimensionsMap.TryGetValue(BoteConfig.Capacidad, out var capacidadDims))
+            {
+                if (capacidadDims.TryGetValue(BoteConfig.Diametro, out var dimension))
+                {
+                    CurrentBoteDimension = dimension;
+                    Console.WriteLine($"Dimensiones encontradas - Altura: {dimension.Altura}, Base: {dimension.DiametroBase}, Boca: {dimension.DiametroBoca}");
+                    return;
+                }
+            }
+        }
+
+        // Valores por defecto si no se encuentra la combinación
+        CurrentBoteDimension = null;
+        Console.WriteLine("Usando dimensiones por defecto");
+    }
+    private BoteDimension? CurrentBoteDimension { get; set; }
+    private void UpdateCapDimensions()
+    {
+        if (!string.IsNullOrEmpty(CapConfig.Forma) && !string.IsNullOrEmpty(CapConfig.Diametro))
+        {
+            var formaUpper = NormFormaCap(CapConfig.Forma);
+
+            if (CapDimensionsMap.TryGetValue(formaUpper, out var diametros))
+            {
+                if (diametros.TryGetValue(CapConfig.Diametro, out var dimension))
+                {
+                    CurrentCapDimension = dimension;
+                    return;
+                }
+            }
+        }
+
+        // Valores por defecto si no se encuentra la combinación
+        CurrentCapDimension = null;
+    }
+    private (double Diameter, double Height)? CurrentCapDimension { get; set; }
     [Inject] private IApiService ApiService { get; set; } = default!;
     [Inject] private ILocalizationService Localization { get; set; } = default!;
     public sealed class UpdatedOptions
@@ -368,7 +828,8 @@
     // Formas habilitadas según los filtros actuales
     private HashSet<string> AvailableBottleForms = new(StringComparer.OrdinalIgnoreCase);
     private HashSet<string> AvailableCapForms = new(StringComparer.OrdinalIgnoreCase);
-
+    private string ComponentId { get; set; } = Guid.NewGuid().ToString("N");
+    private ElementReference bottleWrapper;
     // ===== Estado =====
     private bool IsBottleTab { get; set; } = true;
     private BoteConfigModel BoteConfig { get; set; } = new();
@@ -427,8 +888,187 @@
     private List<ColorOption> OptionsColorBoteFiltered = new();
     private List<ColorOption> OptionsColorCoverFiltered = new();
 
-    private BoteDimension? CurrentBoteDimension;
+ 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
 
+        if (IsVisible)
+        {
+            if (IsBottleTab && !string.IsNullOrEmpty(BoteConfig.Forma))
+            {
+                await AdjustDimensionLines();
+            }
+            else if (!IsBottleTab && !string.IsNullOrEmpty(CapConfig.Forma))
+            {
+                await AdjustCapDimensionLines();
+            }
+        }
+    }
+    public string GetCapDiameterText()
+    {
+        // Si no hay dimensiones cargadas, intentar cargarlas
+        if (CurrentCapDimension == null &&
+            !string.IsNullOrEmpty(CapConfig.Forma) &&
+            !string.IsNullOrEmpty(CapConfig.Diametro))
+        {
+            UpdateCapDimensions();
+        }
+
+        // Si hay dimensiones válidas, mostrarlas; si no, mostrar N/A
+        return CurrentCapDimension.HasValue
+            ? $"{CurrentCapDimension.Value.Diameter:F2} mm"
+            : "N/A";
+    }
+    public string GetCapHeightText()
+    {
+        // Si no hay dimensiones cargadas, intentar cargarlas
+        if (CurrentCapDimension == null &&
+            !string.IsNullOrEmpty(CapConfig.Forma) &&
+            !string.IsNullOrEmpty(CapConfig.Diametro))
+        {
+            UpdateCapDimensions();
+        }
+
+        // Si hay dimensiones válidas, mostrarlas; si no, mostrar N/A
+        return CurrentCapDimension.HasValue
+            ? $"{CurrentCapDimension.Value.Height:F2} mm"
+            : "N/A";
+    }
+    private bool HasBoteDimensions()
+    {
+        return CurrentBoteDimension != null;
+    }
+
+    private bool HasCapDimensions()
+    {
+        return CurrentCapDimension.HasValue;
+    }
+    private string GetDimensionAvailabilityMessage()
+    {
+        if (!HasBoteDimensions() && !string.IsNullOrEmpty(BoteConfig.Capacidad) && !string.IsNullOrEmpty(BoteConfig.Diametro))
+        {
+            return $"Las dimensiones para {BoteConfig.Capacidad}cc con diámetro {BoteConfig.Diametro} no están disponibles.";
+        }
+        return string.Empty;
+    }
+
+    private string GetCapDimensionAvailabilityMessage()
+    {
+        if (!HasCapDimensions() && !string.IsNullOrEmpty(CapConfig.Forma) && !string.IsNullOrEmpty(CapConfig.Diametro))
+        {
+            return $"Las dimensiones para tapa {CapConfig.Forma} con diámetro {CapConfig.Diametro} no están disponibles.";
+        }
+        return string.Empty;
+    }
+    private async Task OnBottleConfigChanged()
+    {
+        RecomputeAllFilters();
+        await InvokeAsync(StateHasChanged);
+
+        // Esperar un momento para que el DOM se actualice
+        await Task.Delay(100);
+        await AdjustDimensionLines();
+    }
+    private async Task AdjustDimensionLines()
+    {
+        try
+        {
+            var script = $@"
+            (function() {{
+                // Obtener el contenedor del bote
+                var bottleContainer = document.getElementById('bottle-container-{ComponentId}');
+                if (!bottleContainer) return;
+
+                // Obtener el SVG del bote
+                var bottleSvg = bottleContainer.querySelector('svg');
+                if (!bottleSvg) return;
+
+                // Obtener las dimensiones reales del SVG
+                var svgRect = bottleSvg.getBoundingClientRect();
+                var containerRect = bottleContainer.getBoundingClientRect();
+
+                // Calcular la altura real del bote (sin el cuello)
+                var bottleHeight = svgRect.height * 0.85; // 85% para excluir el cuello
+                var bottleTop = svgRect.top - containerRect.top + (svgRect.height * 0.15); // 15% desde arriba
+
+                // Ajustar la línea de altura
+                var dimLeft = document.getElementById('dim-left-{ComponentId}');
+                if (dimLeft) {{
+                    dimLeft.style.top = bottleTop + 'px';
+                    dimLeft.style.height = bottleHeight + 'px';
+                }}
+
+                // Ajustar la posición de la línea superior
+                var dimTop = document.querySelector('#dimension-lines-{ComponentId} .dimension-top');
+                if (dimTop) {{
+                    var topPosition = svgRect.top - containerRect.top - 15;
+                    dimTop.style.top = topPosition + 'px';
+                }}
+
+                // Ajustar la posición de la línea inferior
+                var dimBottom = document.querySelector('#dimension-lines-{ComponentId} .dimension-bottom');
+                if (dimBottom) {{
+                    var bottomPosition = containerRect.height - (svgRect.bottom - containerRect.top) - 15;
+                    dimBottom.style.bottom = bottomPosition + 'px';
+                }}
+
+                // Ajustar el ancho de las líneas horizontales según el ancho del bote
+                if (dimTop) {{
+                    dimTop.style.width = (svgRect.width * 0.6) + 'px';
+                }}
+                if (dimBottom) {{
+                    dimBottom.style.width = (svgRect.width * 0.85) + 'px';
+                }}
+            }})();
+        ";
+
+            await JSRuntime.InvokeVoidAsync("eval", script);
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogWarning("Error adjusting dimension lines: {Message}", ex.Message);
+        }
+    }
+     
+     
+
+    
+
+    
+    private async Task AdjustDimensionLinesAlternative()
+    {
+        var jsCode = @"
+        window.adjustBottleDimensions = function(componentId) {
+            const container = document.getElementById('bottle-container-' + componentId);
+            if (!container) return;
+
+            const svg = container.querySelector('svg');
+            if (!svg) return;
+
+            // Obtener el viewBox del SVG para determinar las proporciones
+            const viewBox = svg.getAttribute('viewBox');
+            const rect = svg.getBoundingClientRect();
+
+            // Calcular posiciones basadas en el tamaño real
+            const dimLeft = document.getElementById('dim-left-' + componentId);
+            if (dimLeft) {
+                // Ajustar altura de la línea vertical al 85% de la altura del SVG
+                const lineHeight = rect.height * 0.85;
+                const lineTop = (rect.height * 0.075); // Comenzar al 7.5% desde arriba
+
+                dimLeft.style.height = lineHeight + 'px';
+                dimLeft.style.top = (75 + lineTop) + 'px';
+            }
+        };
+    ";
+
+        // Primero, registrar la función si no existe
+        await JSRuntime.InvokeVoidAsync("eval", jsCode);
+
+        // Luego, llamar la función
+        await JSRuntime.InvokeVoidAsync("adjustBottleDimensions", ComponentId);
+    }
     // ====================== RECOMPUTES (CASCADA) ======================
     private void RecomputeBottleFilters()
     {
@@ -554,7 +1194,7 @@
 
         // ===== Sincroniza diámetro de tapa cuando exista
         CapConfig.Diametro = string.IsNullOrEmpty(BoteConfig.Diametro) ? "" : BoteConfig.Diametro;
-
+        UpdateCurrentDimensions();
     }
 
     private void RecomputeCapFilters()
@@ -590,28 +1230,81 @@
         if (!string.IsNullOrEmpty(CapConfig.Color) &&
             !OptionsColorCoverFiltered.Any(o => string.Equals((o.Label ?? o.Value), CapConfig.Color, StringComparison.OrdinalIgnoreCase)))
             CapConfig.Color = "";
+        UpdateCapDimensions();
     }
 
     private void RecomputeAllFilters()
     {
         RecomputeBottleFilters();
         RecomputeCapFilters();
+        UpdateCurrentDimensions(); // Asegurarse de actualizar las dimensiones
         StateHasChanged();
     }
 
    
 
     // ===== Handlers =====
-    private void SetFormaBote(string forma) { BoteConfig.Forma = forma; RecomputeAllFilters(); }
-    private void OnCapacityChanged(ChangeEventArgs e) { BoteConfig.Capacidad = e?.Value?.ToString() ?? BoteConfig.Capacidad; RecomputeAllFilters(); }
-    private void OnDiametroChanged(ChangeEventArgs e) { BoteConfig.Diametro = e?.Value?.ToString() ?? BoteConfig.Diametro; RecomputeAllFilters(); }
-    private void OnMaterialChanged(ChangeEventArgs e) { BoteConfig.Material = e?.Value?.ToString() ?? BoteConfig.Material; RecomputeAllFilters(); }
+    private async void SetFormaBote(string forma) 
+    { 
+        BoteConfig.Forma = forma;
+        RecomputeAllFilters();
+        await OnBottleConfigChanged();
+    }
+    private async void OnCapacityChanged(ChangeEventArgs e) { BoteConfig.Capacidad = e?.Value?.ToString() ?? BoteConfig.Capacidad; RecomputeAllFilters(); await OnBottleConfigChanged(); }
+    private async void OnDiametroChanged(ChangeEventArgs e) { BoteConfig.Diametro = e?.Value?.ToString() ?? BoteConfig.Diametro; RecomputeAllFilters(); await OnBottleConfigChanged(); }
+    private async void OnMaterialChanged(ChangeEventArgs e) { BoteConfig.Material = e?.Value?.ToString() ?? BoteConfig.Material; RecomputeAllFilters(); await OnBottleConfigChanged(); }
 
     private void SetFormaCap(string forma) 
     { 
         CapConfig.Forma = forma; 
         RecomputeCapFilters(); 
+        UpdateCapDimensions();
         InvokeAsync(StateHasChanged);
+    }
+    private async Task AdjustCapDimensionLines()
+    {
+        try
+        {
+            var script = $@"
+            (function() {{
+                // Obtener el contenedor de la tapa
+                var capContainer = document.getElementById('cap-wrapper-{ComponentId}');
+                if (!capContainer) return;
+
+                // Obtener el SVG de la tapa
+                var capSvg = capContainer.querySelector('svg');
+                if (!capSvg) return;
+
+                // Obtener las dimensiones reales del SVG
+                var svgRect = capSvg.getBoundingClientRect();
+                var containerRect = capContainer.getBoundingClientRect();
+
+                // Ajustar la línea de altura de la tapa
+                var dimLeft = capContainer.querySelector('.cap-dimension-left');
+                if (dimLeft) {{
+                    var capHeight = svgRect.height;
+                    var capTop = svgRect.top - containerRect.top;
+
+                    dimLeft.style.top = (containerRect.height / 2 - capHeight / 2) + 'px';
+                    dimLeft.style.height = capHeight + 'px';
+                }}
+
+                // Ajustar la posición de la línea superior de la tapa
+                var dimTop = capContainer.querySelector('.cap-dimension-top');
+                if (dimTop) {{
+                    var topPosition = svgRect.top - containerRect.top - 15;
+                    dimTop.style.top = topPosition + 'px';
+                    dimTop.style.width = (svgRect.width + 40) + 'px';
+                }}
+            }})();
+        ";
+
+            await JSRuntime.InvokeVoidAsync("eval", script);
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogWarning("Error adjusting cap dimension lines: {Message}", ex.Message);
+        }
     }
     private void OnBoteColorChanged(ChangeEventArgs e)
     {
@@ -744,9 +1437,49 @@
         return hexColor;
     }
 
-    private string GetAlturaText() => (CurrentBoteDimension?.Altura ?? 88.3).ToString("0.0") + " mm";
-    private string GetDiamBaseText() => (CurrentBoteDimension?.DiametroBase ?? 55.3).ToString("0.0") + " mm";
-    private string GetDiamBocaText() => (CurrentBoteDimension?.DiametroBoca ?? 43.82).ToString("0.00") + " mm";
+    private string GetAlturaText()
+    {// Si no hay dimensiones cargadas, intentar cargarlas
+        if (CurrentBoteDimension == null &&
+            !string.IsNullOrEmpty(BoteConfig.Capacidad) &&
+            !string.IsNullOrEmpty(BoteConfig.Diametro))
+        {
+            UpdateCurrentDimensions();
+        }
+
+        // Si hay dimensiones válidas, mostrarlas; si no, mostrar N/A
+        return CurrentBoteDimension != null
+            ? $"{CurrentBoteDimension.Altura:F1} mm"
+            : "N/A";
+    }
+    private string GetDiamBaseText()
+    {
+        // Si no hay dimensiones cargadas, intentar cargarlas
+        if (CurrentBoteDimension == null &&
+            !string.IsNullOrEmpty(BoteConfig.Capacidad) &&
+            !string.IsNullOrEmpty(BoteConfig.Diametro))
+        {
+            UpdateCurrentDimensions();
+        }
+
+        // Si hay dimensiones válidas, mostrarlas; si no, mostrar N/A
+        return CurrentBoteDimension != null
+            ? $"{CurrentBoteDimension.DiametroBase:F1} mm"
+            : "N/A";
+    }
+    private string GetDiamBocaText()
+    {
+        if (CurrentBoteDimension == null &&
+       !string.IsNullOrEmpty(BoteConfig.Capacidad) &&
+       !string.IsNullOrEmpty(BoteConfig.Diametro))
+        {
+            UpdateCurrentDimensions();
+        }
+
+        // Si hay dimensiones válidas, mostrarlas; si no, mostrar N/A
+        return CurrentBoteDimension != null
+            ? $"{CurrentBoteDimension.DiametroBoca:F2} mm"
+            : "N/A";
+    }
 
     private void OnCapacityChangedCore() { /* ya no se usa; dejamos stub para compatibilidad */ }
 
@@ -799,17 +1532,18 @@
     }
 
     private sealed record BoteDimension(double Altura, double DiametroBase, double DiametroBoca);
-
-    // Mapa sencillo para mostrar dimensiones aproximadas por capacidad/diámetro
-    private readonly Dictionary<string, Dictionary<string, BoteDimension>> DimensionsMap = new()
+    private async Task OnCapacidadChanged()
     {
-        ["150"] = new() { ["D45"] = new(88.3, 55.3, 43.82) },
-        ["200"] = new() { ["D45"] = new(105.86, 60.0, 43.82) },
-        ["250"] = new() { ["D45"] = new(111.3, 63.91, 43.82) },
-        ["300"] = new() { ["D45"] = new(125.5, 70.0, 43.82) },
-        ["400"] = new() { ["D45"] = new(140.0, 75.0, 43.82) },
-        ["500"] = new() { ["D45"] = new(155.0, 80.0, 43.82) }
-    };
+        RecomputeAllFilters();
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task OnDiametroChanged()
+    {
+        RecomputeAllFilters();
+        await InvokeAsync(StateHasChanged);
+    }
+    // Mapa sencillo para mostrar dimensiones aproximadas por capacidad/diámetro
+    
     private static List<ColorOption> MapNamesToColorOptions(
     IEnumerable<string> names,
     IEnumerable<ColorOption> catalog)

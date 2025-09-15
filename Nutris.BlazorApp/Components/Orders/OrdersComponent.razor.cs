@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Nutris.BlazorApp.Components.Modals;
 using NutrisBlazor.Models;
 using NutrisBlazor.Services;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using static Nutris.BlazorApp.Components.Modals.BoteCapDataModal;
@@ -13,6 +15,7 @@ namespace Nutris.BlazorApp.Components.Orders;
 
 public class OrdersComponentBase : ComponentBase
 {
+    [Inject] private HttpClient Http { get; set; } = default!;
     [Inject] protected IJSRuntime JS { get; set; } = default!; // Agregar esta línea
     [Inject] public ILocalStorageService LocalStorage { get; set; } = default!;
     [Inject] protected IApiService Api { get; set; } = default!;
@@ -39,7 +42,9 @@ public class OrdersComponentBase : ComponentBase
     [Parameter] public EventCallback<object> OnPatchRG35 { get; set; }
     [Parameter] public EventCallback<object> OnPatchRG37 { get; set; }
     [Parameter] public EventCallback<object> OnUploadBoxOrPallet { get; set; }
-
+   
+    public bool isLabelModalOpen;
+    public string? LabelImageUrl;
     // Estado de carga
     protected bool IsLoading { get; set; } = false;
     private bool isBoteCapOpen;
@@ -119,7 +124,7 @@ public class OrdersComponentBase : ComponentBase
     // LABEL
     protected int PercentFilledLabel { get; set; }
     protected bool NoLabel { get; set; }
-    protected string LabelImageUrl { get; set; } = "";
+ 
     protected List<InputItem> LabelInfo { get; set; } = new();
 
     // PALLETIZING
@@ -161,7 +166,7 @@ public class OrdersComponentBase : ComponentBase
     protected BoteCapDataModal.BoteDataItem? selectedBoteOption;
     protected BoteCapDataModal.CapDataItem? selectedCapOption;
     protected string characteristics = "";
-
+    protected bool isLabelOpen;
     private string? _boteResumen;
     private string? _tapaResumen;
     public readonly OptionLookups _opts = new();
@@ -177,7 +182,88 @@ public class OrdersComponentBase : ComponentBase
     //              .OrderBy(d => d, StringComparer.OrdinalIgnoreCase)
     //              .ToList()
     //    );
+    private async Task OpenLabelModalAsync()
+    {
+        await ReloadLabelPreviewAsync();
+        isLabelOpen = true;
+    }
+    protected Task CloseLabelModal()
+    {
+        isLabelOpen = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    private async Task ReloadLabelPreviewAsync()
+    {
+        // Si tu API devuelve bytes:
+        var bytes = await Http.GetByteArrayAsync(
+            $"api/CustomizeRG35('{Code}')/Label?tenant=nutris");
+        LabelImageUrl = "data:image/png;base64," + Convert.ToBase64String(bytes);
 
+        // Si tu API devuelve una URL directa, simplemente asigna esa URL:
+        // LabelImageUrl = await Http.GetStringAsync(...);
+    }
+    public async Task OnLabelSave()
+    {
+        // Aquí no hace nada especial: ya actualizaste en Upload/Delete.
+        // Si quieres, fuerza un reload de los datos de la orden.
+        await ReloadOrderAsync();
+    }
+    public Task OnLabelImageChanged(string? newUrl)
+    {
+        LabelImageUrl = newUrl; // refleja lo que devuelva el modal
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    protected async Task UploadLabelAsync(IBrowserFile file)
+    {
+        // Límite razonable (ajusta a tu necesidad)
+        const long maxSize = 20 * 1024 * 1024;
+
+        using var content = new MultipartFormDataContent();
+        var stream = file.OpenReadStream(maxSize);
+        var sc = new StreamContent(stream);
+        sc.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+        content.Add(sc, "file", file.Name);
+
+        // ENDPOINT de subida que ya tengas en OrdersComponent (ajústalo al tuyo real)
+        var resp = await Http.PostAsync(
+            $"api/CustomizeRG35('{Code}')/Label/Upload?tenant=nutris", content);
+
+        resp.EnsureSuccessStatusCode();
+        await ReloadLabelPreviewAsync();   // refresca la miniatura
+    }
+
+    protected async Task<Stream> DownloadLabelAsync()
+    {
+        // ENDPOINT de descarga (ajústalo)
+        var resp = await Http.GetAsync(
+            $"api/CustomizeRG35('{Code}')/Label/Download?tenant=nutris",
+            HttpCompletionOption.ResponseHeadersRead);
+
+        resp.EnsureSuccessStatusCode();
+        return await resp.Content.ReadAsStreamAsync();
+    }
+
+
+    protected async Task DeleteLabelAsync()
+    {
+        // ENDPOINT de borrado (ajústalo si existe)
+        var resp = await Http.DeleteAsync(
+            $"api/CustomizeRG35('{Code}')/Label?tenant=nutris");
+
+        resp.EnsureSuccessStatusCode();
+
+        LabelImageUrl = null;
+        StateHasChanged();
+    }
+    
+    private async Task ReloadOrderAsync()
+    {
+        // vuelve a pedir los datos y refresca UI
+        // ...
+        await InvokeAsync(StateHasChanged);
+    }
     private void LoadBoteAndCapData()
     {
         // Convertir RelacionBote a List<BoteDataItem>

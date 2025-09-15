@@ -1,4 +1,6 @@
- 
+/* Loading.css optimizado */
+
+/* Prevenir parpadeo inicial */
 .loading-overlay {
     position: fixed;
     top: 0;
@@ -10,6 +12,18 @@
     justify-content: center;
     align-items: center;
     z-index: 9999;
+    /* Animación de entrada suave */
+    animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .loading-container {
@@ -19,6 +33,20 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     text-align: center;
     min-width: 250px;
+    /* Animación de escala suave */
+    animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .spinner-wrapper {
@@ -26,6 +54,9 @@
     width: 80px;
     height: 80px;
     margin: 0 auto;
+    /* Importante: overflow hidden para contener la imagen */
+    overflow: hidden;
+    border-radius: 50%;
 }
 
 .spinner-circle {
@@ -38,14 +69,35 @@
     animation: spin 1s linear infinite;
 }
 
+/* Imagen con tamaño fijo desde el inicio */
 .center-logo {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 81px;
-    height:81px;
+    width: 81px !important;
+    height: 81px !important;
+    max-width: 81px !important;
+    max-height: 81px !important;
     object-fit: contain;
+    /* Prevenir parpadeo de la imagen */
+    opacity: 0;
+    animation: imageFadeIn 0.3s ease-in 0.1s forwards;
+    /* Evitar que la imagen se muestre antes de estar posicionada */
+    visibility: hidden;
+    animation-fill-mode: both;
+}
+
+@keyframes imageFadeIn {
+    0% {
+        visibility: visible;
+        opacity: 0;
+    }
+
+    100% {
+        visibility: visible;
+        opacity: 1;
+    }
 }
 
 @keyframes spin {
@@ -63,6 +115,24 @@
     color: #333;
     font-size: 1.1rem;
     font-family: 'Raleway', sans-serif;
+    /* Fade in del texto */
+    opacity: 0;
+    animation: textFadeIn 0.4s ease-in 0.2s forwards;
 }
 
- 
+@keyframes textFadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Clase adicional para cuando el loading se está ocultando */
+.loading-overlay.hiding {
+    animation: fadeOut 0.2s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+    }
+}
