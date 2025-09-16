@@ -923,12 +923,11 @@
                     </div>
 
                     <!-- Confirm Button -->
-                   
                     @if (CustomerAccepted && Prefix == "RG35")
                     {
                         <!-- Confirm Button -->
                         <div class="btn-atr-confirm d-flex justify-content-end">
-                            <button data-bs-toggle="modal" data-bs-target="#confirmModal"
+                            <button @onclick="ShowConfirmModal"
                                     class="@GetConfirmButtonClass() RalewayRegular font-20"
                                     disabled="@(!CanConfirmAndSign)">
                                 @Localization["orderView.ConfirmProductAndSign"]
@@ -943,7 +942,12 @@
     <!-- Modales -->
     <ApproveModal CustomerAccepted="@CustomerAccepted" CodeRG35="@Code" TomarMuestra="@TakeSample" RG37="@RG37Code" OnFormulationApproved="@HandleFormulationApproved" />
     <UploadTagModal />
-    <ConfirmModal OnConfirm="HandleConfirm" Status="@Status" CodeRG35="@Code" RG37="@RG37Code" PalletComments="@PalletComments" />
+    <ConfirmModal @bind-IsModalVisible="isConfirmModalVisible"
+                  OnConfirm="HandleConfirm"
+                  Status="@Status"
+                  CodeRG35="@Code"
+                  RG37="@RG37Code"
+                  PalletComments="@PalletComments" />
     <ThankYouModal />
     <PalletLabelImagenModal CodeRG35="@Code" OnUpdated="HandlePalletLabelUpdated" IsVisible=false  />
     <BoxLabelImagenModal CodeRG35="@Code" OnUpdated="HandleBoxLabelUpdated" />

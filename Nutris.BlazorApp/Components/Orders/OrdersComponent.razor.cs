@@ -105,7 +105,7 @@ public class OrdersComponentBase : ComponentBase
     protected bool SuitableVegans { get; set; }
     protected bool NaturalColors { get; set; }
     protected bool NaturalFlavor { get; set; }
-
+    protected bool isConfirmModalVisible = false;
     // Listas de Gummy DNA
     protected List<InputItem> GummyListBn { get; set; } = new();
     protected List<InputItem> GummyListB { get; set; } = new();
@@ -205,8 +205,12 @@ public class OrdersComponentBase : ComponentBase
         await ReloadLabelPreviewAsync();
         isLabelOpen = true;
     }
-   
-  
+    protected void ShowConfirmModal()
+    {
+        isConfirmModalVisible = true;
+        StateHasChanged();
+    }
+
 
     private async Task ReloadLabelPreviewAsync()
     {
@@ -1515,7 +1519,7 @@ public class OrdersComponentBase : ComponentBase
 
     protected void HandleConfirm()
     {
-        // Lógica para confirmar y firmar
+        isConfirmModalVisible = false;
         StateHasChanged();
     }
 
