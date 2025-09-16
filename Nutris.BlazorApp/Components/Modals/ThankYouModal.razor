@@ -7,38 +7,39 @@
 
 @if (IsModalVisible)
 {
-    <div class="modal-overlay" @onclick="HandleBackdropClick">
-        <div class="confirm-modal-container modal-dialog modal-content width855 height571" @onclick:stopPropagation="true">
-            <div class="modal-body padding-modal">
-                <!-- Close button (optional) -->
-               
+    <!-- Backdrop -->
+    <div class="custom-modal-backdrop"></div>
 
+    <!-- Modal -->
+    <div class="custom-modal-wrapper">
+        <div class="custom-modal-container">
+            <div class="modal-body padding-modal">
                 <!-- Success icon -->
                 <div class="img-confirm">
                     <img class="width80" src="/img/bien.png" alt="Success">
                 </div>
 
                 <!-- Thank you message -->
-                <div class="paragraph-confirm font-24">
-                    <span>@Localization["ModalThankYou.Thankyou"]</span>
-                    <span>@Localization["ModalThankYou.reviewing"]</span>
-                    <span>@Localization["ModalThankYou.theproduct"]</span>
-                    <span>@Localization["ModalThankYou.posible"]</span>
+                <div class="paragraph-confirm">
+                    <p class="font-24 text-center mb-0">
+                        @Localization["ModalThankYou.Thankyou"]
+                    </p>
+                    <p class="font-20 text-center mt-3">
+                        @Localization["ModalThankYou.reviewing"]
+                    </p>
+                    <p class="font-18 text-center">
+                        @Localization["ModalThankYou.theproduct"]
+                    </p>
+                    <p class="font-18 text-center">
+                        @Localization["ModalThankYou.posible"]
+                    </p>
                 </div>
 
-                <!-- Navigation link -->
-                @if (!string.IsNullOrEmpty(ReturnUrl))
-                {
-                    <a href="@ReturnUrl"
-                       @onclick="HandleReturnClick"
-                       @onclick:preventDefault="true"
-                       class="RalewayRegular font-20 text-center d-flex justify-content-center text-decoration-none color-a">
-                        @Localization["Returntoyourproductspage"]
-                    </a>
-                }
-                
-
-                 
+                <!-- Return button -->
+                <button @onclick="HandleReturnClick"
+                        class="btn-return-home RalewayRegular font-20">
+                    @Localization["Returntoyourproductspage"]
+                </button>
             </div>
         </div>
     </div>
@@ -47,128 +48,87 @@
 @code {
     // Parameters
     [Parameter] public bool IsModalVisible { get; set; }
-    // [Parameter] public EventCallback<bool> IsModalVisibleChanged { get; set; }
-    // [Parameter] public EventCallback OnClose { get; set; }
-       public string ReturnUrl { get; set; } = "/customize";
-    // [Parameter] public bool ShowCloseButton { get; set; } = false;
-    // [Parameter] public bool CloseOnBackdropClick { get; set; } = true;
-    // [Parameter] public bool ShowCustomAction { get; set; } = false;
-    // [Parameter] public string? CustomActionText { get; set; }
-    // [Parameter] public EventCallback OnCustomAction { get; set; }
-    // [Parameter] public int AutoCloseDelay { get; set; } = 0; // In milliseconds, 0 = no auto close
+    [Parameter] public EventCallback<bool> IsModalVisibleChanged { get; set; }
+    [Parameter] public string ReturnUrl { get; set; } = "/customize";
 
-    // Private fields
-    private System.Threading.Timer? autoCloseTimer;
-
-    
-
-    private async Task StopAutoCloseTimer()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (autoCloseTimer != null)
+        if (IsModalVisible)
         {
-            await autoCloseTimer.DisposeAsync();
-            autoCloseTimer = null;
+            // Prevenir scroll del body cuando el modal está abierto
+            await JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = 'hidden';");
         }
-    }
-
-   
-
-    private async Task HandleBackdropClick()
-    {
-       
-             
-        
+        else
+        {
+            // Restaurar scroll cuando se cierra
+            await JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = '';");
+        }
     }
 
     private async Task HandleReturnClick()
     {
         Logger.LogInformation("Navigating to: {ReturnUrl}", ReturnUrl);
 
-        
+        // Cerrar modal
+        IsModalVisible = false;
+        await IsModalVisibleChanged.InvokeAsync(false);
 
-        // Navigate after a small delay to ensure modal closes smoothly
-        await Task.Delay(100);
-        Navigation.NavigateTo(ReturnUrl);
-    }
+        // Restaurar scroll
+        await JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = '';");
 
-    private async Task HandleCustomAction()
-    {
-        Logger.LogInformation("Custom action triggered");
+        StateHasChanged();
 
-        // Invoke custom action callback
-       
-    }
-
-    // Public method to show the modal programmatically
-    public async Task ShowModal()
-    {
-        IsModalVisible = true;
-        
-    }
-
-    // Public method to hide the modal programmatically
-    public async Task HideModal()
-    {
-        
-    }
-
-    public void Dispose()
-    {
-        autoCloseTimer?.Dispose();
+        // Navegar después de un pequeño delay para asegurar que el modal se cierre suavemente
+        await Task.Delay(300);
+        Navigation.NavigateTo(ReturnUrl, forceLoad: true);
     }
 }
 
 <style>
-    .modal-overlay {
+    /* Backdrop personalizado */
+    .custom-modal-backdrop {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: #DEE6F38C; /* Color con transparencia (8C = 55% de opacidad) */
-        z-index: 999;
+        background-color: rgba(222, 230, 243, 0.55);
         backdrop-filter: blur(2px);
-        animation: fadeIn 0.3s ease-in-out;
+        z-index: 1040;
+        animation: fadeIn 0.3s ease;
+    }
+
+    /* Wrapper para centrar el modal */
+    .custom-modal-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1050;
+        pointer-events: none;
+    }
+
+    /* Contenedor del modal */
+    .custom-modal-container {
+        position: relative;
+        width: 100%;
+        max-width: 689px;
+        background-color: white;
+        background-color: var(--sectionSuperior, white);
+        padding: 4.3rem 2rem;
+        margin: 0 1rem;
+        border-radius: 15px;
+        box-shadow: 1px 3px 20px -2px rgba(0, 0, 0, 0.13);
+        pointer-events: all;
+        animation: slideIn 0.3s ease;
     }
 
     .padding-modal {
-        padding: 3.125rem;
-        position: relative;
-    }
-
-    .color-a {
-        color: var(--textButton);
-    }
-
-    .text-decoration-none {
-        text-decoration: none !important;
-    }
-
-        .text-decoration-none:hover {
-            text-decoration: underline !important;
-            color: var(--textButton);
-        }
-
-    .confirm-modal-container {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        max-width: 689px;
-        height: 460px;
-        background-color: var(--sectionSuperior);
-        padding: 4.3rem 0;
-        margin: auto;
-        border-radius: 15px;
-        box-shadow: 1px 3px 20px -2px #00000021;
-        overflow: hidden;
-        animation: slideUp 0.3s ease-out;
-    }
-
-    .modal.show .modal-dialog {
-        padding: 2.064rem;
+        padding: 0;
     }
 
     .img-confirm {
@@ -178,125 +138,81 @@
 
         .img-confirm img {
             display: block;
-            margin: auto;
+            margin: 0 auto;
             animation: scaleIn 0.5s ease-out;
         }
 
     .width80 {
-        width: 80px;
+        width: 100px;
         height: auto;
     }
 
     .paragraph-confirm {
-        margin: 2.82rem 0;
-        text-align: center;
-        font-size: 1.13em;
-        color: #000;
-        line-height: 1.6;
+        margin: 2rem 0 3rem;
         padding: 0 2rem;
     }
 
-        .paragraph-confirm span {
-            display: inline;
-            margin: 0 0.2em;
+        .paragraph-confirm p {
+            line-height: 1.6;
+            color: #333;
         }
 
-    .btn-cancel-atr {
+    /* Botón de retorno al home */
+    .btn-return-home {
         display: block;
-        background-color: transparent;
-        color: var(--textButton);
-        font-size: 1.44em;
-        margin: 1rem auto;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        padding: 1rem 1.57rem;
+        border: solid 1px var(--textButton, #2F5496);
         border-radius: 30px;
-        border: none;
-    }
-
-        .btn-cancel-atr:hover {
-            color: var(--textButton);
-            background: white;
-            border: 1px solid var(--textButton);
-            transition: all 0.3s ease;
-        }
-
-    .btn-save-atr-confirm {
-        display: block;
-        border: solid 1px var(--textButton);
-        border-radius: 30px;
-        background-color: var(--textButton);
+        background-color: var(--textButton, #2F5496);
         line-height: 1rem;
-        font-size: 1.44em;
-        padding: 1.44rem 1.57rem;
+        padding: 1.44rem 2rem;
         color: #fff;
-        margin: 3rem auto 0;
+        margin: 2rem auto 0;
         cursor: pointer;
         transition: all 0.3s ease;
-        min-width: 200px;
+        min-width: 250px;
+        text-align: center;
+        outline: none;
     }
 
-        .btn-save-atr-confirm:hover {
-            color: var(--textButton);
-            background: white;
-            transition: all 0.3s ease;
+        .btn-return-home:hover {
+            background-color: transparent;
+            color: var(--textButton, #2F5496);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-    .btn-close-custom {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        background: transparent;
-        border: none;
-        font-size: 1.5rem;
-        color: #666;
-        cursor: pointer;
-        padding: 0.5rem;
-        line-height: 1;
-        transition: color 0.3s ease;
-        z-index: 1;
-    }
-
-        .btn-close-custom:hover {
-            color: #000;
-        }
-
-    /* Bootstrap utility classes */
-    .d-flex {
-        display: flex !important;
-    }
-
-    .justify-content-center {
-        justify-content: center !important;
-    }
-
+    /* Utilidades */
     .text-center {
         text-align: center !important;
     }
 
+    .mb-0 {
+        margin-bottom: 0 !important;
+    }
+
+    .mt-3 {
+        margin-top: 1rem !important;
+    }
+
     /* Font classes */
+    .font-18 {
+        font-size: 18px;
+    }
+
     .font-20 {
         font-size: 20px;
     }
 
     .font-24 {
         font-size: 24px;
+        font-weight: 600;
+        color: var(--textButton, #2F5496);
     }
 
     .RalewayRegular {
         font-family: 'RalewayRegular', sans-serif;
     }
 
-    /* Size classes */
-    .width855 {
-        max-width: 855px;
-    }
-
-    .height571 {
-        max-height: 571px;
-    }
-
-    /* Animations */
+    /* Animaciones */
     @@keyframes fadeIn {
         from
 
@@ -310,11 +226,11 @@
 
     }
 
-    @@keyframes slideUp {
+    @@keyframes slideIn {
         from
 
     {
-        transform: translateY(30px);
+        transform: translateY(-20px);
         opacity: 0;
     }
 
@@ -330,78 +246,87 @@
 
     {
         transform: scale(0);
+        opacity: 0;
     }
 
     to {
         transform: scale(1);
+        opacity: 1;
     }
 
     }
 
-    /* Responsive styles */
+    /* Responsive */
     @@media (max-width: 768px) {
-        .confirm-modal-container
+        .custom-modal-container
 
     {
         max-width: 90%;
-        height: auto;
-        min-height: 400px;
-        padding: 3rem 1rem;
-    }
-
-    .padding-modal {
-        padding: 2rem 1rem;
+        padding: 3rem 1.5rem;
     }
 
     .paragraph-confirm {
-        font-size: 1em;
         padding: 0 1rem;
-        margin: 2rem 0;
+        margin: 1.5rem 0 2rem;
     }
 
-    .btn-save-atr-confirm,
-    .btn-cancel-atr {
-        font-size: 1.2em;
-        padding: 0.8rem 1.2rem;
+    .font-24 {
+        font-size: 22px;
+    }
+
+    .font-20 {
+        font-size: 18px;
+    }
+
+    .font-18 {
+        font-size: 16px;
+    }
+
+    .btn-return-home {
+        padding: 1rem 1.5rem;
+        min-width: 200px;
     }
 
     .width80 {
-        width: 60px;
+        width: 80px;
     }
 
     }
 
     @@media (max-width: 480px) {
-        .confirm-modal-container
+        .custom-modal-container
 
     {
         max-width: 95%;
-        padding: 2rem 0.5rem;
-        min-height: 380px;
-    }
-
-    .padding-modal {
-        padding: 1.5rem 0.5rem;
+        margin: 0 0.5rem;
+        padding: 2rem 1rem;
     }
 
     .paragraph-confirm {
-        font-size: 0.9em;
-        margin: 1.5rem 0;
+        margin: 1rem 0 1.5rem;
+        padding: 0 0.5rem;
     }
 
-    .btn-save-atr-confirm,
-    .btn-cancel-atr {
-        font-size: 1em;
-        padding: 0.7rem 1rem;
-        min-width: 150px;
+    .font-24 {
+        font-size: 20px;
     }
 
     .font-20 {
         font-size: 16px;
     }
 
-    .font-24 {
-        font-size: 20px;
+    .font-18 {
+        font-size: 14px;
+    }
+
+    .btn-return-home {
+        padding: 0.8rem 1.2rem;
+        min-width: 180px;
+        font-size: 16px;
+    }
+
+    .width80 {
+        width: 60px;
     }
 
     }

@@ -175,6 +175,8 @@ public class OrdersComponentBase : ComponentBase
     private string? _boteResumen;
     private string? _tapaResumen;
     public readonly OptionLookups _opts = new();
+
+    protected bool isThankYouModalVisible = false;
     private sealed class LabelOptionsDto
     {
         public string? Label_size { get; set; }
@@ -182,7 +184,7 @@ public class OrdersComponentBase : ComponentBase
         public string? Label_finish { get; set; }
         public string? Label_Color { get; set; }
     }
-
+ 
     protected List<NutrisBlazor.Components.Modals.ModalLabel.OptionMX> MapSizeMx(List<AtributoOption> src) =>
     src.Select((x, i) => new NutrisBlazor.Components.Modals.ModalLabel.OptionMX
     {
@@ -210,7 +212,7 @@ public class OrdersComponentBase : ComponentBase
         isConfirmModalVisible = true;
         StateHasChanged();
     }
-
+    
 
     private async Task ReloadLabelPreviewAsync()
     {
@@ -1421,9 +1423,18 @@ public class OrdersComponentBase : ComponentBase
         }
     }
 
-    protected string GetConfirmButtonClass()
+    private string GetConfirmButtonClass()
     {
-        return CanConfirmAndSign ? "btn-save-confirm RalewayRegular font-20" : "btn-save-confirm-disabled";
+        // Si el botón puede ser clickeado (está habilitado)
+        if (CanConfirmAndSign)
+        {
+            return "btn-save-confirm";
+        }
+        // Si el botón está deshabilitado
+        else
+        {
+            return "btn-save-confirm"; // Usamos la misma clase, el :disabled se encargará del estilo
+        }
     }
 
     // Acciones
@@ -1517,9 +1528,17 @@ public class OrdersComponentBase : ComponentBase
         await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.downloadBase64File", base64, name);
     }
 
-    protected void HandleConfirm()
+    protected async Task HandleConfirm()
     {
+        // Cerrar el modal de confirmación
         isConfirmModalVisible = false;
+        StateHasChanged();
+
+        // Esperar un momento para que se cierre el modal de confirmación
+        await Task.Delay(300);
+
+        // Mostrar el modal de agradecimiento
+        isThankYouModalVisible = true;
         StateHasChanged();
     }
 

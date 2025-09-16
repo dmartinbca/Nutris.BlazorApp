@@ -926,9 +926,9 @@
                     @if (CustomerAccepted && Prefix == "RG35")
                     {
                         <!-- Confirm Button -->
-                        <div class="btn-atr-confirm d-flex justify-content-end">
+                        <div class="btn-atr-confirm">
                             <button @onclick="ShowConfirmModal"
-                                    class="@GetConfirmButtonClass() RalewayRegular font-20"
+                                    class="btn-save-confirm RalewayRegular font-20"
                                     disabled="@(!CanConfirmAndSign)">
                                 @Localization["orderView.ConfirmProductAndSign"]
                             </button>
@@ -948,7 +948,7 @@
                   CodeRG35="@Code"
                   RG37="@RG37Code"
                   PalletComments="@PalletComments" />
-    <ThankYouModal />
+    <ThankYouModal IsModalVisible="@isThankYouModalVisible" />
     <PalletLabelImagenModal CodeRG35="@Code" OnUpdated="HandlePalletLabelUpdated" IsVisible=false  />
     <BoxLabelImagenModal CodeRG35="@Code" OnUpdated="HandleBoxLabelUpdated" />
     <ModalLabel
@@ -991,4 +991,5 @@
                       Materiales="@_opts.Materiales" />
 
 </div>
+
  

@@ -1353,4 +1353,103 @@ button.btn-t {
         min-width: 90px;
         height: 140px;
     }
+    /* Agregar estos estilos al archivo OrdersComponent.css */
+
+    /* Botón Confirm Product and Sign */
+    .btn-save-confirm {
+        display: block;
+        border: solid 1px var(--textButton, #2F5496);
+        border-radius: 30px;
+        line-height: 1rem;
+        font-size: 1.44em;
+        padding: 1.44rem 1.57rem;
+        margin: 0 0 0 auto;
+        transition: all 0.3s ease;
+        background-color: var(--textButton, #2F5496);
+        color: white;
+        cursor: pointer;
+    }
+
+        /* Estado hover del botón cuando está habilitado */
+        .btn-save-confirm:not(:disabled):hover {
+            transition: all 0.3s ease;
+            background-color: transparent;
+            color: var(--textButton, #2F5496);
+        }
+
+        /* Estado deshabilitado del botón */
+        .btn-save-confirm:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #7A8CA8; /* Azul muy desaturado */
+            color: #E0E0E0;
+            border: solid 1px #7A8CA8;
+            filter: grayscale(50%); /* Añade un efecto de escala de grises */
+        }
+      
+    /* Alternativa con clase específica para deshabilitado */
+    .btn-save-confirm-disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background-color: #7A8CA8; /* Azul muy desaturado */
+        color: #E0E0E0;
+        border: solid 1px #7A8CA8;
+        filter: grayscale(50%); /* Añade un efecto de escala de grises */
+    }
+
+    /* Corrección del botón btn-save-confirm-firm que estaba mal definido */
+    .btn-save-confirm-firm {
+        display: block;
+        border: solid 1px #D2D2D2;
+        border-radius: 30px;
+        line-height: 1rem;
+        font-size: 1.44em;
+        padding: 1.44rem 1.57rem;
+        margin: 0 0 0 auto;
+        transition: all 0.3s ease;
+        background-color: transparent;
+        color: #D2D2D2;
+        cursor: not-allowed;
+    }
+
+    /* Ajuste específico para el contenedor del botón */
+    .btn-atr-confirm {
+        padding: 3.96rem 6.93rem 0;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+        .btn-atr-confirm button {
+            min-width: 250px; /* Asegura un ancho mínimo para el botón */
+        }
+
+    /* Estado deshabilitado del botón - Forzar color gris apagado */
+    .btn-save-confirm:disabled,
+    .btn-save-confirm[disabled],
+    button.btn-save-confirm:disabled,
+    button.btn-save-confirm[disabled] {
+        background-color: #C0C0C0 !important; /* Gris claro */
+        border-color: #C0C0C0 !important;
+        color: #FFFFFF !important;
+        opacity: 1 !important; /* Quitamos la opacidad para controlar mejor el color */
+        cursor: not-allowed !important;
+    }
+
+    /* Si aún no funciona, prueba con esta versión más específica */
+    .btn-atr-confirm button.btn-save-confirm:disabled {
+        background-color: #9E9E9E !important; /* Gris medio */
+        border: solid 1px #9E9E9E !important;
+        color: #F5F5F5 !important;
+        opacity: 1 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+    }
+
+    /* Asegurarse de que no haya hover en estado disabled */
+    .btn-save-confirm:disabled:hover,
+    button.btn-save-confirm:disabled:hover {
+        background-color: #9E9E9E !important;
+        border-color: #9E9E9E !important;
+        color: #F5F5F5 !important;
+    }
 }
