@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Nutris.BlazorApp.Components.Modals;
+using NutrisBlazor.Components.Modals;
 using NutrisBlazor.Models;
 using NutrisBlazor.Services;
 using System.Net.Http;
@@ -42,9 +43,13 @@ public class OrdersComponentBase : ComponentBase
     [Parameter] public EventCallback<object> OnPatchRG35 { get; set; }
     [Parameter] public EventCallback<object> OnPatchRG37 { get; set; }
     [Parameter] public EventCallback<object> OnUploadBoxOrPallet { get; set; }
-   
-    public bool isLabelModalOpen;
-    public string? LabelImageUrl;
+    protected bool isLabelModalOpen { get; set; }
+    protected List<LabelOptionMX> LabelOptionsSize { get; set; } = new();
+    protected List<LabelOption> LabelOptionsFinish { get; set; } = new();
+    protected List<LabelOption> LabelOptionsMaterial { get; set; } = new();
+    protected List<LabelOption> LabelOptionsColor { get; set; } = new();
+    protected SelectedLabelOptions selectedLabelOptions { get; set; } = new();
+    public string? LabelImageUrl { get; set; } // 
     // Estado de carga
     protected bool IsLoading { get; set; } = false;
     private bool isBoteCapOpen;
@@ -170,29 +175,32 @@ public class OrdersComponentBase : ComponentBase
     private string? _boteResumen;
     private string? _tapaResumen;
     public readonly OptionLookups _opts = new();
-    // Agregar después de la línea 173 (después de: protected string characteristics = "";)
-    //public Dictionary<string, List<string>> capacidadToDiametros =>
-    //(boteDataList ?? Enumerable.Empty<BoteCapDataModal.BoteDataItem>())
-    //    .Where(b => !string.IsNullOrWhiteSpace(b.Capacidad) && !string.IsNullOrWhiteSpace(b.Diametro))
-    //    .GroupBy(b => b.Capacidad!.Trim())
-    //    .ToDictionary(
-    //        g => g.Key,
-    //        g => g.Select(x => x.Diametro!.Trim())
-    //              .Distinct(StringComparer.OrdinalIgnoreCase)
-    //              .OrderBy(d => d, StringComparer.OrdinalIgnoreCase)
-    //              .ToList()
-    //    );
+    private sealed class LabelOptionsDto
+    {
+        public string? Label_size { get; set; }
+        public string? Label_material { get; set; }
+        public string? Label_finish { get; set; }
+        public string? Label_Color { get; set; }
+    }
     private async Task OpenLabelModalAsync()
     {
         await ReloadLabelPreviewAsync();
         isLabelOpen = true;
     }
+    protected async Task OpenLabelModal()
+    {
+        // (Opcional) refrescar el preview desde API si quieres traer la última imagen
+        await ReloadLabelPreviewAsync();
+        isLabelModalOpen = true;
+        StateHasChanged();
+    }
     protected Task CloseLabelModal()
     {
-        isLabelOpen = false;
+        isLabelModalOpen = false;
         StateHasChanged();
         return Task.CompletedTask;
     }
+     
     private async Task ReloadLabelPreviewAsync()
     {
         // Si tu API devuelve bytes:
@@ -470,6 +478,7 @@ public class OrdersComponentBase : ComponentBase
 
         if (Atributos.ValueKind == JsonValueKind.Object)
             BuildOptionLookupsFromAtributos(Atributos);
+
     }
     private void BuildOptionLookupsFromAtributos(JsonElement atributos)
     {
@@ -975,6 +984,68 @@ public class OrdersComponentBase : ComponentBase
 
         SumAnalytics = AnalyticsRows.FirstOrDefault()?.Price ?? 0;
         characteristics = data.Characteristics ?? "";
+        selectedLabelOptions = new SelectedLabelOptions
+        {
+            LabelSize = data.Label_size ?? "",
+            LabelMaterial = data.Label_material ?? "",
+            LabelFinish = data.Label_finish ?? "",
+            LabelColors = data.Label_color ?? ""
+        };
+
+        // Imagen final de etiqueta (si existe)
+        if (!string.IsNullOrEmpty(data.Label_imagen))
+            LabelImageUrl = $"data:image/png;base64,{data.Label_imagen}";
+        else
+            LabelImageUrl = null;
+
+
+    }
+    private static List<LabelOption> MapAttrToLabelOption(JsonElement valueArr, int idx)
+    {
+        var list = new List<LabelOption>();
+        if (idx < 0 || idx >= valueArr.GetArrayLength()) return list;
+
+        int id = 1;
+        foreach (var v in valueArr[idx].GetProperty("valoresAtributos").EnumerateArray())
+        {
+            var val = v.TryGetProperty("Value", out var ve) ? ve.GetString() ?? "" : "";
+            if (string.IsNullOrWhiteSpace(val)) continue;
+            list.Add(new LabelOption { ID = id++, Value = val.Trim() });
+        }
+        return list;
+    }
+
+    private static List<LabelOptionMX> MapAttrToLabelOptionMX(JsonElement valueArr, int idx)
+    {
+        var list = new List<LabelOptionMX>();
+        if (idx < 0 || idx >= valueArr.GetArrayLength()) return list;
+
+        int id = 1;
+        foreach (var v in valueArr[idx].GetProperty("valoresAtributos").EnumerateArray())
+        {
+            var val = v.TryGetProperty("Value", out var ve) ? ve.GetString() ?? "" : "";
+            var img = v.TryGetProperty("Imagen", out var im) ? (im.GetString() ?? "") : "";
+            if (string.IsNullOrWhiteSpace(val)) continue;
+            list.Add(new LabelOptionMX { ID = id++, Value = val.Trim(), Imagen = img });
+        }
+        return list;
+    }
+
+    private void BuildLabelCatalogsFromAtributos(JsonElement atributos)
+    {
+        if (!atributos.TryGetProperty("value", out var valueArr) || valueArr.ValueKind != JsonValueKind.Array)
+            return;
+
+        // Índices (los mismos que usabas en tu VUE):
+        // optionsSizeLabel     -> value[16]  (usa MX)
+        // optionsFinish        -> value[8]
+        // optionsLabelMaterial -> value[9]
+        // optionsColorLabel    -> value[10]
+
+        LabelOptionsSize = MapAttrToLabelOptionMX(valueArr, 16);
+        LabelOptionsFinish = MapAttrToLabelOption(valueArr, 8);
+        LabelOptionsMaterial = MapAttrToLabelOption(valueArr, 9);
+        LabelOptionsColor = MapAttrToLabelOption(valueArr, 10);
     }
 
     private void LoadFromRG37(CustomizeRG37Response data)
@@ -1071,6 +1142,10 @@ public class OrdersComponentBase : ComponentBase
 
                 // Aquí podrías cargar las opciones específicas según los índices
                 // Por ejemplo: OptionsSize, OptionsSizeLabel, etc.
+            }
+            if (Atributos.ValueKind == JsonValueKind.Object)
+            {
+                BuildLabelCatalogsFromAtributos(Atributos);
             }
         }
         catch (Exception ex)
@@ -1534,23 +1609,60 @@ public class OrdersComponentBase : ComponentBase
             Console.WriteLine(ex.Message, "Error handling box label update");
         }
     }
-    protected void HandleBoxLabelUpdated(string newUrl)
+    protected async Task HandleLabelOptionsUpdated(ModalLabel.LabelOptionsUpdatedEventArgs e)
     {
-        BoxLabelImg = newUrl;
+        // e.SentData tiene lo que enviaste; e.Response la respuesta cruda
+        await ReloadOrderAsync();          // refresca datos (o actualiza solo lo necesario)
+        var json = JsonSerializer.Serialize(e.SentData);
+        var dto = JsonSerializer.Deserialize<LabelOptionsDto>(json);
+
+        if (dto is null) return;
+
+        // Asegura 4 filas en LabelInfo y actualiza valores mostrados
+        while (LabelInfo.Count < 4) LabelInfo.Add(new InputItem());
+        LabelInfo[0].Value = string.IsNullOrWhiteSpace(dto.Label_size) ? "-" : dto.Label_size;
+        LabelInfo[1].Value = string.IsNullOrWhiteSpace(dto.Label_material) ? "-" : dto.Label_material;
+        LabelInfo[2].Value = string.IsNullOrWhiteSpace(dto.Label_finish) ? "-" : dto.Label_finish;
+        LabelInfo[3].Value = string.IsNullOrWhiteSpace(dto.Label_Color) ? "-" : dto.Label_Color;
+
+        // Recalcula % de la sección Label y refresca
+        CalculateLabelPercentage();
+        await InvokeAsync(StateHasChanged);
+    }
+    protected async Task HandleDraftLabelUpdated(object payload)
+    {
+        await ReloadLabelPreviewAsync();   // vuelve a traer la imagen
+        try
+        {
+            var json = payload?.ToString() ?? "{}";
+            using var doc = JsonDocument.Parse(json);
+
+            string? base64 = null;
+
+            // según cómo te responda la API
+            if (doc.RootElement.TryGetProperty("Label_imagen", out var v))
+                base64 = v.GetString();
+            else if (doc.RootElement.TryGetProperty("data", out var d) &&
+                     d.TryGetProperty("Label_imagen", out var v2))
+                base64 = v2.GetString();
+
+            if (!string.IsNullOrWhiteSpace(base64))
+            {
+                LabelImageUrl = base64.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
+                    ? base64
+                    : $"data:image/png;base64,{base64}";
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+        catch { /* opcional: log */ }
+        CalculateLabelPercentage();
         StateHasChanged();
+         
     }
 
-    protected void HandleLabelOptionsUpdated(object payload)
-    {
-        // Actualizar opciones de etiqueta
-        StateHasChanged();
-    }
 
-    protected void HandleDraftLabelUpdated(object payload)
-    {
-        // Actualizar borrador de etiqueta
-        StateHasChanged();
-    }
+     
     protected override async Task OnInitializedAsync()
     {
         try

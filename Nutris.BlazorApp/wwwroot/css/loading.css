@@ -1,62 +1,10 @@
-/* Loading.css optimizado */
-
-/* Prevenir parpadeo inicial */
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    /* Animación de entrada suave */
-    animation: fadeIn 0.4s ease-in;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-.loading-container {
-    background-color: white;
-    padding: 3rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    min-width: 250px;
-    /* Animación de escala suave */
-    animation: scaleIn 0.3s ease-out;
-}
-
-@keyframes scaleIn {
-    from {
-        transform: scale(0.95);
-        opacity: 0;
-    }
-
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
+/* Estilos específicos para imagen Base64 dentro del spinner */
 
 .spinner-wrapper {
     position: relative;
     width: 80px;
     height: 80px;
     margin: 0 auto;
-    /* Importante: overflow hidden para contener la imagen */
-    overflow: hidden;
-    border-radius: 50%;
 }
 
 .spinner-circle {
@@ -69,34 +17,60 @@
     animation: spin 1s linear infinite;
 }
 
-/* Imagen con tamaño fijo desde el inicio */
+/* Imagen normal desde URL */
 .center-logo {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 81px !important;
-    height: 81px !important;
-    max-width: 81px !important;
-    max-height: 81px !important;
+    width: 60px; /* Reducido para que quepa dentro del spinner */
+    height: 60px;
     object-fit: contain;
-    /* Prevenir parpadeo de la imagen */
+    border-radius: 50%;
     opacity: 0;
-    animation: imageFadeIn 0.3s ease-in 0.1s forwards;
-    /* Evitar que la imagen se muestre antes de estar posicionada */
+    animation: logoFadeIn 0.8s ease-in 0.3s forwards;
     visibility: hidden;
     animation-fill-mode: both;
 }
 
-@keyframes imageFadeIn {
+/* Contenedor para imagen Base64 */
+.center-logo-base64 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px; /* Tamaño ajustado para caber dentro del spinner */
+    height: 60px;
+    background-size: contain; /* Ajusta la imagen al contenedor */
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 50%;
+    /* Aparición gradual */
+    opacity: 0;
+    animation: logoFadeIn 0.8s ease-in 0.3s forwards;
+    visibility: hidden;
+    animation-fill-mode: both;
+}
+
+    /* Si prefieres que la imagen Base64 tenga un fondo */
+    .center-logo-base64.with-background {
+        background-color: white;
+        padding: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+/* Animación de aparición gradual */
+@keyframes logoFadeIn {
     0% {
         visibility: visible;
         opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
     }
 
     100% {
         visibility: visible;
         opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
     }
 }
 
@@ -110,29 +84,35 @@
     }
 }
 
-.loading-text {
-    margin-top: 1.5rem;
-    color: #333;
-    font-size: 1.1rem;
-    font-family: 'Raleway', sans-serif;
-    /* Fade in del texto */
-    opacity: 0;
-    animation: textFadeIn 0.4s ease-in 0.2s forwards;
+/* Ajustes para diferentes tamaños de spinner */
+.spinner-wrapper.small {
+    width: 60px;
+    height: 60px;
 }
 
-@keyframes textFadeIn {
-    to {
-        opacity: 1;
+    .spinner-wrapper.small .spinner-circle {
+        width: 60px;
+        height: 60px;
     }
-}
 
-/* Clase adicional para cuando el loading se está ocultando */
-.loading-overlay.hiding {
-    animation: fadeOut 0.2s ease-out forwards;
-}
-
-@keyframes fadeOut {
-    to {
-        opacity: 0;
+    .spinner-wrapper.small .center-logo,
+    .spinner-wrapper.small .center-logo-base64 {
+        width: 45px;
+        height: 45px;
     }
+
+.spinner-wrapper.large {
+    width: 100px;
+    height: 100px;
 }
+
+    .spinner-wrapper.large .spinner-circle {
+        width: 100px;
+        height: 100px;
+    }
+
+    .spinner-wrapper.large .center-logo,
+    .spinner-wrapper.large .center-logo-base64 {
+        width: 75px;
+        height: 75px;
+    }

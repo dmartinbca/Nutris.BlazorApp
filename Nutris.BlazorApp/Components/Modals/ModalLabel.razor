@@ -3,6 +3,7 @@
 @using System.Text.Json
 @using Microsoft.AspNetCore.Components.Forms
 @using NutrisBlazor.Components.Shared
+@using NutrisBlazor.Models
 @inject ILocalizationService Localization
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
@@ -23,7 +24,7 @@
                     <button type="button" class="b-close" @onclick="CloseModal">
                         <img class="btn-close"
                              aria-label="Close"
-                             src="/img/close-x.svg"
+                             src="img/close-x.svg"
                              alt="" />
                     </button>
                 </div>
@@ -119,7 +120,7 @@
                                                    class="container-donload-file-text"
                                                    style="cursor:pointer; display:inline-block;"
                                                    target="_blank">
-                                                    <img src="/img/arrow-d.svg" alt="download" /><br />
+                                                    <img src="img/arrow-d.svg" alt="download" /><br />
                                                     @Localization["ModalLabel.Downloadsample"]
                                                 </a>
                                             }
@@ -234,13 +235,15 @@
     // Parameters
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
+
+    [Parameter] public string CodeRG35 { get; set; } = "";
+    [Parameter] public string FinalImagen { get; set; } = "";
+
     [Parameter] public List<OptionMX> OptionsSizeLabel { get; set; } = new();
     [Parameter] public List<Option> OptionsFinish { get; set; } = new();
     [Parameter] public List<Option> OptionsLabelMaterial { get; set; } = new();
     [Parameter] public List<Option> OptionsColorLabel { get; set; } = new();
     [Parameter] public SelectedLabelOptions? SelectedOptionLabels { get; set; }
-    [Parameter] public string CodeRG35 { get; set; } = "";
-    [Parameter] public string FinalImagen { get; set; } = "";
     [Parameter] public EventCallback<LabelOptionsUpdatedEventArgs> OnLabelOptionsUpdated { get; set; }
     [Parameter] public EventCallback<object> OnDraftLabelUpdated { get; set; }
 

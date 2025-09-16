@@ -1,7 +1,10 @@
-﻿ 
+﻿@using NutrisBlazor.Components.Modals
+@using NutrisBlazor.Models
 @using Nutris.BlazorApp.Components.Modals
 @using Nutris.BlazorApp.Components.Orders.Steps
-@using NutrisBlazor.Models
+@using ML = NutrisBlazor.Components.Modals.ModalLabel
+
+
 @using NutrisBlazor.Services
 @using System.Text.Json
 @inherits OrdersComponentBase
@@ -625,7 +628,7 @@
                                             <h3 class="font-18 RalewayExtraBold">@Localization["orderView.GUMMYDNA"]</h3>
                                             @if (Status == "Desarrollo" && !NoLabel)
                                             {
-                                                <button class="btn-t RalewayMedium font-20" type="button" data-bs-toggle="modal" data-bs-target="#sidebarRightModal2">
+                                                <button class="btn-t RalewayMedium font-20" type="button" @onclick="OpenLabelModal">
                                                     <img src="/img/pencil-icon.svg" alt="edit">@Localization["Edit"]
                                                 </button>
                                             }
@@ -944,7 +947,28 @@
     <ThankYouModal />
     <PalletLabelImagenModal CodeRG35="@Code" OnUpdated="HandlePalletLabelUpdated" IsVisible=false  />
     <BoxLabelImagenModal CodeRG35="@Code" OnUpdated="HandleBoxLabelUpdated" />
-    <ModalLabel OnLabelOptionsUpdated="HandleLabelOptionsUpdated" OnDraftLabelUpdated="HandleDraftLabelUpdated" />
+    <ModalLabel
+    IsVisible="@isLabelModalOpen"
+    OnClose="CloseLabelModal"
+
+    OptionsSizeLabel="@(OptionsSizeLabel.Select((x, i) => new ML.OptionMX { ID = i + 1, Value = x.Value, Imagen = "" }).ToList())"
+    OptionsFinish="@(OptionsFinish.Select((x, i) => new ML.Option { ID = i + 1, Value = x.Value }).ToList())"
+    OptionsLabelMaterial="@(OptionsLabelMaterial.Select((x, i) => new ML.Option { ID = i + 1, Value = x.Value }).ToList())"
+    OptionsColorLabel="@(OptionsColorLabel.Select((x, i) => new ML.Option { ID = i + 1, Value = x.Value }).ToList())"
+
+    SelectedOptionLabels="@(new ModalLabel.SelectedLabelOptions {
+        LabelSize     = RG35?.Label_size,
+        LabelMaterial = RG35?.Label_material,
+        LabelFinish   = RG35?.Label_finish,
+        LabelColors   = RG35?.Label_color
+    })"
+
+    CodeRG35="@Code"
+    FinalImagen="@LabelImageUrl"
+
+    OnLabelOptionsUpdated="HandleLabelOptionsUpdated"
+    OnDraftLabelUpdated="HandleDraftLabelUpdated" />
+
     <BoteCapDataModal @ref="modalRef"
                       SelectedOption="@selectedBoteOption"
                       SelectedOptionCap="@selectedCapOption"
