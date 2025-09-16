@@ -182,25 +182,32 @@ public class OrdersComponentBase : ComponentBase
         public string? Label_finish { get; set; }
         public string? Label_Color { get; set; }
     }
+
+    protected List<NutrisBlazor.Components.Modals.ModalLabel.OptionMX> MapSizeMx(List<AtributoOption> src) =>
+    src.Select((x, i) => new NutrisBlazor.Components.Modals.ModalLabel.OptionMX
+    {
+        ID = i + 1,
+        Value = x.Value ?? "",
+        Imagen = ""
+    }).ToList();
+
+    protected List<NutrisBlazor.Components.Modals.ModalLabel.Option> MapSimple(List<AtributoOption> src) =>
+    src.Select((x, i) => new NutrisBlazor.Components.Modals.ModalLabel.Option
+    {
+        ID = i + 1,
+        Value = x.Value ?? ""
+    }).ToList();
+
+    protected Task OpenLabelModal() { isLabelModalOpen = true; StateHasChanged(); return Task.CompletedTask; }
+    protected Task CloseLabelModal() { isLabelModalOpen = false; StateHasChanged(); return Task.CompletedTask; }
     private async Task OpenLabelModalAsync()
     {
         await ReloadLabelPreviewAsync();
         isLabelOpen = true;
     }
-    protected async Task OpenLabelModal()
-    {
-        // (Opcional) refrescar el preview desde API si quieres traer la última imagen
-        await ReloadLabelPreviewAsync();
-        isLabelModalOpen = true;
-        StateHasChanged();
-    }
-    protected Task CloseLabelModal()
-    {
-        isLabelModalOpen = false;
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-     
+   
+  
+
     private async Task ReloadLabelPreviewAsync()
     {
         // Si tu API devuelve bytes:
@@ -1114,45 +1121,46 @@ public class OrdersComponentBase : ComponentBase
     {
         try
         {
-            // Cargar formatos de lote y BBD
+            // ---- Lote / BBD (ya lo tenías) ----
             if (LotFormat.ValueKind == JsonValueKind.Object && LotFormat.TryGetProperty("value", out var lotValues))
-            {
-                BatchFormats = lotValues.EnumerateArray()
-                    .Select(item => new FormatOption
-                    {
-                        Format = item.TryGetProperty("Format", out var f) ? f.GetString() ?? "" : ""
-                    })
-                    .ToList();
-            }
+                BatchFormats = lotValues.EnumerateArray().Select(i => new FormatOption { Format = i.GetProperty("Format").GetString() ?? "" }).ToList();
 
             if (BbdFormat.ValueKind == JsonValueKind.Object && BbdFormat.TryGetProperty("value", out var bbdValues))
+                BbdFormats = bbdValues.EnumerateArray().Select(i => new FormatOption { Format = i.GetProperty("Format").GetString() ?? "" }).ToList();
+
+            // ---- Atributos → opciones del modal ----
+            if (!(Atributos.ValueKind == JsonValueKind.Object && Atributos.TryGetProperty("value", out var attrValues)))
+                return;
+
+            var arr = attrValues.EnumerateArray().ToList();
+
+            List<AtributoOption> FromIndex(int idx)
             {
-                BbdFormats = bbdValues.EnumerateArray()
-                    .Select(item => new FormatOption
-                    {
-                        Format = item.TryGetProperty("Format", out var f) ? f.GetString() ?? "" : ""
-                    })
-                    .ToList();
+                if (idx < 0 || idx >= arr.Count) return new();
+                if (!arr[idx].TryGetProperty("valoresAtributos", out var vals)) return new();
+                return vals.EnumerateArray()
+                           .Select(v => new AtributoOption
+                           {
+                               Value = v.TryGetProperty("Value", out var ve) ? (ve.GetString() ?? "") : "",
+                               Display = v.TryGetProperty("Value", out var ve2) ? (ve2.GetString() ?? "") : ""
+                           })
+                           .Where(x => !string.IsNullOrWhiteSpace(x.Value))
+                           .ToList();
             }
 
-            // Cargar atributos si están disponibles
-            if (Atributos.ValueKind == JsonValueKind.Object && Atributos.TryGetProperty("value", out var attrValues))
-            {
-                var attrArray = attrValues.EnumerateArray().ToList();
-
-                // Aquí podrías cargar las opciones específicas según los índices
-                // Por ejemplo: OptionsSize, OptionsSizeLabel, etc.
-            }
-            if (Atributos.ValueKind == JsonValueKind.Object)
-            {
-                BuildLabelCatalogsFromAtributos(Atributos);
-            }
+            // Índices iguales al proyecto Vue:
+            //   SizeLabel = [16],  Finish = [8],  LabelMaterial = [9],  ColorLabel = [10]
+            OptionsSizeLabel = FromIndex(16);
+            OptionsFinish = FromIndex(8);
+            OptionsLabelMaterial = FromIndex(9);
+            OptionsColorLabel = FromIndex(10);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading catalog options: {ex.Message}");
         }
     }
+
 
     private void CalculateAllPercentages()
     {
@@ -1611,58 +1619,25 @@ public class OrdersComponentBase : ComponentBase
     }
     protected async Task HandleLabelOptionsUpdated(ModalLabel.LabelOptionsUpdatedEventArgs e)
     {
-        // e.SentData tiene lo que enviaste; e.Response la respuesta cruda
-        await ReloadOrderAsync();          // refresca datos (o actualiza solo lo necesario)
-        var json = JsonSerializer.Serialize(e.SentData);
-        var dto = JsonSerializer.Deserialize<LabelOptionsDto>(json);
-
-        if (dto is null) return;
-
-        // Asegura 4 filas en LabelInfo y actualiza valores mostrados
-        while (LabelInfo.Count < 4) LabelInfo.Add(new InputItem());
-        LabelInfo[0].Value = string.IsNullOrWhiteSpace(dto.Label_size) ? "-" : dto.Label_size;
-        LabelInfo[1].Value = string.IsNullOrWhiteSpace(dto.Label_material) ? "-" : dto.Label_material;
-        LabelInfo[2].Value = string.IsNullOrWhiteSpace(dto.Label_finish) ? "-" : dto.Label_finish;
-        LabelInfo[3].Value = string.IsNullOrWhiteSpace(dto.Label_Color) ? "-" : dto.Label_Color;
-
-        // Recalcula % de la sección Label y refresca
+        // Si quieres, puedes parsear e.Response o e.SentData para refrescar UI local
+        // Por simplicidad, recarga porcentajes y cierra el modal
         CalculateLabelPercentage();
         await InvokeAsync(StateHasChanged);
+        isLabelModalOpen = false;
     }
-    protected async Task HandleDraftLabelUpdated(object payload)
+    protected async Task HandleDraftLabelUpdated(ModalLabel.DraftLabelUpdatedEventArgs e)
     {
-        await ReloadLabelPreviewAsync();   // vuelve a traer la imagen
-        try
+        if (!string.IsNullOrEmpty(e.Base64))
         {
-            var json = payload?.ToString() ?? "{}";
-            using var doc = JsonDocument.Parse(json);
-
-            string? base64 = null;
-
-            // según cómo te responda la API
-            if (doc.RootElement.TryGetProperty("Label_imagen", out var v))
-                base64 = v.GetString();
-            else if (doc.RootElement.TryGetProperty("data", out var d) &&
-                     d.TryGetProperty("Label_imagen", out var v2))
-                base64 = v2.GetString();
-
-            if (!string.IsNullOrWhiteSpace(base64))
-            {
-                LabelImageUrl = base64.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
-                    ? base64
-                    : $"data:image/png;base64,{base64}";
-            }
-
+            // construimos un data URL y lo mostramos en la UI
+            LabelImageUrl = e.DataUrl;   // p.ej. "data:image/png;base64,...."
+            CalculateLabelPercentage();  // si tu porcentaje depende de tener imagen
             await InvokeAsync(StateHasChanged);
         }
-        catch { /* opcional: log */ }
-        CalculateLabelPercentage();
-        StateHasChanged();
-         
     }
 
 
-     
+
     protected override async Task OnInitializedAsync()
     {
         try

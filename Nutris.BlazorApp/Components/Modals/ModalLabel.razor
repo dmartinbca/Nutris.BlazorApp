@@ -9,7 +9,7 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ILogger<ModalLabel> Logger
-
+@inject IApiService ApiService
 <link href="css/ModalLabel.css" rel="stylesheet" />
 @if (!isLoading)
 {
@@ -50,7 +50,7 @@
                                             <label class="form-group-label-size" for="size">
                                                 @Localization["modalLabel.Maximumsize"]
                                             </label>
-                                            <select class="form-select-config font-16 Museo"
+                                            <select class="form-select-config Museo size-select"
                                                     @bind="labelSize"
                                                     @bind:after="FetchPdfOnSizeChange"
                                                     disabled>
@@ -188,14 +188,15 @@
                                         <span class="child_content-label-info-title font-24 RalewayMedium">
                                             @Localization["ModalLabel.FinalLabel"]
                                         </span>
-                                        
+
                                         @if (!string.IsNullOrEmpty(FinalImagen))
                                         {
-                                            <div class="child_content-label-button">
-                                                <span @onclick="DownloadImage" 
+                                            <div class="final-label-actions">
+                                                <span @onclick="DownloadImage"
                                                       class="child_content-label-button-upload cursor-pointer font-20 RalewayBold">
                                                     @Localization["ModalLabel.DownloadLabel"]
                                                 </span>
+
                                                 <span class="RalewayRegular font-20">
                                                     @Localization["ModalLabel.finalLabelmessage"]
                                                 </span>
@@ -209,6 +210,7 @@
                                                 </span>
                                             </div>
                                         }
+
                                     </div>
                                 </div>
                             </div>
@@ -245,15 +247,23 @@
     [Parameter] public List<Option> OptionsColorLabel { get; set; } = new();
     [Parameter] public SelectedLabelOptions? SelectedOptionLabels { get; set; }
     [Parameter] public EventCallback<LabelOptionsUpdatedEventArgs> OnLabelOptionsUpdated { get; set; }
-    [Parameter] public EventCallback<object> OnDraftLabelUpdated { get; set; }
-
+    [Parameter] public EventCallback<DraftLabelUpdatedEventArgs> OnDraftLabelUpdated { get; set; }
+    public class DraftLabelUpdatedEventArgs
+    {
+        public string? Base64 { get; set; }
+        public string? ContentType { get; set; }  // ej: "image/png"
+        public string? DataUrl =>
+            string.IsNullOrEmpty(Base64)
+                ? null
+                : $"data:{(string.IsNullOrEmpty(ContentType) ? "image/png" : ContentType)};base64,{Base64}";
+    }
     // State variables
     private bool isLoading = false;
     private string? previewImage = null;
     private string? base64Data = null;
     private string? pdfDownloadUrl = null;
     private long maxFileSize = 10 * 1024 * 1024; // 10MB
-
+    private string? uploadedContentType;
     // Form fields
     private string labelSize = "";
     private string labelMaterial = "";
@@ -262,18 +272,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Initialize from SelectedOptionLabels
         if (SelectedOptionLabels != null)
         {
             labelSize = SelectedOptionLabels.LabelSize ?? "";
             labelMaterial = SelectedOptionLabels.LabelMaterial ?? "";
             labelFinish = SelectedOptionLabels.LabelFinish ?? "";
             labelColors = SelectedOptionLabels.LabelColors ?? "";
-            
+
             if (!string.IsNullOrEmpty(labelSize))
-            {
                 await FetchPdfOnSizeChange();
-            }
         }
     }
 
@@ -282,68 +289,54 @@
         // Update when parameters change
         if (SelectedOptionLabels != null)
         {
-            labelSize = SelectedOptionLabels.LabelSize ?? labelSize;
-            labelMaterial = SelectedOptionLabels.LabelMaterial ?? labelMaterial;
-            labelFinish = SelectedOptionLabels.LabelFinish ?? labelFinish;
-            labelColors = SelectedOptionLabels.LabelColors ?? labelColors;
+            labelSize = SelectedOptionLabels.LabelSize ?? "";
+            labelMaterial = SelectedOptionLabels.LabelMaterial ?? "";
+            labelFinish = SelectedOptionLabels.LabelFinish ?? "";
+            labelColors = SelectedOptionLabels.LabelColors ?? "";
+
+            if (!string.IsNullOrEmpty(labelSize))
+                await FetchPdfOnSizeChange();
         }
     }
 
     private async Task FetchPdfOnSizeChange()
     {
-        // Clean up previous URL if exists
-        if (!string.IsNullOrEmpty(pdfDownloadUrl))
+        var response = await ApiService.PostAsync2("troquelPDF(1)/Microsoft.NAV.Download?tenant=nutris", new { numeroTroquel = labelSize }
+);
+
+        if (response.IsSuccessStatusCode)
         {
-            await JSRuntime.InvokeVoidAsync("URL.revokeObjectURL", pdfDownloadUrl);
-            pdfDownloadUrl = null;
-        }
+            var responseContent = await response.Content.ReadAsStringAsync();
 
-        if (string.IsNullOrEmpty(labelSize))
-        {
-            return;
-        }
+            string? base64 = null;
+            using var jsonDoc = JsonDocument.Parse(responseContent);
 
-        var data = new { numeroTroquel = labelSize };
+            // OData actual (como en Vue): { "value": "..." }
+            if (jsonDoc.RootElement.TryGetProperty("value", out var valueEl))
+                base64 = valueEl.GetString();
+            // fallback por si viene anidado: { "data": { "value": "..." } }
+            else if (jsonDoc.RootElement.TryGetProperty("data", out var dataEl) &&
+                     dataEl.TryGetProperty("value", out var nestedVal))
+                base64 = nestedVal.GetString();
 
-        try
-        {
-            var response = await Http.PostAsJsonAsync(
-                "api/troquelPDF(1)/Microsoft.NAV.Download",
-                data
-            );
-
-            if (response.IsSuccessStatusCode)
+            if (!string.IsNullOrWhiteSpace(base64))
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var jsonDoc = JsonDocument.Parse(responseContent);
-                
-                if (jsonDoc.RootElement.TryGetProperty("data", out var dataElement) &&
-                    dataElement.TryGetProperty("value", out var valueElement))
-                {
-                    var base64 = valueElement.GetString();
-                    
-                    if (!string.IsNullOrEmpty(base64))
-                    {
-                        // Remove prefix if present
-                        if (base64.StartsWith("data:application/pdf;base64,"))
-                        {
-                            base64 = base64.Replace("data:application/pdf;base64,", "");
-                        }
-                        
-                        // Remove whitespace
-                        base64 = base64.Replace(" ", "").Replace("\n", "").Replace("\r", "");
-                        
-                        // Create blob URL using JavaScript
-                        pdfDownloadUrl = await CreateBlobUrl(base64, "application/pdf");
-                    }
-                }
+                if (base64.StartsWith("data:application/pdf;base64,", StringComparison.OrdinalIgnoreCase))
+                    base64 = base64.Substring("data:application/pdf;base64,".Length);
+                base64 = base64.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+
+                pdfDownloadUrl = await CreateBlobUrl(base64, "application/pdf");
+            }
+            else
+            {
+                pdfDownloadUrl = null;
             }
         }
-        catch (Exception ex)
+        else
         {
-            Logger.LogError(ex, "Error fetching PDF for troquel");
             pdfDownloadUrl = null;
         }
+
     }
 
     private async Task<string> CreateBlobUrl(string base64, string mimeType)
@@ -377,7 +370,7 @@
             using var memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream);
             var bytes = memoryStream.ToArray();
-            
+            uploadedContentType = file.ContentType; // NUEVO
             // Create base64 string
             base64Data = Convert.ToBase64String(bytes);
             previewImage = $"data:{file.ContentType};base64,{base64Data}";
@@ -410,10 +403,7 @@
 
         try
         {
-            var response = await Http.PatchAsJsonAsync(
-                $"api/CustomizeRG35('{CodeRG35}')?$expand=Formulation,Recipe,Analytics&tenant=nutris",
-                data
-            );
+            var response = await ApiService.PatchAsync($"CustomizeRG35('{CodeRG35}')?$expand=Formulation,Recipe,Analytics&tenant=nutris",data);
 
             if (response.IsSuccessStatusCode)
             {
@@ -428,7 +418,9 @@
                 };
                 
                 await OnLabelOptionsUpdated.InvokeAsync(eventData);
-                
+                if (!string.IsNullOrEmpty(base64Data))
+                    await OnDraftLabelUpdated.InvokeAsync(new DraftLabelUpdatedEventArgs { Base64 = base64Data, ContentType = uploadedContentType });
+
                 // Close modal after delay
                 await Task.Delay(500);
                 await CloseModal();
@@ -452,43 +444,28 @@
         }
     }
 
+ 
+
     private async Task UpdatedDraftLabel()
     {
-        if (string.IsNullOrEmpty(base64Data))
-        {
-            await ShowAlert("Please select an image first");
-            return;
-        }
+        if (string.IsNullOrEmpty(base64Data)) { await ShowAlert("Please select an image first"); return; }
+        isLoading = true; StateHasChanged();
 
-        isLoading = true;
-        StateHasChanged();
-
-        var data = new
-        {
-            numeroRG = CodeRG35,
-            tipoImagen = "Label_imagen",
-            imagenBase64 = base64Data
-        };
-
-        Logger.LogInformation("Updating draft label for {CodeRG35}", CodeRG35);
-
+        var data = new { numeroRG = CodeRG35, tipoImagen = "Label_imagen", imagenBase64 = base64Data };
         try
         {
-            var response = await Http.PostAsJsonAsync(
-                "api/modificarImagen(1)/Microsoft.NAV.modificarCab",
-                data
-            );
+            var response = await ApiService.PostAsync2("modificarImagen(1)/Microsoft.NAV.modificarCab?tenant=nutris", data);
 
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                Logger.LogInformation("Draft label updated successfully");
+                // 👉 Notifica al padre con lo que ACABAS de subir
+                await OnDraftLabelUpdated.InvokeAsync(new DraftLabelUpdatedEventArgs
+                {
+                    Base64 = base64Data,
+                    ContentType = uploadedContentType
+                });
 
-                // Emit event to parent component
-                await OnDraftLabelUpdated.InvokeAsync(responseContent);
-                
-                // Close modal after delay
-                await Task.Delay(500);
+                await Task.Delay(300);
                 await CloseModal();
             }
             else
@@ -509,6 +486,7 @@
             StateHasChanged();
         }
     }
+
 
     private async Task DownloadImage()
     {
@@ -538,7 +516,7 @@
         // Clean up blob URL if exists
         if (!string.IsNullOrEmpty(pdfDownloadUrl))
         {
-            await JSRuntime.InvokeVoidAsync("URL.revokeObjectURL", pdfDownloadUrl);
+           await JSRuntime.InvokeVoidAsync("revokeBlobUrl", pdfDownloadUrl);
             pdfDownloadUrl = null;
         }
         
@@ -634,4 +612,6 @@
             }
         }
     };
+      window.revokeBlobUrl = (url) => { try { URL.revokeObjectURL(url); } catch(e){} }
+
 </script>

@@ -151,6 +151,7 @@
             IsLoading = true;
             StateHasChanged();
 
+          
             var data = new
             {
                 numeroRG = CodeRG35,
@@ -158,7 +159,7 @@
                 imagenBase64 = Base64Data
             };
 
-            var response = await ApiService.PostAsync("modificarImagen(1)/Microsoft.NAV.modificarCab?$tenant=nutris", data);
+            var response = await ApiService.PostAsync2("modificarImagen(1)/Microsoft.NAV.modificarCab?tenant=nutris", data);
 
             if (response.IsSuccessStatusCode)
             {

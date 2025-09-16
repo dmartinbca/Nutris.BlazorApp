@@ -68,8 +68,8 @@
     height: 100%;
     max-height: calc(120vh);
     overflow-y: auto;
-    border-top-left-radius: 40px;
-    border-bottom-left-radius: 40px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
     border: none;
 }
 
@@ -497,5 +497,128 @@
         width: 100%;
         max-width: 200px;
         margin: 5px 0;
+    }
+}
+/* Que los inputs de esa fila ocupen todo el ancho disponible */
+.child_content_features-bottle-form {
+    display: flex;
+    gap: 1rem;
+}
+
+    .child_content_features-bottle-form .form-grup-input-field {
+        flex: 1 1 0;
+        min-width: 220px;
+    }
+
+    .child_content_features-bottle-form .form-select-config {
+        width: 100% !important; /* antes eran 238px */
+    }
+
+/* Sólo para el select de “Tamaño máximo” */
+.size-select {
+    font-size: 0.95rem; /* un pelín más pequeño */
+    padding-right: 2.5rem; /* para el caret */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    height: 60px; /* mantiene altura del diseño */
+}
+
+/* Si tienes pantallas grandes, aún más ancho visual */
+@media (min-width: 1280px) {
+    .size-select {
+        min-width: 360px;
+    }
+}
+/* Quita el padding que bootstrap mete al body cuando hay modal (por la scrollbar) */
+body.modal-open {
+    padding-right: 0 !important;
+}
+
+/* El overlay del modal a pantalla completa, sin padding extra */
+.modal.sidebar-right {
+    padding-right: 0 !important;
+}
+
+    /* El diálogo pegado al borde derecho y sin márgenes */
+    .modal.sidebar-right .modal-dialog {
+        position: fixed;
+        top: 0;
+        right: 0;
+        margin: 0 !important;
+        width: 100vw; /* ocupa todo el ancho posible */
+        max-width: 1263px; /* tu ancho objetivo */
+        height: 100%;
+        transform: translateX(0); /* ya visible */
+    }
+
+/* Asegura que el contenido no genera espacio */
+.modal-dialog.modal-dialog-right {
+    margin: 0 !important;
+}
+.final-label-actions {
+    display: flex;
+    flex-direction: column; /* botón encima, texto debajo */
+    align-items: flex-start;
+    gap: .5rem;
+}
+
+    /* Si quieres que el botón no ocupe todo el ancho */
+    .final-label-actions .child_content-label-button-upload {
+        width: auto;
+        min-width: 240px; /* opcional */
+        text-align: center;
+    }
+
+/* Centrar botón + texto en "Etiqueta final" */
+.chil_content_info_upload .child_content-label-button {
+    display: flex;
+    flex-direction: column; /* botón arriba, texto debajo */
+    align-items: center; /* centro horizontal perfecto */
+    justify-content: center;
+    gap: 12px; /* aire entre botón y texto */
+    text-align: center;
+}
+
+.child_content-label-button-upload {
+    margin: 0 auto; /* por si algún estilo previo lo desalineaba */
+}
+/* Elimina el padding que mete Bootstrap cuando el modal está abierto */
+body.modal-open {
+    padding-right: 0 !important;
+}
+
+/* Asegura que el modal no herede padding extra a la derecha */
+.modal {
+    padding-right: 0 !important;
+}
+
+    /* Márgenes simétricos del cuadro del modal (evita “aire” extra a la derecha) */
+    .modal .modal-dialog {
+        margin: 1.25rem auto !important; /* centrado perfecto */
+        /* opcional: controla el ancho máximo del modal */
+        max-width: 980px;
+        width: calc(100% - 2.5rem);
+    }
+    /* Redondeo global del contenido del modal */
+    .modal .modal-content {
+        border-radius: 28px !important;
+        overflow: hidden; /* recorta hijos con fondos */
+        border: none;
+    }
+
+/* Asegura radios en las dos mitades (izq./der.) si llevan fondo */
+.child-bottles-form {
+    border-top-left-radius: 28px;
+    border-bottom-left-radius: 28px;
+}
+
+.child_content_info-bottle-label {
+    border-top-right-radius: 28px;
+    border-bottom-right-radius: 28px;
+}
+@media (max-width: 768px) {
+    .chil_content_info_upload .child_content-label-button {
+        gap: 10px;
     }
 }

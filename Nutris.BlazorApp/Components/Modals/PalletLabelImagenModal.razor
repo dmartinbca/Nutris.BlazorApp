@@ -137,6 +137,8 @@ else
             IsLoading = true;
             StateHasChanged();
 
+            
+
             var data = new
             {
                 numeroRG = CodeRG35,
@@ -144,9 +146,9 @@ else
                 imagenBase64 = Base64Data
             };
 
-            var jsonData = JsonSerializer.Serialize(data);
-            var response = await ApiService.PostAsync("modificarImagen(1)/Microsoft.NAV.modificarCab?$tenant=nutris", data);
+            var response = await ApiService.PostAsync2("modificarImagen(1)/Microsoft.NAV.modificarCab?tenant=nutris", data);
 
+           
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();

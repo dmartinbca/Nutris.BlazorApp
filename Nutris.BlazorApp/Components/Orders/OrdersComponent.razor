@@ -218,7 +218,7 @@
                             </div>
                             <img @onclick="() => ToggleSection(1)" id="id-0" 
                                  class="arrow-t @(IsOpen[1] ? "arrow-t-r" : "")" 
-                                 src="/img/arrow-close-down.svg" alt="arrow open">
+                                 src="img/arrow-close-down.svg" alt="arrow open">
                         </div>
                     </div>
                      
@@ -268,7 +268,7 @@
                                                 <div class="line-from"></div>
                                                 @if (item.Value != "-")
                                                 {
-                                                    <img src="/img/check-icon.svg" alt="check">
+                                                    <img src="img/check-icon.svg" alt="check">
                                                 }
                                             </div>
                                         </div>
@@ -285,7 +285,7 @@
                                                 <div class="line-from"></div>
                                                 @if (item.Value != "-")
                                                 {
-                                                    <img src="/img/check-icon.svg" alt="check">
+                                                    <img src="img/check-icon.svg" alt="check">
                                                 }
                                             </div>
                                         </div>
@@ -310,7 +310,7 @@
                                             <div class="line-from" id="line-from-gommy"></div>
                                             @if (!string.IsNullOrEmpty(GummyShapeImg))
                                             {
-                                                <img src="/img/check-icon.svg" alt="check">
+                                                <img src="img/check-icon.svg" alt="check">
                                             }
                                         </div>
                                     </div>
@@ -417,7 +417,7 @@
                                     </div>
                                     <img @onclick="() => ToggleSection(2)" id="id-1" 
                                          class="arrow-t @(IsOpen[2] ? "arrow-t-r" : "")" 
-                                         src="/img/arrow-close-down.svg" alt="arrow open">
+                                         src="img/arrow-close-down.svg" alt="arrow open">
                                 </div>
                             </div>
 
@@ -446,7 +446,7 @@
                                                     <div class="line-from d-none d-xl-block"></div>
                                                     @if (ProductName2 != "-")
                                                     {
-                                                        <img src="/img/check-icon.svg" alt="check" class="d-none d-xl-block">
+                                                        <img src="img/check-icon.svg" alt="check" class="d-none d-xl-block">
                                                     }
                                                 </div>
                                             </div>
@@ -467,10 +467,10 @@
                                                                 <p class="font-18 RalewayRegular">@item.Label</p>
                                                                 <div class="data-t">
                                                                     <span><p class="font-20 RalewayBold">@item.Value</p></span>
-                                                                    @if (item.Value != "-")
+                                                                    @if (item.Value != "")
                                                                     {
                                                                         <div class="line-from"></div>
-                                                                        <img src="/img/check-icon.svg" alt="check">
+                                                                        <img src="img/check-icon.svg" alt="check">
                                                                     }
                                                                 </div>
                                                             </div>
@@ -492,7 +492,7 @@
                                                     {
                                                         <div class="d-flex btn-edit-bottle col-12 col-lg-2">
                                                             <button class="btn-t RalewayMedium font-20" type="button" @onclick="OpenBoteCapModal">
-                                                                <img src="/img/pencil-icon.svg" alt="edit">@Localization["Edit"]
+                                                                <img src="img/pencil-icon.svg" alt="edit">@Localization["Edit"]
                                                             </button>
                                                         </div>
                                                     }
@@ -524,10 +524,10 @@
                                                                         <span>@(IsSendingBatchOther ? "Enviando..." : "Enviar")</span>
                                                                     </button>
                                                                 }
-                                                                @if (FillingBatch != "-")
+                                                                @if (FillingBatch != "")
                                                                 {
                                                                     <div class="line-from"></div>
-                                                                    <img src="/img/check-icon.svg" alt="check">
+                                                                    <img src="img/check-icon.svg" alt="check">
                                                                 }
                                                             </div>
                                                         </div>
@@ -551,10 +551,10 @@
                                                                         <span>@(IsSendingBbdOther ? "Enviando..." : "Enviar")</span>
                                                                     </button>
                                                                 }
-                                                                @if (FillingExpDate != "-")
+                                                                @if (FillingExpDate != "")
                                                                 {
                                                                     <div class="line-from"></div>
-                                                                    <img src="/img/check-icon.svg" alt="check">
+                                                                    <img src="img/check-icon.svg" alt="check">
                                                                 }
                                                             </div>
                                                         </div>
@@ -564,17 +564,17 @@
                                                             <p class="font-18 RalewayRegular">@Localization["orderView.Location"]</p>
                                                             <div class="data-t">
                                                                 <input type="text" readonly class="font-20 RalewayRegular" value="@FillingLocation">
-                                                                @if (FillingLocation != "-")
+                                                                @if (FillingLocation != "")
                                                                 {
                                                                     <div class="line-from"></div>
-                                                                    <img src="/img/check-icon.svg" alt="check">
+                                                                    <img src="img/check-icon.svg" alt="check">
                                                                 }
                                                             </div>
                                                         </div>
                                                     </div>
 
                                                     <div class="bottle-img-1">
-                                                        <img src="/img/bottle-instructions.png" alt="instructions">
+                                                        <img src="img/bottle-instructions.png" alt="instructions">
                                                     </div>
                                                 </div>
                                             </div>
@@ -584,7 +584,7 @@
                                         {
                                             <div class="d-none d-xl-flex btn-edit-bottle col-12 col-lg-2 content-t-button align-items-end" style="height:180px;">
                                                 <button class="btn-t RalewayMedium font-20" type="button" data-bs-toggle="modal" data-bs-target="#sidebarRightModal3">
-                                                    <img src="/img/pencil-icon.svg" alt="edit">@Localization["Edit"]
+                                                    <img src="img/pencil-icon.svg" alt="edit">@Localization["Edit"]
                                                 </button>
                                             </div>
                                         }
@@ -616,7 +616,7 @@
                                     </div>
                                     <img @onclick="() => ToggleSection(3)" id="id-2" 
                                          class="arrow-t @(IsOpen[3] ? "arrow-t-r" : "")" 
-                                         src="/img/arrow-close-down.svg" alt="arrow open">
+                                         src="img/arrow-close-down.svg" alt="arrow open">
                                 </div>
                             </div>
 
@@ -629,7 +629,7 @@
                                             @if (Status == "Desarrollo" && !NoLabel)
                                             {
                                                 <button class="btn-t RalewayMedium font-20" type="button" @onclick="OpenLabelModal">
-                                                    <img src="/img/pencil-icon.svg" alt="edit">@Localization["Edit"]
+                                                    <img src="img/pencil-icon.svg" alt="edit">@Localization["Edit"]
                                                 </button>
                                             }
                                         </div>
@@ -641,10 +641,10 @@
                                                     <p class="font-18 RalewayRegular @(NoLabel ? "disabled-text" : "")">@item.Label</p>
                                                     <div class="data-t">
                                                         <span><p class="font-20 RalewayBold @(NoLabel ? "disabled-text" : "")">@item.Value</p></span>
-                                                        @if (item.Value != "-" && !NoLabel)
+                                                        @if (item.Value != "" && !NoLabel)
                                                         {
                                                             <div class="line-from"></div>
-                                                            <img src="/img/check-icon.svg" alt="check">
+                                                            <img src="img/check-icon.svg" alt="check">
                                                         }
                                                     </div>
                                                 </div>
@@ -655,7 +655,7 @@
                                                 <div class="data-t">
                                                     @if (!string.IsNullOrEmpty(LabelImageUrl))
                                                     {
-                                                        <img alt="label" class="w-100" src="@LabelImageUrl">
+                                                        <img alt="label" class="w-100" src="@LabelImageUrl" >
                                                     }
                                                 </div>
                                             </div>
@@ -679,7 +679,7 @@
                                 </div>
                                 <img @onclick="() => ToggleSection(4)" id="id-3" 
                                      class="arrow-t @(IsOpen[4] ? "arrow-t-r" : "")" 
-                                     src="/img/arrow-close-down.svg" alt="arrow open">
+                                     src="img/arrow-close-down.svg" alt="arrow open">
                             </div>
                         </div>
 
@@ -700,7 +700,7 @@
                                                     @if (item.Value != "-")
                                                     {
                                                         <div class="line-from"></div>
-                                                        <img src="/img/check-icon.svg" alt="check">
+                                                        <img src="img/check-icon.svg" alt="check">
                                                     }
                                                 </div>
                                             </div>
@@ -721,7 +721,7 @@
                                                             }
                                                             else
                                                             {
-                                                                <p>-</p>
+                                                                <p></p>
                                                             }
                                                         </div>
                                                     </div>
@@ -730,7 +730,7 @@
                                                         <div>
                                                             <div class="btn-pallet-tag">
                                                                 <button class="btn-t font-20 RalewayMedium" type="button" data-bs-toggle="modal" data-bs-target="#BoxLabelImagen">
-                                                                    <img src="/img/pencil-icon.svg" alt="edit">@Localization["orderView.Personalize"]
+                                                                    <img src="img/pencil-icon.svg" alt="edit">@Localization["orderView.Personalize"]
                                                                 </button>
                                                             </div>
                                                             <div class="desc-pallet d-flex justify-content-end text-end">
@@ -758,7 +758,7 @@
                                                     @if (item.Value != "-")
                                                     {
                                                         <div class="line-from"></div>
-                                                        <img src="/img/check-icon.svg" alt="check">
+                                                        <img src="img/check-icon.svg" alt="check">
                                                     }
                                                 </div>
                                             </div>
@@ -841,7 +841,7 @@
                                 </div>
                                 <img @onclick="() => ToggleSection(5)" id="id-4" 
                                      class="arrow-t @(IsOpen[5] ? "arrow-t-r" : "")" 
-                                     src="/img/arrow-close-down.svg" alt="arrow open">
+                                     src="img/arrow-close-down.svg" alt="arrow open">
                             </div>
                         </div>
 
@@ -951,17 +951,17 @@
     IsVisible="@isLabelModalOpen"
     OnClose="CloseLabelModal"
 
-    OptionsSizeLabel="@(OptionsSizeLabel.Select((x, i) => new ML.OptionMX { ID = i + 1, Value = x.Value, Imagen = "" }).ToList())"
-    OptionsFinish="@(OptionsFinish.Select((x, i) => new ML.Option { ID = i + 1, Value = x.Value }).ToList())"
-    OptionsLabelMaterial="@(OptionsLabelMaterial.Select((x, i) => new ML.Option { ID = i + 1, Value = x.Value }).ToList())"
-    OptionsColorLabel="@(OptionsColorLabel.Select((x, i) => new ML.Option { ID = i + 1, Value = x.Value }).ToList())"
-
-    SelectedOptionLabels="@(new ModalLabel.SelectedLabelOptions {
-        LabelSize     = RG35?.Label_size,
-        LabelMaterial = RG35?.Label_material,
-        LabelFinish   = RG35?.Label_finish,
-        LabelColors   = RG35?.Label_color
-    })"
+     OptionsSizeLabel="@MapSizeMx(OptionsSizeLabel)"
+    OptionsFinish="@MapSimple(OptionsFinish)"
+    OptionsLabelMaterial="@MapSimple(OptionsLabelMaterial)"
+    OptionsColorLabel="@MapSimple(OptionsColorLabel)"
+                SelectedOptionLabels="@(new NutrisBlazor.Components.Modals.ModalLabel.SelectedLabelOptions
+                {
+                    LabelSize = RG35?.Label_size ?? "",
+                    LabelMaterial = RG35?.Label_material ?? "",
+                    LabelFinish = RG35?.Label_finish ?? "",
+                    LabelColors = RG35?.Label_color ?? ""
+                })"
 
     CodeRG35="@Code"
     FinalImagen="@LabelImageUrl"

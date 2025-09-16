@@ -13,6 +13,7 @@ namespace NutrisBlazor.Services
     {
         Task<T> GetAsync<T>(string path);
         Task<HttpResponseMessage> PostAsync(string path, object data);
+        Task<HttpResponseMessage> PostAsync2(string path, object data);
         Task<HttpResponseMessage> PatchAsync(string path, object data);
     }
 
@@ -78,6 +79,26 @@ namespace NutrisBlazor.Services
  
                 Console.WriteLine($"API POST: {fullUrl}");
                 return await _httpClient.PostAsync(fullUrl, content);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en POST request: {ex.Message}");
+                throw;
+            }
+        }
+        public async Task<HttpResponseMessage> PostAsync2(string path, object data)
+        {
+            try
+            {
+                var fullUrl = path.StartsWith("http") ? path : $"{_baseUrl}{path}";
+                var json = JsonSerializer.Serialize(data);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, fullUrl)
+                {
+                    Content = content
+                };
+                Console.WriteLine($"API POST: {fullUrl}");
+                return await _httpClient.SendAsync(request);
             }
             catch (Exception ex)
             {

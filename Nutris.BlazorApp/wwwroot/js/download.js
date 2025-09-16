@@ -8,4 +8,6 @@
     a.click();
     a.remove();
   };
+
+
 </script>
