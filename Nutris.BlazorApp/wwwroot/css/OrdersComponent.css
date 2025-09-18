@@ -1452,4 +1452,33 @@ button.btn-t {
         border-color: #9E9E9E !important;
         color: #F5F5F5 !important;
     }
+    /* Añadir o modificar en OrdersComponent.css */
+    .row.mt-3 {
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
+        padding: 0 10px;
+        overflow: visible;
+    }
+
+    .steps-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+        margin: 1.44rem 0 0;
+        width: 100%;
+        padding: 0;
+        overflow: visible;
+    }
+
+    /* Asegurarse de que el header-order no corte el contenido */
+    .header-order {
+        overflow: visible;
+    }
+
+    .hcol1 {
+        overflow: visible;
+    }
 }

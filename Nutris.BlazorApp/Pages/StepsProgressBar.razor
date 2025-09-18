@@ -1,0 +1,643 @@
+﻿@namespace Nutris.BlazorApp.Components.Orders.Steps
+@using NutrisBlazor.Services
+@inject ILocalizationService Localization
+
+<div class="steps-progress-container">
+    <div class="steps-progress-inner-wrapper">
+        <div class="steps-progress-bar">
+            @for (int i = 1; i <= 5; i++)
+            {
+                var stepIndex = GetOriginalStepIndex(i);
+                var displayIndex = i;
+                var stepClass = GetStepClass(stepIndex);
+                var isCompleted = IsStepCompleted(stepIndex);
+
+                <div class="step-item @stepClass" data-step="@displayIndex">
+                    <div class="step-content">
+                        <span class="step-text">@GetStepText(stepIndex)</span>
+                        @if (isCompleted)
+                        {
+                            <span class="step-check">✓</span>
+                        }
+                    </div>
+                    @if (i < 5)
+                    {
+                        <div class="step-connector">
+                            <div class="connector-line"></div>
+                            <div class="connector-arrow">
+                                <svg width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1.5 3H4.5M4.5 3L3 1.5M4.5 3L3 4.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Status { get; set; } = "Desarrollo";
+    [Parameter] public bool CustomerAccepted { get; set; } = false;
+    [Parameter] public int PercentFilledFormulation { get; set; } = 0;
+    [Parameter] public int PercentFilledBottle { get; set; } = 0;
+    [Parameter] public int PercentFilledLabel { get; set; } = 0;
+    [Parameter] public int PercentFilledPalletizing { get; set; } = 0;
+    [Parameter] public int PercentFilledAnalytics { get; set; } = 0;
+    [Parameter] public string Prefix { get; set; } = "RG35";
+    [Parameter] public bool Status37 { get; set; } = false;
+    [Parameter] public string ProductType { get; set; } = "Bote";
+    [Parameter] public bool NoLabel { get; set; } = false;
+    [Parameter] public bool NoAnalytics { get; set; } = false;
+
+    // Mapeo del nuevo orden al índice original
+    // Nuevo orden: 1, 5, 2, 3, 4
+    private int GetOriginalStepIndex(int displayPosition)
+    {
+        return displayPosition switch
+        {
+            1 => 1, // "Listo para la formulación" permanece en posición 1
+            2 => 5, // "Pendiente aprobación calidad" ahora en posición 2
+            3 => 2, // "Listo para diseño de envasado" ahora en posición 3
+            4 => 3, // "Realizando la última revisión" ahora en posición 4
+            5 => 4, // "Listo para producción" ahora en posición 5
+            _ => displayPosition
+        };
+    }
+
+    private string GetStepText(int step)
+    {
+        return step switch
+        {
+            1 => Localization["Steps.Step1"] ?? "Listo para la formulación",
+            2 => Localization["Steps.Step2"] ?? "Listo para diseño de envasado",
+            3 => Localization["Steps.Step3"] ?? "Realizando la última revisión",
+            4 => Localization["Steps.Step4"] ?? "Listo para producción",
+            5 => Localization["Steps.Step5"] ?? "Pendiente aprobación calidad",
+            _ => ""
+        };
+    }
+
+    private string GetStepClass(int step)
+    {
+        var stepState = GetStepState(step);
+
+        var classes = new List<string>();
+
+        switch (stepState)
+        {
+            case StepState.Completed:
+                classes.Add("step-completed");
+                break;
+            case StepState.InProgress:
+                classes.Add("step-in-progress");
+                break;
+            case StepState.Pending:
+            default:
+                classes.Add("step-pending");
+                break;
+        }
+
+        return string.Join(" ", classes);
+    }
+
+    private enum StepState
+    {
+        Pending,
+        InProgress,
+        Completed
+    }
+
+    private StepState GetStepState(int step)
+    {
+        const string verde = "#8ED300";
+        const string verdeSuave = "#FFA500";
+        const string gris = "#E5E5E5";
+
+        string color = GetStepColor(step);
+
+        if (color == verde)
+            return StepState.Completed;
+        if (color == verdeSuave)
+            return StepState.InProgress;
+        return StepState.Pending;
+    }
+
+    private string GetStepColor(int step)
+    {
+        const string verde = "#8ED300";
+        const string verdeSuave = "#FFA500";
+        const string gris = "#E5E5E5";
+
+        if (Prefix == "RG37")
+        {
+            if (step == 1)
+            {
+                if (PercentFilledFormulation == 100 && (Status == "Cerrado cliente" || Status == "Cerrado cliente y calidad"))
+                    return verde;
+                if (PercentFilledFormulation > 0 && Status == "Desarrollo")
+                    return verdeSuave;
+                return gris;
+            }
+            if (step == 5)
+            {
+                if (Status == "Cerrado cliente y calidad") return verde;
+                if (Status == "Cerrado cliente") return verdeSuave;
+                return gris;
+            }
+            return gris;
+        }
+
+        // RG35
+        if (Prefix == "RG35" && step == 1 && Status37)
+        {
+            return verde;
+        }
+
+        if (step == 2)
+        {
+            if (ProductType == "Bulk")
+            {
+                if (PercentFilledPalletizing == 100 && (NoAnalytics || PercentFilledAnalytics == 100) &&
+                    (Status == "Cerrado cliente" || Status == "Cerrado cliente y calidad"))
+                    return verde;
+                if (PercentFilledPalletizing > 0 || (NoAnalytics || PercentFilledAnalytics > 0))
+                    return verdeSuave;
+                return gris;
+            }
+            else
+            {
+                if (PercentFilledBottle == 100 && (PercentFilledLabel == 100 || NoLabel) &&
+                    PercentFilledPalletizing == 100 && (NoAnalytics || PercentFilledAnalytics == 100) &&
+                    (Status == "Cerrado cliente" || Status == "Cerrado cliente y calidad"))
+                    return verde;
+                if (PercentFilledBottle > 0 || PercentFilledLabel > 0 || PercentFilledPalletizing > 0 ||
+                    (NoAnalytics || PercentFilledAnalytics > 0))
+                    return verdeSuave;
+                return gris;
+            }
+        }
+
+        if (step == 3)
+        {
+            if (Status == "Cerrado cliente y calidad") return verde;
+            if (Status == "Cerrado cliente") return verdeSuave;
+            return gris;
+        }
+
+        if (step == 4)
+        {
+            if (Status == "Cerrado cliente y calidad") return verdeSuave;
+            return gris;
+        }
+
+        if (step == 5)
+        {
+            if (Prefix == "RG35" && Status37) return verde;
+            return gris;
+        }
+
+        return gris;
+    }
+
+    private bool IsStepCompleted(int step)
+    {
+        return GetStepState(step) == StepState.Completed;
+    }
+
+    private bool IsStepInProgress(int step)
+    {
+        return GetStepState(step) == StepState.InProgress;
+    }
+
+    private bool IsStepCurrent(int step)
+    {
+        // El paso actual es el primer paso en progreso o pendiente
+        for (int i = 1; i <= 5; i++)
+        {
+            var state = GetStepState(i);
+            if (state == StepState.InProgress)
+                return i == step;
+            if (state == StepState.Pending)
+                return i == step;
+        }
+        return false;
+    }
+}
+
+<style>
+    .steps-progress-container {
+        width: 100%;
+        padding: 1rem 0;
+        margin: 1rem 0;
+        overflow-x: visible; /* Cambiado para evitar cortes */
+    }
+
+    .steps-progress-bar {
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        position: relative;
+        max-width: 100%; /* Usar todo el ancho disponible */
+        margin: 0;
+        padding: 0 15px; /* Padding mínimo para no cortar */
+        gap: 4px; /* Aumentado de 2px */
+        min-width: fit-content;
+    }
+
+    .step-item {
+        position: relative;
+        flex: 1 1 0; /* Distribución uniforme del espacio */
+        display: flex;
+        align-items: stretch;
+        min-width: 160px; /* Reducido de 180px */
+        max-width: 220px; /* Reducido de 250px */
+    }
+
+    .step-content {
+        position: relative;
+        padding: 0.8rem 1rem; /* Reducido ligeramente */
+        background: #EBE9ED;
+        color: #989898;
+        border-radius: 10px; /* Reducido de 12px */
+        min-height: 65px; /* Reducido de 70px */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        flex-direction: column;
+        z-index: 2;
+        width: 100%;
+    }
+
+    .step-text {
+        font-family: 'RalewayBold', sans-serif;
+        font-size: 13px; /* Aumentado de 11px */
+        text-align: center;
+        line-height: 1.3;
+        display: block;
+        word-break: break-word;
+        padding: 0 4px;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        font-weight: 600;
+    }
+
+    .step-check {
+        position: absolute;
+        top: -8px; /* Ajustado */
+        right: -8px;
+        background: #0ED88F;
+        color: white;
+        width: 26px; /* Aumentado de 20px */
+        height: 26px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px; /* Aumentado de 12px */
+        font-weight: bold;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        z-index: 5;
+    }
+
+    /* Conector entre pasos con flecha */
+    .step-connector {
+        position: relative;
+        width: 30px; /* Aumentado de 20px */
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 -3px;
+        z-index: 1;
+        flex-shrink: 0;
+    }
+
+    .connector-line {
+        position: absolute;
+        width: 100%;
+        height: 2px; /* Aumentado de 1px */
+        background: #D2D2D2;
+        transition: background 0.3s ease;
+    }
+
+    .connector-arrow {
+        position: relative;
+        z-index: 2;
+        background: white;
+        padding: 2px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+        .connector-arrow svg {
+            width: 10px; /* Aumentado de 8px */
+            height: 10px;
+            color: #989898;
+            transition: color 0.3s ease;
+            display: block;
+        }
+
+    /* Actualización del color de los conectores cuando el paso está completado */
+    .step-completed .connector-line {
+        background: #8ED300;
+    }
+
+    .step-completed .connector-arrow svg {
+        color: #6BA000;
+    }
+
+    .step-in-progress .connector-arrow {
+        animation: arrowPulse 1.5s infinite;
+    }
+
+        .step-in-progress .connector-arrow svg {
+            color: #8ED300;
+        }
+
+    @@keyframes arrowPulse {
+        0%, 100%
+
+    {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(3px);
+    }
+
+    }
+
+    /* Estados de los pasos */
+    .step-completed .step-content {
+        background: #8ED300;
+        color: #FFFFFF;
+        border-color: #8ED300;
+    }
+
+    .step-in-progress .step-content {
+        background: #FFA500;
+        color: #FFFFFF;
+        border-color: #FFA500;
+        animation: pulse 2s infinite;
+    }
+
+    .step-in-progress.step-warning .step-content {
+        background: #FFA500;
+        color: #FFFFFF;
+        border-color: #FFA500;
+    }
+
+    .step-current .step-content {
+        background: #FDB833;
+        color: #FFFFFF;
+        border-color: #FDB833;
+        box-shadow: 0 4px 12px rgba(253, 184, 51, 0.3);
+    }
+
+    .step-pending .step-content {
+        background: #E5E5E5;
+        color: #989898;
+    }
+
+    /* Actualización de conectores para estado en progreso naranja */
+    .step-in-progress .connector-line {
+        background: #FFA500;
+    }
+
+    .step-in-progress .connector-arrow svg {
+        color: #FF8C00;
+    }
+
+    /* Hover effects */
+    .step-content:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Animación de pulso para pasos en progreso */
+    @@keyframes pulse {
+        0%
+
+    {
+        box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 165, 0, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 165, 0, 0);
+    }
+
+    }
+
+    /* Responsive design */
+    @@media (max-width: 1200px) {
+        .step-item
+
+    {
+        min-width: 140px;
+        max-width: 200px;
+    }
+
+    .step-content {
+        padding: 0.7rem 0.8rem;
+        min-height: 60px;
+    }
+
+    .step-text {
+        font-size: 12px;
+    }
+
+    .steps-progress-bar {
+        padding: 0 10px;
+    }
+
+    }
+
+    @@media (max-width: 768px) {
+        .steps-progress-container
+
+    {
+        padding: 0.5rem 0;
+        margin: 0.5rem 0;
+    }
+
+    .steps-progress-bar {
+        padding: 0 8px;
+        gap: 2px;
+    }
+
+    .step-item {
+        min-width: 120px;
+        max-width: 160px;
+    }
+
+    .step-content {
+        padding: 0.6rem 0.4rem;
+        min-height: 50px;
+        border-radius: 8px;
+    }
+
+    .step-text {
+        font-size: 11px;
+        line-height: 1.2;
+        padding: 0 2px;
+    }
+
+    .step-connector {
+        width: 18px;
+        margin: 0 -2px;
+    }
+
+    .connector-arrow svg {
+        width: 8px;
+        height: 8px;
+    }
+
+    .connector-line {
+        height: 1.5px;
+    }
+
+    .step-check {
+        width: 18px;
+        height: 18px;
+        font-size: 11px;
+        top: -5px;
+        right: -5px;
+    }
+
+    }
+
+    @@media (max-width: 480px) {
+        .steps-progress-container
+
+    {
+        padding: 0.3rem 0;
+    }
+
+    .steps-progress-bar {
+        gap: 1px;
+        padding: 0 5px;
+    }
+
+    .step-item {
+        min-width: 100px;
+        max-width: 140px;
+    }
+
+    .step-content {
+        padding: 0.5rem 0.3rem;
+        border-radius: 6px;
+        min-height: 45px;
+    }
+
+    .step-text {
+        font-size: 10px;
+        line-height: 1.15;
+    }
+
+    .step-connector {
+        width: 15px;
+        margin: 0 -1px;
+    }
+
+    .connector-arrow svg {
+        width: 7px;
+        height: 7px;
+    }
+
+    }
+
+    @@media (max-width: 360px) {
+        .steps-progress-container
+
+    {
+        padding: 0.4rem 0.2rem;
+    }
+
+    .step-item {
+        min-width: 100px;
+        max-width: 130px;
+    }
+
+    .step-content {
+        padding: 0.4rem 0.25rem;
+        min-height: 44px;
+    }
+
+    .step-text {
+        font-size: 9px;
+        line-height: 1.1;
+    }
+
+    .step-connector {
+        width: 12px;
+    }
+
+    .connector-arrow svg {
+        width: 6px;
+        height: 6px;
+    }
+
+    }
+
+    /* Ocultar scrollbar si aparece */
+    .steps-progress-container {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .steps-progress-container::-webkit-scrollbar {
+            display: none;
+        }
+
+    /* Efecto de carga progresiva */
+    .steps-progress-bar {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Tooltips opcionales para mostrar porcentajes */
+    .step-content[data-progress]:hover::after {
+        content: attr(data-progress);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        white-space: nowrap;
+        z-index: 10;
+    }
+</style>
