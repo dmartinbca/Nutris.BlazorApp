@@ -163,7 +163,7 @@
     "Observations": "Quantity",
     "ORDER": "ORDER",
     "Country": "Country of sale:",
-    "NutrisCode": "NUTRIS",
+    "NutrisCode1": "NUTRIS",
     "NutrisCode2": "CODE",
     "Estimated": "Requested delivery date",
     "EstimatedTooltip": "Requested delivery date for the product launch.",

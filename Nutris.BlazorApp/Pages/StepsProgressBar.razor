@@ -229,9 +229,13 @@
 <style>
     .steps-progress-container {
         width: 100%;
-        padding: 1rem 0;
-        margin: 1rem 0;
-        overflow-x: visible; /* Cambiado para evitar cortes */
+        padding: 0.3rem 0; /* Reducido significativamente */
+        margin: 0.3rem 0; /* Reducido significativamente */
+        overflow-x: visible;
+    }
+
+    .steps-progress-inner-wrapper {
+        padding: 0; /* Sin padding adicional */
     }
 
     .steps-progress-bar {
@@ -239,11 +243,12 @@
         align-items: stretch;
         justify-content: center;
         position: relative;
-        max-width: 100%; /* Usar todo el ancho disponible */
+        max-width: 100%;
         margin: 0;
-        padding: 0 15px; /* Padding mínimo para no cortar */
-        gap: 4px; /* Aumentado de 2px */
+        padding: 0 15px; /* Solo padding horizontal */
+        gap: 4px;
         min-width: fit-content;
+        min-height: auto; /* Altura automática */
     }
 
     .step-item {
@@ -257,11 +262,11 @@
 
     .step-content {
         position: relative;
-        padding: 0.8rem 1rem; /* Reducido ligeramente */
+        padding: 0.6rem 1rem; /* Reducido el padding vertical */
         background: #EBE9ED;
         color: #989898;
-        border-radius: 10px; /* Reducido de 12px */
-        min-height: 65px; /* Reducido de 70px */
+        border-radius: 10px;
+        min-height: 55px; /* Reducido de 65px */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -341,13 +346,13 @@
         transition: all 0.3s ease;
     }
 
-        .connector-arrow svg {
-            width: 10px; /* Aumentado de 8px */
-            height: 10px;
-            color: #989898;
-            transition: color 0.3s ease;
-            display: block;
-        }
+    .connector-arrow svg {
+        width: 10px; /* Aumentado de 8px */
+        height: 10px;
+        color: #989898;
+        transition: color 0.3s ease;
+        display: block;
+    }
 
     /* Actualización del color de los conectores cuando el paso está completado */
     .step-completed .connector-line {
@@ -362,21 +367,17 @@
         animation: arrowPulse 1.5s infinite;
     }
 
-        .step-in-progress .connector-arrow svg {
-            color: #8ED300;
-        }
+    .step-in-progress .connector-arrow svg {
+        color: #8ED300;
+    }
 
     @@keyframes arrowPulse {
-        0%, 100%
-
-    {
-        transform: translateX(0);
-    }
-
-    50% {
-        transform: translateX(3px);
-    }
-
+        0%, 100% {
+            transform: translateX(0);
+        }
+        50% {
+            transform: translateX(3px);
+        }
     }
 
     /* Estados de los pasos */
@@ -428,171 +429,161 @@
 
     /* Animación de pulso para pasos en progreso */
     @@keyframes pulse {
-        0%
-
-    {
-        box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.4);
-    }
-
-    70% {
-        box-shadow: 0 0 0 10px rgba(255, 165, 0, 0);
-    }
-
-    100% {
-        box-shadow: 0 0 0 0 rgba(255, 165, 0, 0);
-    }
-
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 165, 0, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 165, 0, 0);
+        }
     }
 
     /* Responsive design */
     @@media (max-width: 1200px) {
-        .step-item
-
-    {
-        min-width: 140px;
-        max-width: 200px;
-    }
-
-    .step-content {
-        padding: 0.7rem 0.8rem;
-        min-height: 60px;
-    }
-
-    .step-text {
-        font-size: 12px;
-    }
-
-    .steps-progress-bar {
-        padding: 0 10px;
-    }
-
+        .step-item {
+            min-width: 140px;
+            max-width: 200px;
+        }
+        
+        .step-content {
+            padding: 0.5rem 0.8rem; /* Reducido vertical */
+            min-height: 50px; /* Reducido */
+        }
+        
+        .step-text {
+            font-size: 12px;
+        }
+        
+        .steps-progress-bar {
+            padding: 0 10px;
+        }
+        
+        .steps-progress-container {
+            padding: 0.2rem 0;
+            margin: 0.2rem 0;
+        }
     }
 
     @@media (max-width: 768px) {
-        .steps-progress-container
+        .steps-progress-container {
+            padding: 0.2rem 0; /* Mínimo padding vertical */
+            margin: 0.2rem 0;
+        }
 
-    {
-        padding: 0.5rem 0;
-        margin: 0.5rem 0;
-    }
+        .steps-progress-bar {
+            padding: 0 8px;
+            gap: 2px;
+        }
 
-    .steps-progress-bar {
-        padding: 0 8px;
-        gap: 2px;
-    }
+        .step-item {
+            min-width: 120px;
+            max-width: 160px;
+        }
 
-    .step-item {
-        min-width: 120px;
-        max-width: 160px;
-    }
+        .step-content {
+            padding: 0.4rem 0.4rem; /* Reducido vertical */
+            min-height: 45px; /* Reducido */
+            border-radius: 8px;
+        }
 
-    .step-content {
-        padding: 0.6rem 0.4rem;
-        min-height: 50px;
-        border-radius: 8px;
-    }
+        .step-text {
+            font-size: 11px;
+            line-height: 1.2;
+            padding: 0 2px;
+        }
 
-    .step-text {
-        font-size: 11px;
-        line-height: 1.2;
-        padding: 0 2px;
-    }
+        .step-connector {
+            width: 18px;
+            margin: 0 -2px;
+        }
 
-    .step-connector {
-        width: 18px;
-        margin: 0 -2px;
-    }
+        .connector-arrow svg {
+            width: 8px;
+            height: 8px;
+        }
 
-    .connector-arrow svg {
-        width: 8px;
-        height: 8px;
-    }
+        .connector-line {
+            height: 1.5px;
+        }
 
-    .connector-line {
-        height: 1.5px;
-    }
-
-    .step-check {
-        width: 18px;
-        height: 18px;
-        font-size: 11px;
-        top: -5px;
-        right: -5px;
-    }
-
+        .step-check {
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            top: -5px;
+            right: -5px;
+        }
     }
 
     @@media (max-width: 480px) {
-        .steps-progress-container
+        .steps-progress-container {
+            padding: 0.15rem 0; /* Mínimo padding */
+            margin: 0.15rem 0;
+        }
 
-    {
-        padding: 0.3rem 0;
-    }
+        .steps-progress-bar {
+            gap: 1px;
+            padding: 0 5px;
+        }
 
-    .steps-progress-bar {
-        gap: 1px;
-        padding: 0 5px;
-    }
+        .step-item {
+            min-width: 100px;
+            max-width: 140px;
+        }
 
-    .step-item {
-        min-width: 100px;
-        max-width: 140px;
-    }
+        .step-content {
+            padding: 0.35rem 0.3rem; /* Reducido vertical */
+            border-radius: 6px;
+            min-height: 40px; /* Reducido */
+        }
 
-    .step-content {
-        padding: 0.5rem 0.3rem;
-        border-radius: 6px;
-        min-height: 45px;
-    }
+        .step-text {
+            font-size: 10px;
+            line-height: 1.15;
+        }
 
-    .step-text {
-        font-size: 10px;
-        line-height: 1.15;
-    }
+        .step-connector {
+            width: 15px;
+            margin: 0 -1px;
+        }
 
-    .step-connector {
-        width: 15px;
-        margin: 0 -1px;
-    }
-
-    .connector-arrow svg {
-        width: 7px;
-        height: 7px;
-    }
-
+        .connector-arrow svg {
+            width: 7px;
+            height: 7px;
+        }
     }
 
     @@media (max-width: 360px) {
-        .steps-progress-container
+        .steps-progress-container {
+            padding: 0.1rem 0; /* Casi sin padding */
+            margin: 0.1rem 0;
+        }
 
-    {
-        padding: 0.4rem 0.2rem;
-    }
+        .step-item {
+            min-width: 100px;
+            max-width: 130px;
+        }
 
-    .step-item {
-        min-width: 100px;
-        max-width: 130px;
-    }
+        .step-content {
+            padding: 0.3rem 0.25rem; /* Mínimo padding vertical */
+            min-height: 38px; /* Reducido */
+        }
 
-    .step-content {
-        padding: 0.4rem 0.25rem;
-        min-height: 44px;
-    }
+        .step-text {
+            font-size: 9px;
+            line-height: 1.1;
+        }
 
-    .step-text {
-        font-size: 9px;
-        line-height: 1.1;
-    }
+        .step-connector {
+            width: 12px;
+        }
 
-    .step-connector {
-        width: 12px;
-    }
-
-    .connector-arrow svg {
-        width: 6px;
-        height: 6px;
-    }
-
+        .connector-arrow svg {
+            width: 6px;
+            height: 6px;
+        }
     }
 
     /* Ocultar scrollbar si aparece */
@@ -601,9 +592,9 @@
         -ms-overflow-style: none;
     }
 
-        .steps-progress-container::-webkit-scrollbar {
-            display: none;
-        }
+    .steps-progress-container::-webkit-scrollbar {
+        display: none;
+    }
 
     /* Efecto de carga progresiva */
     .steps-progress-bar {
@@ -611,18 +602,14 @@
     }
 
     @@keyframes fadeIn {
-        from
-
-    {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     /* Tooltips opcionales para mostrar porcentajes */
