@@ -25,7 +25,12 @@
     .language-button:hover {
         background: #f8f9fa;
     }
-
+.redDate {
+    color: red;
+    /* o puedes usar un tono específico de rojo */
+    /* color: #FF0000; */
+    /* color: #dc3545; (rojo Bootstrap) */
+}
 .language-dropdown {
     position: absolute;
     top: calc(100% + 8px);
@@ -1039,7 +1044,36 @@ button.btn-save-confirm-firm {
             border-style: none;
             border-radius: 5px;
         }
+button.btn-save-confirm {
+    display: block;
+    border: solid 1px var(--icon);
+    border-radius: 30px;
+    line-height: 1rem;
+    font-size: 1.44em;
+    padding: 1.44rem 1.57rem;
+    margin: 0 0 0 auto;
+    transition: all 0.3s ease;
+    background-color: var(--textButton);
+    color: white;
+    cursor: pointer;
+}
 
+    /* Estado hover (solo cuando no está deshabilitado) */
+    button.btn-save-confirm:not(:disabled):hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    /* Estado deshabilitado */
+    button.btn-save-confirm:disabled {
+        background-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+        opacity: 0.6;
+        border-color: #cccccc;
+        pointer-events: none; /* Previene cualquier interacción */
+    }
 #input-bt-width {
     width: 252px
 }
@@ -1369,33 +1403,19 @@ button.btn-t {
         color: white;
         cursor: pointer;
     }
-
-        /* Estado hover del botón cuando está habilitado */
-        .btn-save-confirm:not(:disabled):hover {
-            transition: all 0.3s ease;
-            background-color: transparent;
-            color: var(--textButton, #2F5496);
-        }
-
-        /* Estado deshabilitado del botón */
         .btn-save-confirm:disabled {
-            opacity: 0.6;
+            background-color: #cccccc;
+            color: #666666;
             cursor: not-allowed;
-            background-color: #7A8CA8; /* Azul muy desaturado */
-            color: #E0E0E0;
-            border: solid 1px #7A8CA8;
-            filter: grayscale(50%); /* Añade un efecto de escala de grises */
+            opacity: 0.6;
         }
+
+     
+        
+       
       
     /* Alternativa con clase específica para deshabilitado */
-    .btn-save-confirm-disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        background-color: #7A8CA8; /* Azul muy desaturado */
-        color: #E0E0E0;
-        border: solid 1px #7A8CA8;
-        filter: grayscale(50%); /* Añade un efecto de escala de grises */
-    }
+     
 
     /* Corrección del botón btn-save-confirm-firm que estaba mal definido */
     .btn-save-confirm-firm {
@@ -1423,35 +1443,8 @@ button.btn-t {
             min-width: 250px; /* Asegura un ancho mínimo para el botón */
         }
 
-    /* Estado deshabilitado del botón - Forzar color gris apagado */
-    .btn-save-confirm:disabled,
-    .btn-save-confirm[disabled],
-    button.btn-save-confirm:disabled,
-    button.btn-save-confirm[disabled] {
-        background-color: #C0C0C0 !important; /* Gris claro */
-        border-color: #C0C0C0 !important;
-        color: #FFFFFF !important;
-        opacity: 1 !important; /* Quitamos la opacidad para controlar mejor el color */
-        cursor: not-allowed !important;
-    }
-
-    /* Si aún no funciona, prueba con esta versión más específica */
-    .btn-atr-confirm button.btn-save-confirm:disabled {
-        background-color: #9E9E9E !important; /* Gris medio */
-        border: solid 1px #9E9E9E !important;
-        color: #F5F5F5 !important;
-        opacity: 1 !important;
-        cursor: not-allowed !important;
-        pointer-events: none !important;
-    }
-
-    /* Asegurarse de que no haya hover en estado disabled */
-    .btn-save-confirm:disabled:hover,
-    button.btn-save-confirm:disabled:hover {
-        background-color: #9E9E9E !important;
-        border-color: #9E9E9E !important;
-        color: #F5F5F5 !important;
-    }
+    
+   
     /* Añadir o modificar en OrdersComponent.css */
     .row.mt-3 {
         max-width: 100%;

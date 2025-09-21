@@ -323,8 +323,24 @@
 
                 <!-- Footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn-cancel" @onclick="HideModal">@Localization["NavBar.Cancel"]</button>
-                    <button type="button" class="btn-primary" @onclick="SaveAsync">@Localization["NavBar.Save"]</button>
+                    <button type="button" class="btn-cancel" @onclick="HideModal" disabled="@IsSaving">
+                        @Localization["NavBar.Cancel"]
+                    </button>
+                    <button type="button"
+                            class="btn-primary"
+                            @onclick="SaveAsync"
+                            disabled="@IsSaving"
+                            style="min-width: 100px;">
+                        @if (IsSaving)
+                        {
+                            <span class="spinner-save"></span>
+                            <span>Guardando...</span>
+                        }
+                        else
+                        {
+                            @Localization["NavBar.Save"]
+                        }
+                    </button>
                 </div>
             </div>
         </div>
@@ -669,7 +685,58 @@
             white-space: nowrap;
             z-index: 2;
         }
- 
+    /* Spinner para el botón save */
+    .spinner-save {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        margin-right: 8px;
+        vertical-align: middle;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spinner-rotate 0.8s linear infinite;
+    }
+
+    @@keyframes spinner-rotate {
+        to
+
+    {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    /* Mantener el estilo del botón cuando está deshabilitado */
+    .btn-primary:disabled {
+        background-color: #2F5496 !important; /* Mantener el color morado original */
+        border-color: #2F5496 !important;
+        opacity: 0.8; /* Solo reducir ligeramente la opacidad */
+        cursor: not-allowed;
+        /* NO cambiar el tamaño ni padding */
+    }
+
+        /* Prevenir cambios de hover cuando está deshabilitado */
+        .btn-primary:disabled:hover {
+            background-color: #2F5496 !important;
+            border-color: #2F5496 !important;
+            transform: none !important; /* Evitar cualquier transformación */
+        }
+
+    /* Asegurar que el botón mantenga su altura */
+    .modal-footer .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px; /* Altura fija */
+        transition: opacity 0.3s ease; /* Solo transición de opacidad */
+    }
+
+    /* Cancelar también debe verse deshabilitado apropiadamente */
+    .btn-cancel:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
     
  
 </style>
@@ -693,7 +760,7 @@
     [Parameter] public Dictionary<string, List<string>>? CapacidadToDiametros { get; set; }
     [Parameter] public IEnumerable<string>? Materiales { get; set; }
     [Parameter] public string Characteristics { get; set; } = string.Empty;
-
+    private bool IsSaving { get; set; } = false;
     [Parameter] public EventCallback<bool> SetAccordionOpen { get; set; }
     private readonly Dictionary<string, Dictionary<string, (double Diameter, double Height)>> CapDimensionsMap = new()
     {
@@ -1570,6 +1637,8 @@
     }
     private async Task SaveAsync()
     {
+        IsSaving = true;
+        StateHasChanged();
         try
         {
             // Valores actuales del modal

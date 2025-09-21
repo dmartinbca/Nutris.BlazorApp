@@ -229,8 +229,8 @@
 <style>
     .steps-progress-container {
         width: 100%;
-        padding: 0.3rem 0; /* Reducido significativamente */
-        margin: 0.3rem 0; /* Reducido significativamente */
+        padding: 0.5rem 0;
+        margin: 0.5rem 0;
         overflow-x: visible;
     }
 
@@ -241,23 +241,22 @@
     .steps-progress-bar {
         display: flex;
         align-items: stretch;
-        justify-content: center;
+        justify-content: space-between; /* Cambiado de center a space-between */
         position: relative;
-        max-width: 100%;
+        width: 100%;
         margin: 0;
-        padding: 0 15px; /* Solo padding horizontal */
+        padding: 0; /* Quitamos el padding horizontal */
         gap: 4px;
-        min-width: fit-content;
-        min-height: auto; /* Altura automática */
+        min-height: auto;
     }
 
     .step-item {
         position: relative;
-        flex: 1 1 0; /* Distribución uniforme del espacio */
+        flex: 1 1 0;
         display: flex;
         align-items: stretch;
-        min-width: 160px; /* Reducido de 180px */
-        max-width: 220px; /* Reducido de 250px */
+        min-width: 0; /* Permitir que se contraiga */
+        max-width: none; /* Sin límite máximo */
     }
 
     .step-content {
@@ -626,5 +625,185 @@
         font-size: 11px;
         white-space: nowrap;
         z-index: 10;
+    }
+    /* Pantallas grandes - expandir completamente */
+    @@media (min-width: 1367px) {
+        .steps-progress-bar
+
+    {
+        gap: 8px;
+    }
+
+    .step-item {
+        min-width: 180px;
+    }
+
+    .step-content {
+        padding: 0.8rem 1.2rem;
+        min-height: 65px;
+    }
+
+    .step-text {
+        font-size: 14px;
+    }
+
+    .step-connector {
+        width: 40px;
+    }
+
+    }
+
+    /* Tablets - optimizar espacio */
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        .steps-progress-bar
+
+    {
+        gap: 3px;
+        padding: 0;
+    }
+
+    .step-item {
+        min-width: 130px;
+        max-width: 180px;
+        flex: 1 1 auto;
+    }
+
+    .step-content {
+        padding: 0.5rem 0.6rem;
+        min-height: 55px;
+    }
+
+    .step-text {
+        font-size: 11px;
+        line-height: 1.2;
+    }
+
+    .step-connector {
+        width: 20px;
+        margin: 0 -2px;
+    }
+
+    .step-check {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+        top: -6px;
+        right: -6px;
+    }
+
+    }
+
+    /* Pantallas medianas */
+    @@media (min-width: 1025px) and (max-width: 1366px) {
+        .steps-progress-bar
+
+    {
+        gap: 5px;
+    }
+
+    .step-item {
+        min-width: 150px;
+        max-width: 200px;
+    }
+
+    .step-content {
+        padding: 0.6rem 0.9rem;
+        min-height: 60px;
+    }
+
+    .step-text {
+        font-size: 12px;
+    }
+
+    .step-connector {
+        width: 30px;
+    }
+
+    }
+
+    /* Móviles grandes */
+    @@media (min-width: 480px) and (max-width: 767px) {
+        .steps-progress-container
+
+    {
+        overflow-x: auto;
+        padding: 0.3rem 0;
+    }
+
+    .steps-progress-bar {
+        min-width: 600px; /* Ancho mínimo para scroll horizontal */
+        padding: 0 10px;
+    }
+
+    .step-item {
+        min-width: 110px;
+        max-width: 130px;
+    }
+
+    .step-content {
+        padding: 0.4rem 0.5rem;
+        min-height: 48px;
+    }
+
+    .step-text {
+        font-size: 10px;
+    }
+
+    }
+
+    /* Asegurar que el contenedor principal no limite el ancho */
+    .row-b {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .col-b {
+        padding: 3.52rem 2.64rem; /* Añadir padding lateral consistente */
+        max-width: 100%;
+    }
+
+    /* Ajustar toggles para que respeten el ancho completo */
+    .toggle-from {
+        border: solid 1px #D2D2D2;
+        border-radius: 50px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Ajustes específicos para el contenido del header en tablets */
+    @@media (min-width: 768px) and (max-width: 1024px) {
+        /* Reorganizar el diseño de países */
+        .country-rh1
+
+    {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .country-rh1 .d-flex {
+        flex-wrap: wrap;
+        max-width: 200px;
+    }
+
+    /* Ajustar el botón de descarga */
+    .colh1-r4 button {
+        font-size: 1rem;
+        padding: 0.8rem;
+    }
+
+    /* Optimizar espacio en fechas */
+    .colh2-r3, .colh3-r3 {
+        padding: 0.8rem 0;
+    }
+
+        .colh2-r3 p, .colh3-r3 p {
+            font-size: 0.9rem;
+        }
+
+    .MuseoSemiBold.font-18 {
+        font-size: 1rem !important;
+    }
+
     }
 </style>

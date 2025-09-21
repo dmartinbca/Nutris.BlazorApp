@@ -216,15 +216,25 @@
                             </div>
                         </section>
                     </div>
-                    
+
                     <div class="modal-footer-bts">
-                        <button @onclick="CloseModal" 
-                                class="modal-footer-btc-cancel RalewayBold font-20">
+                        <button @onclick="CloseModal"
+                                class="modal-footer-btc-cancel RalewayBold font-20"
+                                disabled="@isLoading">
                             @Localization["NavBar.Cancel"]
                         </button>
-                        <button class="modal-footer-btc-save RalewayBold font-20" 
-                                @onclick="UpdateSelectedOption">
-                            @Localization["NavBar.Save"]
+                        <button class="modal-footer-btc-save RalewayBold font-20"
+                                @onclick="UpdateSelectedOption"
+                                disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-label"></span>
+                                <span>Guardando...</span>
+                            }
+                            else
+                            {
+                                @Localization["NavBar.Save"]
+                            }
                         </button>
                     </div>
                 </div>
@@ -234,6 +244,7 @@
 }
 
 @code {
+
     // Parameters
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
@@ -350,7 +361,7 @@
         try
         {
             var file = e.File;
-            
+
             // Validate file type
             if (!file.ContentType.StartsWith("image/"))
             {
@@ -374,7 +385,7 @@
             // Create base64 string
             base64Data = Convert.ToBase64String(bytes);
             previewImage = $"data:{file.ContentType};base64,{base64Data}";
-            
+
             StateHasChanged();
         }
         catch (Exception ex)
@@ -389,8 +400,11 @@
     private async Task UpdateSelectedOption()
     {
         isLoading = true;
+
+
         StateHasChanged();
 
+        await Task.Delay(300); // Allow UI to update
         var data = new
         {
             Label_size = labelSize,
@@ -580,6 +594,57 @@
     
     .cursor-pointer {
         cursor: pointer;
+    }
+    /* Spinner para el botón save */
+    .spinner-label {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        margin-right: 8px;
+        vertical-align: middle;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spinner-rotate 0.8s linear infinite;
+    }
+
+    @@keyframes spinner-rotate {
+        to
+
+    {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    /* Mantener el estilo del botón cuando está deshabilitado */
+    .modal-footer-btc-save {
+        min-width: 120px;
+        min-height: 48px;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s ease;
+    }
+
+        .modal-footer-btc-save:disabled {
+            /* Busca el color original de tu botón Save y reemplaza #007bff con ese color */
+            background-color: #007bff !important; /* Mantener el color original */
+            opacity: 0.8;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+            /* Prevenir cambios de hover cuando está deshabilitado */
+            .modal-footer-btc-save:disabled:hover {
+                transform: none !important;
+            }
+
+    /* Botón cancelar deshabilitado */
+    .modal-footer-btc-cancel:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 </style>
 
