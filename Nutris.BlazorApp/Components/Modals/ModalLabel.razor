@@ -399,12 +399,13 @@
 
     private async Task UpdateSelectedOption()
     {
-        isLoading = true;
 
+        isLoading = true;
+        await Task.Delay(500); // Allow UI to update
 
         StateHasChanged();
 
-        await Task.Delay(300); // Allow UI to update
+     
         var data = new
         {
             Label_size = labelSize,

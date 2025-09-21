@@ -9,6 +9,7 @@ using NutrisBlazor.Services;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using static Nutris.BlazorApp.Components.Modals.BoteCapDataModal;
 
@@ -184,7 +185,13 @@ public class OrdersComponentBase : ComponentBase
         public string? Label_finish { get; set; }
         public string? Label_Color { get; set; }
     }
- 
+    public class LabelOptionsPatch // mismo DTO de arriba
+    {
+        [JsonPropertyName("Label_size")] public string? LabelSize { get; set; }
+        [JsonPropertyName("Label_material")] public string? LabelMaterial { get; set; }
+        [JsonPropertyName("Label_finish")] public string? LabelFinish { get; set; }
+        [JsonPropertyName("Label_Color")] public string? LabelColors { get; set; }
+    }
     protected List<NutrisBlazor.Components.Modals.ModalLabel.OptionMX> MapSizeMx(List<AtributoOption> src) =>
     src.Select((x, i) => new NutrisBlazor.Components.Modals.ModalLabel.OptionMX
     {
@@ -1644,6 +1651,24 @@ public class OrdersComponentBase : ComponentBase
     {
         // Si quieres, puedes parsear e.Response o e.SentData para refrescar UI local
         // Por simplicidad, recarga porcentajes y cierra el modal
+        if (e.SentData is not null)
+        {
+
+            
+            var json = JsonSerializer.Serialize(e.SentData);
+            var opts = JsonSerializer.Deserialize<LabelOptionsPatch>(json);
+            if (opts is null) return;
+
+            LabelInfo = new List<InputItem>
+            {
+                new() { Label = Localization["orderView.GUMMYDNAL[0]"], Value = opts.LabelSize     ?? "-" },
+                new() { Label = Localization["orderView.GUMMYDNAL[1]"], Value = opts.LabelMaterial ?? "-" },
+                new() { Label = Localization["orderView.GUMMYDNAL[2]"], Value = opts.LabelFinish   ?? "-" },
+                new() { Label = Localization["orderView.GUMMYDNAL[3]"], Value = opts.LabelColors   ?? "-" },
+            };
+
+        }
+
         CalculateLabelPercentage();
         await InvokeAsync(StateHasChanged);
         isLabelModalOpen = false;
