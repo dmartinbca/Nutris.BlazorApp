@@ -220,7 +220,33 @@ public class OrdersComponentBase : ComponentBase
         isConfirmModalVisible = true;
         StateHasChanged();
     }
-    
+    protected async Task DownloadImage()
+    {
+        if (string.IsNullOrEmpty(LabelImageUrl))
+        {
+            await ShowAlert("No image available to download");
+            return;
+        }
+
+        try
+        {
+            // Create download link using JavaScript
+            await JSRuntime.InvokeVoidAsync("downloadBase64File",
+                LabelImageUrl,
+                $"Label-Imagen-{Id}.png",
+                "image/png");
+        }
+        catch (Exception ex)
+        {
+         
+            await ShowAlert("Error downloading image. Please try again.");
+        }
+    }
+    private async Task ShowAlert(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
+    }
+
 
     private async Task ReloadLabelPreviewAsync()
     {

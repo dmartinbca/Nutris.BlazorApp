@@ -665,6 +665,26 @@
                                                     @if (!string.IsNullOrEmpty(LabelImageUrl))
                                                     {
                                                         <img alt="label" class="w-100" src="@LabelImageUrl">
+                                                       
+                                                             
+                                                        
+                                                    }
+                                                </div>
+                                                <div class="data-t">
+                                                    @if (!string.IsNullOrEmpty(LabelImageUrl))
+                                                    {
+                                                       
+                                                        <div class="final-label-actions">
+                                                            <span @onclick="DownloadImage"
+                                                                  class="child_content-label-button-upload cursor-pointer font-20 RalewayBold">
+                                                                @Localization["ModalLabel.DownloadLabel"]
+                                                            </span>
+
+                                                            <span class="RalewayRegular font-20">
+                                                                @Localization["ModalLabel.finalLabelmessage"]
+                                                            </span>
+                                                        </div>
+
                                                     }
                                                 </div>
                                             </div>
