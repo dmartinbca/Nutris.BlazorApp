@@ -448,15 +448,34 @@ p {
     justify-content: space-between;
     align-items: center;
 }
+.bottle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0; /* Sin espacio entre ellas, o ajusta según necesites */
+}
 
+.Cap-img, .bottle-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+     
 .bottle-img {
     width: 213px;
     /* height: 274px; */
     padding: 1.89rem;
-    background: #f2f2f2;
+    background-color: rgba(0, 0, 0, 0);
     border-radius: 10px;
 }
-
+.Cap-img {
+    width: 213px;
+    /* height: 274px; */
+    padding: 1.89rem;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 10px;
+}
 .bottle-img-1 {
     width: 213px;
     /*height: 213px; */
@@ -464,10 +483,19 @@ p {
     /* margin-left: 62px; */
 }
 
-    .bottle-img img, .bottle-img-1 img {
+    .bottle-img img  {
         width: 100%;
         height: auto;
     }
+    .Cap-img img {
+        width: 75%;
+        height: auto;
+    }
+     .bottle-img-1 img {
+        width: 100%;
+        height: auto;
+    }
+
 
 .body-t-bottle {
     width: 100%;
@@ -1474,4 +1502,102 @@ button.btn-t {
     .hcol1 {
         overflow: visible;
     }
+    /* ===========================
+   StepProgressBar – ancho completo + responsive
+   =========================== */
+
+    /* Convierte el header en grid de 2 columnas.
+   Así podemos “forzar” que la fila de steps ocupe el ancho completo. */
+    .header-order {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 420px; /* izquierda flexible + derecha fija */
+        align-items: start;
+        gap: 0; /* sin huecos entre columnas */
+    }
+
+        /* Asegura que las dos columnas se estiren correctamente */
+        .header-order .hcol1,
+        .header-order .hcol2 {
+            width: 100%;
+        }
+
+        /* La fila que contiene los steps debe abarcar TODAS las columnas del grid */
+        .header-order .row.mt-3 {
+            grid-column: 1 / -1; /* ocupa de la col 1 a la última */
+        }
+
+        /* Contenedor de la barra de pasos */
+        .header-order .steps-row {
+            /* truco para “comerse” paddings internos del contenedor, 
+     y que la barra llegue a los bordes visuales de la tarjeta */
+            margin-left: -24px;
+            margin-right: -24px;
+            padding-left: 24px;
+            padding-right: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: auto; /* deja que crezca todo lo que pueda */
+            max-width: 100%; /* nunca se pase de su contenedor */
+            box-sizing: border-box;
+        }
+
+            /* Cada Step (los componentes hijos) ocupa la misma porción de ancho */
+            .header-order .steps-row > * {
+                flex: 1 1 0;
+                min-width: 0; /* evita desbordes de contenido interno */
+            }
+
+            /* Si dentro de cada Step hay elementos con ancho fijo,
+   esto los libera para que puedan estirarse */
+            .header-order .steps-row .step,
+            .header-order .steps-row [class*="step"] {
+                width: auto !important;
+                max-width: none;
+            }
+
+    /* ===================================
+   Responsive (tablet y abajo)
+   =================================== */
+
+    /* En tablet: coloca la columna derecha debajo,
+   y permite que la barra siga ocupando todo el ancho */
+    @media (max-width: 1200px) {
+        .header-order {
+            grid-template-columns: 1fr;
+        }
+
+            .header-order .row.mt-3 {
+                grid-column: 1; /* ya solo hay una columna */
+            }
+    }
+
+    /* Si quieres que los pasos se partan en 2 filas en pantallas medias,
+   descomenta este bloque: */
+    /*
+@media (max-width: 992px){
+  .header-order .steps-row{
+    flex-wrap: wrap;
+  }
+  .header-order .steps-row > *{
+    flex: 1 1 calc(50% - 16px);
+  }
+  .header-order .steps-row > *:last-child{
+    flex-basis: 100%;   // el último a ancho completo, si te gusta ese efecto
+  }
+}
+*/
+
+    /* En móviles pequeños, apila de a uno si lo prefieres */
+    @media (max-width: 576px) {
+        .header-order .steps-row {
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+            .header-order .steps-row > * {
+                flex: 1 1 100%;
+            }
+    }
+
 }

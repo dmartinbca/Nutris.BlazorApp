@@ -31,6 +31,8 @@ namespace NutrisBlazor.Models
         public string Box_label_imagen { get; set; } = "";
         public string Label_imagen { get; set; } = "";
         public string Bote_imagen { get; set; } = "";
+
+        public string Cap_imagen { get; set; } = "";
         public string Pallet_label_imagen { get; set; } = "";
 
         // Tipo de producto
@@ -50,6 +52,9 @@ namespace NutrisBlazor.Models
         public string Label_finish { get; set; } = "";
         public string Label_color { get; set; } = "";
         public string Label_config { get; set; } = "";
+        public string Label_type { get; set; } = "";
+
+       
 
         // Cap/Tapa
         public string Cap_tapa { get; set; } = "";

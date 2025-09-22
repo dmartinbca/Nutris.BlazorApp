@@ -516,8 +516,8 @@
 
 /* Sólo para el select de “Tamaño máximo” */
 .size-select {
-    font-size: 0.95rem; /* un pelín más pequeño */
-    padding-right: 2.5rem; /* para el caret */
+    font-size: 0.85rem; /* un pelín más pequeño */
+    padding-right: 2.0rem; /* para el caret */
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;

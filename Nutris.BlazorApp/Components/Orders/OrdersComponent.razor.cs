@@ -116,6 +116,7 @@ public class OrdersComponentBase : ComponentBase
     protected int PercentFilledBottle { get; set; }
     protected string BottleType { get; set; } = "-";
     protected string BottleImg { get; set; } = "";
+    protected string CapImg { get; set; } = "";
     protected List<InputItem> BottleInfo { get; set; } = new();
     protected string FillingBatch { get; set; } = "";
     protected string FillingBatchOther { get; set; } = "";
@@ -941,6 +942,9 @@ public class OrdersComponentBase : ComponentBase
         if (!string.IsNullOrEmpty(data.Bote_imagen))
             BottleImg = $"data:image/png;base64,{data.Bote_imagen}";
 
+        if (!string.IsNullOrEmpty(data.Cap_imagen))
+            CapImg = $"data:image/png;base64,{data.Cap_imagen}";
+
         BottleInfo = new List<InputItem>
         {
             new() { Label = Localization["orderView.BottleA[0]"], Value = data.Characteristics ?? "-" },
@@ -1146,7 +1150,7 @@ public class OrdersComponentBase : ComponentBase
                 return;
 
             var arr = attrValues.EnumerateArray().ToList();
-
+            Console.WriteLine(arr);
             List<AtributoOption> FromIndex(int idx)
             {
                 if (idx < 0 || idx >= arr.Count) return new();
@@ -1166,7 +1170,7 @@ public class OrdersComponentBase : ComponentBase
             OptionsSizeLabel = FromIndex(16);
             OptionsFinish = FromIndex(8);
             OptionsLabelMaterial = FromIndex(9);
-            OptionsColorLabel = FromIndex(10);
+            OptionsColorLabel = FromIndex(7);
         }
         catch (Exception ex)
         {
@@ -1534,7 +1538,59 @@ public class OrdersComponentBase : ComponentBase
     {
         await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.downloadBase64File", base64, name);
     }
+    protected async Task DownloadDataSheetAsync()
+    {
+        try
+        {
+            // 1) payload como en Vue
+            var payload = new { numeroRG = Code };
 
+            // 2) POST al mismo endpoint (con tu prefijo api/)
+            var resp = await Api.PostAsync (
+                "dataSheet(1)/Microsoft.NAV.Download",
+                payload
+            );
+
+            resp.EnsureSuccessStatusCode();
+
+            // 3) Leer y extraer base64 (acepta dos formatos)
+            var json = await resp.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(json);
+
+            string? b64 = null;
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("data", out var dataEl) &&
+                dataEl.ValueKind == JsonValueKind.Object &&
+                dataEl.TryGetProperty("value", out var valueEl1))
+            {
+                b64 = valueEl1.GetString();
+            }
+            else if (root.TryGetProperty("value", out var valueEl2))
+            {
+                b64 = valueEl2.GetString();
+            }
+
+            if (string.IsNullOrWhiteSpace(b64))
+                return;
+
+            // 4) Normalizar: quitar prefijo si viene y espacios/nuevas líneas
+            const string prefix = "data:application/pdf;base64,";
+            if (b64.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                b64 = b64.Substring(prefix.Length);
+
+            b64 = Regex.Replace(b64, @"\s+", ""); // sin espacios/saltos
+
+            // 5) Descargar (reutilizamos tu helper de JS que ya usas en ReportFiles)
+            //    => Le pasamos con prefijo data: para que fuerce "download".
+            await DownloadBase64File($"{prefix}{b64}", $"DataSheet-{Code}.pdf");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error downloading datasheet: {ex.Message}");
+            // Si quieres, muestra un toast/alert aquí.
+        }
+    }
     protected async Task HandleConfirm()
     {
         // Cerrar el modal de confirmación

@@ -59,25 +59,25 @@
 
 @code {
     [Parameter] public string Id { get; set; } = string.Empty;
-    
+
     // Datos principales
     CustomizeRG35Response? RG35Data;
     CustomizeRG37Response? RG37Data;
-    
+
     // Catálogos
     JsonDocument? AtributosDoc;
     JsonDocument? RelacionBoteDoc;
     JsonDocument? RelacionTapaDoc;
     JsonDocument? LotFormatDoc;
     JsonDocument? BbdFormatDoc;
-    
+
     // Elementos JSON para pasar al componente
     JsonElement AtributosRoot;
     JsonElement RelacionBoteRoot;
     JsonElement RelacionTapaRoot;
     JsonElement LotFormatRoot;
     JsonElement BbdFormatRoot;
-    
+    [Inject] protected IApiService Api { get; set; } = default!;
     // Estado
     bool IsLoading = true;
     string? Error;
@@ -85,7 +85,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-      //  await LoadAllAsync();
+        //  await LoadAllAsync();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -103,7 +103,7 @@
         IsLoading = true;
         Error = null;
         StateHasChanged(); // Mostrar loading inmediatamente
-
+        List<FileItem> Ficheros = new List<FileItem>();
         try
         {
             // Validar ID
@@ -120,7 +120,7 @@
                 Error = "Formato de ID no válido.";
                 return;
             }
-            
+
             Prefix = parts[0].ToUpper();
             Console.WriteLine($"Loading data for ID: {Id}, Prefix: {Prefix}");
 
@@ -129,13 +129,56 @@
             {
                 Console.WriteLine("Loading RG35 data...");
                 RG35Data = await CustomizeApi.GetRG35Async(Id);
-                
+
                 if (RG35Data == null)
                 {
                     Error = $"No se encontraron datos RG35 para el ID: {Id}";
                     return;
                 }
-                
+                else
+                {
+                  //  Ficheros = RG35Data.Files ?? new List<FileItem>();
+                    // 1) payload como en Vue
+                    var payload = new { numeroRG = Id };
+
+                    // 2) POST al mismo endpoint (con tu prefijo api/)
+                    var resp = await Api.PostAsync(
+                        "dataSheet(1)/Microsoft.NAV.Download?tenant=nutris",
+                        payload
+                    );
+
+                    resp.EnsureSuccessStatusCode();
+
+                    // 3) Leer y extraer base64 (acepta dos formatos)
+                    var json = await resp.Content.ReadAsStringAsync();
+                    using var doc = JsonDocument.Parse(json);
+
+                    string? b64 = null;
+                    var root = doc.RootElement;
+
+                    if (root.TryGetProperty("data", out var dataEl) &&
+                        dataEl.ValueKind == JsonValueKind.Object &&
+                        dataEl.TryGetProperty("value", out var valueEl1))
+                    {
+                        b64 = valueEl1.GetString();
+                    }
+                    else if (root.TryGetProperty("value", out var valueEl2))
+                    {
+                        b64 = valueEl2.GetString();
+                    }
+                    if (!string.IsNullOrWhiteSpace(b64) && RG35Data.Status=="Cerrado cliente y calidad")
+                    {
+                        Ficheros.Add(new FileItem
+                        {
+                            Code = Id,
+                            Name = "TECHNICAL DATA SHEET " + RG35Data.Product_name_2 + ".pdf",
+                            File = b64
+                        });
+                        RG35Data.Files = Ficheros;
+                    }
+                    
+                }
+
                 Console.WriteLine($"RG35 data loaded: Code={RG35Data.Code}, Product={RG35Data.Product_name}");
             }
             else if (Prefix == "RG37")

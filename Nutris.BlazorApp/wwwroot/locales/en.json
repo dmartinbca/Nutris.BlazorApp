@@ -72,7 +72,7 @@
     "Size": "Size",
     "Material": "Material",
     "Shape": "Shape",
-    "Color": "Color",
+    "Color": "Type",
     "YOURBOTTLE": "YOUR BOTTLE",
     "DiameterThread": "Diameter / Thread",
     "Selectasize": "Select a size",
@@ -87,7 +87,7 @@
     "Characteristics": "Characteristics",
     "FinalLabel": "Final Label",
     "Finish": "Finish",
-    "Maximumsize": "Maximum size"
+    "Maximumsize": "Die-cut"
   },
   "modalConfirm": {
     "Confirmandsign": "Confirm and sign",
@@ -226,10 +226,10 @@
       "Number of pieces per container"
     ],
     "GUMMYDNAL": [
-      "Size",
+      "Die-cut",
       "Material",
       "Finish",
-      "Colors"
+      "Type"
     ],
     "BOXLABEL": "BOX LABEL",
     "Pallet": [

@@ -74,7 +74,7 @@
     "Size": "Tamaño",
     "Material": "Material",
     "Shape": "Forma",
-    "Color": "Color",
+    "Color": "Tipo",
     "YOURBOTTLE": "TU BOTE",
     "DiameterThread": "Diámetro / Rosca",
     "Selectasize": "Seleccione un tamaño",
@@ -87,8 +87,8 @@
     "LabelTitle": "Label",
     "DeadLine": "Plazo",
     "Characteristics": "Características",
-    "Finish": "Finalizar",
-    "Maximumsize": "Tamaño máximo"
+    "Finish": "Acabado",
+    "Maximumsize": "Troquel"
   },
   "modalConfirm": {
     "Confirmandsign": "Confirmar y firmar",
@@ -228,10 +228,10 @@
       "Número de piezas por envase"
     ],
     "GUMMYDNAL": [
-      "Tamaño",
+      "Troquel",
       "Material",
       "Acabado",
-      "Colores"
+      "Tipo"
     ],
     "BOXLABEL": "ETIQUETA DE CAJA",
     "Pallet": [
@@ -296,6 +296,6 @@
   "Apply": "Aplicar",
   "Clear": "Limpiar",
   "Message": {
-    "Loading": "Cargando Datos...!"
+    "Loading": "Cargando Datos..."
   }
 }

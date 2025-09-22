@@ -90,8 +90,8 @@
 }
 
 .avatar {
-    width: 85px;
-    height: 85px;
+    width: auto;
+    height: 120px;
     object-fit: contain;
     border-radius: 10px;
 }

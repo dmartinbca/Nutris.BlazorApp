@@ -23,8 +23,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 60px; /* Reducido para que quepa dentro del spinner */
-    height: 60px;
+    width: 75px; /* Reducido para que quepa dentro del spinner */
+    height: 75px;
     object-fit: contain;
     border-radius: 50%;
     opacity: 0;
@@ -39,8 +39,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 60px; /* Tamaño ajustado para caber dentro del spinner */
-    height: 60px;
+    width: 75px; /* Tamaño ajustado para caber dentro del spinner */
+    height: 75px;
     background-size: contain; /* Ajusta la imagen al contenedor */
     background-repeat: no-repeat;
     background-position: center;

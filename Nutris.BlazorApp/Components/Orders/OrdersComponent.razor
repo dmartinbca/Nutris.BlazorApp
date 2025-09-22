@@ -11,7 +11,7 @@
 @inject IJSRuntime JSRuntime
 @inject ILocalStorageService LocalStorage
 
-<link href="css/OrdersComponent.css" rel="stylesheet" />
+<link href="/css/OrdersComponent.css" rel="stylesheet" />
 
 @if (IsLoading)
 {
@@ -66,7 +66,7 @@
             <div class="hcol1">
                 <div class="row1-1 row">
                     <div class="col1-rh1 col-6">
-                        <img alt="logo" style="width:84px;" src="@Logo">
+                        <img alt="logo" style="width:auto; height: 120px;" src="@Logo">
                     </div>
                     <div class="country-rh1 col-6">
                         <p class="RalewayRegular font-18">@Localization["orderView.Country"]</p>
@@ -467,8 +467,24 @@
                                                             </div>
                                                         }
                                                     </div>
-
+                                                   
+                                                    <div class="bottle-container">
+                                                    <div class="Cap-img">
+                                                       
+                                                       
+                                                        @if (!string.IsNullOrEmpty(CapImg))
+                                                        {
+                                                            <img alt="bottle" src="@CapImg">
+                                                        }
+                                                        else
+                                                        {
+                                                            <p>-</p>
+                                                        }
+                                                       
+                                                    </div>
                                                     <div class="bottle-img">
+
+
                                                         @if (!string.IsNullOrEmpty(BottleImg))
                                                         {
                                                             <img alt="bottle" src="@BottleImg">
@@ -477,8 +493,12 @@
                                                         {
                                                             <p>-</p>
                                                         }
+
                                                     </div>
 
+
+                                                    </div>
+                                                  
                                                     @if (Status == "Desarrollo")
                                                     {
                                                         <div class="d-flex btn-edit-bottle col-12 col-lg-2">
@@ -487,7 +507,9 @@
                                                             </button>
                                                         </div>
                                                     }
+                                                    
                                                 </div>
+                                                
                                             </div>
 
                                             <div>
@@ -942,7 +964,7 @@
                     LabelSize = RG35?.Label_size ?? "",
                     LabelMaterial = RG35?.Label_material ?? "",
                     LabelFinish = RG35?.Label_finish ?? "",
-                    LabelColors = RG35?.Label_color ?? ""
+                    LabelColors = RG35?.Label_type ?? ""
                 })"
                 CodeRG35="@Code"
                 FinalImagen="@LabelImageUrl"
@@ -966,5 +988,5 @@
                       OnOptionsUpdated="HandlePackagingUpdated"
                       Materiales="@_opts.Materiales" />
 </div>
-
+ 
  
