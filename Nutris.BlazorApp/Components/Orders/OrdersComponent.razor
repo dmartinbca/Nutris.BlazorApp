@@ -218,8 +218,12 @@
                         </div>
                         <div class="right-from col-4 d-flex gap-1">
                             <div class="line-from"></div>
-                            <div class="@(PercentFilledFormulation == 0 ? "progress-bar-from-0" : "progress-bar-from")">
+                            <div class="@(PercentFilledFormulation < 100 ? "progress-bar-from-0" : "progress-bar-from")">
                                 <p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledFormulation)%</p>
+                                @if (PercentFilledFormulation == 100)
+                                {
+                                    <span class="step-check">✓</span>
+                                }
                             </div>
                             <img @onclick="() => ToggleSection(1)" id="id-0"
                                  class="arrow-t @(IsOpen[1] ? "arrow-t-r" : "")"
@@ -423,9 +427,14 @@
                                 </div>
                                 <div class="right-from col-4 d-flex gap-1">
                                     <div class="line-from"></div>
-                                    <div class="@(PercentFilledBottle == 0 ? "progress-bar-from-0" : "progress-bar-from")">
+                                    <div class="@(PercentFilledBottle < 100 ? "progress-bar-from-0" : "progress-bar-from")">
                                         <p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledBottle)%</p>
+                                        @if (PercentFilledBottle == 100)
+                                        {
+                                        <span class="step-check">✓</span>
+                                        }
                                     </div>
+                                     
                                     <img @onclick="() => ToggleSection(2)" id="id-1"
                                          class="arrow-t @(IsOpen[2] ? "arrow-t-r" : "")"
                                          src="img/arrow-close-down.svg" alt="arrow open">
@@ -667,8 +676,12 @@
                                 </div>
                                 <div class="right-from col-4 d-flex gap-1">
                                     <div class="line-from"></div>
-                                    <div class="@(PercentFilledLabel == 0 ? "progress-bar-from-0" : "progress-bar-from")">
+                                    <div class="@(PercentFilledLabel < 100 ? "progress-bar-from-0" : "progress-bar-from")">
                                         <p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledLabel)%</p>
+                                        @if (PercentFilledLabel == 100)
+                                        {
+                                            <span class="step-check">✓</span>
+                                        }
                                     </div>
                                     <img @onclick="() => ToggleSection(3)" id="id-2"
                                          class="arrow-t @(IsOpen[3] ? "arrow-t-r" : "")"
@@ -754,8 +767,12 @@
                             </div>
                             <div class="right-from col-4 d-flex gap-1">
                                 <div class="line-from"></div>
-                                <div class="@(PercentFilledPalettizing == 0 ? "progress-bar-from-0" : "progress-bar-from")">
+                                <div class="@(PercentFilledPalettizing < 100 ? "progress-bar-from-0" : "progress-bar-from")">
                                     <p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledPalettizing)%</p>
+                                    @if (PercentFilledPalettizing == 100)
+                                    {
+                                        <span class="step-check">✓</span>
+                                    }
                                 </div>
                                 <img @onclick="() => ToggleSection(4)" id="id-3"
                                      class="arrow-t @(IsOpen[4] ? "arrow-t-r" : "")"
@@ -939,8 +956,12 @@
                             </div>
                             <div class="right-from col-4 d-flex gap-1">
                                 <div class="line-from"></div>
-                                <div class="@(PercentFilledAnalytics == 0 ? "progress-bar-from-0" : "progress-bar-from")">
+                                <div class="@(PercentFilledAnalytics < 100 ? "progress-bar-from-0" : "progress-bar-from")">
                                     <p class="font-19 MuseoSemiBold">@FormatPercent(PercentFilledAnalytics)%</p>
+                                    @if (PercentFilledAnalytics == 100)
+                                    {
+                                        <span class="step-check">✓</span>
+                                    }
                                 </div>
                                 <img @onclick="() => ToggleSection(5)" id="id-4"
                                      class="arrow-t @(IsOpen[5] ? "arrow-t-r" : "")"
