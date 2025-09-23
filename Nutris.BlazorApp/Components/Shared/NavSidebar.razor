@@ -4,6 +4,7 @@
 @inject IAuthService AuthService
 @inject ILocalizationService Localization
 @inject ILocalStorageService LocalStorage
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 <div class="sidebar">
@@ -69,26 +70,52 @@
     </div>
 </div>
 
-<!-- Logout Modal -->
+<!-- Logout Modal con estética de ConfirmModal -->
 @if (showLogoutModal)
 {
-    <div class="modal-backdrop fade show"></div>
-    <div class="modal fade show" style="display: block;" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@Localization["NavBar.Confirm"]</h5>
-                    <button type="button" class="btn-close" @onclick="() => showLogoutModal = false"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="text-center">@Localization["NavBar.logout"]</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="() => showLogoutModal = false">
-                        @Localization["NavBar.Cancel"]
+    <!-- Backdrop -->
+    <div class="logout-modal-backdrop" @onclick="CancelLogout"></div>
+
+    <!-- Modal -->
+    <div class="logout-modal-wrapper">
+        <div class="logout-modal-container">
+            <!-- Botón X para cerrar -->
+            <button class="modal-close-btn" @onclick="CancelLogout">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M6 6L18 18" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+
+            <!-- Título del modal -->
+            <div class="modal-header-custom">
+                <h3>@Localization["NavBar.Confirm"]</h3>
+            </div>
+
+            <!-- Contenido -->
+            <div class="modal-body-custom">
+                <p class="modal-question">¿Estás seguro de que deseas cerrar sesión?</p>
+
+                <!-- Botones -->
+                <div class="modal-buttons">
+                    <button class="btn-modal-cancel"
+                            @onclick="CancelLogout"
+                            disabled="@isProcessing">
+                        Cancelar
                     </button>
-                    <button type="button" class="btn btn-danger" @onclick="Logout">
-                        @Localization["NavBar.SignOut"]
+
+                    <button class="btn-modal-confirm"
+                            @onclick="Logout"
+                            disabled="@isProcessing">
+                        @if (isProcessing)
+                        {
+                            <span class="spinner-logout"></span>
+                            <span>Cerrando...</span>
+                        }
+                        else
+                        {
+                            <span>Cerrar Sesión</span>
+                        }
                     </button>
                 </div>
             </div>
@@ -97,6 +124,7 @@
 }
 
 <style>
+    /* Estilos existentes del sidebar */
     .sidebar {
         width: 300px;
         height: 100vh;
@@ -156,6 +184,10 @@
 
     .font-20 {
         font-size: 1.125rem;
+    }
+
+    .font-24 {
+        font-size: 24px;
     }
 
     .lineb {
@@ -221,27 +253,232 @@
             margin: 0;
             text-align: center;
         }
+    /* MODAL DE LOGOUT - Estilo exacto de ConfirmModal */
 
-    /* Modal */
-    .modal-backdrop {
+    /* Backdrop */
+    .logout-modal-backdrop {
         position: fixed;
         top: 0;
         left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
         z-index: 1040;
-        width: 100vw;
-        height: 100vh;
-        background-color: #000;
-        opacity: 0.5;
+        animation: fadeIn 0.2s ease;
     }
 
-    .modal {
+    /* Wrapper para centrar */
+    .logout-modal-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         z-index: 1050;
     }
+
+    /* Contenedor del modal */
+    .logout-modal-container {
+        position: relative;
+        width: 90%;
+        max-width: 500px;
+        background-color: white;
+        padding: 0;
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        animation: slideUp 0.3s ease;
+    }
+
+    /* Botón X para cerrar */
+    .modal-close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        transition: transform 0.2s;
+    }
+
+        .modal-close-btn:hover {
+            transform: scale(1.1);
+        }
+
+    /* Header del modal */
+    .modal-header-custom {
+        padding: 24px 24px 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+        .modal-header-custom h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+    /* Body del modal */
+    .modal-body-custom {
+        padding: 24px;
+    }
+
+    .modal-question {
+        margin: 0 0 24px 0;
+        font-size: 16px;
+        color: #374151;
+        text-align: center;
+        line-height: 1.5;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Contenedor de botones */
+    .modal-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    /* Botón Cancelar */
+    .btn-modal-cancel {
+        padding: 10px 20px;
+        background-color: #6b7280;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+        .btn-modal-cancel:hover:not(:disabled) {
+            background-color: #4b5563;
+        }
+
+    /* Botón Confirmar (Cerrar Sesión) */
+    .btn-modal-confirm {
+        padding: 10px 20px;
+        background-color: #dc2626;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 120px;
+        justify-content: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+        .btn-modal-confirm:hover:not(:disabled) {
+            background-color: #b91c1c;
+        }
+
+        /* Estados deshabilitados */
+        .btn-modal-cancel:disabled,
+        .btn-modal-confirm:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+    /* Spinner */
+    .spinner-logout {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @@keyframes spin {
+        to
+
+    {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    /* Animaciones */
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+    }
+
+    @@keyframes slideUp {
+        from
+
+    {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    }
+
+    /* Responsive */
+    @@media (max-width: 640px) {
+        .logout-modal-container
+
+    {
+        width: 95%;
+        margin: 0 10px;
+    }
+
+    .modal-header-custom {
+        padding: 20px 20px 12px;
+    }
+
+    .modal-body-custom {
+        padding: 20px;
+    }
+
+    .modal-buttons {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .btn-modal-cancel,
+    .btn-modal-confirm {
+        width: 100%;
+    }
+
+    }
+     
 </style>
 
 @code {
     private bool showLogoutModal = false;
     private bool isTooltipVisible = false;
+    private bool isProcessing = false;
     private string userName = "";
     private string customerLogo = "";
 
@@ -249,6 +486,18 @@
     {
         await LoadUserData();
         Localization.OnLanguageChanged += OnLanguageChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (showLogoutModal)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = 'hidden';");
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = '';");
+        }
     }
 
     private async Task LoadUserData()
@@ -274,12 +523,33 @@
     private void ShowLogoutModal()
     {
         showLogoutModal = true;
+        StateHasChanged();
+    }
+
+    private async Task CancelLogout()
+    {
+        showLogoutModal = false;
+        await JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = '';");
+        StateHasChanged();
     }
 
     private async Task Logout()
     {
-        await AuthService.LogoutAsync();
-        Navigation.NavigateTo("/", true);
+        if (isProcessing) return;
+
+        isProcessing = true;
+        StateHasChanged();
+
+        try
+        {
+            await Task.Delay(500); // Pequeña demora para mostrar el spinner
+            await AuthService.LogoutAsync();
+            Navigation.NavigateTo("/", true);
+        }
+        finally
+        {
+            isProcessing = false;
+        }
     }
 
     public void Dispose()

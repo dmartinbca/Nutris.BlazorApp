@@ -12,6 +12,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using static Nutris.BlazorApp.Components.Modals.BoteCapDataModal;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Nutris.BlazorApp.Components.Orders;
 
@@ -191,7 +192,7 @@ public class OrdersComponentBase : ComponentBase
         [JsonPropertyName("Label_size")] public string? LabelSize { get; set; }
         [JsonPropertyName("Label_material")] public string? LabelMaterial { get; set; }
         [JsonPropertyName("Label_finish")] public string? LabelFinish { get; set; }
-        [JsonPropertyName("Label_Color")] public string? LabelColors { get; set; }
+        [JsonPropertyName("Label_type")] public string? LabelColors { get; set; }
     }
     protected List<NutrisBlazor.Components.Modals.ModalLabel.OptionMX> MapSizeMx(List<AtributoOption> src) =>
     src.Select((x, i) => new NutrisBlazor.Components.Modals.ModalLabel.OptionMX
@@ -595,7 +596,7 @@ public class OrdersComponentBase : ComponentBase
             _opts.FormasBote = ListFromIndex(24);     // por si quieres usarlas
             _opts.Bocas = ListFromIndex(22);     // idem
             _opts.FormasTapa = ListFromIndex(19);
-
+         
             _opts.ColorBote = ColorListFromIndex(20);
             _opts.ColorCover = ColorListFromIndex(18);
         }
@@ -975,7 +976,7 @@ public class OrdersComponentBase : ComponentBase
         {
             new() { Label = Localization["orderView.BottleA[0]"], Value = data.Characteristics ?? "-" },
             new() { Label = Localization["orderView.BottleA[1]"], Value = data.Bote_boca ?? "-" },
-            new() { Label = Localization["orderView.BottleA[2]"], Value = data.Pieces_per_container ?? "-" }
+            new() { Label = Localization["orderView.BottleA[2]"], Value = FormatNumericValue(data.Pieces_per_container) }
         };
 
         FillingBatch = data.Filling_batch ?? "-";
@@ -992,9 +993,10 @@ public class OrdersComponentBase : ComponentBase
         LabelInfo = new List<InputItem>
         {
             new() { Label = Localization["orderView.GUMMYDNAL[0]"], Value = data.Label_size ?? "-" },
+            new() { Label = Localization["orderView.GUMMYDNAL[3]"], Value = data.Label_type ?? "-" },
             new() { Label = Localization["orderView.GUMMYDNAL[1]"], Value = data.Label_material ?? "-" },
             new() { Label = Localization["orderView.GUMMYDNAL[2]"], Value = data.Label_finish ?? "-" },
-            new() { Label = Localization["orderView.GUMMYDNAL[3]"], Value = data.Label_color ?? "-" }
+         
         };
 
         // Palletizing
@@ -1004,19 +1006,35 @@ public class OrdersComponentBase : ComponentBase
             PalletLabelImg = $"data:image/png;base64,{data.Pallet_label_imagen}";
 
         PalletComments = data.Pallet_comments ?? "";
-
-        PalletInfo = new List<InputItem>
+        if(data.Box_label_config=="Standard")
         {
+            PalletInfo = new List<InputItem>
+        {
+            new() { Label = Localization["orderView.Pallet[5]"], Value = data.Box_label_config ?? "-" },
             new() { Label = Localization["orderView.Pallet[0]"], Value = data.Box_name ?? "-" },
-            new() { Label = Localization["orderView.Pallet[1]"], Value = data.Box_units_per ?? "-" }
+            new() { Label = Localization["orderView.Pallet[1]"], Value = FormatNumericValue(data.Box_units_per) },
+
+
         };
+        }
+        else
+        {
+            PalletInfo = new List<InputItem>
+        {
+            new() { Label = Localization["orderView.Pallet[5]"], Value = data.Box_label_config ?? "-" },
+          
+
+           
+        };
+        }
+      
 
         PalletizingInfo = new List<InputItem>
         {
             new() { Label = Localization["orderView.PALLETIZINGINFORMATION[0]"], Value = data.Pallet_type ?? "-" },
-            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[1]"], Value = data.Pallet_layers ?? "-" },
-            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[2]"], Value = data.Pallet_boxes_per_layer ?? "-" },
-            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[3]"], Value = data.Pallet_boxes_per_pallet ?? "-" }
+            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[1]"], Value = FormatNumericValue(data.Pallet_layers) },
+            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[2]"], Value =  FormatNumericValue(data.Pallet_boxes_per_layer ) },
+            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[3]"], Value = FormatNumericValue(data.Pallet_boxes_per_pallet)}
         };
 
         // Analytics
@@ -1080,7 +1098,18 @@ public class OrdersComponentBase : ComponentBase
         }
         return list;
     }
-
+    private string FormatNumericValue(int? value)
+    {
+        return value == null || value == 0 ? "-" : value.ToString();
+    }
+    private string FormatNumericValue(decimal? value)
+    {
+        return value == null || value == 0 ? "-" : value.ToString();
+    }
+    private string FormatNumericValue(string? value)
+    {
+        return value == null || value == "0" ? "-" : value.ToString();
+    }
     private void BuildLabelCatalogsFromAtributos(JsonElement atributos)
     {
         if (!atributos.TryGetProperty("value", out var valueArr) || valueArr.ValueKind != JsonValueKind.Array)
@@ -1095,7 +1124,7 @@ public class OrdersComponentBase : ComponentBase
         LabelOptionsSize = MapAttrToLabelOptionMX(valueArr, 16);
         LabelOptionsFinish = MapAttrToLabelOption(valueArr, 8);
         LabelOptionsMaterial = MapAttrToLabelOption(valueArr, 9);
-        LabelOptionsColor = MapAttrToLabelOption(valueArr, 10);
+        LabelOptionsColor = MapAttrToLabelOption(valueArr, 7);
     }
 
     private void LoadFromRG37(CustomizeRG37Response data)
@@ -1144,8 +1173,8 @@ public class OrdersComponentBase : ComponentBase
         {
             new() { Label = Localization["orderView.ListInputB[0]"], Value = data.Color ?? "-" },
             new() { Label = Localization["orderView.ListInputB[1]"], Value = data.Flavour ?? "-" },
-            new() { Label = Localization["orderView.ListInputB[2]"], Value = data.Size ?? "-" },
-            new() { Label = Localization["orderView.ListInputB[3]"], Value = data.Serving ?? "-" }
+            new() { Label = Localization["orderView.ListInputB[2]"], Value = FormatNumericValue(data.Size) },
+            new() { Label = Localization["orderView.ListInputB[3]"], Value = FormatNumericValue(data.Serving) }
         };
 
         // Recipe
@@ -1283,9 +1312,17 @@ public class OrdersComponentBase : ComponentBase
 
         if (!string.IsNullOrEmpty(BoxLabelImg)) fields.Add(BoxLabelImg);
         if (!string.IsNullOrEmpty(PalletLabelImg)) fields.Add(PalletLabelImg);
-
-        var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-");
-        PercentFilledPalettizing = fields.Count > 0 ? (filled * 100 / fields.Count) : 0;
+        if(RG35.Box_label_config=="Standard")
+        {
+            var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-");
+            PercentFilledPalettizing = fields.Count > 0 ? (filled * 100 / fields.Count) : 0;
+        }
+        else
+        {
+            var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-" && RG35.Box_label_imagen!="");
+            PercentFilledPalettizing = fields.Count > 0 ? (filled * 100 / fields.Count) : 0;
+        }
+       
     }
 
     private void CalculateAnalyticsPercentage()
@@ -1722,6 +1759,8 @@ public class OrdersComponentBase : ComponentBase
                     await InvokeAsync(StateHasChanged);
                     Console.WriteLine("Box label image updated successfully");
                 }
+                CalculateAllPercentages();
+                StateHasChanged();
             }
         }
         catch (Exception ex)
@@ -1744,9 +1783,12 @@ public class OrdersComponentBase : ComponentBase
             LabelInfo = new List<InputItem>
             {
                 new() { Label = Localization["orderView.GUMMYDNAL[0]"], Value = opts.LabelSize     ?? "-" },
-                new() { Label = Localization["orderView.GUMMYDNAL[1]"], Value = opts.LabelMaterial ?? "-" },
+                new() { Label = Localization["orderView.GUMMYDNAL[3]"], Value =opts.LabelColors ?? "-" },
+                new() { Label = Localization["orderView.GUMMYDNAL[1]"], Value = opts.LabelMaterial   ?? "-" },
                 new() { Label = Localization["orderView.GUMMYDNAL[2]"], Value = opts.LabelFinish   ?? "-" },
-                new() { Label = Localization["orderView.GUMMYDNAL[3]"], Value = opts.LabelColors   ?? "-" },
+
+              
+            
             };
 
         }

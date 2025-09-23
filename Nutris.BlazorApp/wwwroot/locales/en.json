@@ -234,7 +234,11 @@
     "BOXLABEL": "BOX LABEL",
     "Pallet": [
       "Box",
-      "Units per Box"
+      "Units per Box",
+      "Product Name",
+      "Lot",
+      "BBD",
+      "Type"
     ],
     "BoxLabel": "Box label",
     "Size": "Size",

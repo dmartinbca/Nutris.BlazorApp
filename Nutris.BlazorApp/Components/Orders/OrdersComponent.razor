@@ -1,4 +1,5 @@
 ﻿@using NutrisBlazor.Components.Modals
+@using NutrisBlazor.Components.Shared
 @using NutrisBlazor.Models
 @using Nutris.BlazorApp.Components.Modals
 @using Nutris.BlazorApp.Components.Orders.Steps
@@ -66,12 +67,16 @@
             <div class="hcol1">
                 <div class="row1-1 row">
                     <div class="col1-rh1 col-6">
-                        <img alt="logo" style="width:auto; height: 120px;" src="@Logo">
+                        @if (!string.IsNullOrEmpty(Logo))
+                        {
+                            <img alt="logo" style="width:auto; height: 120px;" src="@Logo">
+                        }
+                       
                     </div>
                     <div class="country-rh1 col-6">
                         <p class="RalewayRegular font-18">@Localization["orderView.Country"]</p>
                         <div class="d-flex gap-3 justify-content-end align-content-center">
-                            @if (!string.IsNullOrEmpty(Country1))
+                            @if (!string.IsNullOrEmpty(Country1) && Country1 != "-")
                             {
                                 <div class="col2-rh1 d-flex justify-content-end">
                                     <img src="@CountryFlag1" alt="@Country1" />
@@ -268,6 +273,11 @@
                                                 {
                                                     <img src="img/check-icon.svg" alt="check">
                                                 }
+                                                else
+                                                {
+                                                    <div class="line-from"></div>
+                                                    <img src="img/cancelar.svg" alt="check">
+                                                }
                                             </div>
                                         </div>
                                     }
@@ -282,6 +292,11 @@
                                                 @if (item.Value != "-")
                                                 {
                                                     <img src="img/check-icon.svg" alt="check">
+                                                }
+                                                else
+                                                {
+                                                    <div class="line-from"></div>
+                                                    <img src="img/cancelar.svg" alt="check">
                                                 }
                                             </div>
                                         </div>
@@ -306,6 +321,11 @@
                                             @if (!string.IsNullOrEmpty(GummyShapeImg))
                                             {
                                                 <img src="img/check-icon.svg" alt="check">
+                                            }
+                                            else
+                                            {
+                                                <div class="line-from"></div>
+                                                <img src="img/cancelar.svg" alt="check">
                                             }
                                         </div>
                                     </div>
@@ -420,17 +440,19 @@
                                             <div class="body-td">
                                                 <div class="d-flex gap-1">
                                                     <p class="font-18 RalewayRegular">@Localization["orderView.TraddeName"]</p>
-                                                    <div data-bs-toggle="tooltip" data-bs-placement="top" title="@Localization["orderView.TraddeNameTooltip"]">
+                                                     <div data-bs-toggle="tooltip" data-bs-placement="top" title="@Localization["orderView.TraddeNameToltip"]">
                                                         <svg xmlns="http://www.w3.org/2000/svg" style="width:24px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                                                         </svg>
                                                     </div>
+                                                   
                                                 </div>
                                                 <div class="data-t">
-                                                    <input class="font-20 RalewayRegular" type="text" @bind="ProductName2" />
+                                                    <input class="font-14 RalewayRegular custom-input" type="text" @bind="ProductName2" />
+
                                                     @if (!CustomerAccepted && Status == "Desarrollo")
                                                     {
-                                                        <button @onclick="SaveName" class="btn-t RalewayMedium font-20" type="button">
+                                                        <button @onclick="SaveName" class="btn-t RalewayMedium font-14" type="button">
                                                             @Localization["orderView.Save"]
                                                         </button>
                                                     }
@@ -438,6 +460,11 @@
                                                     @if (ProductName2 != "-")
                                                     {
                                                         <img src="img/check-icon.svg" alt="check" class="d-none d-xl-block">
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="line-from"></div>
+                                                        <img src="img/cancelar.svg" alt="check">
                                                     }
                                                 </div>
                                             </div>
@@ -458,10 +485,15 @@
                                                                 <p class="font-18 RalewayRegular">@item.Label</p>
                                                                 <div class="data-t">
                                                                     <span><p class="font-20 RalewayBold">@item.Value</p></span>
-                                                                    @if (item.Value != "")
+                                                                    @if (item.Value != "-")
                                                                     {
                                                                         <div class="line-from"></div>
                                                                         <img src="img/check-icon.svg" alt="check">
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <div class="line-from"></div>
+                                                                        <img src="img/cancelar.svg" alt="check">
                                                                     }
                                                                 </div>
                                                             </div>
@@ -536,10 +568,15 @@
                                                                         <span>@(IsSendingBatchOther ? "Enviando..." : "Enviar")</span>
                                                                     </button>
                                                                 }
-                                                                @if (FillingBatch != "")
+                                                                @if (FillingBatch != "-")
                                                                 {
                                                                     <div class="line-from"></div>
                                                                     <img src="img/check-icon.svg" alt="check">
+                                                                }
+                                                                else
+                                                                {
+                                                                    <div class="line-from"></div>
+                                                                    <img src="img/cancelar.svg" alt="check">
                                                                 }
                                                             </div>
                                                         </div>
@@ -562,10 +599,15 @@
                                                                         <span>@(IsSendingBbdOther ? "Enviando..." : "Enviar")</span>
                                                                     </button>
                                                                 }
-                                                                @if (FillingExpDate != "")
+                                                                @if (FillingExpDate != "-")
                                                                 {
                                                                     <div class="line-from"></div>
                                                                     <img src="img/check-icon.svg" alt="check">
+                                                                }
+                                                                else
+                                                                {
+                                                                    <div class="line-from"></div>
+                                                                    <img src="img/cancelar.svg" alt="check">
                                                                 }
                                                             </div>
                                                         </div>
@@ -574,10 +616,15 @@
                                                             <p class="font-18 RalewayRegular">@Localization["orderView.Location"]</p>
                                                             <div class="data-t">
                                                                 <input type="text" readonly class="font-20 RalewayRegular" value="@FillingLocation">
-                                                                @if (FillingLocation != "")
+                                                                @if (FillingLocation != "-")
                                                                 {
                                                                     <div class="line-from"></div>
                                                                     <img src="img/check-icon.svg" alt="check">
+                                                                }
+                                                                else
+                                                                {
+                                                                    <div class="line-from"></div>
+                                                                    <img src="img/cancelar.svg" alt="check">
                                                                 }
                                                             </div>
                                                         </div>
@@ -650,10 +697,15 @@
                                                     <p class="font-18 RalewayRegular @(NoLabel ? "disabled-text" : "")">@item.Label</p>
                                                     <div class="data-t">
                                                         <span><p class="font-20 RalewayBold @(NoLabel ? "disabled-text" : "")">@item.Value</p></span>
-                                                        @if (item.Value != "" && !NoLabel)
+                                                        @if (item.Value != "-" && !NoLabel)
                                                         {
                                                             <div class="line-from"></div>
                                                             <img src="img/check-icon.svg" alt="check">
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="line-from"></div>
+                                                            <img src="img/cancelar.svg" alt="check">
                                                         }
                                                     </div>
                                                 </div>
@@ -719,21 +771,30 @@
                                         <h3 class="font-18 RalewayBold">@Localization["orderView.BOXLABEL"]</h3>
                                     </div>
                                     <div class="body-t">
-                                        @foreach (var item in PalletInfo)
-                                        {
-                                            <div class="body-td">
-                                                <p class="font-18 RalewayRegular">@item.Label</p>
-                                                <div class="data-t">
-                                                    <input class="RalewayRegular font-20" type="text" readonly value="@item.Value">
-                                                    @if (item.Value != "-")
-                                                    {
-                                                        <div class="line-from"></div>
-                                                        <img src="img/check-icon.svg" alt="check">
-                                                    }
+                                        
+                                            @foreach (var item in PalletInfo)
+                                            {
+                                                <div class="body-td">
+                                                    <p class="font-18 RalewayRegular">@item.Label</p>
+                                                    <div class="data-t">
+                                                        <input class="RalewayRegular font-20" type="text" readonly value="@item.Value">
+                                                        @if (item.Value != "-")
+                                                        {
+                                                            <div class="line-from"></div>
+                                                            <img src="img/check-icon.svg" alt="check">
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="line-from"></div>
+                                                            <img src="img/cancelar.svg" alt="check">
+                                                        }
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        }
+                                            }
+                                          
 
+                                           
+                                       
                                         <div class="body-td" id="body-td-pallet">
                                             <p class="font-18 RalewayRegular w-100">@Localization["orderView.BoxLabel"]</p>
                                             <div class="data-t">
@@ -749,11 +810,21 @@
                                                             }
                                                             else
                                                             {
-                                                                <p></p>
+                                                                @if (RG35.Box_label_config == "Standard")
+                                                                {
+                                                                    <ProductLabel ProductName=@RG35.Box_Nombre_Producto
+                                                                    BatchNumber=@RG35.Box_Lote
+                                                                    ExpirationDate=@RG35.Box_BBD
+                                                                     Quantity=@RG35.Box_Quantity />
+                                                                }
+                                                                else
+                                                                {
+                                                                    <p> </p>
+                                                                }
                                                             }
                                                         </div>
                                                     </div>
-                                                    @if (Status == "Desarrollo")
+                                                    @if (Status == "Desarrollo" &&  RG35.Box_label_config !="Standard")
                                                     {
                                                         <div>
                                                             <div class="btn-pallet-tag">
@@ -787,6 +858,11 @@
                                                     {
                                                         <div class="line-from"></div>
                                                         <img src="img/check-icon.svg" alt="check">
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="line-from"></div>
+                                                        <img src="img/cancelar.svg" alt="check">
                                                     }
                                                 </div>
                                             </div>

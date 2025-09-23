@@ -236,7 +236,11 @@
     "BOXLABEL": "ETIQUETA DE CAJA",
     "Pallet": [
       "Caja",
-      "Unidades por caja"
+      "Unidades por caja",
+      "Nombre Producto",
+      "Lote",
+      "BBD",
+      "Tipo"
     ],
     "BoxLabel": "Etiqueta de caja",
     "Size": "Tamaño",

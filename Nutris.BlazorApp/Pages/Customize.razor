@@ -137,7 +137,7 @@
                 }
                 else
                 {
-                  //  Ficheros = RG35Data.Files ?? new List<FileItem>();
+                    //  Ficheros = RG35Data.Files ?? new List<FileItem>();
                     // 1) payload como en Vue
                     var payload = new { numeroRG = Id };
 
@@ -176,7 +176,7 @@
                         });
                         RG35Data.Files = Ficheros;
                     }
-                    
+
                 }
 
                 Console.WriteLine($"RG35 data loaded: Code={RG35Data.Code}, Product={RG35Data.Product_name}");
@@ -185,13 +185,13 @@
             {
                 Console.WriteLine("Loading RG37 data...");
                 RG37Data = await CustomizeApi.GetRG37Async(Id);
-                
+
                 if (RG37Data == null)
                 {
                     Error = $"No se encontraron datos RG37 para el ID: {Id}";
                     return;
                 }
-                
+
                 Console.WriteLine($"RG37 data loaded: Code={RG37Data.Code}, Product={RG37Data.Product_name}");
             }
             else
@@ -202,7 +202,7 @@
 
             // Cargar catálogos (común para ambos tipos)
             Console.WriteLine("Loading catalogs...");
-            
+
             var catalogTasks = new[]
             {
                 CustomizeApi.GetAtributosAsync(),
@@ -213,7 +213,7 @@
             };
 
             var results = await Task.WhenAll(catalogTasks);
-            
+
             AtributosDoc = results[0];
             RelacionBoteDoc = results[1];
             RelacionTapaDoc = results[2];
@@ -228,6 +228,21 @@
             BbdFormatRoot = BbdFormatDoc?.RootElement ?? default;
 
             Console.WriteLine("All data loaded successfully");
+            if (RG35Data is not null)
+            {
+                if (RG35Data.Estimated_date == "0001-01-01")
+                {
+                    RG35Data.Estimated_date = "";
+
+                }
+                if (RG35Data.Deadline_date == "0001-01-01")
+                {
+                    RG35Data.Deadline_date = "";
+
+                }
+            }
+            
+             
         }
         catch (HttpRequestException httpEx)
         {

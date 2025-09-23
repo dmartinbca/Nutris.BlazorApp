@@ -81,6 +81,11 @@ namespace NutrisBlazor.Models
         public string Box_name { get; set; } = "";
         public string Box_units_per { get; set; } = "";
 
+        public string Box_Nombre_Producto { get; set; } = "";
+        public string Box_Lote { get; set; } = "";
+        public string Box_BBD { get; set; } = "";
+        public string Box_label_config { get; set; } = "";
+        public string Box_Quantity { get; set; } = "";
         // Analytics
         public bool No_analitycs { get; set; }
 

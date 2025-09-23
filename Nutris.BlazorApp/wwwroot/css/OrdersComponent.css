@@ -1263,7 +1263,22 @@ h3 {
     padding: 1.4rem 0;
     border-bottom: dotted 1px;
 }
+.custom-input {
+    background-color: white !important;
+    width: auto;
+    padding: 10px 0px;
+    border: 1px solid #D2D2D2;
+    border-radius: 5px;
+    outline: 0.5px solid #D2D2D2;
+    outline-offset: -1px;
+    transition: border-color 0.3s;
+    font-size: small;
+}
 
+    .custom-input:focus {
+        border-color: #2F5496;
+        box-shadow: 0 0 0 2px rgba(47, 84, 150, 0.1);
+    }
 #btd-1 {
     border-top: dotted 1px;
 }

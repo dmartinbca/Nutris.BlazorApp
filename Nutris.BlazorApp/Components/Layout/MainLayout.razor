@@ -78,26 +78,52 @@
     </div>
 </div>
 
-<!-- Logout Modal -->
+<!-- Logout Modal con nuevo estilo -->
 @if (showLogoutModal)
 {
-    <div class="modal-backdrop fade show"></div>
-    <div class="modal fade show" style="display: block;" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@Localization["NavBar.Confirm"]</h5>
-                    <button type="button" class="btn-close" @onclick="() => showLogoutModal = false"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="text-center">@Localization["NavBar.logout"]</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="() => showLogoutModal = false">
+    <!-- Backdrop -->
+    <div class="logout-modal-backdrop" @onclick="CancelLogout"></div>
+
+    <!-- Modal -->
+    <div class="logout-modal-wrapper">
+        <div class="logout-modal-container">
+            <!-- Botón X para cerrar -->
+            <button class="modal-close-btn" @onclick="CancelLogout">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M6 6L18 18" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+
+            <!-- Título del modal -->
+            <div class="modal-header-custom">
+                <h3>@Localization["NavBar.Confirm"]</h3>
+            </div>
+
+            <!-- Contenido -->
+            <div class="modal-body-custom">
+                <p class="modal-question">@Localization["NavBar.logout"]</p>
+
+                <!-- Botones -->
+                <div class="modal-buttons">
+                    <button class="btn-modal-cancel"
+                            @onclick="CancelLogout"
+                            disabled="@isProcessing">
                         @Localization["NavBar.Cancel"]
                     </button>
-                    <button type="button" class="btn btn-danger" @onclick="Logout">
-                        @Localization["NavBar.SignOut"]
+
+                    <button class="btn-modal-confirm"
+                            @onclick="Logout"
+                            disabled="@isProcessing">
+                        @if (isProcessing)
+                        {
+                            <span class="spinner-logout"></span>
+                            <span>Cerrando...</span>
+                        }
+                        else
+                        {
+                            <span>@Localization["NavBar.SignOut"]</span>
+                        }
                     </button>
                 </div>
             </div>
@@ -113,7 +139,7 @@
     private bool isTooltipVisible = false;
     private string userName = "";
     private string customerLogo = "";
-
+    private bool isProcessing = false;
     protected override async Task OnInitializedAsync()
     {
         Navigation.LocationChanged += HandleLocationChanged;
@@ -160,11 +186,29 @@
     {
         showLogoutModal = true;
     }
+    private void CancelLogout()  // NUEVO MÉTODO
+    {
+        showLogoutModal = false;
+        StateHasChanged();
+    }
 
     private async Task Logout()
     {
-        await AuthService.LogoutAsync();
-        Navigation.NavigateTo("/", true);
+        if (isProcessing) return;
+
+        isProcessing = true;
+        StateHasChanged();
+
+        try
+        {
+            await Task.Delay(500); // Pequeña demora para mostrar el spinner
+            await AuthService.LogoutAsync();
+            Navigation.NavigateTo("/", true);
+        }
+        finally
+        {
+            isProcessing = false;
+        }
     }
 
     public void Dispose()

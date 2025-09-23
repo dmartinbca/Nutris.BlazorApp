@@ -43,9 +43,10 @@
                                     <h3 class="child-bottle-title_features font-24 RalewaySemiBold">
                                         @Localization["modalLabel.Characteristics"]
                                     </h3>
-                                    
+
+                                    <!-- Primera fila: Maximum Size y Color -->
                                     <div class="child_content_features-bottle-form">
-                                        <!-- Maximum Size -->
+                                        <!-- Maximum Size (izquierda) -->
                                         <div class="form-grup-input-field RalewayRegular">
                                             <label class="form-group-label-size" for="size">
                                                 @Localization["modalLabel.Maximumsize"]
@@ -61,40 +62,8 @@
                                                 }
                                             </select>
                                         </div>
-                                        
-                                        <!-- Material -->
-                                        <div class="form-grup-input-field">
-                                            <label class="form-group-label-size" for="material">
-                                                @Localization["modalContainer.Material"]
-                                            </label>
-                                            <select class="form-select-config Museo"
-                                                    @bind="labelMaterial">
-                                                <option value="">Select Material</option>
-                                                @foreach (var optionLM in OptionsLabelMaterial)
-                                                {
-                                                    <option value="@optionLM.Value">@optionLM.Value</option>
-                                                }
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="child_content_features-bottle-form">
-                                        <!-- Finish -->
-                                        <div class="form-grup-input-field">
-                                            <label class="form-group-label-size" for="finish">
-                                                @Localization["modalLabel.Finish"]
-                                            </label>
-                                            <select class="form-select-config Museo"
-                                                    @bind="labelFinish">
-                                                <option value="">Select Finish</option>
-                                                @foreach (var optionF in OptionsFinish)
-                                                {
-                                                    <option value="@optionF.Value">@optionF.Value</option>
-                                                }
-                                            </select>
-                                        </div>
-                                        
-                                        <!-- Color -->
+
+                                        <!-- Color (derecha) -->
                                         <div class="form-grup-input-field">
                                             <label class="form-group-label-size" for="color">
                                                 @Localization["modalContainer.Color"]
@@ -109,7 +78,40 @@
                                             </select>
                                         </div>
                                     </div>
-                                    
+
+                                    <!-- Segunda fila: Material y Finish -->
+                                    <div class="child_content_features-bottle-form">
+                                        <!-- Material (izquierda) -->
+                                        <div class="form-grup-input-field">
+                                            <label class="form-group-label-size" for="material">
+                                                @Localization["modalContainer.Material"]
+                                            </label>
+                                            <select class="form-select-config Museo"
+                                                    @bind="labelMaterial">
+                                                <option value="">Select Material</option>
+                                                @foreach (var optionLM in OptionsLabelMaterial)
+                                                {
+                                                    <option value="@optionLM.Value">@optionLM.Value</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <!-- Finish (derecha) -->
+                                        <div class="form-grup-input-field">
+                                            <label class="form-group-label-size" for="finish">
+                                                @Localization["modalLabel.Finish"]
+                                            </label>
+                                            <select class="form-select-config Museo"
+                                                    @bind="labelFinish">
+                                                <option value="">Select Finish</option>
+                                                @foreach (var optionF in OptionsFinish)
+                                                {
+                                                    <option value="@optionF.Value">@optionF.Value</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+
                                     <!-- Download PDF Section -->
                                     <div class="container-download-file">
                                         <div class="container-download-file-button">
@@ -411,7 +413,7 @@
             Label_size = labelSize,
             Label_material = labelMaterial,
             Label_finish = labelFinish,
-            Label_Color = labelColors
+            Label_type = labelColors
         };
 
         Logger.LogInformation("Updating label options with data: {@Data}", data);
