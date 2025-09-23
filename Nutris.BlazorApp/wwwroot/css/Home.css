@@ -32,7 +32,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-image: url('/img/home-background.jpg');
+        background-image: url('https://static.wixstatic.com/media/869cb8_116297d94cf5407f9bc661c97c35a039f000.jpg/v1/fill/w_1288,h_815,al_c,q_85,usm_0.33_1.00_0.00,enc_avif,quality_auto/869cb8_116297d94cf5407f9bc661c97c35a039f000.jpg');
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center;
@@ -40,11 +40,12 @@
         z-index: 1;
         pointer-events: none;
     }
-
-    #home > * {
-        position: relative;
-        z-index: 2;
-    }
+/*<img src="https://static.wixstatic.com/media/869cb8_116297d94cf5407f9bc661c97c35a039f000.jpg/v1/fill/w_1288,h_815,al_c,q_85,usm_0.33_1.00_0.00,enc_avif,quality_auto/869cb8_116297d94cf5407f9bc661c97c35a039f000.jpg" alt="" style="width: 1288px; height: 815px; object-fit: cover; object-position: 50% 50%;" width="980" height="815" data-ssr-src-done="true" fetchpriority="high" >
+*/
+#home > * {
+    position: relative;
+    z-index: 2;
+}
 
 /* Language Selector */
 .language-selector-home {

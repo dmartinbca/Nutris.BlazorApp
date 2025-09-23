@@ -2,9 +2,10 @@
 using NutrisBlazor.Models.Converters;
 using NutrisBlazor.Services;
 using System.Text.Json;
-
+ 
 namespace Nutris.BlazorApp.Features.Customize
 {
+   
     public interface ICustomizeApi
     {
         Task<CustomizeRG35Response?> GetRG35Async(string id);
@@ -24,11 +25,13 @@ namespace Nutris.BlazorApp.Features.Customize
     {
         private readonly SimpleApiService _api;
         private readonly JsonSerializerOptions _jsonOptions;
+        private readonly IAuthService _authService;
+        private User _currentUser;
 
-        public CustomizeApi(SimpleApiService api)
+        public CustomizeApi(SimpleApiService api, IAuthService authService)
         {
             _api = api;
-
+            _authService = authService;
             // Configurar opciones de serialización con los convertidores personalizados
             _jsonOptions = new JsonSerializerOptions
             {
@@ -44,7 +47,15 @@ namespace Nutris.BlazorApp.Features.Customize
                     new FlexibleBoolConverter()
                 }
             };
+          
         }
+        private async Task<User> GetCurrentUserAsync()
+        {
+            // Cache del usuario para evitar múltiples llamadas
+            _currentUser ??= await _authService.GetCurrentUserAsync();
+            return _currentUser;
+        }
+
 
         public async Task<CustomizeRG35Response?> GetRG35Async(string id)
         {
@@ -92,9 +103,26 @@ namespace Nutris.BlazorApp.Features.Customize
                 return null;
             }
         }
-
-        public Task<JsonDocument> GetAtributosAsync() =>
-            _api.GetAsync<JsonDocument>("Atributos?$expand=valoresAtributos&tenant=nutris");
+        public async Task<JsonDocument> GetAtributosAsync()
+        {
+            var url="";
+            var user = await GetCurrentUserAsync();
+            if(user.Family)
+            {
+                url = $"Atributos?$expand=valoresAtributos($filter=Family eq {user.Family.ToString().ToLower()})&tenant=nutris";
+            }
+            if (user.Standard)
+            {
+                url = $"Atributos?$expand=valoresAtributos($filter=Family eq {user.Standard.ToString().ToLower()})&tenant=nutris";
+            }
+            if (user.Premium)
+            {
+                url = $"Atributos?$expand=valoresAtributos($filter=Family eq {user.Premium.ToString().ToLower()})&tenant=nutris";
+            }
+            return await _api.GetAsync<JsonDocument>(url);
+        }
+        //public Task<JsonDocument> GetAtributosAsync() =>
+        //    _api.GetAsync<JsonDocument>("Atributos?$expand=valoresAtributos($filter=Standard eq "+ _currentUser.Standard+" and Premium eq "+ _currentUser.Premium+" and Family eq "+ _currentUser.Family+")&tenant=nutris");
 
         public Task<JsonDocument> GetRelacionBoteAsync() =>
             _api.GetAsync<JsonDocument>("RelacionBote?tenant=nutris");

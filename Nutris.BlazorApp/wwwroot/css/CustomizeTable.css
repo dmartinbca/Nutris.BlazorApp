@@ -1,4 +1,7 @@
-﻿/* Language Selector */
+﻿:root {
+    --status-width: max-content; /* o un valor fijo como 150px */
+}
+/* Language Selector - Exacto como YourProducts */
 .language-selector-products {
     position: fixed;
     top: 20px;
@@ -54,7 +57,7 @@
         background-color: #f8f9fa;
     }
 
-/* Back Button */
+/* Back Button - Exacto como YourProducts */
 .back-button-container {
     position: fixed;
     top: 15%;
@@ -105,7 +108,7 @@
     }
 }
 
-/* Main Content - Ajustado para ocupar más espacio central */
+/* Main Content - Copiado exacto de YourProducts */
 .products-main-content {
     padding: 2rem 3rem;
     margin: 40px auto;
@@ -115,7 +118,7 @@
     margin-left: 20px;
 }
 
-/* Search Container */
+/* Search Container - Copiado exacto de YourProducts */
 .products-search-container {
     width: 100%;
     margin: 0 auto;
@@ -172,7 +175,7 @@
     cursor: pointer;
 }
 
-/* Table Container */
+/* Table Container - Copiado exacto de YourProducts */
 .products-table-container {
     width: 100%;
     margin: 0 auto;
@@ -219,7 +222,7 @@ table.products-customize {
     border-bottom: none;
 }
 
-/* Status Pills */
+/* Status Pills - Copiado exacto de YourProducts */
 .products-status-finish {
     position: relative;
     color: #fff;
@@ -230,11 +233,42 @@ table.products-customize {
     line-height: 1rem;
     padding: 0.50rem 1rem;
     text-align: center;
-    width: max-content;
+    width: var(--status-width);
     display: inline-block;
     font-size: 0.875rem;
     min-width: 200px;
 }
+
+.products-status-develop {
+    color: #fff;
+    font-weight: 700;
+    border: solid 1px #F09B59;
+    background-color: #F09B59;
+    border-radius: 10px;
+    line-height: 1rem;
+    padding: 0.50rem 1rem;
+    text-align: center;
+    width: var(--status-width);
+    display: inline-block;
+    font-size: 0.875rem;
+    min-width: 200px;
+}
+
+.products-status-initial {
+    color: #2F5496;
+    font-weight: 700;
+    border: solid 1px #DAE7F5;
+    background-color: #DAE7F5;
+    border-radius: 10px;
+    line-height: 1rem;
+    padding: 0.50rem 1rem;
+    text-align: center;
+    width: var(--status-width);
+    display: inline-block;
+    font-size: 0.875rem;
+    min-width: 200px;
+}
+
 .step-check {
     position: absolute;
     top: -8px;
@@ -252,37 +286,7 @@ table.products-customize {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     z-index: 5;
 }
-.products-status-develop {
-    color: #fff;
-    font-weight: 700;
-    border: solid 1px #F09B59;
-    background-color: #F09B59;
-    border-radius: 10px;
-    line-height: 1rem;
-    padding: 0.50rem 1rem;
-    text-align: center;
-    width: max-content;
-    display: inline-block;
-    font-size: 0.875rem;
-    min-width: 200px;
-}
-
-.products-status-initial {
-    color: #fff;
-    font-weight: 700;
-    border: solid 1px #eb6710;
-    background-color: #eb6710;
-    border-radius: 10px;
-    line-height: 1rem;
-    padding: 0.50rem 1rem;
-    text-align: center;
-    width: max-content;
-    display: inline-block;
-    font-size: 0.875rem;
-    min-width: 200px;
-}
-
-/* Order Button */
+/* Order Button - Copiado exacto de YourProducts */
 .products-order-btn {
     display: flex;
     align-items: center;
@@ -316,7 +320,7 @@ table.products-customize {
         white-space: nowrap;
     }
 
-/* Empty State */
+/* Empty State - Copiado exacto de YourProducts */
 .products-empty-container {
     min-height: 500px;
     display: flex;
@@ -352,7 +356,7 @@ table.products-customize {
         color: #999A9B;
     }
 
-/* Filter Modal */
+/* Filter Modal - Copiado exacto de YourProducts */
 .products-modal-backdrop {
     position: fixed;
     top: 0;
@@ -487,7 +491,7 @@ table.products-customize {
         background: #1e3a6f;
     }
 
-/* Responsive Design */
+/* Responsive Design - Copiado exacto de YourProducts */
 @@media (max-width: 1400px) {
     .products-main-content {
         max-width: 1200px;
@@ -566,3 +570,5 @@ table.products-customize {
         display: none;
     }
 }
+
+ 

@@ -76,21 +76,21 @@
                     <div class="country-rh1 col-6">
                         <p class="RalewayRegular font-18">@Localization["orderView.Country"]</p>
                         <div class="d-flex gap-3 justify-content-end align-content-center">
-                            @if (!string.IsNullOrEmpty(Country1) && Country1 != "-")
+                            @if (!string.IsNullOrEmpty(Country1))
                             {
                                 <div class="col2-rh1 d-flex justify-content-end">
                                     <img src="@CountryFlag1" alt="@Country1" />
                                     <p>@Country1</p>
                                 </div>
                             }
-                            @if (!string.IsNullOrEmpty(Country2) && Country2 != "-")
+                            @if (!string.IsNullOrEmpty(Country2))
                             {
                                 <div class="col2-rh1 d-flex justify-content-end">
                                     <img src="@CountryFlag2" alt="@Country2" />
                                     <p>@Country2</p>
                                 </div>
                             }
-                            @if (!string.IsNullOrEmpty(Country3) && Country3 != "-")
+                            @if (!string.IsNullOrEmpty(Country3))
                             {
                                 <div class="col2-rh1 d-flex justify-content-end">
                                     <img src="@CountryFlag3" alt="@Country3" />
@@ -110,8 +110,9 @@
 
                 <div class="row3-1 row">
                     <div class="col2-rh3 col-6">
-                        <p class="RalewayBold font-21-23">@Name</p>
-                        <p class="RalewayLight font-21-23">@ProductName2</p>
+                        <p class="RalewayBold font-21-23">@ProductName2</p>
+                        <p class="RalewayLight font-21-23">@Name</p>
+                       
                     </div>
                     <div class="col3-rh3 col-6">
                         <span class="MulishBold font-21-23"><p>MOQ @MOQ units</p></span>
@@ -694,36 +695,41 @@
                                 <div id="container-toggle-3" class="container-toggle active">
                                     <div class="content-t">
                                         <div class="head-t">
-                                            <h3 class="font-18 RalewayExtraBold">@Localization["orderView.GUMMYDNA"]</h3>
-                                            @if (Status == "Desarrollo" && !NoLabel)
+                                            @if (!NoLabel)
                                             {
-                                                <button class="btn-t RalewayMedium font-20" type="button" @onclick="OpenLabelModal">
-                                                    <img src="img/pencil-icon.svg" alt="edit">@Localization["Edit"]
-                                                </button>
+                                                <h3 class="font-18 RalewayExtraBold">@Localization["orderView.GUMMYDNA"]</h3>
+                                                @if (Status == "Desarrollo" && !NoLabel)
+                                                {
+                                                    <button class="btn-t RalewayMedium font-20" type="button" @onclick="OpenLabelModal">
+                                                        <img src="img/pencil-icon.svg" alt="edit">@Localization["Edit"]
+                                                    </button>
+                                                }
                                             }
                                         </div>
-
-                                        <div class="body-t body-nb-t @(NoLabel ? "disabled-section" : "")">
-                                            @foreach (var item in LabelInfo)
-                                            {
-                                                <div class="body-td">
-                                                    <p class="font-18 RalewayRegular @(NoLabel ? "disabled-text" : "")">@item.Label</p>
-                                                    <div class="data-t">
-                                                        <span><p class="font-20 RalewayBold @(NoLabel ? "disabled-text" : "")">@item.Value</p></span>
-                                                        @if (item.Value != "-" && !NoLabel)
-                                                        {
-                                                            <div class="line-from"></div>
-                                                            <img src="img/check-icon.svg" alt="check">
-                                                        }
-                                                        else
-                                                        {
-                                                            <div class="line-from"></div>
-                                                            <img src="img/cancelar.svg" alt="check">
-                                                        }
+                                        @if (!NoLabel)
+                                        {
+                                            <div class="body-t body-nb-t @(NoLabel ? "disabled-section" : "")">
+                                          
+                                                @foreach (var item in LabelInfo)
+                                                {
+                                                    <div class="body-td">
+                                                        <p class="font-18 RalewayRegular @(NoLabel ? "disabled-text" : "")">@item.Label</p>
+                                                        <div class="data-t">
+                                                            <span><p class="font-20 RalewayBold @(NoLabel ? "disabled-text" : "")">@item.Value</p></span>
+                                                            @if (item.Value != "-" && !NoLabel)
+                                                            {
+                                                                <div class="line-from"></div>
+                                                                <img src="img/check-icon.svg" alt="check">
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="line-from"></div>
+                                                                <img src="img/cancelar.svg" alt="check">
+                                                            }
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            }
-
+                                                }
+                                            
                                             <div class="body-td">
                                                 <p class="font-18 RalewayRegular">@Localization["orderView.Label"]</p>
                                                 <div class="data-t">
@@ -753,7 +759,9 @@
                                                     }
                                                 </div>
                                             </div>
+                                            
                                         </div>
+                                        }
                                     </div>
                                 </div>
                             }

@@ -108,7 +108,13 @@ else
                                     <p>@(item.UnitsPerContainer == 0 ? "" : item.UnitsPerContainer.ToString())</p>
                                 </td>
                                 <td>
-                                    <p class="@GetStatusClass(item.Status)">@Localization[item.Status]</p>
+                                    <div class="@GetStatusClass(item.Status)">
+                                        @Localization[item.Status]
+                                        @if (item.Status == "Cerrado cliente y calidad")
+                                        {
+                                            <span class="step-check">✓</span>
+                                        }
+                                    </div>
                                 </td>
                                 <td>
                                     <button class="products-order-btn" @onclick="() => NavigateToDetails(item.Code)">

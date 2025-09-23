@@ -1,4 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.JSInterop;
+using Nutris.BlazorApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -6,10 +11,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
-using Microsoft.JSInterop;
 
 namespace NutrisBlazor.Services
 {
@@ -184,9 +185,9 @@ namespace NutrisBlazor.Services
                 Name = "Demo User",
                 user = username,
                 Email = username.Contains("@") ? username : $"{username}@demo.com",
-                Phone_No = "123456789",
-                SystemCreatedAt = DateTime.Now.ToString("yyyy-MM-dd"),
-                SystemModifiedAt = DateTime.Now.ToString("yyyy-MM-dd")
+               
+               
+
             };
 
             _currentUser = simulatedUser;
@@ -219,12 +220,28 @@ namespace NutrisBlazor.Services
                 var storageOptions = rememberMe ? "permanent" : "session";
 
                 await _localStorage.SetItemAsync("token", "authenticated");
-                await _localStorage.SetItemAsync("user", user);
+                await _localStorage.SetItemAsync("userT", user);
                 await _localStorage.SetItemAsync("name", user.Name);
                 await _localStorage.SetItemAsync("No_", user.Customer);
                 await _localStorage.SetItemAsync("user", user.user);
                 await _localStorage.SetItemAsync("email", user.Email);
                 await _localStorage.SetItemAsync("logo", user.Logo);
+                await _localStorage.SetItemAsync("nombrevendedor", user.Nombre_Vendedor);
+                await _localStorage.SetItemAsync("salessupport", user.Sales_Support);
+                await _localStorage.SetItemAsync("address", user.Address);
+                await _localStorage.SetItemAsync("address2", user.Address_2);
+                await _localStorage.SetItemAsync("city", user.City);
+                await _localStorage.SetItemAsync("county", user.County);
+                await _localStorage.SetItemAsync("country", user.Country);
+                await _localStorage.SetItemAsync("postcode", user.Post_Code);
+                await _localStorage.SetItemAsync("phone", user.Phone);
+                await _localStorage.SetItemAsync("mobilephone", user.Mobile_Phone);
+                await _localStorage.SetItemAsync("email", user.Email);
+                await _localStorage.SetItemAsync("contact", user.Contact);
+                await _localStorage.SetItemAsync("shipmentmethodcode", user.Shipment_Method_Code);
+                await _localStorage.SetItemAsync("family", user.Family);
+                await _localStorage.SetItemAsync("standard", user.Standard);
+                await _localStorage.SetItemAsync("premium", user.Premium);
                 await _localStorage.SetItemAsync("storageType", storageOptions);
             }
             catch (Exception ex)
@@ -261,16 +278,32 @@ namespace NutrisBlazor.Services
             try
             {
                 // Limpiar localStorage
+                 
+
                 await _localStorage.RemoveItemAsync("token");
-                await _localStorage.RemoveItemAsync("user");
+                await _localStorage.RemoveItemAsync("userT");
                 await _localStorage.RemoveItemAsync("name");
                 await _localStorage.RemoveItemAsync("No_");
-                await _localStorage.RemoveItemAsync("User");
+                await _localStorage.RemoveItemAsync("user");
                 await _localStorage.RemoveItemAsync("email");
-                await _localStorage.RemoveItemAsync("Customer_logo");
-                await _localStorage.RemoveItemAsync("data");
+                await _localStorage.RemoveItemAsync("logo");
+                await _localStorage.RemoveItemAsync("nombrevendedor");
+                await _localStorage.RemoveItemAsync("salessupport");
+                await _localStorage.RemoveItemAsync("address");
+                await _localStorage.RemoveItemAsync("address2");
+                await _localStorage.RemoveItemAsync("city");
+                await _localStorage.RemoveItemAsync("county");
+                await _localStorage.RemoveItemAsync("country");
+                await _localStorage.RemoveItemAsync("postcode");
+                await _localStorage.RemoveItemAsync("phone");
+                await _localStorage.RemoveItemAsync("mobilephone");
+                await _localStorage.RemoveItemAsync("email");
+                await _localStorage.RemoveItemAsync("contact");
+                await _localStorage.RemoveItemAsync("shipmentmethodcode");
+                await _localStorage.RemoveItemAsync("family");
+                await _localStorage.RemoveItemAsync("standard");
+                await _localStorage.RemoveItemAsync("premium");
                 await _localStorage.RemoveItemAsync("storageType");
-
                 _currentUser = null;
             }
             catch (Exception ex)
@@ -296,7 +329,7 @@ namespace NutrisBlazor.Services
         {
             if (_currentUser == null)
             {
-                _currentUser = await _localStorage.GetItemAsync<User>("user");
+                _currentUser = await _localStorage.GetItemAsync<User>("userT");
             }
             return _currentUser;
         }
@@ -315,13 +348,26 @@ namespace NutrisBlazor.Services
         public string Name { get; set; }
         public string user { get; set; }
         public string Pass { get; set; }
-        public string Email { get; set; }
-        public string Phone_No { get; set; }
-
+ 
+ 
         public string Logo { get; set; }
-        public string SystemCreatedAt { get; set; }
-        public string SystemCreatedBy { get; set; }
-        public string SystemModifiedAt { get; set; }
-        public string SystemModifiedBy { get; set; }
+        public string CIF { get; set; }
+        public string Nombre_Vendedor { get; set; }
+        public string Sales_Support { get; set; }
+        public string Address { get; set; }
+        public string Address_2 { get; set; }
+        public string City { get; set; }
+        public string County { get; set; }
+        public string Country { get; set; }
+        public string Post_Code { get; set; }
+        public string Phone { get; set; }
+        public string Mobile_Phone { get; set; }
+        public string Email { get; set; }
+        public string Contact { get; set; }
+        public string Shipment_Method_Code { get; set; }
+        public bool Family { get; set; }
+        public bool Standard { get; set; }
+        public bool Premium { get; set; }
+
     }
 }
