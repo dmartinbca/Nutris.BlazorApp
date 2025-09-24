@@ -128,33 +128,6 @@
         margin: 0;
     }
 
-/* Clases de fuente específicas */
-.font-82 {
-    font-size: 5.16em;
-    font-weight: 700;
-}
-
-.MuseoSemiBold {
-    font-family: 'Museo', sans-serif;
-    font-weight: 700;
-}
-
-.pagraph-home {
-    font-size: 1.26em;
-    font-weight: 300;
-    margin-top: 2.58rem;
-    text-shadow: 0.2px 0px 0px;
-}
-
-.font-20 {
-    font-size: 1.16em;
-    font-weight: 200;
-}
-
-.RalewayRegular {
-    font-family: 'Raleway', sans-serif;
-    font-weight: 300;
-}
 
 /* Responsive */
  @media (max-width: 1024px) {

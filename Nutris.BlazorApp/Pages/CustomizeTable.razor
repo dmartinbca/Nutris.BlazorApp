@@ -11,6 +11,8 @@
 @inject ILocalizationService Localization
 @implements IDisposable
 <link href="css/CustomizeTable.css" rel="stylesheet" />
+<link href="css/fonts.css" rel="stylesheet" />
+
 <PageTitle>@Localization["NavBar.Customize"] - NutrisBlazor</PageTitle>
 
 <!-- Language Selector -->
@@ -83,20 +85,20 @@ else
                 <table class="products-customize">
                     <thead>
                         <tr>
-                            <th>@Localization["code"]</th>
-                            <th>@Localization["product_name"]</th>
-                            <th>@Localization["container"]</th>
-                            <th>@Localization["units_per_container"]</th>
-                            <th>@Localization["status"]</th>
+                            <th class="MuseoSemiBold font-20 p-3">@Localization["code"]</th>
+                            <th class="MuseoSemiBold font-20 p-3">@Localization["product_name"]</th>
+                            <th class="MuseoSemiBold font-20 p-3">@Localization["container"]</th>
+                            <th class="MuseoSemiBold font-20 p-3">@Localization["units_per_container"]</th>
+                            <th class="MuseoSemiBold font-20 p-3">@Localization["status"]</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in GetFilteredList())
                         {
-                            <tr>
-                                <td><p>@item.Code</p></td>
-                                <td>
+                            <tr class="RalewayRegular font-16">
+                                <td class="p-2"><p>@item.Code</p></td>
+                                <td class="p-2">
                                     @if (!string.IsNullOrEmpty(item.Product_name))
                                     {
                                         <p>@item.Product_name</p>
@@ -106,12 +108,12 @@ else
                                         <p>-</p>
                                     }
                                 </td>
-                                <td><p>@item.Container</p></td>
-                                <td>
-                                    <p>@( item.Units_per_container == 0 ? "-" : item.Units_per_container.ToString())</p>
+                                <td class="p-2"><p>@item.Container</p></td>
+                                <td class="p-2">
+                                    <p>@(item.Units_per_container == 0 ? "-" : item.Units_per_container.ToString())</p>
                                 </td>
-                                <td>
-                                    <div class="@GetStatusClass(item.Status)">
+                                <td class="p-2">
+                                    <div class="@GetStatusClass(item.Status) text-center">
                                         @Localization[item.Status]
                                         @if (item.Status == "Cerrado cliente y calidad")
                                         {
@@ -119,8 +121,8 @@ else
                                         }
                                     </div>
                                 </td>
-                                <td>
-                                    <button class="products-order-btn" @onclick="() => NavigateToCustomize(item.Code)">
+                                <td class="p-2">
+                                    <button class="products-order-btn d-flex" @onclick="() => NavigateToCustomize(item.Code)">
                                         <span>@Localization["ButtonCustomize"]</span>
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />

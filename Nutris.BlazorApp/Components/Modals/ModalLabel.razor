@@ -652,25 +652,75 @@
 </style>
 
 <script>
-    // Add these JavaScript functions to your main layout or a shared JS file
+       // Add these JavaScript functions to your main layout or a shared JS file
     window.createBlobUrl = (base64, mimeType) => {
-        const byteCharacters = atob(base64);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        try {
+            // Verificar si base64 está vacío o es nulo
+            if (!base64 || base64.trim() === '') {
+                console.warn('Base64 string is empty or null');
+                return null;
+            }
+
+            // Limpiar el string base64 (remover espacios, saltos de línea, etc.)
+            const cleanBase64 = base64.replace(/[\s\r\n]/g, '');
+
+            // Verificar si el string tiene el prefijo data:
+            let base64Data = cleanBase64;
+            if (cleanBase64.includes(',')) {
+                // Si tiene el formato "data:image/png;base64,xxxxx"
+                base64Data = cleanBase64.split(',')[1] || cleanBase64;
+            }
+
+            // Validar que sea un string base64 válido
+            if (!/^[A-Za-z0-9+/]*={0,2}$/.test(base64Data)) {
+                console.error('Invalid base64 string format');
+                return null;
+            }
+
+            const byteCharacters = atob(base64Data);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: mimeType });
+            return URL.createObjectURL(blob);
+        } catch (error) {
+            console.error('Error creating blob URL:', error);
+            return null;
         }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: mimeType });
-        return URL.createObjectURL(blob);
     };
-    
+
     window.downloadBase64File = (base64Data, fileName, mimeType) => {
-        const link = document.createElement('a');
-        link.href = base64Data.startsWith('data:') ? base64Data : `data:${mimeType};base64,${base64Data}`;
-        link.download = fileName;
-        link.click();
+        try {
+            // Verificar datos vacíos
+            if (!base64Data || base64Data.trim() === '') {
+                console.warn('Cannot download: Base64 data is empty');
+                alert('No hay datos para descargar');
+                return;
+            }
+
+            const blobUrl = window.createBlobUrl(base64Data, mimeType);
+
+            if (!blobUrl) {
+                console.error('Failed to create blob URL');
+                alert('Error al procesar el archivo para descarga');
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = fileName || 'download';
+            link.click();
+
+            // Liberar el objeto URL después de usarlo
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+        } catch (error) {
+            console.error('Error downloading file:', error);
+            alert('Error al descargar el archivo');
+        }
     };
-    
+
     window.hideBootstrapModal = (modalId) => {
         const modal = document.getElementById(modalId);
         if (modal) {
@@ -680,6 +730,15 @@
             }
         }
     };
-      window.revokeBlobUrl = (url) => { try { URL.revokeObjectURL(url); } catch(e){} }
+
+    window.revokeBloblUrl = (url) => {
+        try {
+            if (url) {
+                URL.revokeObjectURL(url);
+            }
+        } catch(e) {
+            console.error('Error revoking blob URL:', e);
+        }
+    };
 
 </script>

@@ -1,0 +1,336 @@
+﻿
+/* Estilos existentes del sidebar */
+.sidebar {
+    width: 300px;
+    height: 100vh;
+    background-color: #DAE7F5;
+    flex-shrink: 0;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+.text-titles {
+    text-align: center;
+}
+.text-titles p {
+    font-weight: 300;
+    font-size: 12px;
+}
+.content-sidebar {
+    width: 95%;
+    height: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo {
+    padding: 1rem;
+    margin: 25px 0;
+}
+
+    .logo img {
+        display: block;
+        margin: auto;
+    }
+
+ 
+.navgrid {
+    display: grid;
+    grid-template-columns: 20px auto;
+    gap: 0.69rem;
+    align-items: center;
+}
+
+.nav-container nav a {
+    display: block;
+    margin: 20px 0;
+    padding: 0 1rem;
+    text-decoration: none;
+    font-size: 1.125rem;
+    font-weight: 300;
+    color: #2F5496;
+}
+
+    .nav-container nav a.active {
+        background-color: #C5D9EC;
+        font-weight: 700;
+        border-radius: 30px;
+        padding: 10px 20px;
+    }
+
+ 
+
+.lineb {
+    margin-top: 34px;
+    border-top: 1px dashed #2F5496;
+}
+
+.avatar-container {
+    width: 90%;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.avatar {
+    width: 85px;
+    height: 85px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.text-titles h2 {
+    font-weight: 700;
+    font-size: 14px;
+    margin: 12px 0 0;
+    color: #2c3e50;
+}
+
+.icons-acount {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+    border-top: solid 1px #dee2e6;
+    padding: 1.57rem;
+    position: relative;
+}
+
+    .icons-acount img {
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+    }
+
+.tooltip-custom {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    font-size: 12px;
+    width: 200px;
+    margin-bottom: 10px;
+    z-index: 1000;
+}
+
+    .tooltip-custom p {
+        margin: 0;
+        text-align: center;
+    }
+/* MODAL DE LOGOUT - Estilo exacto de ConfirmModal */
+
+/* Backdrop */
+.logout-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    animation: fadeIn 0.2s ease;
+}
+
+/* Wrapper para centrar */
+.logout-modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+/* Contenedor del modal */
+.logout-modal-container {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    background-color: white;
+    padding: 0;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+}
+
+/* Botón X para cerrar */
+.modal-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: transform 0.2s;
+}
+
+    .modal-close-btn:hover {
+        transform: scale(1.1);
+    }
+
+/* Header del modal */
+.modal-header-custom {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+    .modal-header-custom h3 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+/* Body del modal */
+.modal-body-custom {
+    padding: 24px;
+}
+
+.modal-question {
+    margin: 0 0 24px 0;
+    font-size: 16px;
+    color: #374151;
+    text-align: center;
+    line-height: 1.5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Contenedor de botones */
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+/* Botón Cancelar */
+.btn-modal-cancel {
+    padding: 10px 20px;
+    background-color: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+    .btn-modal-cancel:hover:not(:disabled) {
+        background-color: #4b5563;
+    }
+
+/* Botón Confirmar (Cerrar Sesión) */
+.btn-modal-confirm {
+    padding: 10px 20px;
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+    .btn-modal-confirm:hover:not(:disabled) {
+        background-color: #b91c1c;
+    }
+
+    /* Estados deshabilitados */
+    .btn-modal-cancel:disabled,
+    .btn-modal-confirm:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+/* Spinner */
+.spinner-logout {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .logout-modal-container {
+        width: 95%;
+        margin: 0 10px;
+    }
+
+    .modal-header-custom {
+        padding: 20px 20px 12px;
+    }
+
+    .modal-body-custom {
+        padding: 20px;
+    }
+
+    .modal-buttons {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .btn-modal-cancel,
+    .btn-modal-confirm {
+        width: 100%;
+    }
+}
+
+ 

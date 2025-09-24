@@ -1,0 +1,571 @@
+﻿
+ 
+.steps-progress-container {
+    width: 100%;
+    padding: 0.5rem 0;
+    margin: 0.5rem 0;
+    overflow-x: visible;
+}
+
+.steps-progress-inner-wrapper {
+    padding: 0; /* Sin padding adicional */
+}
+
+.steps-progress-bar {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between; /* Cambiado de center a space-between */
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0; /* Quitamos el padding horizontal */
+    gap: 4px;
+    min-height: auto;
+}
+
+.step-item {
+    position: relative;
+    flex: 1 1 0;
+    display: flex;
+    align-items: stretch;
+    min-width: 0; /* Permitir que se contraiga */
+    max-width: none; /* Sin límite máximo */
+}
+
+.step-content {
+    position: relative;
+    padding: 0.6rem 1rem; /* Reducido el padding vertical */
+    background: #EBE9ED;
+    color: #989898;
+    border-radius: 30px;
+    min-height: 65px; /* Reducido de 65px */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-direction:  column;
+    z-index: 2;
+    width: 100%;
+}
+
+.step-text {
+    font-family: 'RalewayBold', sans-serif;
+    font-size: 13px; /* Aumentado de 11px */
+    text-align: center;
+    line-height: 1.3;
+    display: block;
+    word-break: break-word;
+    padding: 0 4px;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    font-weight: 600;
+}
+
+.step-check {
+    position: absolute;
+    top: -8px; /* Ajustado */
+    right: -8px;
+    background: #0ED88F;
+    color: white;
+    width: 26px; /* Aumentado de 20px */
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px; /* Aumentado de 12px */
+    font-weight: bold;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    z-index: 5;
+}
+
+/* Conector entre pasos con flecha - MÁS GRANDE */
+.step-connector {
+    position: relative;
+    width: 40px; /* Aumentado de 30px */
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 -5px; /* Ajustado para el nuevo tamaño */
+    z-index: 1;
+    flex-shrink: 0;
+}
+
+.connector-line {
+    position: absolute;
+    width: 100%;
+    height: 3px; /* Aumentado de 2px */
+    background: #D2D2D2;
+    transition: background 0.3s ease;
+}
+
+.connector-arrow {
+    position: relative;
+    z-index: 2;
+    background: white;
+    padding: 4px; /* Aumentado de 2px */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+    .connector-arrow svg {
+        width: 16px; /* Aumentado de 10px */
+        height: 16px; /* Aumentado de 10px */
+        color: #989898;
+        transition: color 0.3s ease;
+        display: block;
+    }
+
+/* Actualización del color de los conectores cuando el paso está completado */
+.step-completed .connector-line {
+    background: #8ED300;
+}
+
+.step-completed .connector-arrow svg {
+    color: #6BA000;
+}
+
+.step-in-progress .connector-arrow {
+    animation: arrowPulse 1.5s infinite;
+}
+
+    .step-in-progress .connector-arrow svg {
+        color: #8ED300;
+    }
+
+@@keyframes arrowPulse {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(3px);
+    }
+}
+
+/* Estados de los pasos */
+.step-completed .step-content {
+    background: #8ED300;
+    color: #FFFFFF;
+    border-color: #8ED300;
+}
+
+.step-in-progress .step-content {
+    background: #DAE7F5; /* Azul muy claro en lugar de naranja */
+    color: #2F5496; /* Texto azul oscuro para buen contraste */
+    border-color: #C5D9EC; /* Borde un poco más oscuro */
+    animation: pulse 2s infinite;
+}
+
+.step-in-progress.step-warning .step-content {
+    background: #DAE7F5;
+    color: #2F5496;
+    border-color: #C5D9EC;
+}
+
+.step-current .step-content {
+    background: #FDB833;
+    color: #FFFFFF;
+    border-color: #FDB833;
+    box-shadow: 0 4px 12px rgba(253, 184, 51, 0.3);
+}
+
+.step-pending .step-content {
+    background: #E5E5E5;
+    color: #989898;
+}
+
+/* Actualización de conectores para estado en progreso naranja */
+.step-in-progress .connector-line {
+    background: #C5D9EC; /* Azul un poco más oscuro para el conector */
+}
+
+.step-in-progress .connector-arrow svg {
+    color: #2F5496; /* Azul oscuro para la flecha */
+}
+
+
+/* Hover effects */
+.step-content:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Animación de pulso para pasos en progreso */
+@@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(218, 231, 245, 0.6);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(218, 231, 245, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(218, 231, 245, 0);
+    }
+}
+
+/* Responsive design */
+@@media (max-width: 1200px) {
+    .step-item {
+        min-width: 140px;
+        max-width: 200px;
+    }
+
+    .step-content {
+        padding: 0.5rem 0.8rem; /* Reducido vertical */
+        min-height: 50px; /* Reducido */
+    }
+
+    .step-text {
+        font-size: 12px;
+    }
+
+    .steps-progress-bar {
+        padding: 0 10px;
+    }
+
+    .steps-progress-container {
+        padding: 0.2rem 0;
+        margin: 0.2rem 0;
+    }
+}
+
+@@media (max-width: 768px) {
+    .steps-progress-container {
+        padding: 0.2rem 0; /* Mínimo padding vertical */
+        margin: 0.2rem 0;
+    }
+
+    .steps-progress-bar {
+        padding: 0 8px;
+        gap: 2px;
+    }
+
+    .step-item {
+        min-width: 120px;
+        max-width: 160px;
+    }
+
+    .step-content {
+        padding: 0.4rem 0.4rem; /* Reducido vertical */
+        min-height: 45px; /* Reducido */
+        border-radius: 8px;
+    }
+
+    .step-text {
+        font-size: 11px;
+        line-height: 1.2;
+        padding: 0 2px;
+    }
+
+    .step-connector {
+        width: 18px;
+        margin: 0 -2px;
+    }
+
+    .connector-arrow svg {
+        width: 8px;
+        height: 8px;
+    }
+
+    .connector-line {
+        height: 1.5px;
+    }
+
+    .step-check {
+        width: 18px;
+        height: 18px;
+        font-size: 11px;
+        top: -5px;
+        right: -5px;
+    }
+}
+
+@@media (max-width: 480px) {
+    .steps-progress-container {
+        padding: 0.15rem 0; /* Mínimo padding */
+        margin: 0.15rem 0;
+    }
+
+    .steps-progress-bar {
+        gap: 1px;
+        padding: 0 5px;
+    }
+
+    .step-item {
+        min-width: 100px;
+        max-width: 140px;
+    }
+
+    .step-content {
+        padding: 0.35rem 0.3rem; /* Reducido vertical */
+        border-radius: 6px;
+        min-height: 40px; /* Reducido */
+    }
+
+    .step-text {
+        font-size: 10px;
+        line-height: 1.15;
+    }
+
+    .step-connector {
+        width: 15px;
+        margin: 0 -1px;
+    }
+
+    .connector-arrow svg {
+        width: 7px;
+        height: 7px;
+    }
+}
+
+@@media (max-width: 360px) {
+    .steps-progress-container {
+        padding: 0.1rem 0; /* Casi sin padding */
+        margin: 0.1rem 0;
+    }
+
+    .step-item {
+        min-width: 100px;
+        max-width: 130px;
+    }
+
+    .step-content {
+        padding: 0.3rem 0.25rem; /* Mínimo padding vertical */
+        min-height: 38px; /* Reducido */
+    }
+
+    .step-text {
+        font-size: 9px;
+        line-height: 1.1;
+    }
+
+    .step-connector {
+        width: 12px;
+    }
+
+    .connector-arrow svg {
+        width: 6px;
+        height: 6px;
+    }
+}
+
+/* Ocultar scrollbar si aparece */
+.steps-progress-container {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+    .steps-progress-container::-webkit-scrollbar {
+        display: none;
+    }
+
+/* Efecto de carga progresiva */
+.steps-progress-bar {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tooltips opcionales para mostrar porcentajes */
+.step-content[data-progress]:hover::after {
+    content: attr(data-progress);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 10;
+}
+/* Pantallas grandes - expandir completamente */
+@@media (min-width: 1367px) {
+    .steps-progress-bar {
+        gap: 8px;
+    }
+
+    .step-item {
+        min-width: 180px;
+    }
+
+    .step-content {
+        padding: 0.8rem 1.2rem;
+        min-height: 65px;
+    }
+
+    .step-text {
+        font-size: 14px;
+    }
+
+    .step-connector {
+        width: 40px;
+    }
+}
+
+/* Tablets - optimizar espacio */
+@@media (min-width: 768px) and (max-width: 1024px) {
+    .steps-progress-bar {
+        gap: 3px;
+        padding: 0;
+    }
+
+    .step-item {
+        min-width: 130px;
+        max-width: 180px;
+        flex: 1 1 auto;
+    }
+
+    .step-content {
+        padding: 0.5rem 0.6rem;
+        min-height: 55px;
+    }
+
+    .step-text {
+        font-size: 11px;
+        line-height: 1.2;
+    }
+
+    .step-connector {
+        width: 20px;
+        margin: 0 -2px;
+    }
+
+    .step-check {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+        top: -6px;
+        right: -6px;
+    }
+}
+
+/* Pantallas medianas */
+@@media (min-width: 1025px) and (max-width: 1366px) {
+    .steps-progress-bar {
+        gap: 5px;
+    }
+
+    .step-item {
+        min-width: 150px;
+        max-width: 200px;
+    }
+
+    .step-content {
+        padding: 0.6rem 0.9rem;
+        min-height: 60px;
+    }
+
+    .step-text {
+        font-size: 12px;
+    }
+
+    .step-connector {
+        width: 30px;
+    }
+}
+
+/* Móviles grandes */
+@@media (min-width: 480px) and (max-width: 767px) {
+    .steps-progress-container {
+        overflow-x: auto;
+        padding: 0.3rem 0;
+    }
+
+    .steps-progress-bar {
+        min-width: 600px; /* Ancho mínimo para scroll horizontal */
+        padding: 0 10px;
+    }
+
+    .step-item {
+        min-width: 110px;
+        max-width: 130px;
+    }
+
+    .step-content {
+        padding: 0.4rem 0.5rem;
+        min-height: 48px;
+    }
+
+    .step-text {
+        font-size: 10px;
+    }
+}
+
+/* Asegurar que el contenedor principal no limite el ancho */
+.row-b {
+    width: 100%;
+    max-width: 100%;
+}
+
+.col-b {
+    padding: 3.52rem 2.64rem; /* Añadir padding lateral consistente */
+    max-width: 100%;
+}
+
+/* Ajustar toggles para que respeten el ancho completo */
+.toggle-from {
+    border: solid 1px #D2D2D2;
+    border-radius: 50px;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Ajustes específicos para el contenido del header en tablets */
+@@media (min-width: 768px) and (max-width: 1024px) {
+    /* Reorganizar el diseño de países */
+    .country-rh1 {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+        .country-rh1 .d-flex {
+            flex-wrap: wrap;
+            max-width: 200px;
+        }
+    /* Ajustar el botón de descarga */
+    .colh1-r4 button {
+        font-size: 1rem;
+        padding: 0.8rem;
+    }
+    /* Optimizar espacio en fechas */
+    .colh2-r3, .colh3-r3 {
+        padding: 0.8rem 0;
+    }
+
+        .colh2-r3 p, .colh3-r3 p {
+            font-size: 0.9rem;
+        }
+
+    .MuseoSemiBold.font-18 {
+        font-size: 1rem !important;
+    }
+}
+
+ 

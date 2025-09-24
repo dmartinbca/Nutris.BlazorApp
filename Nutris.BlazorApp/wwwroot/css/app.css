@@ -378,9 +378,9 @@ html, body {
     letter-spacing: 0.5px; /* Mejor espaciado */
 }
 /* Importar otros CSS */
-@import url('loading.css');
+/*@import url('loading.css');
 @import url('ordersbody.css');
 @import url('ordersheader.css');
 @import url('responsedesktop.css');
 @import url('responsivemobile.css');
-@import url('tabledata.css');
+@import url('tabledata.css');*/

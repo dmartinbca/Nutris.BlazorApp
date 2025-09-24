@@ -189,7 +189,7 @@ p {
 }
 
 .row3-1 {
-    border-bottom: dotted 1px;
+/*    border-bottom: dotted 1px;*/
     padding-bottom: 0.57rem;
 }
 
@@ -411,26 +411,34 @@ p {
     padding: 1.71rem 0.5rem;
     font-size: 1.26em;
     border-radius: 10px;
-    height: 147px;
-    width: 574px;
-    justify-content: space-evenly;
+  
+    max-width:380px;
+    max-height:200px;
+    justify-content:  flex-start;
 }
 
 .gomi-content {
     text-align: left;
-    width: 70%;
+    width: 100%; /* CAMBIAR: De 70% a 100% */
+    margin-bottom: 1rem; /* AGREGAR: Espacio antes del cuadro */
 }
 
     .gomi-content h3 {
         font-size: 1.26em;
         font-weight: 700;
     }
-
+#body-td-gommy .data-t {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 2rem;
+}
 #important-gomi p {
     font-size: 1em;
     font-weight: 300;
     line-height: 1.3rem;
     color: var(--textNotFeatured);
+    margin-top: 1.5rem; /* AGREGAR: Separa el texto del título */
+    margin-bottom: 1.5rem; /* AGREGAR: Espacio antes del cuadro gris */
 }
 
 .gomi-img {
@@ -518,8 +526,39 @@ p {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    flex-direction: column; /* CAMBIAR: De row a column para apilar verticalmente */
+    gap: 2rem; /* AGREGAR: Espacio entre elementos */
+}
+    /* Agregar nueva clase para el título */
+    #body-td-gommy > p:first-child {
+        margin-bottom: 0.5rem; /* Espacio después del título "Forma" */
+        font-weight: 700; /* Hacer el título más prominente */
+    }
+    /* Modificar la clase data-t específicamente para gommy */
+    #body-td-gommy .data-t {
+        display: flex;
+        gap: 2.39rem;
+        align-items: center;
+        justify-content: flex-end; /* Alinear todo el contenido a la derecha */
+        flex: 1; /* Tomar todo el espacio disponible */
+    }
+
+/* Asegurar que la línea esté en la posición correcta */
+#line-from-gommy {
+    height: 140px;
+    width: 0;
+    border-left: dotted 1px;
+    margin: auto 0; /* Sin margin auto horizontal para mantener posición */
 }
 
+/* Si necesitas más control sobre la posición exacta */
+#body-td-gommy .data-t {
+    display: flex;
+    gap: 2.39rem;
+    align-items: center;
+    margin-left: auto; /* Empujar todo el bloque data-t hacia la derecha */
+    width: auto; /* No ocupar todo el ancho */
+}
 #body-td-pallet {
     display: flex;
     justify-content: space-between;
@@ -769,7 +808,7 @@ tbody > tr:nth-child(4) > #td-other {
 
 .toggle-from {
     border: solid 1px #D2D2D2;
-    border-radius: 50px;
+    border-radius: 30px;
 }
 
 .left-from {
@@ -842,20 +881,23 @@ textarea {
     font-weight: 500;
     border: solid 1px #8ED300;
     background-color: #8ED300;
-    border-radius: 10px;
+    border-radius: 30px;
     line-height: 1rem;
     padding: 0.50rem 2.56rem;
     margin: auto 0 auto auto;
     text-align: center;
 }
-
+.fila-progress{
+    padding-left:15px;
+    padding-right:15px;
+}
 .progress-bar-from-0 {
     color: #2F5496;
   
     font-weight: 500;
     border: solid 1px #DAE7F5;
     background-color: #DAE7F5;
-    border-radius: 10px;
+    border-radius: 30px;
     line-height: 1rem;
     padding: 0.50rem 2.56rem;
     margin: auto 0 auto auto;

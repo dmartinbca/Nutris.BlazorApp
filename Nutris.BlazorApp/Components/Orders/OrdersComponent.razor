@@ -13,6 +13,7 @@
 @inject ILocalStorageService LocalStorage
 
 <link href="/css/OrdersComponent.css" rel="stylesheet" />
+<link href="/css/fonts.css" rel="stylesheet" />
 
 @if (IsLoading)
 {
@@ -190,7 +191,7 @@
         </div>
 
         <!-- BARRA DE PROGRESO MOVIDA FUERA DEL HEADER -->
-        <div class="row mt-3" style="padding: 10px 20px;">
+        <div class="fila-progress">
             <StepsProgressBar Status="@Status"
                               CustomerAccepted="@CustomerAccepted"
                               PercentFilledFormulation="@PercentFilledFormulation"
@@ -208,8 +209,8 @@
 
     <!-- SECTION BODY -->
     <section>
-        <div class="col-b">
-            <div class="row-b">
+        
+            <div>
 
                 <!-- 1. FORMULATION -->
                 <div class="toggle-from">
@@ -307,20 +308,22 @@
                                         </div>
                                     }
 
-                                    <div class="body-td" id="body-td-gommy">
-                                        <p class="font-18 RalewayRegular">@Localization["orderView.Shape"]</p>
-                                        <div class="data-t">
+                                <div class="body-td" id="body-td-gommy">
+                                    <p class="font-18 RalewayRegular"><strong>@Localization["orderView.Shape"]</strong></p>
+                                    <div class="gomi-content" id="important-gomi">
+                                        <span><p class="font-16 RalewayRegular">@Localization["orderView.TextInfoGummy"]</p></span>
+                                    </div>
+                                    <div class="data-t">
+                                        <h3 class="font-20 MulishBold">@Shape</h3>
                                             <div class="flex-gomi">
+                                          
                                                 @if (!string.IsNullOrEmpty(GummyShapeImg))
                                                 {
                                                     <div class="gomi-img">
                                                         <img alt="gummy" src="@GummyShapeImg">
                                                     </div>
                                                 }
-                                                <div class="gomi-content" id="important-gomi">
-                                                    <h3 class="font-20 MulishBold">@Shape</h3>
-                                                    <span><p class="font-16 RalewayRegular">@Localization["orderView.TextInfoGummy"]</p></span>
-                                                </div>
+                                           
                                             </div>
                                             <div class="line-from" id="line-from-gommy"></div>
                                             @if (!string.IsNullOrEmpty(GummyShapeImg))
@@ -1062,7 +1065,7 @@
                         </button>
                     </div>
                 }
-            </div>
+           
         </div>
     </section>
 
