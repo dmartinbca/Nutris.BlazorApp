@@ -5,11 +5,25 @@
 @inject ILocalStorageService LocalStorage
 @implements IDisposable
 <link href="css/MainLayout.css" rel="stylesheet" />
+
 <div class="page-layout">
     @if (ShowSidebar)
     {
-        <!-- Sidebar inline temporal para verificar -->
-        <div class="sidebar">
+        <!-- Hamburger Button solo para móvil -->
+        <button class="hamburger-menu @(isSidebarOpen ? "active" : "")" @onclick="ToggleSidebar">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- Overlay para móvil cuando el menú está abierto -->
+        @if (isSidebarOpen)
+        {
+            <div class="sidebar-overlay" @onclick="CloseSidebar"></div>
+        }
+
+        <!-- Sidebar con clase condicional para móvil -->
+        <div class="sidebar @(isSidebarOpen ? "mobile-active" : "")">
             <div class="content-sidebar">
                 <div>
                     <a href="/home">
@@ -78,7 +92,7 @@
     </div>
 </div>
 
-<!-- Logout Modal con nuevo estilo -->
+<!-- Logout Modal COMPLETO -->
 @if (showLogoutModal)
 {
     <!-- Backdrop -->
@@ -131,22 +145,20 @@
     </div>
 }
 
- 
-
 @code {
     private bool ShowSidebar { get; set; }
     private bool showLogoutModal = false;
     private bool isTooltipVisible = false;
+    private bool isSidebarOpen = false;
     private string userName = "";
     private string customerLogo = "";
     private bool isProcessing = false;
+
     protected override async Task OnInitializedAsync()
     {
         Navigation.LocationChanged += HandleLocationChanged;
         UpdateSidebarVisibility();
         await LoadUserData();
-
-        // Suscribirse a cambios de idioma
         Localization.OnLanguageChanged += OnLanguageChanged;
     }
 
@@ -186,7 +198,8 @@
     {
         showLogoutModal = true;
     }
-    private void CancelLogout()  // NUEVO MÉTODO
+
+    private void CancelLogout()
     {
         showLogoutModal = false;
         StateHasChanged();
@@ -209,6 +222,16 @@
         {
             isProcessing = false;
         }
+    }
+
+    private void ToggleSidebar()
+    {
+        isSidebarOpen = !isSidebarOpen;
+    }
+
+    private void CloseSidebar()
+    {
+        isSidebarOpen = false;
     }
 
     public void Dispose()

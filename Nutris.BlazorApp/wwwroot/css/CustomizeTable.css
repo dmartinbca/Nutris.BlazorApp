@@ -4,7 +4,7 @@
     --success-color: #8ED300;
     --warning-color: #F09B59;
     --info-color: #DAE7F5;
-    --sidebar-width: 300px; /* Corregido a 300px */
+    --sidebar-width: 300px;
     --border-radius: 10px;
     --transition-speed: 0.3s;
 }
@@ -74,11 +74,11 @@ html, body {
         background-color: #f8f9fa;
     }
 
-/* Back Button - Centrado entre sidebar y contenido */
+/* Back Button */
 .back-button-container {
     position: fixed;
     top: 100px;
-    left: 270px; /* Centrado: 300px (sidebar) - 30px (ajuste para centrar) */
+    left: 270px;
     z-index: 100;
     transition: all var(--transition-speed) ease;
 }
@@ -125,11 +125,11 @@ html, body {
     }
 }
 
-/* Main Content - Ajustado para sidebar de 300px */
+/* Main Content - Diseño original */
 .products-main-content {
     padding: 2rem 3rem;
     margin: 40px 0px 40px 20px;
-    max-width: auto ;
+    max-width: auto;
     font-family: 'Museo', sans-serif;
     box-sizing: border-box;
 }
@@ -223,70 +223,70 @@ table.products-customize {
     color: #333;
     font-size: 1.125rem;
     text-transform: none;
-    text-size-adjust: auto;
 }
 
 .products-customize td {
     vertical-align: middle;
     font-family: 'RalewayRegular', sans-serif;
     font-size: 0.95rem;
-    text-size-adjust: auto;
 }
 
     .products-customize td p {
         margin: 0;
         font-size: 0.95rem;
-        text-size-adjust: auto;
     }
 
 .products-customize tbody tr:last-child td {
     border-bottom: none;
 }
 
-/* Status Pills con overflow visible para checks */
+/* Status Pills */
+/* Status Pills - Actualizado para múltiples líneas */
 .products-status-finish,
 .products-status-develop,
 .products-status-initial {
     position: relative;
     font-weight: 700;
     border-radius: 30px;
-    line-height: 1rem;
+    line-height: 1.2;
     padding: 0.50rem 1rem;
     text-align: center;
-    text-size-adjust:auto;
-    max-width:auto;
-    text-wrap:auto;
-
     display: inline-block;
     font-size: 0.875rem;
-    white-space:  pre-line;
+    /* Permitir múltiples líneas */
+    white-space: normal;
+    word-wrap: break-word;
     overflow: visible !important;
-    min-width:200px
+    /* Ancho fijo con límites */
+    width: 200px;
+    max-width: 200px;
+    /* Limitar a 2 líneas máximo */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .products-status-finish {
     color: #fff;
     border: solid 1px #8ED300;
     background-color: #8ED300;
-    text-size-adjust: auto;
 }
 
 .products-status-develop {
     color: #2F5496;
     border: solid 1px #F9D453;
     background-color: #F9D453;
-    text-size-adjust: auto;
-  
 }
 
 .products-status-initial {
     color: #2F5496;
     border: solid 1px #DAE7F5;
     background-color: #DAE7F5;
-    text-size-adjust: auto;
 }
 
-/* Step Check con z-index alto */
+/* Step Check */
 .step-check {
     position: absolute;
     top: -8px;
@@ -306,12 +306,124 @@ table.products-customize {
     border: 2px solid white;
 }
 
-/* Asegurar que el td tenga overflow visible */
+/* Ajustar el contenedor del td para acomodar el status */
 .products-customize td:nth-child(5) {
     overflow: visible !important;
     position: relative;
+    max-width: 220px;
+    padding: 0.8rem 0.5rem;
+}
+/* Ajuste similar para el nombre del producto */
+.products-customize td:nth-child(2) p {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.3;
+    max-width: 250px;
+}
+/* RESPONSIVE - Ajustes para tablets y móviles */
+
+/* Tablet Portrait */
+@media (max-width: 1024px) and (orientation: portrait) {
+    .products-status-finish,
+    .products-status-develop,
+    .products-status-initial {
+        font-size: 0.75rem;
+        width: 160px;
+        max-width: 160px;
+        padding: 0.4rem 0.8rem;
+        -webkit-line-clamp: 2;
+    }
+
+    .products-customize td:nth-child(5) {
+        max-width: 180px;
+    }
+
+    .products-customize td:nth-child(2) p {
+        max-width: 200px;
+        -webkit-line-clamp: 3;
+    }
 }
 
+/* Móvil */
+@media (max-width: 768px) {
+    .products-status-finish,
+    .products-status-develop,
+    .products-status-initial {
+        font-size: 0.7rem;
+        width: 140px;
+        max-width: 140px;
+        padding: 0.35rem 0.6rem;
+        -webkit-line-clamp: 3; /* Permitir 3 líneas en móvil */
+    }
+
+    .products-customize td:nth-child(5) {
+        max-width: 150px;
+    }
+
+    .products-customize td:nth-child(2) p {
+        max-width: 180px;
+        -webkit-line-clamp: 3;
+        font-size: 0.75rem;
+    }
+}
+
+/* Móvil pequeño */
+@media (max-width: 480px) {
+    .products-status-finish,
+    .products-status-develop,
+    .products-status-initial {
+        font-size: 0.65rem;
+        width: 120px;
+        max-width: 120px;
+        padding: 0.3rem 0.5rem;
+        -webkit-line-clamp: 3;
+    }
+
+    .products-customize td:nth-child(5) {
+        max-width: 130px;
+        padding: 0.6rem 0.3rem;
+    }
+
+    .products-customize td:nth-child(2) p {
+        max-width: 150px;
+        -webkit-line-clamp: 4; /* Hasta 4 líneas en móvil pequeño */
+        font-size: 0.7rem;
+    }
+}
+
+/* Ajustar altura de las filas para acomodar el contenido multilínea */
+.products-customize tr {
+    min-height: 60px;
+}
+
+.products-customize td {
+    vertical-align: middle;
+}
+
+/* Asegurar que el check mark se mantenga visible */
+.step-check {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #0ED88F;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    border: 2px solid white;
+}
 /* Order Button */
 .products-order-btn {
     display: flex;
@@ -329,7 +441,6 @@ table.products-customize {
     transition: all 0.3s ease;
     cursor: pointer;
     font-family: 'Museo', sans-serif;
-    text-size-adjust: auto;
 }
 
     .products-order-btn:hover {
@@ -518,56 +629,135 @@ table.products-customize {
         background: #1e3a6f;
     }
 
-/* Responsive Design */
-@media (max-width: 1400px) {
+/* RESPONSIVE DESIGN */
+
+/* Tablet Landscape */
+@media (min-width: 1025px) and (max-width: 1366px) and (orientation: landscape) {
     .products-main-content {
-        max-width: auto;
-    }
-}
-
-@media (max-width: 1200px) {
-    .products-main-content {
-        padding: 3rem 2rem;
-    }
-}
-
-@media (max-width: 1024px) {
-    .products-main-content {
-        padding: 2rem 1rem;
+        padding: 2rem 2.5rem;
     }
 
-    .products-search-form-grid {
-        width: 60%;
+    .products-customize th {
+        font-size: 1.05rem;
     }
 
-    .products-customize th,
     .products-customize td {
-        padding: 0.75rem 0.5rem;
-    }
-
-    .products-order-btn {
-        font-size: 0.875rem !important;
-        padding: 0.25rem 0.75rem;
+        font-size: 0.9rem;
     }
 
     .products-status-finish,
     .products-status-develop,
     .products-status-initial {
-        padding: 0.35rem 0.75rem;
-        font-size: 0.75rem;
-    }
-
-    .back-button-container {
-        left: 260px;
+        font-size: 0.82rem;
+        min-width: 180px;
     }
 }
 
+/* Tablet Portrait */
+@media (max-width: 1024px) and (orientation: portrait) {
+    /* Ocultar back button en tablet portrait */
+    .back-button-container {
+        display: none;
+    }
+
+    /* Ajustar contenido principal */
+    .products-main-content {
+        padding: 2rem 1.5rem;
+        padding-top: 80px; /* Espacio para hamburger menu */
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .products-search-form-grid {
+        width: 65%;
+    }
+
+    /* Reducir tamaños de fuente proporcionalmente */
+    .products-customize th {
+        font-size: 0.95rem;
+        padding: 0.8rem 0.6rem;
+    }
+
+    .products-customize td {
+        font-size: 0.85rem;
+        padding: 0.8rem 0.6rem;
+    }
+
+        .products-customize td p {
+            font-size: 0.85rem;
+        }
+
+    /* Ajustar status pills */
+    .products-status-finish,
+    .products-status-develop,
+    .products-status-initial {
+        font-size: 0.75rem;
+        min-width: 160px;
+        padding: 0.4rem 0.8rem;
+    }
+
+    /* Ajustar botón */
+    .products-order-btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 1rem;
+    }
+
+    /* Empty state responsive */
+    .products-empty-content h2 {
+        font-size: 32px;
+    }
+
+    .products-empty-content p {
+        font-size: 18px;
+    }
+}
+
+/* iPad Pro Portrait específico */
+@media (min-width: 834px) and (max-width: 1024px) and (orientation: portrait) {
+    .products-main-content {
+        padding: 2rem;
+        padding-top: 90px;
+    }
+
+    .products-customize th {
+        font-size: 1rem;
+    }
+
+    .products-customize td {
+        font-size: 0.9rem;
+    }
+
+    .products-status-finish,
+    .products-status-develop,
+    .products-status-initial {
+        font-size: 0.8rem;
+        min-width: 170px;
+    }
+}
+
+/* Móvil y tablet pequeño */
 @media (max-width: 768px) {
+    .back-button-container {
+        display: none;
+    }
+
     .products-main-content {
         padding: 1rem;
+        padding-top: 70px; /* Espacio para hamburger */
         margin-left: 0;
         margin-right: 0;
-        max-width: 100%;
+        width: 100%;
+    }
+
+    .language-selector-products {
+        top: 15px;
+        right: 15px;
+    }
+
+    .language-button {
+        padding: 8px 16px;
+        font-size: 13px;
+        min-width: 120px;
     }
 
     .products-search-container {
@@ -589,162 +779,292 @@ table.products-customize {
         min-width: 700px;
     }
 
-    .products-filter-modal {
-        width: 90%;
-        max-width: 400px;
+        /* Reducir tamaños */
+        .products-customize th {
+            font-size: 0.85rem;
+            padding: 0.75rem 0.5rem;
+        }
+
+        .products-customize td {
+            font-size: 0.78rem;
+            padding: 0.75rem 0.5rem;
+        }
+
+    .products-status-finish,
+    .products-status-develop,
+    .products-status-initial {
+        font-size: 0.7rem;
+        min-width: 140px;
+        padding: 0.35rem 0.7rem;
     }
 
+    .products-order-btn {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+    }
+
+        .products-order-btn span {
+            display: none; /* Ocultar texto, solo icono */
+        }
+
+    .products-empty-content h2 {
+        font-size: 28px;
+    }
+
+    .products-empty-content p {
+        font-size: 16px;
+        padding: 0 1rem;
+    }
+}
+
+/* Móvil pequeño */
+@media (max-width: 480px) {
+    .products-main-content {
+        padding: 0.8rem;
+        padding-top: 60px;
+    }
+
+    .language-selector-products {
+        top: 10px;
+        right: 10px;
+    }
+
+    .language-button {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-width: 100px;
+    }
+
+    .products-customize th {
+        font-size: 0.75rem;
+        padding: 0.6rem 0.4rem;
+    }
+
+    .products-customize td {
+        font-size: 0.7rem;
+        padding: 0.6rem 0.4rem;
+    }
+
+    .products-status-finish,
+    .products-status-develop,
+    .products-status-initial {
+        font-size: 0.65rem;
+        min-width: 120px;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .step-check {
+        width: 16px;
+        height: 16px;
+        font-size: 9px;
+    }
+}
+
+/* Landscape móvil */
+@media (max-height: 600px) and (orientation: landscape) {
+    .products-main-content {
+        padding: 1rem 2rem;
+        padding-top: 60px;
+    }
+
+    .products-empty-container {
+        min-height: 300px;
+    }
+
+    .products-empty-content h2 {
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+
+    .products-empty-content p {
+        font-size: 14px;
+    }
+
+    .products-empty-content img {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 20px;
+    }
+}
+/* Landscape tablet con sidebar oculto */
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 768px) {
+    /* Back button oculto */
     .back-button-container {
         display: none;
     }
 
-
-
-    /* Ajustes responsive para evitar saltos de línea */
-    @media (max-width: 1400px) {
-        .products-customize th {
-            font-size: 1.05rem;
-        }
-
-        .products-customize td {
-            font-size: 0.9rem;
-        }
-
-            .products-customize td p {
-                font-size: 0.9rem;
-            }
-
-        .products-status-finish,
-        .products-status-develop,
-        .products-status-initial {
-            font-size: 0.82rem;
-        }
+    /* Contenido principal con todo el ancho disponible */
+    .products-main-content {
+        padding: 2rem;
+        padding-top: 70px; /* Espacio para hamburger */
+        margin-left: 0;
+        width: 100%;
     }
 
-    @media (max-width: 1200px) {
-        .products-customize th {
+    /* Tabla normal sin restricciones */
+    .products-table-container {
+        overflow-x: auto;
+    }
+
+    /* Tamaños de fuente ligeramente reducidos pero cómodos */
+    .products-customize th {
+        font-size: 1rem;
+    }
+
+    .products-customize td {
+        font-size: 0.9rem;
+    }
+
+    /* Status pills con espacio suficiente */
+    .products-status-finish,
+    .products-status-develop,
+    .products-status-initial {
+        width: 180px;
+        max-width: 180px;
+        font-size: 0.8rem;
+    }
+}
+/* Desktop - Dar más espacio al nombre del producto */
+@media screen and (min-width: 1025px) {
+    /* Ajustar el nombre del producto con más espacio */
+    .products-customize td:nth-child(2) p {
+        max-width: 400px; /* Aumentar de 250px a 400px */
+        white-space: normal;
+        word-wrap: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Mantener 2 líneas máximo */
+        -webkit-box-orient: vertical;
+        line-height: 1.4;
+    }
+
+    /* Ajustar anchos de columnas en desktop para optimizar espacio */
+    .products-customize th:nth-child(2),
+    .products-customize td:nth-child(2) {
+        width: 35%; /* Aumentar del 25% al 35% */
+        min-width: 300px;
+    }
+
+    /* Reducir un poco las otras columnas para compensar */
+    .products-customize th:nth-child(5),
+    .products-customize td:nth-child(5) {
+        width: 20%; /* Reducir del 25% al 20% */
+    }
+}
+
+/* Desktop grande (pantallas más anchas) */
+@media screen and (min-width: 1400px) {
+    .products-customize td:nth-child(2) p {
+        max-width: 500px; /* Aún más espacio en pantallas grandes */
+    }
+
+    .products-customize th:nth-child(2),
+    .products-customize td:nth-child(2) {
+        width: 40%;
+        min-width: 350px;
+    }
+}
+
+/* Desktop extra grande */
+@media screen and (min-width: 1920px) {
+    .products-customize td:nth-child(2) p {
+        max-width: 600px;
+        -webkit-line-clamp: 3; /* Permitir 3 líneas en pantallas muy grandes */
+    }
+
+    .products-customize th:nth-child(2),
+    .products-customize td:nth-child(2) {
+        width: 45%;
+        min-width: 400px;
+    }
+}
+/* Desktop - Dar más espacio al código y nombre del producto */
+@media screen and (min-width: 1025px) {
+    /* Columna del código - más ancho */
+    .products-customize th:nth-child(1),
+    .products-customize td:nth-child(1) {
+        width: 15%; /* Aumentar del 10% al 15% */
+        min-width: 120px; /* Aumentar mínimo de 80px a 120px */
+    }
+
+        .products-customize td:nth-child(1) p {
+            white-space: nowrap; /* Evitar que el código se parta */
             font-size: 0.95rem;
         }
 
-        .products-customize td {
-            font-size: 0.85rem;
-        }
-
-            .products-customize td p {
-                font-size: 0.85rem;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 250px;
-            }
-
-        .products-status-finish,
-        .products-status-develop,
-        .products-status-initial {
-            font-size: 0.78rem;
-            width: 180px;
-        }
-
-        .products-order-btn {
-            font-size: 0.85rem !important;
-        }
+    /* Nombre del producto con más espacio */
+    .products-customize th:nth-child(2),
+    .products-customize td:nth-child(2) {
+        width: 35%;
+        min-width: 300px;
     }
 
-    @media (max-width: 1024px) {
-        .products-customize th {
-            font-size: 0.88rem;
-            padding: 0.75rem 0.5rem;
+        .products-customize td:nth-child(2) p {
+            max-width: 400px;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.4;
         }
 
-        .products-customize td {
-            font-size: 0.8rem;
-            padding: 0.75rem 0.5rem;
-        }
-
-            .products-customize td p {
-                font-size: 0.8rem;
-                line-height: 1.2;
-            }
-
-            /* Específicamente para nombre del producto - permitir 2 líneas máximo */
-            .products-customize td:nth-child(2) p {
-                white-space: normal;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                max-width: none;
-            }
-
-        .products-status-finish,
-        .products-status-develop,
-        .products-status-initial {
-            font-size: 0.72rem;
-            width: 160px;
-            padding: 0.4rem 0.8rem;
-        }
-
-        .products-order-btn {
-            font-size: 0.78rem !important;
-            padding: 0.35rem 0.9rem;
-        }
+    /* Ajustar las demás columnas para compensar */
+    .products-customize th:nth-child(3),
+    .products-customize td:nth-child(3) {
+        width: 10%; /* Envase */
+        min-width: 70px;
     }
 
-    @media (max-width: 900px) {
-        .products-customize th {
-            font-size: 0.82rem;
-        }
-
-        .products-customize td {
-            font-size: 0.75rem;
-        }
-
-            .products-customize td p {
-                font-size: 0.75rem;
-            }
-
-        .products-status-finish,
-        .products-status-develop,
-        .products-status-initial {
-            font-size: 0.68rem;
-            width: 140px;
-        }
-
-        .products-order-btn {
-            font-size: 0.72rem !important;
-            padding: 0.3rem 0.8rem;
-        }
-
-            .products-order-btn span {
-                display: none;
-            }
-
-            /* Solo mostrar icono en botón cuando es muy pequeño */
-            .products-order-btn svg {
-                width: 16px;
-                height: 16px;
-            }
+    .products-customize th:nth-child(4),
+    .products-customize td:nth-child(4) {
+        width: 10%; /* Unidades */
+        min-width: 70px;
+        text-align: center;
     }
 
-    /* Para tablets en modo portrait - ajustes específicos */
-    @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-        .products-customize {
-            font-size: 0.8rem;
+    .products-customize th:nth-child(5),
+    .products-customize td:nth-child(5) {
+        width: 18%; /* Status - reducir un poco */
+        min-width: 180px;
+    }
+
+    .products-customize th:nth-child(6),
+    .products-customize td:nth-child(6) {
+        width: 12%; /* Botón detalles */
+        min-width: 100px;
+    }
+}
+
+/* Desktop grande */
+@media screen and (min-width: 1400px) {
+    .products-customize th:nth-child(1),
+    .products-customize td:nth-child(1) {
+        width: 15%;
+        min-width: 130px;
+    }
+
+        .products-customize td:nth-child(1) p {
+            font-size: 1rem; /* Tamaño normal en pantallas grandes */
         }
 
-            .products-customize th {
-                font-size: 0.85rem;
-                letter-spacing: -0.01em;
-            }
+    .products-customize td:nth-child(2) p {
+        max-width: 500px;
+    }
+}
 
-            .products-customize td {
-                font-size: 0.78rem;
-            }
+/* Desktop extra grande */
+@media screen and (min-width: 1920px) {
+    .products-customize th:nth-child(1),
+    .products-customize td:nth-child(1) {
+        min-width: 140px;
+    }
 
-                /* Reducir espaciado entre letras para ganar espacio */
-                .products-customize td p {
-                    letter-spacing: -0.02em;
-                }
+    .products-customize td:nth-child(2) p {
+        max-width: 600px;
+        -webkit-line-clamp: 3;
     }
 }
