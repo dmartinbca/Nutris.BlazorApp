@@ -1044,25 +1044,23 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach (var a in AnalyticsRows)
-                                                            {
-                                                                <tr class="text-table-td RalewayRegular">
-                                                                    <td class="font-12" colspan="2">@a.Active</td>
-                                                                    <td class="font-12">@a.Quantity</td>
-                                                                    <td class="font-12">@a.Source</td>
-                                                                    <td class="text-center font-12">
-                                                                        <div class="check-from-label-2 ml-0 justify-content-center">
-                                                                            <input type="checkbox" checked="@a.Analytics" disabled />
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text" class="form-control font-12" readonly value="@a.Periodicity" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text" class="form-control font-12" readonly value="@a.Observations" />
-                                                                    </td>
-                                                                </tr>
-                                                            }
+                                                        @foreach (var a in AnalyticsRows)
+                                                        {
+                                                            <tr class="text-table-td RalewayRegular">
+                                                                <td data-label="Tipo">@a.Active</td>
+                                                                <td data-label="Cantidad">@a.Quantity</td>
+                                                                <td data-label="Origen">@a.Source</td>
+                                                                <td data-label="Analítica">
+                                                                    <input type="checkbox" checked="@a.Analytics" disabled />
+                                                                </td>
+                                                                <td data-label="Periodicidad">
+                                                                    <input type="text" class="form-control" readonly value="@a.Periodicity" />
+                                                                </td>
+                                                                <td data-label="Observaciones">
+                                                                    <input type="text" class="form-control" readonly value="@a.Observations" />
+                                                                </td>
+                                                            </tr>
+                                                        }
                                                         </tbody>
                                                     </table>
                                                 </div>

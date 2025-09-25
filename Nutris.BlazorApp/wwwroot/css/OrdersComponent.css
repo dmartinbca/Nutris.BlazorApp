@@ -3014,4 +3014,180 @@ button.btn-t {
         max-width: 200px;
     }
 }
- 
+/* Tablet - Diseño de dos niveles */
+@media (min-width: 769px) and (max-width: 1368px) {
+    .table-responsive {
+        overflow: visible;
+    }
+
+    .table tbody tr {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        padding: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+        .table tbody tr td {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+            .table tbody tr td::before {
+                content: attr(data-label);
+                font-size: 0.75rem;
+                color: #666;
+                font-weight: 600;
+            }
+
+            /* Primera columna ocupa todo el ancho */
+            .table tbody tr td:first-child {
+                grid-column: 1 / -1;
+                background: #2F5496;
+                color: white;
+                padding: 0.5rem;
+                border-radius: 5px;
+            }
+}
+/* Tablets y móvil - Diseño de tarjetas */
+@media (max-width: 1368px) {
+    /* Ocultar header de tabla */
+    .text-table-th {
+        display: none !important;
+    }
+
+    /* Contenedor de analíticas */
+    .content-others {
+        padding: 1rem;
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    /* Convertir cada fila en una tarjeta */
+    .table-responsive table tbody tr {
+        display: block;
+        background: white;
+        border-radius: 10px;
+        padding: 0;
+        margin-bottom: 1.5rem;
+        border: 1px solid #dee2e6;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+        /* Primer TD - Título de la tarjeta */
+        .table-responsive table tbody tr td:first-child {
+            display: block;
+            width: 100% !important;
+            background: #2F5496;
+            color: white;
+            padding: 1rem;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin: 0;
+            border: none;
+            text-align: center;
+        }
+
+        /* Resto de TDs - Ocupar todo el ancho */
+        .table-responsive table tbody tr td:not(:first-child) {
+            display: block;
+            width: 100%;
+            margin: 0;
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border: none;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        /* Eliminar borde del último elemento */
+        .table-responsive table tbody tr td:last-child {
+            border-bottom: none;
+        }
+
+        /* Añadir labels antes del contenido */
+        .table-responsive table tbody tr td:nth-child(2)::before {
+            content: "CANTIDAD";
+        }
+
+        .table-responsive table tbody tr td:nth-child(3)::before {
+            content: "ORIGEN";
+        }
+
+        .table-responsive table tbody tr td:nth-child(4)::before {
+            content: "ANALÍTICA";
+        }
+
+        .table-responsive table tbody tr td:nth-child(5)::before {
+            content: "PERIODICIDAD";
+        }
+
+        .table-responsive table tbody tr td:nth-child(6)::before {
+            content: "OBSERVACIONES";
+        }
+
+        /* Estilo de los labels */
+        .table-responsive table tbody tr td:not(:first-child)::before {
+            display: block;
+            font-size: 0.7rem;
+            color: #666;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Contenido de las celdas */
+        .table-responsive table tbody tr td {
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+            /* Inputs centrados y con mejor estilo */
+            .table-responsive table tbody tr td input.form-control {
+                font-size: 0.85rem;
+                padding: 0.5rem;
+                width: 80%;
+                max-width: 250px;
+                margin: 0 auto;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                background: white;
+                text-align: center;
+            }
+
+            /* Checkbox centrado */
+            .table-responsive table tbody tr td:nth-child(4) {
+                text-align: center;
+            }
+
+                .table-responsive table tbody tr td:nth-child(4) .check-from-label-2 {
+                    display: inline-block;
+                    margin: 0 auto;
+                }
+
+            /* Alternar colores de fondo */
+            .table-responsive table tbody tr td:nth-child(odd):not(:first-child) {
+                background: #f8f9fa;
+            }
+
+            .table-responsive table tbody tr td:nth-child(even):not(:first-child) {
+                background: white;
+            }
+}
+
+/* Móvil pequeño - mantener igual */
+@media (max-width: 480px) {
+    .table-responsive table tbody tr td:not(:first-child) {
+        padding: 0.8rem 1rem;
+    }
+
+    .table-responsive table tbody tr td input.form-control {
+        width: 90%;
+        font-size: 0.8rem;
+    }
+}
