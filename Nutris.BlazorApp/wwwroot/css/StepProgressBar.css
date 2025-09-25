@@ -567,5 +567,799 @@
         font-size: 1rem !important;
     }
 }
+/* RESPONSIVE - Móvil APILADO MEJORADO */
+@media (max-width: 768px) {
+    .steps-progress-container {
+        padding: 1rem;
+        overflow: visible;
+    }
 
- 
+    .steps-progress-inner-wrapper {
+        padding: 0;
+    }
+
+    .steps-progress-bar {
+        flex-direction: column;
+        gap: 0;
+        padding: 0;
+        min-width: auto;
+        width: 100%;
+    }
+
+    .step-item {
+        width: 100%;
+        max-width: 100%;
+        min-width: auto;
+        flex-direction: column;
+        margin-bottom: 0;
+    }
+
+        /* QUITAR los números circulares */
+        .step-item::before {
+            display: none !important;
+        }
+
+    .step-content {
+        width: 100%;
+        min-height: 60px; /* Aumentado de 50px */
+        border-radius: 10px;
+        padding: 1rem; /* Padding uniforme */
+        display: flex;
+        justify-content: center; /* Centrar contenido */
+        align-items: center;
+        position: relative;
+    }
+
+    .step-text {
+        font-size: 14px; /* Aumentado de 13px */
+        text-align: center; /* CENTRADO */
+        line-height: 1.3;
+        width: 100%;
+        padding: 0 30px; /* Espacio para el check */
+        font-weight: 600;
+    }
+
+    .step-check {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        width: 24px; /* Un poco más grande */
+        height: 24px;
+    }
+
+    /* Conector vertical entre pasos */
+    .step-connector {
+        width: 100%;
+        height: 30px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .connector-line {
+        width: 2px;
+        height: 100%;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .connector-arrow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(90deg);
+        background: white;
+        padding: 2px;
+        border-radius: 50%;
+    }
+
+        .connector-arrow svg {
+            width: 12px;
+            height: 12px;
+        }
+
+    /* Último paso sin conector */
+    .step-item:last-child .step-connector {
+        display: none;
+    }
+}
+
+/* Móvil pequeño */
+@media (max-width: 480px) {
+    .steps-progress-container {
+        padding: 0.8rem;
+    }
+
+    .step-content {
+        min-height: 55px; /* Un poco más alto */
+        padding: 0.9rem;
+    }
+
+    .step-text {
+        font-size: 13px; /* Aumentado de 12px */
+        padding: 0 25px;
+    }
+
+    .step-check {
+        width: 22px;
+        height: 22px;
+        right: 12px;
+    }
+
+    .step-connector {
+        height: 25px;
+    }
+}
+
+/* Móvil muy pequeño */
+@media (max-width: 360px) {
+    .step-content {
+        min-height: 50px;
+        padding: 0.8rem;
+    }
+
+    .step-text {
+        font-size: 12px;
+        padding: 0 20px;
+    }
+
+    .step-check {
+        width: 20px;
+        height: 20px;
+        right: 10px;
+    }
+}
+
+/* Animación de entrada mejorada */
+@media (max-width: 768px) {
+    .step-item {
+        animation: slideIn 0.3s ease forwards;
+        opacity: 0;
+    }
+
+        .step-item:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .step-item:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .step-item:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .step-item:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .step-item:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+    @keyframes slideIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+    }
+}
+/* SECCIONES DESPLEGABLES - RESPONSIVE */
+
+/* Desktop - mantener diseño original */
+.toggle-from {
+    border: solid 1px #D2D2D2;
+    border-radius: 30px;
+}
+
+.flex-elm-from {
+    padding: 0.92rem 2.64rem;
+    justify-content: space-between;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .toggle-from {
+        margin: 1.5rem 15px;
+        border-radius: 20px;
+    }
+
+    .flex-elm-from {
+        padding: 0.8rem 1.5rem;
+    }
+
+    /* Contenido interno */
+    .content-t, .content-t-2 {
+        padding: 2rem 1.5rem !important;
+    }
+
+    /* Títulos más pequeños */
+    .left-from h2 {
+        font-size: 1.3rem;
+    }
+
+    /* Progress bars ajustados */
+    .progress-bar-from,
+    .progress-bar-from-0 {
+        padding: 0.4rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+    .toggle-from {
+        margin: 1rem 10px;
+        border-radius: 15px;
+    }
+
+    .flex-elm-from {
+        padding: 0.7rem 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* Reorganizar header del toggle */
+    .left-from {
+        width: 100% !important;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+        .left-from h2 {
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+
+    /* Checkbox "Sin etiqueta" / "Sin analíticas" */
+    .l-data-from {
+        margin-left: 0 !important;
+    }
+
+    .check-from-label-2 {
+        margin-left: 0 !important;
+        font-size: 0.9rem;
+    }
+
+    /* Parte derecha con progress y flecha */
+    .right-from {
+        width: 100% !important;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 !important;
+    }
+
+        .right-from .line-from {
+            display: none; /* Ocultar línea vertical en móvil */
+        }
+
+    .progress-bar-from,
+    .progress-bar-from-0 {
+        padding: 0.35rem 1.2rem;
+        font-size: 0.85rem;
+        margin: 0;
+    }
+
+    /* Flecha de expandir */
+    .arrow-t {
+        width: 35px;
+        height: 35px;
+    }
+
+    /* CONTENIDO INTERNO DE LAS SECCIONES */
+
+    /* Padding general */
+    .content-t,
+    .content-t-2,
+    .content-t-pdb {
+        padding: 1.5rem 1rem !important;
+    }
+
+    /* Features row (los 4 iconos) */
+    .features-row {
+        gap: 0.5rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .feature {
+        min-width: 80px;
+        height: 120px;
+    }
+
+        .feature .img-icon-tags img {
+            max-width: 50px;
+        }
+
+    .paragraph-img-tags p {
+        font-size: 0.7rem;
+        padding: 5px;
+    }
+
+    /* Inputs y campos */
+    .body-td {
+        flex-direction: column;
+        padding: 1rem 0;
+        gap: 0.5rem;
+    }
+
+        .body-td > p {
+            width: 100%;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+    .data-t {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+        .data-t input[type="text"] {
+            width: 100%;
+            font-size: 1rem;
+        }
+
+    /* Ocultar líneas y checks en móvil para simplificar */
+    .body-td .line-from {
+        display: none;
+    }
+
+    .body-td .data-t > img {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Tabla de recetas responsive */
+    .body-t-flex {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+        .body-t-flex.header-row {
+            display: none; /* Ocultar headers en móvil */
+        }
+
+    .body-data {
+        width: 100%;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        background: #f5f5f5;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+    }
+
+        .body-data::before {
+            content: attr(data-label);
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+    /* Comentarios área */
+    .comments-area textarea {
+        min-width: 100%;
+        max-width: 100%;
+        min-height: 150px;
+    }
+
+    /* Botones */
+    .btn-atr {
+        padding: 1.5rem 1rem;
+    }
+
+    .btn-save-atr {
+        width: 100%;
+        font-size: 1.1rem;
+        padding: 1rem;
+    }
+
+    .paragraph-customize {
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    /* Sección de forma (Gummy) */
+    #body-td-gommy {
+        gap: 1rem;
+    }
+
+    #important-gomi p {
+        font-size: 0.85rem;
+        margin: 1rem 0;
+    }
+
+    .flex-gomi {
+        max-width: 100%;
+        padding: 1rem;
+    }
+
+    /* Tabla de analíticas responsive */
+    .content-others {
+        padding: 1rem;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        min-width: 600px;
+    }
+}
+
+/* Móvil pequeño */
+@media (max-width: 480px) {
+    .toggle-from {
+        margin: 0.8rem 5px;
+        border-radius: 12px;
+    }
+
+    .flex-elm-from {
+        padding: 0.6rem 0.8rem;
+    }
+
+    .left-from h2 {
+        font-size: 1rem;
+    }
+
+    .content-t,
+    .content-t-2 {
+        padding: 1rem 0.8rem !important;
+    }
+
+    .progress-bar-from,
+    .progress-bar-from-0 {
+        padding: 0.3rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .arrow-t {
+        width: 30px;
+        height: 30px;
+    }
+
+    /* Features más pequeños */
+    .feature {
+        min-width: 70px;
+        height: 100px;
+    }
+
+        .feature .img-icon-tags img {
+            max-width: 40px;
+        }
+
+    /* Botón final más pequeño */
+    .btn-save-atr {
+        font-size: 1rem;
+        padding: 0.8rem;
+    }
+}
+
+/* Landscape móvil */
+@media (max-height: 600px) and (orientation: landscape) {
+    .toggle-from {
+        margin: 0.5rem 10px;
+    }
+
+    .flex-elm-from {
+        padding: 0.5rem 1rem;
+        flex-direction: row;
+    }
+
+    .content-t,
+    .content-t-2 {
+        padding: 1rem !important;
+    }
+
+    /* Reducir altura de elementos */
+    .body-td {
+        padding: 0.5rem 0;
+    }
+
+    .comments-area textarea {
+        min-height: 100px;
+    }
+}
+
+/* Animación suave al expandir/contraer */
+.container-toggle {
+    transition: all 0.3s ease;
+}
+
+    .container-toggle.active {
+        animation: slideDown 0.3s ease;
+    }
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@media (max-width: 768px) {
+    .progress-bar-from .step-check {
+        display: none !important;
+    }
+}
+/* FEATURES ROW - Responsive apilado */
+
+/* Desktop - mantener en fila */
+.features-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    margin-bottom: 1rem;
+    align-items: stretch;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 0;
+    min-width: 80px;
+    justify-content: space-between;
+    height: 160px;
+}
+
+/* Móvil - APILAR 2x2 */
+@media (max-width: 768px) {
+    .content-toggle-header {
+        padding: 1.5rem 1rem;
+    }
+
+    .features-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        max-width: 100%;
+        margin: 0 auto 1.5rem;
+    }
+
+    .feature {
+        min-width: auto;
+        height: 140px;
+        padding: 0.5rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .img-icon-tags {
+        margin-bottom: 0.5rem;
+    }
+
+        .img-icon-tags img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+    .paragraph-img-tags p {
+        font-size: 0.75rem;
+        padding: 5px 2px;
+        line-height: 1.2;
+        text-align: center;
+    }
+
+    .content-switch {
+        margin-top: auto;
+    }
+
+    .switch {
+        margin: 0;
+    }
+}
+
+/* Móvil pequeño - APILAR 1 columna */
+@media (max-width: 480px) {
+    .features-row {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .feature {
+        height: auto;
+        min-height: 80px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem;
+    }
+
+    .img-icon-tags {
+        margin-bottom: 0;
+        margin-right: 1rem;
+    }
+
+        .img-icon-tags img {
+            width: 40px;
+            height: 40px;
+        }
+
+    .paragraph-img-tags {
+        flex: 1;
+        text-align: left;
+    }
+
+        .paragraph-img-tags p {
+            font-size: 0.8rem;
+            padding: 0;
+            text-align: left;
+        }
+
+    .content-switch {
+        margin-top: 0;
+        margin-left: auto;
+    }
+}
+
+/* Tablet portrait - 2x2 */
+@media (min-width: 481px) and (max-width: 1024px) and (orientation: portrait) {
+    .features-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .feature {
+        height: 150px;
+    }
+}
+
+/* Landscape móvil - mantener en fila con scroll */
+@media (max-height: 600px) and (orientation: landscape) {
+    .features-row {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 0.5rem;
+    }
+
+    .feature {
+        min-width: 100px;
+        height: 120px;
+    }
+
+    .img-icon-tags img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .paragraph-img-tags p {
+        font-size: 0.7rem;
+    }
+}
+/* TABLA DE RECETAS - Responsive agrupada por columnas */
+
+/* Desktop - mantener tabla normal */
+.body-t-flex.header-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 2px solid #e5e5e5;
+    font-weight: bold;
+}
+
+.body-t-flex.data-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Móvil - AGRUPAR POR COLUMNAS */
+@media (max-width: 768px) {
+    /* Ocultar estructura original */
+    .body-t-flex.header-row {
+        display: none;
+    }
+
+    .body-t-flex.data-row {
+        display: none;
+    }
+
+    /* Contenedor para la vista móvil */
+    .content-t.content-t-pdb .body-t {
+        display: block;
+    }
+
+        /* Crear grupos por columna después de la tabla */
+        .content-t.content-t-pdb .body-t::after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+
+    /* Estilos para grupos móviles - los crearemos con JavaScript o Razor */
+    .mobile-recipe-groups {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .mobile-recipe-groups {
+            display: block;
+        }
+
+        .mobile-recipe-group {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e5e5e5;
+        }
+
+            .mobile-recipe-group h4 {
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: #2F5496;
+                text-transform: uppercase;
+                margin-bottom: 0.8rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 2px solid #2F5496;
+            }
+
+        .mobile-recipe-item {
+            background: white;
+            padding: 0.6rem;
+            margin-bottom: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            font-size: 0.9rem;
+        }
+
+            .mobile-recipe-item:last-child {
+                margin-bottom: 0;
+            }
+    }
+}
+
+/* Móvil pequeño */
+@media (max-width: 480px) {
+    .mobile-recipe-group {
+        padding: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+
+        .mobile-recipe-group h4 {
+            font-size: 0.8rem;
+        }
+
+    .mobile-recipe-item {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+}

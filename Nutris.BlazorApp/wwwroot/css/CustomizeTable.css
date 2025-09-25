@@ -1068,3 +1068,75 @@ table.products-customize {
         -webkit-line-clamp: 3;
     }
 }
+/* iPad Pro y tablets landscape específico */
+@media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) {
+    /* Ajustar el contenedor principal */
+    .products-main-content {
+        padding: 2rem 1.5rem;
+        margin: 40px 10px 40px 10px;
+    }
+
+    /* Ajustar la tabla */
+    .products-table-container {
+        padding: 1rem 1.5rem;
+        overflow-x: auto;
+    }
+
+    /* Hacer la tabla scrolleable si es necesario */
+    .products-customize {
+        min-width: 900px;
+    }
+
+        /* Ajustar anchos de columnas */
+        .products-customize th:nth-child(1),
+        .products-customize td:nth-child(1) {
+            width: 12%;
+        }
+
+        .products-customize th:nth-child(2),
+        .products-customize td:nth-child(2) {
+            width: 30%;
+        }
+
+        .products-customize th:nth-child(5),
+        .products-customize td:nth-child(5) {
+            width: 22%;
+        }
+
+        .products-customize th:nth-child(6),
+        .products-customize td:nth-child(6) {
+            width: 15%;
+            white-space: nowrap;
+        }
+
+    /* Ajustar el botón de detalles */
+    .products-order-btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.9rem;
+        white-space: nowrap;
+    }
+
+    /* Status pills más pequeños */
+    .products-status-finish,
+    .products-status-develop,
+    .products-status-initial {
+        font-size: 0.75rem;
+        width: 160px;
+        max-width: 160px;
+        padding: 0.4rem 0.6rem;
+    }
+}
+
+/* Específico para iPad Pro 11" (1194x834) y 12.9" (1366x1024) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+    .products-main-content {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Asegurar que nada se desborde */
+    .products-table-container {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+}
