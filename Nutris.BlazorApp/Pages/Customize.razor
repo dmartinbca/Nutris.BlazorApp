@@ -166,16 +166,24 @@
                     {
                         b64 = valueEl2.GetString();
                     }
-                    if (!string.IsNullOrWhiteSpace(b64) && RG35Data.Status=="Cerrado cliente y calidad")
+                    try
                     {
-                        Ficheros.Add(new FileItem
+                        if (!string.IsNullOrWhiteSpace(b64) && RG35Data.Status == "Cerrado cliente y calidad")
                         {
-                            Code = Id,
-                            Name = "TECHNICAL DATA SHEET " + RG35Data.Product_name_2 + ".pdf",
-                            File = b64
-                        });
-                        RG35Data.Files = Ficheros;
+                            Ficheros.Add(new FileItem
+                            {
+                                Code = Id,
+                                Name = "TECHNICAL DATA SHEET " + RG35Data.Product_name_2 + ".pdf",
+                                File = b64
+                            });
+                            RG35Data.Files = Ficheros;
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error processing base64 file: {ex}");
+                    }
+                
 
                 }
 
