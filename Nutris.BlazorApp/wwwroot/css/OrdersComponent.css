@@ -1646,11 +1646,12 @@ button.btn-t {
             .header-order .row.mt-3 {
                 grid-column: 1; /* ya solo hay una columna */
             }
-    }
+       
+        }
 
     /* Si quieres que los pasos se partan en 2 filas en pantallas medias,
    descomenta este bloque: */
-    /*
+    
 @media (max-width: 992px){
   .header-order .steps-row{
     flex-wrap: wrap;
@@ -1662,7 +1663,7 @@ button.btn-t {
     flex-basis: 100%;   // el último a ancho completo, si te gusta ese efecto
   }
 }
-*/
+
 
     /* En móviles pequeños, apila de a uno si lo prefieres */
     @media (max-width: 576px) {
@@ -1688,4 +1689,7 @@ button.btn-t {
             min-width: 240px; /* opcional */
             text-align: center;
         }
+    
+
+
 }
