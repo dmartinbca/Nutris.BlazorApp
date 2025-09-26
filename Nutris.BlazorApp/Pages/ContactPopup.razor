@@ -1,0 +1,202 @@
+﻿@* ContactPopup.razor *@
+@using NutrisBlazor.Services
+@inject ILocalizationService Localization
+@inject IJSRuntime JSRuntime
+<link href="css/ContactPopup.css" rel="stylesheet" />
+<link href="css/fonts.css" rel="stylesheet" />
+
+
+@if (IsVisible)
+{
+    <!-- Backdrop -->
+    <div class="contact-popup-backdrop" @onclick="Close"></div>
+
+    <!-- Popup Container -->
+    <div class="contact-popup-wrapper">
+        <div class="contact-popup-container">
+            <!-- Header -->
+            <div class="popup-header">
+                <h3 class="RalewayBold">@Localization["contact.SendMessage"]</h3>
+                <button class="popup-close-btn" @onclick="Close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="popup-body">
+                <form @onsubmit="HandleSubmit" @onsubmit:preventDefault="true">
+                    <!-- Nombre -->
+                    <div class="form-group">
+                        <label class="RalewayRegular">@Localization["contact.Name"] <span class="optional">(@Localization["contact.Optional"])</span></label>
+                        <input type="text"
+                               class="form-control"
+                               @bind="formData.Name"
+                               placeholder="@Localization["contact.EnterName"]" />
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label class="RalewayRegular">@Localization["contact.Email"] <span class="required">*</span></label>
+                        <input type="email"
+                               class="form-control @(emailError ? "error" : "")"
+                               @bind="formData.Email"
+                               @oninput="ClearEmailError"
+                               placeholder="@Localization["contact.EnterEmail"]"
+                               required />
+                        @if (emailError)
+                        {
+                            <span class="error-message">@Localization["contact.EmailRequired"]</span>
+                        }
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="form-group">
+                        <label class="RalewayRegular">@Localization["contact.Phone"] <span class="optional">(@Localization["contact.Optional"])</span></label>
+                        <input type="tel"
+                               class="form-control"
+                               @bind="formData.Phone"
+                               placeholder="@Localization["contact.EnterPhone"]" />
+                    </div>
+
+                    <!-- Mensaje -->
+                    <div class="form-group">
+                        <label class="RalewayRegular">@Localization["contact.HowCanWeHelp"] <span class="required">*</span></label>
+                        <textarea class="form-control @(messageError ? "error" : "")"
+                                  @bind="formData.Message"
+                                  @oninput="ClearMessageError"
+                                  rows="5"
+                                  placeholder="@Localization["contact.EnterMessage"]"
+                                  required></textarea>
+                        @if (messageError)
+                        {
+                            <span class="error-message">@Localization["contact.MessageRequired"]</span>
+                        }
+                    </div>
+
+                    <!-- Botón Enviar -->
+                    <div class="form-actions">
+                        <button type="submit"
+                                class="btn-send RalewayBold"
+                                disabled="@isSubmitting">
+                            @if (isSubmitting)
+                            {
+                                <span class="spinner-small"></span>
+                                <span>@Localization["contact.Sending"]...</span>
+                            }
+                            else
+                            {
+                                <span>@Localization["contact.Send"]</span>
+                            }
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="popup-footer">
+                <img src="/img/logo-nutris.jpg" alt="zendesk" class="zendesk-logo" />
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Success Message -->
+@if (showSuccess)
+{
+    <div class="success-toast">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <span>@Localization["contact.MessageSentSuccess"]</span>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private ContactFormData formData = new();
+    private bool emailError = false;
+    private bool messageError = false;
+    private bool isSubmitting = false;
+    private bool showSuccess = false;
+
+    private class ContactFormData
+    {
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public string Message { get; set; } = "";
+    }
+
+    private void Close()
+    {
+        IsVisible = false;
+        IsVisibleChanged.InvokeAsync(false);
+        OnClose.InvokeAsync();
+        ResetForm();
+    }
+
+    private void ClearEmailError(ChangeEventArgs e)
+    {
+        formData.Email = e.Value?.ToString() ?? "";
+        emailError = false;
+    }
+
+    private void ClearMessageError(ChangeEventArgs e)
+    {
+        formData.Message = e.Value?.ToString() ?? "";
+        messageError = false;
+    }
+
+    private async Task HandleSubmit()
+    {
+        // Validación
+        emailError = string.IsNullOrWhiteSpace(formData.Email);
+        messageError = string.IsNullOrWhiteSpace(formData.Message);
+
+        if (emailError || messageError)
+        {
+            return;
+        }
+
+        isSubmitting = true;
+        StateHasChanged();
+
+        try
+        {
+            // Simular envío (aquí iría la llamada real a la API)
+            await Task.Delay(1500);
+
+            // Mostrar mensaje de éxito
+            showSuccess = true;
+            StateHasChanged();
+
+            // Cerrar popup después de 2 segundos
+            await Task.Delay(2000);
+
+            Close();
+            showSuccess = false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending message: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ResetForm()
+    {
+        formData = new ContactFormData();
+        emailError = false;
+        messageError = false;
+        isSubmitting = false;
+    }
+}

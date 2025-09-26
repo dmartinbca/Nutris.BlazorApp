@@ -73,7 +73,8 @@
                         <img @onclick="ShowLogoutModal" src="/menu/exit.svg" alt="exit" style="cursor: pointer;">
                         <img src="/menu/interrogacion.png" alt="help" style="width: 25px; cursor: pointer;"
                              @onmouseover="() => isTooltipVisible = true"
-                             @onmouseleave="() => isTooltipVisible = false">
+                             @onmouseleave="() => isTooltipVisible = false"
+                             @onclick="ShowContactPopup">
                         <!-- TAMBIÉN PUEDES HACER CLICKEABLE EL ICONO DE PERFIL -->
                         <img @onclick="NavigateToProfile"
                              src="/menu/perfil.svg"
@@ -96,6 +97,7 @@
     <div class="content-area">
         @Body
     </div>
+    <ContactPopup @bind-IsVisible="showContactPopup" />
 </div>
 
 <!-- Logout Modal COMPLETO -->
@@ -148,7 +150,9 @@
                 </div>
             </div>
         </div>
+      
     </div>
+   
 }
 
 @code {
@@ -159,7 +163,7 @@
     private string userName = "";
     private string customerLogo = "";
     private bool isProcessing = false;
-
+    private bool showContactPopup = false;
     protected override async Task OnInitializedAsync()
     {
         Navigation.LocationChanged += HandleLocationChanged;
@@ -167,7 +171,10 @@
         await LoadUserData();
         Localization.OnLanguageChanged += OnLanguageChanged;
     }
-
+    private void ShowContactPopup()
+    {
+        showContactPopup = true;
+    }
     private async Task LoadUserData()
     {
         var user = await AuthService.GetCurrentUserAsync();

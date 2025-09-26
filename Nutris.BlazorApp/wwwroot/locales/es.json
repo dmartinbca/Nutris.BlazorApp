@@ -177,6 +177,22 @@
     "SalesRep": "Responsable de ventas",
     "SalesSupport": "Soporte de ventas"
   },
+  "contact": {
+    "SendMessage": "Enviar Mensaje",
+    "Name": "Nombre",
+    "Optional": "Opcional",
+    "EnterName": "Nombre",
+    "Email": "Email",
+    "EnterEmail": "Email",
+    "EmailRequired": "obligatorio",
+    "Phone": "teléfono",
+    "EnterPhone": "teléfono",
+    "HowCanWeHelp": "¿Podemos ayudarte?",
+    "EnterMessage": "Mensaje",
+    "MessageRequired": "obligatorio",
+    "Sending": "Enviando",
+    "Send": "Enviar"
+  },
   "orderView": {
     "Type": "Tipo",
     "Quantity": "Cantidad",

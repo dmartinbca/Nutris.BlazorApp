@@ -176,6 +176,22 @@
     "SalesRep": "Sales Manager",
     "SalesSupport": "Sales Support"
   },
+  "contact": {
+    "SendMessage": "Send Message",
+    "Name": "Name",
+    "Optional": "Optional",
+    "EnterName": "Enter Name",
+    "Email": "Email",
+    "EnterEmail": "Enter Email",
+    "EmailRequired": "Email Required",
+    "Phone": "Phone",
+    "EnterPhone": "Enter Phone",
+    "HowCanWeHelp": "How Can We Help?",
+    "EnterMessage": "Enter Message",
+    "MessageRequired": "Message Required",
+    "Sending": "Sending",
+    "Send": "Send"
+  },
   "orderView": {
     "Type": "Type",
     "Quantity": "Quantity",
