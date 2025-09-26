@@ -58,7 +58,8 @@
                 </div>
 
                 <div class="perfil-container">
-                    <div class="avatar-container">
+                    <!-- AQUÍ ESTÁ EL CAMBIO - Avatar clickeable -->
+                    <div class="avatar-container" @onclick="NavigateToProfile" style="cursor: pointer;">
                         @if (!string.IsNullOrEmpty(customerLogo))
                         {
                             <img src="@($"data:image/png;base64,{customerLogo}")" alt="" class="avatar">
@@ -69,11 +70,16 @@
                     </div>
 
                     <div class="icons-acount">
-                        <img @onclick="ShowLogoutModal" src="/menu/exit.svg" alt="exit">
-                        <img src="/menu/interrogacion.png" alt="help" style="width: 25px;"
+                        <img @onclick="ShowLogoutModal" src="/menu/exit.svg" alt="exit" style="cursor: pointer;">
+                        <img src="/menu/interrogacion.png" alt="help" style="width: 25px; cursor: pointer;"
                              @onmouseover="() => isTooltipVisible = true"
                              @onmouseleave="() => isTooltipVisible = false">
-                        <img src="/menu/perfil.svg" alt="perfil">
+                        <!-- TAMBIÉN PUEDES HACER CLICKEABLE EL ICONO DE PERFIL -->
+                        <img @onclick="NavigateToProfile"
+                             src="/menu/perfil.svg"
+                             alt="perfil"
+                             style="cursor: pointer;"
+                             title="Ver perfil del cliente">
 
                         @if (isTooltipVisible)
                         {
@@ -232,6 +238,12 @@
     private void CloseSidebar()
     {
         isSidebarOpen = false;
+    }
+
+    // NUEVO MÉTODO PARA NAVEGAR AL PERFIL
+    private void NavigateToProfile()
+    {
+        Navigation.NavigateTo("/customer-profile");
     }
 
     public void Dispose()

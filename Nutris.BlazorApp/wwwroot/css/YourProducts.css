@@ -1,5 +1,5 @@
 ﻿/* ========================================
-   YOURPRODUCTSCOMPONENT.CSS - SIMPLIFICADO
+   YOURPRODUCTSCOMPONENT.CSS - AJUSTES FINALES
    ======================================== */
 
 /* ========================================
@@ -649,11 +649,11 @@ table.products-customize {
     color: #333;
 }
 
-/* Status en tarjetas */
+/* Status en tarjetas - ALINEADO A LA IZQUIERDA */
 .product-card-status {
     margin-bottom: 1rem;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; /* Cambiado de center a flex-start */
     position: relative;
 }
 
@@ -671,6 +671,7 @@ table.products-customize {
         max-width: 90%;
         width: auto;
         position: relative;
+        margin: 0; /* Sin margen automático */
     }
 
 /* ========================================
@@ -718,18 +719,18 @@ table.products-customize {
         width: 100%;
     }
 
-    /* BOTÓN ORDER EN TARJETAS - SIMPLIFICADO */
+    /* BOTÓN DETALLES EN MÓVIL - TEXTO CENTRADO */
     .product-card .products-order-btn {
         display: flex !important;
         width: auto !important;
         height: auto !important;
         min-height: auto !important;
         max-height: none !important;
-        padding: 0.5rem 1rem !important;
+        padding: 0.5rem 1.5rem !important; /* Más padding horizontal */
         margin: 0 auto !important;
         font-size: 0.85rem !important;
         text-align: center !important;
-        justify-content: center !important;
+        justify-content: center !important; /* Centrar contenido */
         align-items: center !important;
         background: white !important;
         color: #2F5496 !important;
@@ -744,6 +745,7 @@ table.products-customize {
 
         .product-card .products-order-btn span {
             display: inline !important;
+            text-align: center !important;
         }
 
         .product-card .products-order-btn svg {
@@ -751,6 +753,12 @@ table.products-customize {
             width: 16px !important;
             height: 16px !important;
         }
+
+    /* Status alineado a la izquierda en móvil */
+    .product-card-status {
+        justify-content: flex-start !important;
+        padding-left: 0 !important;
+    }
 }
 
 /* Móvil pequeño */
@@ -769,7 +777,7 @@ table.products-customize {
 
         .product-card .products-order-btn {
             font-size: 0.8rem !important;
-            padding: 0.4rem 0.8rem !important;
+            padding: 0.4rem 1.2rem !important;
         }
 }
 

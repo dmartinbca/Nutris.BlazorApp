@@ -43,7 +43,7 @@
         </div>
 
         <div class="perfil-container">
-            <div class="avatar-container">
+            <div class="avatar-container" @onclick="NavigateToProfile" style="cursor: pointer;">
                 @if (!string.IsNullOrEmpty(customerLogo))
                 {
                     <img src="@($"data:image/png;base64,{customerLogo}")" alt="" class="avatar">
@@ -164,7 +164,10 @@
 
         customerLogo = await LocalStorage.GetItemAsync<string>("logo") ?? "";
     }
-
+    private void NavigateToProfile()
+    {
+        Navigation.NavigateTo("/customer-profile");
+    }
     private void OnLanguageChanged()
     {
         InvokeAsync(StateHasChanged);

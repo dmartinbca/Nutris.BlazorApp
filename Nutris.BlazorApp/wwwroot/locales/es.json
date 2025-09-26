@@ -155,6 +155,28 @@
     "Diameter": "Diámetro",
     "Cover": "Tapa"
   },
+  "customerProfile": {
+    "Code": "Nº de Cliente",
+    "CompanyInfo": "Nombre",
+    "VAT": "CIF/NIF",
+    "Contact": "Contacto",
+    "ShipmentMethod": "Método de envío",
+    "Address": "Dirección",
+    "Address1": "Dirección 1",
+    "Address2": "Dirección 2",
+    "City": "Ciudad",
+    "County": "Estado/Provincia",
+    "PostCode": "Código postal",
+    "Country": "País",
+    "ContactInfo": "Información de contacto",
+    "Phone": "Teléfono",
+    "MobilePhone": "Teléfono móvil",
+    "Email": "Correo electrónico",
+    "ContactPerson": "Persona de contacto",
+    "SalesTeam": "Equipo de ventas",
+    "SalesRep": "Responsable de ventas",
+    "SalesSupport": "Soporte de ventas"
+  },
   "orderView": {
     "Type": "Tipo",
     "Quantity": "Cantidad",

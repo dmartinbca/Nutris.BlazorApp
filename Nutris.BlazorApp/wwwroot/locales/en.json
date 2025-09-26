@@ -154,6 +154,28 @@
     "Diameter": "Diameter",
     "Cover": "Cover"
   },
+  "customerProfile": {
+    "Code": "Customer No.",
+    "CompanyInfo": "Name",
+    "VAT": "VAT Number",
+    "Contact": "Contact",
+    "ShipmentMethod": "Shipment Method",
+    "Address": "Address",
+    "Address1": "Address 1",
+    "Address2": "Address 2",
+    "City": "City",
+    "County": "County",
+    "PostCode": "Postal Code",
+    "Country": "Country",
+    "ContactInfo": "Contact Information",
+    "Phone": "Phone",
+    "MobilePhone": "Mobile Phone",
+    "Email": "Email",
+    "ContactPerson": "Contact Person",
+    "SalesTeam": "Sales Team",
+    "SalesRep": "Sales Manager",
+    "SalesSupport": "Sales Support"
+  },
   "orderView": {
     "Type": "Type",
     "Quantity": "Quantity",
