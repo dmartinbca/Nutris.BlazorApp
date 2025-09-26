@@ -165,6 +165,12 @@ namespace NutrisBlazor.Models
         public string Serving { get; set; } = "";
         public string Shape { get; set; } = "";
         public string Imagen { get; set; } = "";
+        public string Shape_2 { get; set; } = "";
+        public string Imagen_2 { get; set; } = "";
+        public string Shape_3 { get; set; } = "";
+        public string Imagen_3 { get; set; } = "";
+        public string Shape_4 { get; set; } = "";
+        public string Imagen_4 { get; set; } = "";
     }
 
     public class RecipeItem

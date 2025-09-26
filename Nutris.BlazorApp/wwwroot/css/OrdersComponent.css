@@ -1,12 +1,13 @@
 ﻿/* ========================================
-   ORDERSCOMPONENT.CSS - LIMPIO Y OPTIMIZADO
+   ORDERSCOMPONENT.CSS - VERSIÓN CORREGIDA
+   MÓVIL PORTRAIT OPTIMIZADO
    ======================================== */
 
 /* ========================================
    1. ESTILOS GLOBALES
    ======================================== */
 
-/* Variables */
+/* Variables CSS */
 :root {
     --primary-color: #2F5496;
     --success-color: #8ED300;
@@ -211,12 +212,22 @@ p {
     justify-content: space-between;
 }
 
-/* Columnas específicas */
-.col1-rh1 img {
-    margin-bottom: 1rem;
-    max-height: 120px;
-    width: auto;
+/* Imagen corazón */
+.col1-rh1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
 }
+
+    .col1-rh1 img {
+        margin-bottom: 1rem;
+        max-width: 80px;
+        max-height: 80px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
 
 .col1-rh2 {
     margin-top: 1.57rem;
@@ -239,11 +250,24 @@ p {
 }
 
 /* País y banderas */
-.country-rh1 p:nth-child(1) {
-    text-align: right;
-    color: #999A9B;
-    margin-bottom: 0;
+.country-rh1 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
+
+    .country-rh1 > p:first-child {
+        text-align: right;
+        color: #999A9B;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .country-rh1 > div {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
 
 .col2-rh1 {
     align-items: center;
@@ -254,12 +278,13 @@ p {
         border-radius: 50%;
         width: 20px;
         height: 20px;
-        margin: 1rem 0;
+        margin: 0.5rem 0;
     }
 
     .col2-rh1 p {
         padding-left: 9px;
-        margin: 1rem 0;
+        margin: 0.5rem 0;
+        font-size: 1rem;
     }
 
 /* Fechas */
@@ -275,15 +300,23 @@ p {
     justify-content: space-between;
 }
 
-.colh3-r3 span > p {
-    font-size: 1.26em;
-    font-weight: 700;
+.colh2-r3,
+.colh3-r3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
 }
 
-.colh3-r3 span:nth-child(2) > p {
-    color: #D91515;
-    margin-top: 0.5rem;
-}
+    .colh3-r3 span > p {
+        font-size: 1.26em;
+        font-weight: 700;
+    }
+
+    .colh3-r3 span:nth-child(2) > p {
+        color: #D91515;
+        margin-top: 0.5rem;
+    }
 
 /* Botón descargar */
 .colh1-r4 {
@@ -415,6 +448,20 @@ p {
     display: flex;
 }
 
+.etiqueta-section,
+.requisitos-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+}
+
+    .etiqueta-section h2,
+    .requisitos-section h2 {
+        margin: 0;
+        min-width: fit-content;
+    }
+
 .right-from {
     align-items: center;
     padding: 0 !important;
@@ -437,7 +484,6 @@ p {
     filter: grayscale(0) !important;
 }
 
-/* Container Toggle */
 .container-toggle {
     max-height: 0;
     overflow: hidden;
@@ -473,6 +519,78 @@ p {
     padding: 1.8rem 1.2rem;
 }
 
+/* Features row */
+.features-row {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 120px;
+}
+
+.img-icon-tags img {
+    width: 79px;
+    height: 79px;
+}
+
+.paragraph-img-tags p {
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+/* Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+input:checked + .slider {
+    background-color: #8ED300;
+}
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
 /* Tablas de contenido */
 .body-t {
     width: 100%;
@@ -498,81 +616,158 @@ p {
 }
 
 /* ========================================
-   7. FORMULARIOS
+   7. SECCIÓN LA RECETA
    ======================================== */
 
-/* Inputs */
-.content-t input[type="text"] {
-    background-color: #F1F1F1;
-    border-style: none;
-    padding: 0 1.44rem;
-    font-size: 1.26em;
-    border-radius: 10px;
-    height: 44px;
-}
-
-.content-t input[type="number"] {
-    background-color: #F1F1F1;
-    border-style: none;
-    padding: 0 1.44rem;
-    font-size: 1.26em;
-    border-radius: 10px;
-    height: 44px;
-    width: 300px;
-}
-
-/* Textarea */
-textarea {
-    min-height: 128px;
-    max-height: 128px;
-    padding: 0.5rem;
-    border-color: var(--icon);
-    border-radius: 10px;
-    min-width: 850px;
-    max-width: auto;
-}
-
-.comments-area textarea {
-    min-height: 200px;
-    width: 100%;
-    padding: 1rem;
-    border: 1px solid var(--icon);
-    border-radius: 10px;
-    resize: vertical;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-/* Checkboxes */
-.check-from-label {
+/* Vista de tabla por defecto (Desktop) */
+.body-t-flex {
     display: flex;
-    margin-left: 3.52rem;
-    gap: 3.84rem;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    width: 100%;
 }
 
-    .check-from-label p {
-        font-weight: 700;
-        font-size: 1.13em;
+    .body-t-flex.header-row {
+        margin-top: 40px;
+        border-bottom: 2px solid #e5e5e5;
+        padding-bottom: 1rem;
     }
 
-    .check-from-label input[type="checkbox"] {
-        width: 28px !important;
-        height: 28px;
-        appearance: none;
-        border: 1px solid var(--icon);
-        border-radius: 5px;
-    }
-
-        .check-from-label input[type="checkbox"]:checked {
-            background-image: url("/img/check-icon-others.svg");
-            background-repeat: no-repeat;
-            background-size: 28px;
-            border: none;
+        .body-t-flex.header-row .body-data p {
+            font-size: 0.85rem !important;
+            font-weight: 700;
+            color: #999A9B;
+            text-transform: uppercase;
         }
 
+.data-row {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    width: 100%;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+    .data-row:last-child {
+        border-bottom: none;
+    }
+
+.body-data {
+    flex: 1 1 0;
+    padding: 0 0.5rem;
+}
+
+    .body-data input[type="text"] {
+        width: 100%;
+        background-color: #F1F1F1;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+/* Vista de tarjetas - OCULTA POR DEFECTO */
+.recipe-cards-container {
+    display: none !important;
+}
+
+.recipe-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+.recipe-card-header {
+    background: linear-gradient(135deg, #2F5496 0%, #3d5fa8 100%);
+    color: white;
+    padding: 1rem 1.2rem;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.recipe-card-body {
+    padding: 1.2rem;
+}
+
+.recipe-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.recipe-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+    .recipe-info-item:last-child {
+        border-bottom: none;
+    }
+
+.recipe-info-label {
+    font-weight: 600;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.recipe-info-value {
+    color: #333;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
 /* ========================================
-   8. BOTONES
+   8. RESTO DE SECCIONES
    ======================================== */
+
+/* Botones */
+button.btn-t,
+.btn-edit-bottle button,
+button[onclick*="Edit"] {
+    display: flex;
+    align-items: center;
+    border: none;
+    background: transparent;
+    line-height: 1rem;
+    padding: 0.88rem 1.2rem;
+    border-radius: 10px;
+    font-size: 1.26rem;
+    color: var(--text-button);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+    button.btn-t:hover,
+    .btn-edit-bottle button:hover,
+    button[onclick*="Edit"]:hover {
+        background-color: var(--text-button);
+        color: white;
+    }
+
+    button.btn-t img,
+    .btn-edit-bottle button img,
+    button[onclick*="Edit"] img {
+        width: 14.88px;
+        height: 15px;
+        margin-right: 0.44rem;
+    }
+
+    button.btn-t:hover img,
+    .btn-edit-bottle button:hover img,
+    button[onclick*="Edit"]:hover img {
+        filter: brightness(0) invert(100%);
+    }
 
 .btn-atr {
     padding: 2rem 6.93rem;
@@ -626,48 +821,158 @@ button.btn-save-confirm {
         pointer-events: none;
     }
 
-/* ========================================
-   9. TABLA DE RECETAS
-   ======================================== */
+/* Formularios */
+.content-t input[type="text"] {
+    background-color: #F1F1F1;
+    border-style: none;
+    padding: 0 1.44rem;
+    font-size: 1.26em;
+    border-radius: 10px;
+    height: 44px;
+}
 
-.body-t-flex {
+.content-t input[type="number"] {
+    background-color: #F1F1F1;
+    border-style: none;
+    padding: 0 1.44rem;
+    font-size: 1.26em;
+    border-radius: 10px;
+    height: 44px;
+    width: 300px;
+}
+
+textarea {
+    min-height: 128px;
+    max-height: 128px;
+    padding: 0.5rem;
+    border-color: var(--icon);
+    border-radius: 10px;
+    min-width: 850px;
+    max-width: auto;
+}
+
+.comments-area textarea {
+    min-height: 200px;
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--icon);
+    border-radius: 10px;
+    resize: vertical;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.etiqueta-checkbox {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 0.5rem;
+}
+
+    .etiqueta-checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        cursor: pointer;
+    }
+
+    .etiqueta-checkbox label {
+        margin: 0;
+        cursor: pointer;
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+
+.check-from-label {
+    display: flex;
+    margin-left: 3.52rem;
+    gap: 3.84rem;
+}
+
+    .check-from-label p {
+        font-weight: 700;
+        font-size: 1.13em;
+    }
+
+    .check-from-label input[type="checkbox"] {
+        width: 28px !important;
+        height: 28px;
+        appearance: none;
+        border: 1px solid var(--icon);
+        border-radius: 5px;
+    }
+
+        .check-from-label input[type="checkbox"]:checked {
+            background-image: url("/img/check-icon-others.svg");
+            background-repeat: no-repeat;
+            background-size: 28px;
+            border: none;
+        }
+
+/* Gummies */
+#body-td-gommy {
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
-    padding: 0.5rem 0;
-    margin-top: 40px;
+    padding: 1.5rem 0;
+}
+
+.gomi-content {
+    margin-bottom: 1rem;
+}
+
+    .gomi-content p {
+        font-size: 16px;
+        color: #666;
+        line-height: 1.5;
+    }
+
+#body-td-gommy .data-t {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    align-items: start;
     width: 100%;
 }
 
-    .body-t-flex.header-row {
-        border-bottom: 2px solid #e5e5e5;
+    #body-td-gommy .data-t > h3 {
+        grid-column: span 1;
+        margin: 0;
+        font-size: 1.2rem;
+        color: var(--text-button);
+        text-align: center;
     }
 
-        .body-t-flex.header-row .body-data p {
-            font-size: 0.85rem !important;
-            font-weight: 700;
-            color: #999A9B;
-            text-transform: uppercase;
-        }
+.flex-gomi {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #F1F1F1;
+    border-radius: 10px;
+    padding: 1.5rem;
+    height: 200px;
+    justify-content: center;
+}
 
-    .body-t-flex.data-row {
-        border-bottom: 1px solid #f0f0f0;
+.gomi-img {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+    .gomi-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
 
-.body-data {
-    flex: 1 1 0;
-    padding: 0 0.5rem;
+#line-from-gommy {
+    grid-column: span 2;
+    width: 100%;
+    margin-top: 1rem;
 }
-
-/* Vista de tarjetas - oculta por defecto */
-.recipe-cards-container {
-    display: none !important;
-}
-
-/* ========================================
-   10. SECCIONES ESPECÍFICAS
-   ======================================== */
 
 /* Botella/Packaging */
 .bottle-container {
@@ -675,6 +980,8 @@ button.btn-save-confirm {
     flex-direction: column;
     align-items: center;
     gap: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .Cap-img,
@@ -691,11 +998,15 @@ button.btn-save-confirm {
     .bottle-img img {
         width: 100%;
         height: auto;
+        max-width: 100%;
+        object-fit: contain;
     }
 
     .Cap-img img {
         width: 75%;
         height: auto;
+        max-width: 100%;
+        object-fit: contain;
     }
 
 .body-t-bottle {
@@ -703,28 +1014,20 @@ button.btn-save-confirm {
     max-width: 833px;
 }
 
-/* Gummies */
-#body-td-gommy {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 2rem;
+.bottle-img-1 {
+    width: 213px;
+    margin-right: auto;
+    overflow: hidden;
 }
 
-.flex-gomi {
-    display: flex;
-    background-color: #F1F1F1;
-    border-style: none;
-    padding: 1.71rem 0.5rem;
-    font-size: 1.26em;
-    border-radius: 10px;
-    max-width: 380px;
-    max-height: 200px;
-    justify-content: flex-start;
-}
+    .bottle-img-1 img {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        object-fit: contain;
+    }
 
-/* Analytics */
+/* Tabla de analíticas */
 .content-others {
     border: solid 1px var(--icon);
     border-radius: 15px;
@@ -732,20 +1035,199 @@ button.btn-save-confirm {
     width: 95%;
 }
 
+    .content-others .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        table-layout: fixed !important;
+    }
+
+    .content-others .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .content-others thead th {
+        padding: 12px 10px !important;
+        text-align: left !important;
+        font-weight: 700;
+        color: #666;
+        font-size: 14px;
+        border-bottom: 2px solid #e5e5e5;
+        vertical-align: middle;
+    }
+
+        .content-others thead th:nth-child(1) {
+            width: 26% !important;
+            padding-left: 0 !important;
+        }
+
+        .content-others thead th:nth-child(2) {
+            width: 12% !important;
+        }
+
+        .content-others thead th:nth-child(3) {
+            width: 22% !important;
+        }
+
+        .content-others thead th:nth-child(4) {
+            width: 10% !important;
+            text-align: center !important;
+        }
+
+        .content-others thead th:nth-child(5) {
+            width: 15% !important;
+        }
+
+        .content-others thead th:nth-child(6) {
+            width: 15% !important;
+        }
+
+    .content-others tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+        .content-others tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+    .content-others tbody td {
+        padding: 12px 10px !important;
+        vertical-align: middle;
+        font-size: 14px;
+        color: #333;
+    }
+
+        .content-others tbody td:nth-child(1) {
+            width: 26% !important;
+            font-weight: 500;
+            padding-left: 0 !important;
+        }
+
+        .content-others tbody td:nth-child(2) {
+            width: 12% !important;
+        }
+
+        .content-others tbody td:nth-child(3) {
+            width: 22% !important;
+        }
+
+        .content-others tbody td:nth-child(4) {
+            width: 10% !important;
+            text-align: center !important;
+        }
+
+        .content-others tbody td:nth-child(5) {
+            width: 15% !important;
+        }
+
+        .content-others tbody td:nth-child(6) {
+            width: 15% !important;
+        }
+
+    .content-others input[type="text"],
+    .content-others input.form-control,
+    .content-others .form-control {
+        width: 100% !important;
+        padding: 6px 10px;
+        font-size: 13px;
+        background-color: #f8f8f8;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .content-others input[type="checkbox"] {
+        width: 18px !important;
+        height: 18px !important;
+        margin: 0 auto;
+        display: block;
+    }
+
+    .content-others td,
+    .content-others th {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+.text-table-th {
+    font-weight: 700 !important;
+    color: #666 !important;
+    font-size: 14px !important;
+}
+
+.text-table-td {
+    font-size: 14px !important;
+    color: #333 !important;
+}
+
+.content-others .p-1 {
+    padding: 12px 10px !important;
+}
+
+#body-t-other {
+    margin-top: 20px;
+    padding-top: 20px;
+}
+
+.line-f {
+    border-top: 2px solid #e5e5e5;
+    margin: 20px 0;
+}
+
+#body-td-other-2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+}
+
+    #body-td-other-2 p {
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+#data-t-other p {
+    font-size: 20px;
+    color: #2F5496;
+    font-weight: 700;
+}
+
+#body-td-other-f-1 {
+    margin-top: 10px;
+}
+
+    #body-td-other-f-1 p {
+        font-size: 14px;
+        color: #666;
+        font-style: italic;
+    }
+
 /* ========================================
-   11. RESPONSIVE - PORTRAIT MÓVIL/TABLET
+   11. RESPONSIVE - MÓVIL PORTRAIT OPTIMIZADO
    ======================================== */
 
-/* Tablet Portrait */
-@media (max-width: 1024px) and (orientation: portrait) {
-    /* Contenedor principal con márgenes mínimos */
+/* Tablet Portrait y Móvil */
+@media (max-width: 1024px) {
+    /* OCULTAR tabla de recetas, MOSTRAR tarjetas */
+    .body-t-flex.header-row {
+        display: none !important;
+    }
+
+    .data-row {
+        display: none !important;
+    }
+
+    .recipe-cards-container {
+        display: block !important;
+        padding: 1rem 0;
+    }
+
     section {
         width: 100%;
         padding: 0;
         margin: 0;
     }
 
-    /* Header con márgenes ajustados */
     .header-order {
         margin: 65px 10px 15px 10px;
         width: calc(100% - 20px);
@@ -762,13 +1244,23 @@ button.btn-save-confirm {
         padding: 1.5rem;
     }
 
-    /* Secciones toggle con ancho completo */
     .toggle-from {
         margin: 10px;
         width: calc(100% - 20px);
     }
 
-    /* Contenido optimizado */
+    .etiqueta-section,
+    .requisitos-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+        .etiqueta-section h2,
+        .requisitos-section h2 {
+            margin-bottom: 0.5rem;
+        }
+
     .content-t,
     .content-t-2,
     .content-t.content-t-pdb {
@@ -784,12 +1276,25 @@ button.btn-save-confirm {
         padding: 1rem;
     }
 
-    /* Botón final */
+    #body-td-gommy .data-t {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .flex-gomi {
+        padding: 1rem;
+        height: 180px;
+    }
+
+    .gomi-img {
+        width: 120px;
+        height: 120px;
+    }
+
     .btn-atr-confirm {
         padding: 2rem 1rem;
     }
 
-    /* Back button responsive */
     .back-button-container {
         position: fixed;
         top: 70px;
@@ -814,53 +1319,16 @@ button.btn-save-confirm {
             width: 28px;
             height: 28px;
         }
-
-    /* Tabla de recetas responsive */
-    .recipe-cards-container {
-        display: block !important;
-        padding: 0;
-    }
-
-    .body-t-flex.header-row,
-    .body-t-flex.data-row {
-        display: none !important;
-    }
-
-    .recipe-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        margin-bottom: 1rem;
-        overflow: hidden;
-        border: 1px solid #e5e7eb;
-    }
-
-    .recipe-card-header {
-        background: #2F5496;
-        color: white;
-        padding: 0.8rem 1rem;
-        font-weight: bold;
-        font-size: 0.9rem;
-    }
-
-    .recipe-card-body {
-        padding: 1rem;
-    }
-
-    .recipe-card-info {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
 }
 
-/* Móvil Portrait */
+/* Móvil Portrait - OPTIMIZADO */
 @media (max-width: 768px) and (orientation: portrait) {
-    /* Márgenes más pequeños */
+    /* Header optimizado para móvil */
     .header-order {
-        margin: 60px 8px 10px 8px;
-        width: calc(100% - 16px);
+        margin: 55px 3px 10px 3px;
+        width: calc(100% - 6px);
         grid-template-columns: 1fr;
+        border-radius: 15px;
     }
 
     .hcol1,
@@ -868,62 +1336,267 @@ button.btn-save-confirm {
         padding: 1rem;
     }
 
-    /* Logo más grande */
-    .col1-rh1 img {
-        max-height: 90px;
-        width: auto;
-        margin: 0 auto;
-        display: block;
+    /* Reorganizar header para móvil */
+    .row1-1 {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding-bottom: 1rem;
     }
 
-    /* Ajustes de texto */
+    /* Logo centrado */
+    .col1-rh1 {
+        width: 100%;
+        text-align: center;
+        padding: 0.5rem 0;
+        order: 1;
+    }
+
+        .col1-rh1 img {
+            max-width: 60px;
+            max-height: 60px;
+            margin: 0 auto;
+            display: block;
+        }
+
+    /* Sección de países VISIBLE y optimizada */
+    .country-rh1 {
+        width: 100%;
+        order: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 0.5rem;
+    }
+
+        .country-rh1 > p:first-child {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: #999A9B;
+        }
+
+        .country-rh1 > div {
+            justify-content: center !important;
+            flex-wrap: wrap;
+            gap: 0.75rem !important;
+            width: 100%;
+        }
+
+    .col2-rh1 {
+        justify-content: center;
+        margin: 0;
+    }
+
+        .col2-rh1 img {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+        }
+
+        .col2-rh1 p {
+            font-size: 0.8rem;
+            margin: 0;
+            padding-left: 5px;
+        }
+
+    /* Ajustes de texto del header */
     .col1-rh2 {
-        font-size: 1.1rem;
+        font-size: 1rem;
         text-align: center;
         justify-content: center;
         display: flex;
         gap: 0.5rem;
+        margin-top: 0.5rem;
     }
 
-    /* Toggle sections */
+    .row2-1 {
+        justify-content: center;
+        padding: 0.5rem 0;
+    }
+
+    .row3-1 {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+
+    .col2-rh3,
+    .col3-rh3 {
+        width: 100%;
+    }
+
+        .col2-rh3 p:nth-child(1),
+        .col3-rh3 span p {
+            font-size: 1rem;
+        }
+
+        .col2-rh3 p:nth-child(2) {
+            font-size: 0.85rem;
+        }
+
+    /* Fechas en móvil */
+    .rowh3-2 {
+        padding: 0.8rem 0;
+    }
+
+    .colh2-r3,
+    .colh3-r3 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+        .colh2-r3 > div,
+        .colh3-r3 > div {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .colh2-r3 p,
+        .colh3-r3 p {
+            font-size: 0.85rem !important;
+        }
+
+    /* Toggle sections optimizadas */
     .toggle-from {
-        margin: 8px;
-        width: calc(100% - 16px);
+        margin: 5px 3px;
+        width: calc(100% - 6px);
+        border-radius: 20px;
+    }
+
+    .flex-elm-from {
+        padding: 0.6rem 0.8rem;
+    }
+
+    .left-from h2 {
+        font-size: 1.1rem;
+    }
+
+    .right-from img {
+        width: 35px;
+        height: 35px;
+    }
+
+    /* Secciones con checkboxes */
+    .etiqueta-section,
+    .requisitos-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+        .etiqueta-section h2,
+        .requisitos-section h2 {
+            font-size: 1.1rem;
+        }
+
+    .etiqueta-checkbox label {
+        font-size: 0.85rem;
+    }
+
+    .etiqueta-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
     }
 
     /* Contenido */
     .content-t,
     .content-t-2,
     .content-t.content-t-pdb {
-        padding: 1rem 0.8rem !important;
+        padding: 0.8rem !important;
     }
 
-    /* Back button más pequeño */
-    .back-button-container {
-        top: 65px;
-        left: 10px;
+    /* Gummies en móvil - 1 columna */
+    #body-td-gommy .data-t {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
     }
 
-    .back-button {
-        width: 36px;
-        height: 36px;
-    }
-
-        .back-button svg {
-            width: 24px;
-            height: 24px;
+        #body-td-gommy .data-t > h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
         }
 
-    /* Language selector más pequeño */
+    .flex-gomi {
+        padding: 0.8rem;
+        height: 140px;
+    }
+
+    .gomi-img {
+        width: 80px;
+        height: 80px;
+    }
+
+    #line-from-gommy {
+        grid-column: span 1;
+    }
+
+    /* Tabla de analíticas móvil */
+    .content-others .table-responsive {
+        margin: 0 -0.8rem;
+    }
+
+    .content-others table {
+        display: block;
+    }
+
+    .content-others thead {
+        display: none;
+    }
+
+    .content-others tbody {
+        display: block;
+    }
+
+        .content-others tbody tr {
+            display: block;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: #fff;
+        }
+
+        .content-others tbody td {
+            display: block;
+            text-align: left;
+            padding: 6px 0;
+            border: none;
+            position: relative;
+            padding-left: 35%;
+        }
+
+            .content-others tbody td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 30%;
+                font-weight: 700;
+                color: #666;
+                font-size: 11px;
+            }
+
+    /* Back button oculto */
+    .back-button-container {
+        display: none;
+    }
+
+    /* Language selector ajustado */
     .language-selector-products {
-        top: 10px;
-        right: 10px;
+        position: fixed;
+        top: 8px;
+        right: 8px;
+        left: auto;
+        z-index: 200;
     }
 
     .language-button {
-        padding: 6px 12px;
-        font-size: 12px;
-        min-width: 100px;
+        padding: 5px 10px;
+        font-size: 11px;
+        min-width: 80px;
     }
 
     /* Textarea responsive */
@@ -934,25 +1607,59 @@ button.btn-save-confirm {
 
     /* Botón final */
     .btn-atr-confirm {
-        padding: 1.5rem 0.5rem;
+        padding: 1rem 0.5rem;
     }
 
         .btn-atr-confirm button {
-            width: auto;
-            margin-right: 0.5rem;
+            width: 100%;
+            margin: 0;
+            font-size: 1.1rem;
+            padding: 1rem 1.2rem;
         }
+
+    /* Ocultar líneas decorativas en móvil */
+    .line-from {
+        display: none;
+    }
+
+    /* Barra de progreso optimizada */
+    .fila-progress {
+        padding: 8px 3px;
+    }
+
+    .steps-row {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+
+    .progress-bar-from,
+    .progress-bar-from-0 {
+        padding: 0.3rem 1.2rem;
+        font-size: 0.75rem;
+    }
+
+    /* Botón descargar reportes */
+    .colh1-r4 button {
+        font-size: 0.9rem;
+        padding: 0.8rem;
+    }
+
+    .download-t ul {
+        padding: 1rem 0.8rem;
+        font-size: 0.85rem;
+    }
 }
 
-/* Móvil pequeño portrait */
+/* Móvil muy pequeño */
 @media (max-width: 480px) and (orientation: portrait) {
     .header-order {
-        margin: 55px 5px 8px 5px;
-        width: calc(100% - 10px);
+        margin: 50px 2px 8px 2px;
+        width: calc(100% - 4px);
     }
 
     .toggle-from {
-        margin: 5px;
-        width: calc(100% - 10px);
+        margin: 4px 2px;
+        width: calc(100% - 4px);
     }
 
     .hcol1,
@@ -961,40 +1668,59 @@ button.btn-save-confirm {
     }
 
     .col1-rh1 img {
-        max-height: 70px;
+        max-height: 50px;
+        max-width: 50px;
     }
 
-    .back-button {
-        width: 32px;
-        height: 32px;
+    #body-td-gommy .data-t {
+        gap: 0.6rem;
     }
 
-        .back-button svg {
-            width: 20px;
-            height: 20px;
+    .flex-gomi {
+        padding: 0.6rem;
+        height: 120px;
+    }
+
+    .gomi-img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .etiqueta-section h2,
+    .requisitos-section h2 {
+        font-size: 1rem;
+    }
+
+    .content-others {
+        padding: 0.5rem;
+    }
+
+        .content-others tbody tr {
+            padding: 8px;
+            margin-bottom: 8px;
         }
+
+        .content-others tbody td {
+            padding: 5px 0;
+            font-size: 10px;
+        }
+
+            .content-others tbody td:before {
+                font-size: 10px;
+            }
 }
 
-/* Desktop - Asegurar vista normal */
-@media (min-width: 1025px) {
-    .recipe-cards-container {
-        display: none !important;
-    }
-
-    .body-t-flex.header-row,
-    .body-t-flex.data-row {
+/* Landscape - Mantener tabla de recetas */
+@media (orientation: landscape) and (max-width: 1024px) {
+    .body-t-flex.header-row {
         display: flex !important;
     }
-}
 
-/* Landscape - Mantener tabla */
-@media (orientation: landscape) {
-    .recipe-cards-container {
-        display: none !important;
+    .data-row {
+        display: flex !important;
     }
 
-    .body-t-flex.header-row,
-    .body-t-flex.data-row {
-        display: flex !important;
+    .recipe-cards-container {
+        display: none !important;
     }
 }

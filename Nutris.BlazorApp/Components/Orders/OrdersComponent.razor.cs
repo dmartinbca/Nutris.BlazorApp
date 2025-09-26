@@ -101,6 +101,12 @@ public class OrdersComponentBase : ComponentBase
     protected string NutrisComments { get; set; } = "";
     protected string Shape { get; set; } = "-";
     protected string GummyShapeImg { get; set; } = "";
+    protected string Shape_1 { get; set; } = "-";
+    protected string GummyShapeImg_1 { get; set; } = "";
+    protected string Shape_2 { get; set; } = "-";
+    protected string GummyShapeImg_2 { get; set; } = "";
+    protected string Shape_3 { get; set; } = "-";
+    protected string GummyShapeImg_3 { get; set; } = "";
 
     // Features (vegetarian, vegan, etc.)
     protected bool SuitableVegetarians { get; set; }
@@ -935,9 +941,18 @@ public class OrdersComponentBase : ComponentBase
             TakeSample = form.Tomar_muestra;
             TakeSamplePrice = decimal.TryParse(form.Take_sample, out var price) ? price : 0;
             Shape = form.Shape ?? "-";
+            Shape_1 = form.Shape_2 ?? "-";
+            Shape_2 = form.Shape_3 ?? "-";
+            Shape_3 = form.Shape_4 ?? "-";
 
             if (!string.IsNullOrEmpty(form.Imagen))
                 GummyShapeImg = $"data:image/png;base64,{form.Imagen}";
+            if (!string.IsNullOrEmpty(form.Imagen_2))
+                GummyShapeImg_1 = $"data:image/png;base64,{form.Imagen_2}";
+            if (!string.IsNullOrEmpty(form.Imagen_3))
+                GummyShapeImg_2 = $"data:image/png;base64,{form.Imagen_3}";
+            if (!string.IsNullOrEmpty(form.Imagen_4))
+                GummyShapeImg_3 = $"data:image/png;base64,{form.Imagen_4}";
 
             // Gummy DNA lists
             GummyListBn = new List<InputItem>
