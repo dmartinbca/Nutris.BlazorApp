@@ -371,44 +371,34 @@
                             </div>
 
                             <!-- Vista móvil agrupada por columnas (solo visible en móvil) -->
-                                    <div class="mobile-recipe-groups">
-                                        <!-- Grupo ACTIVO -->
-                                        <div class="mobile-recipe-group">
-                                            <h4>@Localization["orderView.Active"]</h4>
-                                            @foreach (var r in RecipeRows)
-                                            {
-                                                <div class="mobile-recipe-item">@r.Active</div>
-                                            }
-                                        </div>
-    
-                                        <!-- Grupo FUENTE UTILIZADA -->
-                                        <div class="mobile-recipe-group">
-                                            <h4>@Localization["orderView.SourceUsed"]</h4>
-                                            @foreach (var r in RecipeRows)
-                                            {
-                                                <div class="mobile-recipe-item">@r.SourceUsed</div>
-                                            }
-                                        </div>
-    
-                                        <!-- Grupo CANTIDAD POR DOSIS -->
-                                        <div class="mobile-recipe-group">
-                                            <h4>@Localization["orderView.QuantityServing"]</h4>
-                                            @foreach (var r in RecipeRows)
-                                            {
-                                                <div class="mobile-recipe-item">@r.QuantityServing</div>
-                                            }
-                                        </div>
-    
-                                        <!-- Grupo % EU RDA -->
-                                        <div class="mobile-recipe-group">
-                                            <h4>% EU RDA</h4>
-                                            @foreach (var r in RecipeRows)
-                                            {
-                                                <div class="mobile-recipe-item">@r.RdaEu</div>
-                                            }
-                                        </div>
+                    
+                                    <!-- Vista de tarjetas para tablets y móvil -->
+                                    <div class="recipe-cards-container">
+                                        @foreach (var r in RecipeRows)
+                                        {
+                                            <div class="recipe-card">
+                                                <div class="recipe-card-header">
+                                                    @r.Active
+                                                </div>
+                                                <div class="recipe-card-body">
+                                                    <div class="recipe-card-info">
+                                                        <div class="recipe-info-item">
+                                                            <span class="recipe-info-label">@Localization["orderView.SourceUsed"]</span>
+                                                            <span class="recipe-info-value">@r.SourceUsed</span>
+                                                        </div>
+                                                        <div class="recipe-info-item">
+                                                            <span class="recipe-info-label">@Localization["orderView.QuantityServing"]</span>
+                                                            <span class="recipe-info-value">@r.QuantityServing</span>
+                                                        </div>
+                                                        <div class="recipe-info-item">
+                                                            <span class="recipe-info-label">% EU RDA</span>
+                                                            <span class="recipe-info-value">@r.RdaEu</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
                                     </div>
-
                             <div class="content-t content-t-pdb">
                                 <div class="head-t">
                                     <h3 class="font-18 RalewayBold">@Localization["orderView.NutrisComments"]</h3>

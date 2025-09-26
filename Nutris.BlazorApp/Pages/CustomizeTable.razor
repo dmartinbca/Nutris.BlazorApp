@@ -134,6 +134,60 @@ else
                     </tbody>
                 </table>
             </div>
+            <div class="products-cards-container">
+                @foreach (var product in GetFilteredList())
+                {
+                    <div class="product-card">
+                        <div class="product-card-header">
+                            @product.Code
+                        </div>
+                        <div class="product-card-body">
+                            <div class="product-card-title">
+                                @product.Product_name
+                            </div>
+                            <div class="product-card-info">
+                                <div class="product-info-item">
+                                    <span class="product-info-label">@Localization["container"]</span>
+                                    <span class="product-info-value">@product.Container</span>
+                                </div>
+                                <div class="product-info-item">
+                                    <span class="product-info-label">@Localization["units_per_container"]</span>
+                                    <span class="product-info-value">@(product.Units_per_container == 0 ? "-" : product.Units_per_container.ToString())</span>
+                                </div>
+                            </div>
+                            <div class="product-card-status">
+                                @if (product.Status == "Finished" || product.Status == "Cerrado cliente y calidad")
+                                {
+                                    <span class="products-status-finish">
+                                        @product.Status
+
+                                        <span class="step-check">✓</span>
+
+                                    </span>
+                                }
+                                else if (product.Status == "Development" || product.Status == "Desarrollo")
+                                {
+                                    <span class="products-status-develop">
+                                        @product.Status
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="products-status-initial">
+                                        @product.Status
+                                    </span>
+                                }
+                            </div>
+                            <div class="product-card-action">
+                                <button class="products-order-btn" @onclick="() => NavigateToCustomize(product.Code)">
+                                    <span>@Localization["ButtonCustomize"]</span>
+                                    <svg><!-- tu icono --></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
         }
         else
         {

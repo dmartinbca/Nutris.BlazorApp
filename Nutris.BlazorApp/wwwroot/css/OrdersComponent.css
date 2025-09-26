@@ -1,4 +1,12 @@
-﻿/* Language Selector */
+﻿/* ========================================
+   ORDENCOMPONENT.CSS - LIMPIO Y ORGANIZADO
+   ======================================== */
+
+/* ========================================
+   1. COMPONENTES GLOBALES
+   ======================================== */
+
+/* Language Selector */
 .language-selector-products {
     position: fixed;
     top: 20px;
@@ -25,12 +33,7 @@
     .language-button:hover {
         background: #f8f9fa;
     }
-.redDate {
-    color: red;
-    /* o puedes usar un tono específico de rojo */
-    /* color: #FF0000; */
-    /* color: #dc3545; (rojo Bootstrap) */
-}
+
 .language-dropdown {
     position: absolute;
     top: calc(100% + 8px);
@@ -66,6 +69,7 @@
     left: 270px;
     transform: translateY(-50%);
     z-index: 100;
+    transition: all 0.3s ease;
 }
 
 .back-button {
@@ -104,48 +108,18 @@
     animation: spin 1s linear infinite;
 }
 
-.steps-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0;
-    margin: 1.44rem 0 0;
-    width: 100%;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-.disabled {
-    display: none;
-    height: auto;
-}
+/* ========================================
+   2. HEADER Y PASOS
+   ======================================== */
 
-.active {
-    display: block;
-    height: auto;
-}
-
-p {
-    font-size: 1.13em;
-}
-
-.comments-area {
-    width: 100%;
-    margin-bottom: 20px;
-}
-    .comments-area textarea {
-        min-height: 200px; /* Aumenta la altura mínima */
-        width: 100%;
-        padding: 1rem;
-        border: 1px solid var(--icon);
-        border-radius: 10px;
-        resize: vertical;
-        font-size: 16px;
-        line-height: 1.5;
-    } 
+/* Header Order */
 .header-order {
-    /* background-color: var(--sectionSuperior); */
     padding: 0;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
@@ -153,26 +127,6 @@ p {
     display: grid;
     grid-template-columns: 70% 30%;
 }
-
-.download-t {
-    position: absolute;
-    z-index: 1;
-    top: 40px;
-    background-color: #f9f9fa;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border-bottom: 1px solid #2f5496;
-    border-left: 1px solid #2f5496;
-    border-right: 1px solid #2f5496;
-    width: 100%;
-}
-
-    .download-t ul {
-        list-style: none;
-        padding: 1.65rem 1rem 1rem;
-        margin-bottom: 0;
-        font-weight: 700;
-    }
 
 .hcol1 {
     padding: 2.85rem 2.64rem 1.3rem 2.64rem;
@@ -189,25 +143,8 @@ p {
 }
 
 .row3-1 {
-/*    border-bottom: dotted 1px;*/
     padding-bottom: 0.57rem;
 }
-
-.row4-1 {
-    margin: 1.44rem 0 0;
-    height: 100%;
-    max-height: 60px;
-    display: grid;
-    grid-template-columns: 23.63% 23.33% 23.33% 23.33%;
-}
-
-    .row4-1 div > div > p {
-        font-size: 0.88em;
-        font-weight: 700;
-        text-align: left;
-        color: #9B9B9B;
-        margin: 0 1rem;
-    }
 
 .rowh1-2 {
     border-bottom: dotted 1px;
@@ -228,6 +165,7 @@ p {
     margin: 1.44rem 0 0;
 }
 
+/* Columnas del header */
 .col1-rh1 img:nth-child(1) {
     margin-bottom: 1rem;
 }
@@ -255,20 +193,7 @@ p {
         margin: 1rem 0;
     }
 
-.colh1-r1 p {
-    font-size: 1em;
-    font-weight: 700;
-    margin: 0;
-}
-
-.colh2-r1 span > p {
-    font-size: 1.76em;
-    text-align: right;
-    margin: 0;
-}
-
 .col1-rh2 {
-    /* gap: 6px; */
     margin-top: 1.57rem;
     color: var(--textButton);
     font-size: 1.32rem;
@@ -300,11 +225,19 @@ p {
     text-align: right;
 }
 
-.colh2-r2 p {
-    font-size: 1.26em;
+.colh1-r1 p {
+    font-size: 1em;
     font-weight: 700;
+    margin: 0;
 }
 
+.colh2-r1 span > p {
+    font-size: 1.76em;
+    text-align: right;
+    margin: 0;
+}
+
+.colh2-r3 p,
 .colh3-r3 span > p {
     font-size: 1.26em;
     font-weight: 700;
@@ -315,18 +248,11 @@ p {
     margin-top: 0.5rem;
 }
 
-.colh4-r3 span > p {
-    color: #D91515;
-    text-align: right;
-    margin-bottom: 0.5rem;
+.redDate {
+    color: red;
 }
 
-.colh4-r3 img {
-    display: block;
-    margin-left: auto;
-    margin-bottom: 0.5rem;
-}
-
+/* Download Reports */
 .colh1-r4 {
     position: relative;
 }
@@ -346,538 +272,47 @@ p {
         align-items: center;
     }
 
-/* Limita el ancho de la barra de fases y céntrala */
-.row.mt-3, .row4-1 {
+.download-t {
+    position: absolute;
+    z-index: 1;
+    top: 40px;
+    background-color: #f9f9fa;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom: 1px solid #2f5496;
+    border-left: 1px solid #2f5496;
+    border-right: 1px solid #2f5496;
+    width: 100%;
+}
+
+    .download-t ul {
+        list-style: none;
+        padding: 1.65rem 1rem 1rem;
+        margin-bottom: 0;
+        font-weight: 700;
+    }
+
+/* Steps Progress Bar */
+.steps-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0;
+    margin: 1.44rem 0 0;
+    width: 100%;
     max-width: 900px;
     margin-left: auto;
     margin-right: auto;
-    width: 100%;
 }
 
-/* Body content */
-h2 {
-    font-size: 1.51em;
-    font-weight: 700;
-}
-
-p {
-    font-size: 1.26em;
-    margin: 0;
-}
-
-.tag {
-    width: 150px;
-}
-
-#header-gap-t {
-    gap: 117px;
-}
-
-.paragraph-img-tags p {
-    text-align: center;
-    padding: 15px;
-    font-size: 0.8em;
-}
-
-.img-icon-tags img {
-    display: block;
-    margin: auto;
-    width: 100%;
-    height: auto;
-    max-width: 120px;
-}
-
-.paragraph-customize {
-    text-align: right;
-    font-size: 1.008em;
-    color: var(--textNotFeatured);
-    line-height: 1.3rem;
-    margin-top: 1.19rem;
-}
-
-.arrow-t {
-    rotate: 0deg;
-}
-
-.arrow-t-r {
-    rotate: 180deg !important;
-    filter: grayscale(0) !important;
-}
-
-.flex-gomi {
-    display: flex;
-    background-color: #F1F1F1;
-    border-style: none;
-    padding: 1.71rem 0.5rem;
-    font-size: 1.26em;
-    border-radius: 10px;
-  
-    max-width:380px;
-    max-height:200px;
-    justify-content:  flex-start;
-}
-
-.gomi-content {
-    text-align: left;
-    width: 100%; /* CAMBIAR: De 70% a 100% */
-    margin-bottom: 1rem; /* AGREGAR: Espacio antes del cuadro */
-}
-
-    .gomi-content h3 {
-        font-size: 1.26em;
-        font-weight: 700;
-    }
-#body-td-gommy .data-t {
-    width: 100%;
-    justify-content: flex-start;
-    gap: 2rem;
-}
-#important-gomi p {
-    font-size: 1em;
-    font-weight: 300;
-    line-height: 1.3rem;
-    color: var(--textNotFeatured);
-    margin-top: 1.5rem; /* AGREGAR: Separa el texto del título */
-    margin-bottom: 1.5rem; /* AGREGAR: Espacio antes del cuadro gris */
-}
-
-.gomi-img {
-    width: 105px;
-    height: 95.45px;
-}
-
-    .gomi-img img {
-        width: 100%;
-        height: 100%;
-    }
-
-.flex-bottle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.bottle-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0; /* Sin espacio entre ellas, o ajusta según necesites */
-}
-
-.Cap-img, .bottle-img {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-     
-.bottle-img {
-    width: 213px;
-    /* height: 274px; */
-    padding: 1.89rem;
-    background-color: rgba(0, 0, 0, 0);
-    border-radius: 10px;
-}
-.Cap-img {
-    width: 213px;
-    /* height: 274px; */
-    padding: 1.89rem;
-    background-color: rgba(0, 0, 0, 0);
-    border-radius: 10px;
-}
-.bottle-img-1 {
-    width: 213px;
-    /*height: 213px; */
-    margin-right: auto;
-    /* margin-left: 62px; */
-}
-
-    .bottle-img img  {
-        width: 100%;
-        height: auto;
-    }
-    .Cap-img img {
-        width: 75%;
-        height: auto;
-    }
-     .bottle-img-1 img {
-        width: 100%;
-        height: auto;
-    }
-
-
-.body-t-bottle {
-    width: 100%;
-    max-width: 833px;
-}
-
-    .body-t-bottle :nth-child(3) {
-        border: none;
-    }
-
-.body-t-filling :nth-child(3) {
-    border: none;
-}
-
-.body-nb-t :nth-child(4) {
-    border: none;
-}
-
-#body-td-gommy {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-direction: column; /* CAMBIAR: De row a column para apilar verticalmente */
-    gap: 2rem; /* AGREGAR: Espacio entre elementos */
-}
-    /* Agregar nueva clase para el título */
-    #body-td-gommy > p:first-child {
-        margin-bottom: 0.5rem; /* Espacio después del título "Forma" */
-        font-weight: 700; /* Hacer el título más prominente */
-    }
-    /* Modificar la clase data-t específicamente para gommy */
-    #body-td-gommy .data-t {
-        display: flex;
-        gap: 2.39rem;
-        align-items: center;
-        justify-content: flex-end; /* Alinear todo el contenido a la derecha */
-        flex: 1; /* Tomar todo el espacio disponible */
-    }
-
-/* Asegurar que la línea esté en la posición correcta */
-#line-from-gommy {
-    height: 140px;
-    width: 0;
-    border-left: dotted 1px;
-    margin: auto 0; /* Sin margin auto horizontal para mantener posición */
-}
-
-/* Si necesitas más control sobre la posición exacta */
-#body-td-gommy .data-t {
-    display: flex;
-    gap: 2.39rem;
-    align-items: center;
-    margin-left: auto; /* Empujar todo el bloque data-t hacia la derecha */
-    width: auto; /* No ocupar todo el ancho */
-}
-#body-td-pallet {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    border: none;
-    padding-right: 7rem;
-}
-
-.btn-pallet-tag button {
-    margin-left: auto;
-    margin-top: 2.52rem;
-}
-
-.tag-flex {
-    display: flex;
-    gap: 23px;
-    justify-content: flex-end;
-}
-
-.tag-pallet-text, .desc-pallet, .desc-pallet-1 {
-    font-size: 1em;
-    color: var(--textNotFeatured);
-}
-
-.desc-pallet {
-    margin-top: 1.07rem;
-    /* line-height: 1.3rem; */
-}
-
-.desc-pallet-1 {
-    margin-top: 1.07rem;
-    /* line-height: 1.3rem; */
-    text-align: right;
-}
-
-.arrow-other img {
-    cursor: pointer;
-    filter: grayscale(1);
-    rotate: -90deg;
-}
-
-.body-t {
-    width: 100%;
-}
-
-#body-t-other {
-    width: 77.77%;
-}
-
-#body-td-other {
-    display: flex;
-    justify-content: flex-start;
-    gap: 25px;
-    border: none;
-    padding: 0 0 1rem;
-    padding-right: 1rem;
-}
-
-#body-td-other-head {
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-end;
-    gap: 20px;
-    border: none;
-    padding: 0 0 1rem;
-    margin-bottom: 1.583rem;
-}
-
-    #body-td-other-head > .frecuency-text {
-        font-size: 1.260em;
-    }
-
-.line-h {
-    width: 64.688%;
-    height: 0;
-    border-bottom: dotted 1px;
-}
-
-.line-f {
-    width: 100%;
-    height: 0;
-    border-bottom: dotted 1px;
-}
-
-#body-td-other-1 {
-    margin: 4.040rem 0 1.517rem;
-    width: 100%;
-    padding: 0 15.5rem 0.31rem 0;
-    border: none;
-}
-
-    #body-td-other-1 p {
-        color: var(--textNotFeatured);
-        font-size: 1rem;
-        font-weight: 300;
-        margin-left: 2.89rem;
-    }
-
-#body-td-other-f-1 {
-    margin: 0.446rem 0 1.517rem;
-    width: 100%;
-    padding: 0 15.5rem 0.31rem 0;
-    border: none;
-}
-
-    #body-td-other-f-1 p {
-        color: var(--textNotFeatured);
-        font-size: 1rem;
-        font-weight: 300;
-        margin-left: 2.89rem;
-    }
-
-#body-td-other-2 {
-    margin: 1.638rem 0 0;
-    width: 100%;
-    padding: 0 14.3rem 0.31rem 0;
-    border: none;
-}
-
-    #body-td-other-2 p {
-        font-size: 1rem;
-        font-weight: 700;
-        margin-left: 2.89rem;
-    }
-
-    #body-td-other-2 > div > p {
-        font-size: 1.260em;
-        font-weight: 300;
-    }
-
-#data-t-other {
-    display: flex;
-    gap: 39px;
-    margin-left: auto;
-}
-
-#data-t-other-head {
-    text-align: center;
-    display: flex;
-    gap: 28px;
-    margin-left: auto;
-}
-
-    #data-t-other-head p:nth-child(2) {
-        display: none;
-    }
-
-    #data-t-other-head p {
-        font-size: 1rem;
-    }
-
-#data-t-other-0 {
-    margin-right: auto;
-    margin-left: 240px;
-}
-
-#data-t-other-1 {
-    margin-left: auto;
-}
-
-#data-t-other-2 {
-    margin-right: auto;
-    margin-left: 293px;
-}
-
-#data-t-other-3 {
-    margin-right: auto;
-    margin-left: 190px;
-}
-
-#content-t-other {
-    padding-top: 2rem;
-}
-
-.content-toggle-other {
-    padding: 10px 68px;
-    padding-right: 0;
-}
-
-#t-other-content {
-    padding: 10px 135px 10px 110px;
-}
-
-.tb-other-content {
-    margin-left: 20px;
-    background-color: #f2f2f2;
-    border-radius: 10px;
-    width: 400px;
-}
-
-#th-other {
-    padding: 9px 14px;
-    width: 250px;
-    font-size: 1.5em;
-    font-weight: 300;
-    border-bottom: dotted 1px;
-}
-
-.content-others {
-    border: solid 1px var(--icon);
-    border-radius: 15px;
-    padding: 2.646rem;
-    width: 95%;
-}
-
-tbody > tr:nth-child(4) > #th-other {
-    border: none;
-}
-
-tbody > tr:nth-child(4) > #td-other {
-    border-bottom: none;
-}
-
-#td-other {
-    padding: 9px 14px;
-    width: 150px;
-    font-size: 1.5em;
-    border-left: dotted 1px;
-    border-bottom: dotted 1px;
-}
-
-.content-t input[type="number"] {
-    background-color: #F1F1F1;
-    border-style: none;
-    padding: 0 1.44rem;
-    font-size: 1.26em;
-    border-radius: 10px;
-    height: 44px;
-    width: 300px;
-}
-
-
-
-
-.m-top-toggle {
-    margin-top: 2.394rem;
-}
-
-.col-b {
-    padding: 3.52rem 0;
-}
-
-.flex-elm-from {
-    padding: 0.92rem 2.64rem;
-    justify-content: space-between;
-}
-
-.toggle-from {
-    border: solid 1px #D2D2D2;
-    border-radius: 30px;
-}
-
-.left-from {
-    align-items: center;
-    padding: 0 !important;
-}
-
-.l-data-from img {
-    width: 26.22px;
-    height: 32px;
-}
-
-.l-data-from {
-    gap: 10px;
-    margin-left: 2.89rem;
-    align-items: center;
-}
-
-    .l-data-from span > p {
-        font-weight: 700;
-    }
-
-.right-from div:nth-child(1) img {
-    width: 19.5px;
-    height: 20px;
-}
-
-.comment-from {
-    justify-content: flex-end;
-    gap: 10px;
-    color: #989797;
-}
-
-    .comment-from p {
-        text-decoration: underline;
-        font-size: 1.5em;
-    }
-
-textarea {
-    min-height: 128px;
-    max-height: 128px;
-    padding: 0.5rem;
-    border-color: var(--icon);
-    border-radius: 10px;
-    min-width: 850px;
-    max-width: auto;
-}
-
-    textarea:focus-visible {
-        border-color: var(--icon);
-        outline: 0;
-    }
-
-.right-from img {
-    width: 40px;
-    height: 40px;
-   
-    margin-left: auto;
-    cursor: pointer;
-}
-
-.right-from {
-    align-items: center;
-    padding: 0 !important;
+.fila-progress {
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 .progress-bar-from {
     color: #fff;
-    position: relative; /* AGREGAR ESTO */
+    position: relative;
     font-weight: 500;
     border: solid 1px #8ED300;
     background-color: #8ED300;
@@ -887,13 +322,9 @@ textarea {
     margin: auto 0 auto auto;
     text-align: center;
 }
-.fila-progress{
-    padding-left:15px;
-    padding-right:15px;
-}
+
 .progress-bar-from-0 {
     color: #2F5496;
-  
     font-weight: 500;
     border: solid 1px #DAE7F5;
     background-color: #DAE7F5;
@@ -921,6 +352,153 @@ textarea {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     z-index: 5;
 }
+
+/* ========================================
+   3. CONTENIDO PRINCIPAL
+   ======================================== */
+
+/* Typography */
+h2 {
+    font-size: 1.51em;
+    font-weight: 700;
+}
+
+h3 {
+    font-weight: 900;
+}
+
+p {
+    font-size: 1.26em;
+    margin: 0;
+}
+
+.content-t p,
+.content-t h3 {
+    font-size: 1.125rem;
+}
+
+/* States */
+.disabled {
+    display: none;
+    height: auto;
+}
+
+.active {
+    display: block;
+    height: auto;
+}
+
+/* Secciones Toggle */
+.toggle-from {
+    border: solid 1px #D2D2D2;
+    border-radius: 30px;
+}
+
+.m-top-toggle {
+    margin-top: 2.394rem;
+}
+
+.flex-elm-from {
+    padding: 0.92rem 2.64rem;
+    justify-content: space-between;
+}
+
+.left-from {
+    align-items: center;
+    padding: 0 !important;
+}
+
+.right-from {
+    align-items: center;
+    padding: 0 !important;
+}
+
+    .right-from img {
+        width: 40px;
+        height: 40px;
+        margin-left: auto;
+        cursor: pointer;
+    }
+
+.arrow-t {
+    rotate: 0deg;
+}
+
+.arrow-t-r {
+    rotate: 180deg !important;
+    filter: grayscale(0) !important;
+}
+
+/* Container Toggle */
+.container-toggle {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.8s ease;
+}
+
+    .container-toggle.active {
+        display: block;
+        max-height: none;
+        overflow: visible;
+        padding-bottom: 20px;
+    }
+
+/* Content Areas */
+.content-t {
+    padding: 3.96rem 6.93rem;
+}
+
+.content-t-2 {
+    padding: 3.96rem 6.93rem;
+}
+
+.content-t-pdb {
+    padding-bottom: 0 !important;
+    width: 100%;
+    overflow-x: auto;
+}
+
+.content-t.content-t-pdb {
+    padding: 2rem 6.93rem;
+    padding-bottom: 2rem !important;
+}
+
+.content-toggle-header {
+    background-color: #F8F7F9;
+    padding: 1.8rem 1.2rem;
+}
+
+/* Body Tables */
+.body-t {
+    width: 100%;
+}
+
+.body-td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.4rem 0;
+    border-bottom: dotted 1px;
+}
+
+    .body-td span > p {
+        font-size: 1.26em;
+        font-weight: 700;
+    }
+
+.data-t {
+    display: flex;
+    gap: 2.39rem;
+    align-items: center;
+}
+
+.head-t {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.69rem;
+}
+
+/* Lines */
 .line-from {
     width: 0;
     height: 49px;
@@ -928,71 +506,195 @@ textarea {
     margin: auto;
 }
 
-#line-from-gommy {
-    height: 140px;
+.line-f {
+    width: 100%;
+    height: 0;
+    border-bottom: dotted 1px;
 }
 
-.check-from-label p {
-    font-weight: 700;
-    font-size: 1.13em;
+/* ========================================
+   4. FORMULARIOS Y CONTROLES
+   ======================================== */
+
+/* Inputs */
+.content-t input[type="text"] {
+    background-color: #F1F1F1;
+    border-style: none;
+    padding: 0 1.44rem;
+    font-size: 1.26em;
+    border-radius: 10px;
+    height: 44px;
 }
 
-.check-from-label input[type="checkbox"] {
-    width: 28px !important;
-    height: 28px;
-    appearance: none;
-    border: 1px solid var(--icon);
-    border-radius: 5px;
-}
-
-    .check-from-label input[type="checkbox"]:checked {
-        background-image: url("/img/check-icon-others.svg");
-        background-repeat: no-repeat;
-        background-size: 28px;
-        border: none;
+    .content-t input[type="text"]:focus-visible {
+        outline: 0;
     }
 
-.check-from-label input:nth-child(2) {
-    display: none;
+.content-t input[type="number"] {
+    background-color: #F1F1F1;
+    border-style: none;
+    padding: 0 1.44rem;
+    font-size: 1.26em;
+    border-radius: 10px;
+    height: 44px;
+    width: 300px;
 }
 
+.custom-input {
+    background-color: white !important;
+    width: auto;
+    padding: 10px 0px;
+    border: 1px solid #D2D2D2;
+    border-radius: 5px;
+    outline: 0.5px solid #D2D2D2;
+    outline-offset: -1px;
+    transition: border-color 0.3s;
+    font-size: small;
+}
+
+    .custom-input:focus {
+        border-color: #2F5496;
+        box-shadow: 0 0 0 2px rgba(47, 84, 150, 0.1);
+    }
+
+/* Select */
+.selectNew {
+    background-color: #F1F1F1;
+    border-style: none;
+    padding: 0 1.44rem;
+    font-size: 1.26em;
+    border-radius: 10px;
+    height: 44px;
+}
+
+/* Textarea */
+textarea {
+    min-height: 128px;
+    max-height: 128px;
+    padding: 0.5rem;
+    border-color: var(--icon);
+    border-radius: 10px;
+    min-width: 850px;
+    max-width: auto;
+}
+
+    textarea:focus-visible {
+        border-color: var(--icon);
+        outline: 0;
+    }
+
+.comments-area {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+    .comments-area textarea {
+        min-height: 200px;
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid var(--icon);
+        border-radius: 10px;
+        resize: vertical;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+/* Checkboxes */
 .check-from-label {
     display: flex;
     margin-left: 3.52rem;
     gap: 3.84rem;
 }
 
-.check-from-label-2 {
-}
-
-
-    .check-from-label-2 p {
+    .check-from-label p {
         font-weight: 700;
         font-size: 1.13em;
     }
 
-    .check-from-label-2 input[type="checkbox"] {
-        width: 28px;
+    .check-from-label input[type="checkbox"] {
+        width: 28px !important;
         height: 28px;
         appearance: none;
         border: 1px solid var(--icon);
         border-radius: 5px;
     }
 
-        .check-from-label-2 input[type="checkbox"]:checked {
+        .check-from-label input[type="checkbox"]:checked {
             background-image: url("/img/check-icon-others.svg");
             background-repeat: no-repeat;
             background-size: 28px;
             border: none;
         }
 
-    .check-from-label-2 input:nth-child(2) {
-        display: none;
+.check-from-label-2 input[type="checkbox"] {
+    width: 28px;
+    height: 28px;
+    appearance: none;
+    border: 1px solid var(--icon);
+    border-radius: 5px;
+}
+
+    .check-from-label-2 input[type="checkbox"]:checked {
+        background-image: url("/img/check-icon-others.svg");
+        background-repeat: no-repeat;
+        background-size: 28px;
+        border: none;
     }
 
+/* Switch */
+.switch {
+    display: block;
+    margin-top: 0;
+}
+
+.slider {
+    background-color: #C7C7CC;
+    border-radius: 100px;
+    padding: 1px;
+    margin: 10px;
+    cursor: pointer;
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0s;
+    align-items: center;
+    position: relative;
+    display: block;
+    width: 40px;
+    height: 20px;
+    box-shadow: #C7C7CC 0px 0px 5px inset, #C7C7CC 0px 0px 0px 24px inset, #8ED300 0px 0px 0px 0px inset, rgba(224, 224, 224, 0.45) 0px 1px 0px 0px;
+}
+
+    .slider::after {
+        content: "";
+        display: flex;
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        background-color: #fff;
+        border-radius: 200px;
+        position: absolute;
+        transition: left 300ms cubic-bezier(0.4, 0, 0.2, 1) 0s, background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0s;
+        will-change: left, background-color;
+    }
+
+.switch input[type="checkbox"]:checked + .slider {
+    box-shadow: #0ED88F 0px 0px 0px 2px inset, #0ED88F 0px 0px 0px 24px inset, rgba(224, 224, 224, 0.45) 0px 1px 0px 0px;
+}
+
+    .switch input[type="checkbox"]:checked + .slider::after {
+        left: 24px;
+    }
+
+.switch input[type="checkbox"] {
+    display: none;
+}
+
+/* ========================================
+   5. BOTONES
+   ======================================== */
+
 .btn-atr {
-    padding: 2rem 6.93rem; /* Reduce el padding */
-    padding-bottom: 3rem; /* Mantén espacio al final */
+    padding: 2rem 6.93rem;
+    padding-bottom: 3rem;
 }
 
 .btn-atr-confirm {
@@ -1029,331 +731,23 @@ button.btn-save-confirm {
     transition: all 0.3s ease;
     background-color: var(--textButton);
     color: white;
-}
-
-button.btn-save-confirm-firm {
-    display: block;
-    border: solid 1px var(--icon);
-    border-radius: 30px;
-    line-height: 1rem;
-    font-size: 1.44em;
-    padding: 1.44rem 1.57rem;
-    margin: 0 0 0 auto;
-    transition: all 0.3s ease;
-    background-color: transparent;
-    color: #F2F2F2;
-}
-
-button.btn-save-confirm-firm {
-    display: block;
-    border: solid 1px var(--icon);
-    border-radius: 30px;
-    line-height: 1rem;
-    font-size: 1.44em;
-    padding: 1.44rem 1.57rem;
-    margin: 0 0 0 auto;
-    transition: all 0.3s ease;
-    background-color: transparent;
-    color: #F2F2F2;
-}
-
-    button.btn-save-confirm-firm:hover {
-        transition: all 0.3s ease;
-        background-color: transparent;
-        color: #F2F2F2;
-    }
-
-/*content 1*/
-
-.border-none-t {
-    border-style: none !important;
-}
-
-.body-t-flex {
-    display: flex;
-    /* gap: 3rem; */
-    margin-top: 40px;
-    width: 100%;
-    /* overflow-x: auto; */
-}
-
-/* .gap-t {
-        gap: 2.35rem;
-    } */
-
-/* .body-data p:nth-child(1) {
-        font-weight: 700;
-        font-size: 0.88rem;
-        color: #929292;
-        margin-bottom: 1.57rem;
-    }
-
-    .body-data span p:only-child {
-        font-weight: 700;
-        font-size: 1.13rem;
-        color: #000;
-        text-align: center;
-        margin-top: 0.63rem;
-    }
-
-    .body-data img {
-        margin: 2.83rem auto auto;
-        cursor: pointer;
-    } */
-
-.body-t-flex {
-    display: flex;
-    justify-content: space-between; /* Espacio entre columnas */
-    align-items: center; /* Centra verticalmente */
-    gap: 1rem; /* Espacio entre columnas, ajusta según tus clases gap-... */
-    padding: 0.5rem 0;
-}
-
-
-
-.body-data {
-    flex: 1 1 0; /* Todas las columnas ocupan el mismo ancho */
-    /* text-align: center;  */ /* Centra el texto y los inputs */
-    padding: 0 0.5rem; /* Espaciado horizontal */
-}
-
-    .body-data input {
-        width: 100%;
-        padding: 0.25rem 0.5rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background: #fafafa;
-    }
-
-        .body-data input[type="checkbox"] {
-            appearance: none;
-            background-color: #F1F1F1;
-            width: 28px;
-            height: 28px;
-            border-style: none;
-            border-radius: 5px;
-        }
-button.btn-save-confirm {
-    display: block;
-    border: solid 1px var(--icon);
-    border-radius: 30px;
-    line-height: 1rem;
-    font-size: 1.44em;
-    padding: 1.44rem 1.57rem;
-    margin: 0 0 0 auto;
-    transition: all 0.3s ease;
-    background-color: var(--textButton);
-    color: white;
     cursor: pointer;
 }
 
-    /* Estado hover (solo cuando no está deshabilitado) */
     button.btn-save-confirm:not(:disabled):hover {
         opacity: 0.9;
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
-    /* Estado deshabilitado */
     button.btn-save-confirm:disabled {
         background-color: #cccccc;
         color: #666666;
         cursor: not-allowed;
         opacity: 0.6;
         border-color: #cccccc;
-        pointer-events: none; /* Previene cualquier interacción */
+        pointer-events: none;
     }
-#input-bt-width {
-    width: 252px
-}
-
-/* #input-bt-width-390 {
-        width: 390px;
-    } */
-
-#input-bt-width-240 {
-    width: 240px;
-}
-
-#input-bt-width-65 {
-    width: 70px;
-    padding: 0 10px;
-}
-
-/* .content-t div:nth-child(1)>p {
-        font-size: 1.3em;
-    } */
-
-.content-td p > span {
-    padding: 1rem 0;
- 
-    font-weight: 700;
-}
-
-.content-t-pdb {
-    padding-bottom: 0 !important;
-    width: 100%;
-    overflow-x: auto;
-}
-
-.content-toggle-header {
-    background-color: #F8F7F9;
-    padding: 1.8rem 1.2rem;
-}
-
-.content-td-flex {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    font-size: 1.13rem;
-    margin-top: 2.83rem;
-}
-
-.header-content-t {
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    gap: 25px;
-}
-
-.content-t input[type="text"] {
-    background-color: #F1F1F1;
-    border-style: none;
-    padding: 0 1.44rem;
-    font-size: 1.26em;
-    border-radius: 10px;
-    height: 44px;
-    /* width: 20.625rem; */
-    /* max-width: 500px; */
-}
-
-.selectNew {
-    background-color: #F1F1F1;
-    border-style: none;
-    padding: 0 1.44rem;
-    font-size: 1.26em;
-    border-radius: 10px;
-    height: 44px;
-}
-
-.content-t input[type="text"]:focus-visible {
-    outline: 0;
-}
-
-/*switch*/
-.slider {
-    background-color: #C7C7CC;
-    border-radius: 100px;
-    padding: 1px;
-    margin: 10px;
-    cursor: pointer;
-    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1) 0s;
-    align-items: center;
-    position: relative;
-    display: block;
-    width: 40px;
-    height: 20px;
-    box-shadow: #C7C7CC 0px 0px 5px inset, #C7C7CC 0px 0px 0px 24px inset, #8ED300 0px 0px 0px 0px inset, rgba(224, 224, 224, 0.45) 0px 1px 0px 0px;
-}
-
-    .slider::after {
-        content: "";
-        display: flex;
-        top: 2px;
-        left: 2px;
-        width: 16px;
-        height: 16px;
-        background-color: #fff;
-        border-radius: 200px;
-        position: absolute;
-        transition: left 300ms cubic-bezier(0.4, 0, 0.2, 1) 0s, background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0s;
-        will-change: left, background-color;
-    }
-
-.switch {
-    display: block;
-    margin-top: 0;
-}
-
-    .switch input[type="checkbox"]:checked + .slider {
-        box-shadow: #0ED88F 0px 0px 0px 2px inset, #0ED88F 0px 0px 0px 24px inset, rgba(224, 224, 224, 0.45) 0px 1px 0px 0px;
-    }
-
-        .switch input[type="checkbox"]:checked + .slider::after {
-            left: 24px;
-        }
-
-    .switch input[type="checkbox"] {
-        display: none;
-    }
-
-/*end content 1*/
-/*content 2 */
-.content-t p, h3 {
-    font-size: 1.125rem;
-}
-
-h3 {
-    font-weight: 900;
-}
-
-.content-t {
-    padding: 3.96rem 6.93rem;
-}
-
-.content-t-2 {
-    padding: 3.96rem 6.93rem;
-}
-
-.head-t {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.69rem;
-}
-
-.data-t {
-    display: flex;
-    gap: 2.39rem;
-    align-items: center;
-}
-
-.body-td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.4rem 0;
-    border-bottom: dotted 1px;
-}
-.custom-input {
-    background-color: white !important;
-    width: auto;
-    padding: 10px 0px;
-    border: 1px solid #D2D2D2;
-    border-radius: 5px;
-    outline: 0.5px solid #D2D2D2;
-    outline-offset: -1px;
-    transition: border-color 0.3s;
-    font-size: small;
-}
-
-    .custom-input:focus {
-        border-color: #2F5496;
-        box-shadow: 0 0 0 2px rgba(47, 84, 150, 0.1);
-    }
-#btd-1 {
-    border-top: dotted 1px;
-}
-
-.body-td span > p {
-    font-size: 1.26em;
-    font-weight: 700;
-}
-
-.btn-t img {
-    width: 14.88px;
-    height: 15px;
-    margin-right: 0.44rem;
-}
 
 button.btn-t {
     display: flex;
@@ -1377,79 +771,17 @@ button.btn-t {
             filter: brightness(0) invert(100%);
         }
 
-/*end content 2 */
-
-
-.text-table-th {
-    color: #999A9B;
-    font-size: 1rem;
-    font-weight: 400;
+.btn-t img {
+    width: 14.88px;
+    height: 15px;
+    margin-right: 0.44rem;
 }
 
-    .text-table-th th {
-        font-weight: 400 !important;
-    }
+/* ========================================
+   6. SECCIONES ESPECÍFICAS
+   ======================================== */
 
-.text-table-td td {
-    font-size: 1.25rem;
-    font-weight: 300;
-}
-
-/* #recipe-1 {
-        width: 100%;
-        overflow-x: auto;
-    } */
-
-
-
-
-.container-toggle {
-    max-height: 0; /* Inicialmente oculto */
-    overflow: hidden;
-    transition: max-height 0.8s ease; /* Ajusta la duración y el tipo de easing */
-}
-
-    .container-toggle.active {
-        display: block;
-        max-height: none; /* Elimina el límite de altura */
-        overflow: visible; /* Muestra todo el contenido */
-        padding-bottom: 20px; /* Agrega espacio al final */
-    }
-.content-t.content-t-pdb {
-    padding: 2rem 6.93rem; /* Reduce el padding superior */
-    padding-bottom: 2rem !important; /* Asegura espacio inferior */
-}
-.disabled {
-    display: none;
-    height: auto;
-}
-
-.active {
-    display: block;
-    height: auto;
-}
-
-#bt-3 {
-    border-bottom: none !important;
-}
-
-/* Ajuste de padding para fondo gris en tablet y mobile */
-@media (max-width: 1024px) {
-    .content-toggle-header {
-        padding: 1.2rem 0.5rem;
-    }
-
-    .header-content-t {
-        gap: 8px !important;
-        flex-wrap: wrap;
-    }
-
-    .content-t,
-    .content-t-2 {
-        padding: 1.2rem 0.5rem !important;
-    }
-}
-
+/* Features Row */
 .features-row {
     display: flex;
     justify-content: space-between;
@@ -1474,13 +806,291 @@ button.btn-t {
     margin-bottom: 0;
 }
 
+.img-icon-tags img {
+    display: block;
+    margin: auto;
+    width: 100%;
+    height: auto;
+    max-width: 120px;
+}
+
+.paragraph-img-tags p {
+    text-align: center;
+    padding: 15px;
+    font-size: 0.8em;
+}
+
+/* Gummy Shape */
+#body-td-gommy {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+    #body-td-gommy > p:first-child {
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    #body-td-gommy .data-t {
+        display: flex;
+        gap: 2.39rem;
+        align-items: center;
+        margin-left: auto;
+        width: auto;
+    }
+
+.flex-gomi {
+    display: flex;
+    background-color: #F1F1F1;
+    border-style: none;
+    padding: 1.71rem 0.5rem;
+    font-size: 1.26em;
+    border-radius: 10px;
+    max-width: 380px;
+    max-height: 200px;
+    justify-content: flex-start;
+}
+
+.gomi-content {
+    text-align: left;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+    .gomi-content h3 {
+        font-size: 1.26em;
+        font-weight: 700;
+    }
+
+#important-gomi p {
+    font-size: 1em;
+    font-weight: 300;
+    line-height: 1.3rem;
+    color: var(--textNotFeatured);
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.gomi-img {
+    width: 105px;
+    height: 95.45px;
+}
+
+    .gomi-img img {
+        width: 100%;
+        height: 100%;
+    }
+
+#line-from-gommy {
+    height: 140px;
+    width: 0;
+    border-left: dotted 1px;
+    margin: auto 0;
+}
+
+/* TABLA DE RECETAS */
+.body-t-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    margin-top: 40px;
+    width: 100%;
+}
+
+    .body-t-flex.header-row {
+        border-bottom: 2px solid #e5e5e5;
+    }
+
+        .body-t-flex.header-row .body-data p {
+            font-size: 0.85rem !important;
+            font-weight: 700;
+            color: #999A9B;
+            text-transform: uppercase;
+        }
+
+    .body-t-flex.data-row {
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+.body-data {
+    flex: 1 1 0;
+    padding: 0 0.5rem;
+}
+
+    .body-data input {
+        width: 100%;
+        padding: 0.25rem 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: #fafafa;
+    }
+
+/* Recipe Cards Container - Hidden by default */
+.recipe-cards-container {
+    display: none !important;
+}
+
+/* Bottle/Packaging Section */
+.bottle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.Cap-img,
+.bottle-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 213px;
+    padding: 1.89rem;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 10px;
+}
+
+    .bottle-img img {
+        width: 100%;
+        height: auto;
+    }
+
+    .Cap-img img {
+        width: 75%;
+        height: auto;
+    }
+
+.bottle-img-1 {
+    width: 213px;
+    margin-right: auto;
+}
+
+    .bottle-img-1 img {
+        width: 100%;
+        height: auto;
+    }
+
+.body-t-bottle {
+    width: 100%;
+    max-width: 833px;
+}
+
+    .body-t-bottle :nth-child(3) {
+        border: none;
+    }
+
+.body-t-filling :nth-child(3) {
+    border: none;
+}
+
+/* Pallet Section */
+#body-td-pallet {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border: none;
+    padding-right: 7rem;
+}
+
+.btn-pallet-tag button {
+    margin-left: auto;
+    margin-top: 2.52rem;
+}
+
+.tag-flex {
+    display: flex;
+    gap: 23px;
+    justify-content: flex-end;
+}
+
+.tag-pallet-text,
+.desc-pallet,
+.desc-pallet-1 {
+    font-size: 1em;
+    color: var(--textNotFeatured);
+}
+
+.desc-pallet {
+    margin-top: 1.07rem;
+}
+
+.desc-pallet-1 {
+    margin-top: 1.07rem;
+    text-align: right;
+}
+
+/* Analytics/Others Section */
+.content-others {
+    border: solid 1px var(--icon);
+    border-radius: 15px;
+    padding: 2.646rem;
+    width: 95%;
+}
+
+.text-table-th {
+    color: #999A9B;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+    .text-table-th th {
+        font-weight: 400 !important;
+    }
+
+.text-table-td td {
+    font-size: 1.25rem;
+    font-weight: 300;
+}
+
+/* Label Actions */
+.final-label-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .5rem;
+}
+
+    .final-label-actions .child_content-label-button-upload {
+        width: auto;
+        min-width: 240px;
+        text-align: center;
+    }
+
+/* ========================================
+   7. RESPONSIVE DESIGN
+   ======================================== */
+
+/* Tablet Landscape */
 @media (max-width: 1200px) {
     .features-row {
         gap: 1rem;
     }
+
+    .header-order {
+        grid-template-columns: 1fr;
+    }
 }
 
+/* Tablet General */
 @media (max-width: 1024px) {
+    .content-toggle-header {
+        padding: 1.2rem 0.5rem;
+    }
+
+    .header-content-t {
+        gap: 8px !important;
+        flex-wrap: wrap;
+    }
+
+    .content-t,
+    .content-t-2 {
+        padding: 1.2rem 0.5rem !important;
+    }
+
     .features-row {
         gap: 0.5rem;
         flex-wrap: nowrap;
@@ -1491,52 +1101,14 @@ button.btn-t {
         min-width: 90px;
         height: 140px;
     }
-    /* Agregar estos estilos al archivo OrdersComponent.css */
 
-    /* Botón Confirm Product and Sign */
-    .btn-save-confirm {
-        display: block;
-        border: solid 1px var(--textButton, #2F5496);
-        border-radius: 30px;
-        line-height: 1rem;
-        font-size: 1.44em;
-        padding: 1.44rem 1.57rem;
-        margin: 0 0 0 auto;
-        transition: all 0.3s ease;
-        background-color: var(--textButton, #2F5496);
-        color: white;
-        cursor: pointer;
-    }
-        .btn-save-confirm:disabled {
-            background-color: #cccccc;
-            color: #666666;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-     
-        
-       
-      
-    /* Alternativa con clase específica para deshabilitado */
-     
-
-    /* Corrección del botón btn-save-confirm-firm que estaba mal definido */
-    .btn-save-confirm-firm {
-        display: block;
-        border: solid 1px #D2D2D2;
-        border-radius: 30px;
-        line-height: 1rem;
-        font-size: 1.44em;
-        padding: 1.44rem 1.57rem;
-        margin: 0 0 0 auto;
-        transition: all 0.3s ease;
-        background-color: transparent;
-        color: #D2D2D2;
+    .btn-save-confirm:disabled {
+        background-color: #cccccc;
+        color: #666666;
         cursor: not-allowed;
+        opacity: 0.6;
     }
 
-    /* Ajuste específico para el contenedor del botón */
     .btn-atr-confirm {
         padding: 3.96rem 6.93rem 0;
         display: flex;
@@ -1544,225 +1116,29 @@ button.btn-t {
     }
 
         .btn-atr-confirm button {
-            min-width: 250px; /* Asegura un ancho mínimo para el botón */
+            min-width: 250px;
         }
 
-    
-   
-    /* Añadir o modificar en OrdersComponent.css */
-    .row.mt-3 {
-        max-width: 100%;
-        margin-left: 0;
-        margin-right: 0;
-        width: 100%;
-        padding: 0 10px;
-        overflow: visible;
+    .header-order {
+        margin: 20px 15px;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .fila-progress {
+        padding: 10px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .steps-row {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 0;
-        margin: 1.44rem 0 0;
-        width: 100%;
-        padding: 0;
-        overflow: visible;
+        min-width: 600px;
     }
 
-    /* Asegurarse de que el header-order no corte el contenido */
-    .header-order {
-        overflow: visible;
-    }
-
-    .hcol1 {
-        overflow: visible;
-    }
-    /* ===========================
-   StepProgressBar – ancho completo + responsive
-   =========================== */
-
-    /* Convierte el header en grid de 2 columnas.
-   Así podemos “forzar” que la fila de steps ocupe el ancho completo. */
-    .header-order {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 420px; /* izquierda flexible + derecha fija */
-        align-items: start;
-        gap: 0; /* sin huecos entre columnas */
-    }
-
-        /* Asegura que las dos columnas se estiren correctamente */
-        .header-order .hcol1,
-        .header-order .hcol2 {
-            width: 100%;
-        }
-
-        /* La fila que contiene los steps debe abarcar TODAS las columnas del grid */
-        .header-order .row.mt-3 {
-            grid-column: 1 / -1; /* ocupa de la col 1 a la última */
-        }
-
-        /* Contenedor de la barra de pasos */
-        .header-order .steps-row {
-            /* truco para “comerse” paddings internos del contenedor, 
-     y que la barra llegue a los bordes visuales de la tarjeta */
-            margin-left: -24px;
-            margin-right: -24px;
-            padding-left: 24px;
-            padding-right: 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            width: auto; /* deja que crezca todo lo que pueda */
-            max-width: 100%; /* nunca se pase de su contenedor */
-            box-sizing: border-box;
-        }
-
-            /* Cada Step (los componentes hijos) ocupa la misma porción de ancho */
-            .header-order .steps-row > * {
-                flex: 1 1 0;
-                min-width: 0; /* evita desbordes de contenido interno */
-            }
-
-            /* Si dentro de cada Step hay elementos con ancho fijo,
-   esto los libera para que puedan estirarse */
-            .header-order .steps-row .step,
-            .header-order .steps-row [class*="step"] {
-                width: auto !important;
-                max-width: none;
-            }
-
-    /* ===================================
-   Responsive (tablet y abajo)
-   =================================== */
-
-    /* En tablet: coloca la columna derecha debajo,
-   y permite que la barra siga ocupando todo el ancho */
-    @media (max-width: 1200px) {
-        .header-order {
-            grid-template-columns: 1fr;
-        }
-
-            .header-order .row.mt-3 {
-                grid-column: 1; /* ya solo hay una columna */
-            }
-       
-        }
-
-    /* Si quieres que los pasos se partan en 2 filas en pantallas medias,
-   descomenta este bloque: */
-    
-@media (max-width: 992px){
-  .header-order .steps-row{
-    flex-wrap: wrap;
-  }
-  .header-order .steps-row > *{
-    flex: 1 1 calc(50% - 16px);
-  }
-  .header-order .steps-row > *:last-child{
-    flex-basis: 100%;   // el último a ancho completo, si te gusta ese efecto
-  }
-}
-
-
-    /* En móviles pequeños, apila de a uno si lo prefieres */
-    @media (max-width: 576px) {
-        .header-order .steps-row {
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-            .header-order .steps-row > * {
-                flex: 1 1 100%;
-            }
-    }
-    .final-label-actions {
-        display: flex;
-        flex-direction: column; /* botón encima, texto debajo */
-        align-items: flex-start;
-        gap: .5rem;
-    }
-
-        /* Si quieres que el botón no ocupe todo el ancho */
-        .final-label-actions .child_content-label-button-upload {
-            width: auto;
-            min-width: 240px; /* opcional */
-            text-align: center;
-        }
-
-    /* Back Button - Versión flotante adaptativa */
+    /* Back button responsive */
     .back-button-container {
         position: fixed;
-        top: 15%;
-        left: 270px;
-        transform: translateY(-50%);
-        z-index: 100;
-        transition: all 0.3s ease;
-    }
-
-    @media (max-width: 1024px) {
-        .back-button-container {
-            position: fixed;
-            top: auto;
-            bottom: 30px;
-            left: 30px;
-            right: auto;
-            transform: none;
-            z-index: 1000;
-        }
-
-        .back-button {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-        }
-
-            .back-button:hover {
-                transform: scale(1.05);
-            }
-    }
-
-    @media (max-width: 768px) {
-        .back-button-container {
-            bottom: 20px;
-            left: 20px;
-        }
-
-        .back-button svg {
-            width: 56px;
-            height: 56px;
-        }
-    }
-
-}
-/* Back Button - Versión flotante pequeña y bien posicionada */
-.back-button-container {
-    position: fixed;
-    top: 15%;
-    left: 270px;
-    transform: translateY(-50%);
-    z-index: 100;
-    transition: all 0.3s ease;
-}
-
-.back-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-    padding: 0;
-    display: block;
-}
-
-    .back-button:hover {
-        transform: scale(1.1);
-    }
-
-/* RESPONSIVE - Botón flotante pequeño */
-@media (max-width: 1024px) and (orientation: landscape) and (max-height: 768px), (max-width: 1024px) and (orientation: portrait), (max-width: 768px) {
-
-    .back-button-container {
-        position: fixed;
-        top: 70px; /* Justo debajo del hamburger menu */
+        top: 70px;
         left: 20px;
         transform: none;
         z-index: 100;
@@ -1787,33 +1163,68 @@ button.btn-t {
         }
 }
 
-/* Ajustes para el contenido principal en responsive */
+/* RECIPE CARDS - Tablets and Mobile */
 @media (max-width: 1024px) {
-    /* Dar espacio al contenido para el botón flotante */
-    section {
-        padding-top: 20px;
+    /* Hide table */
+    .content-t.content-t-pdb .body-t-flex.header-row,
+    .content-t.content-t-pdb .body-t-flex.data-row,
+    .content-t.content-t-pdb .d-flex.gap-lg-4.data-row {
+        display: none !important;
     }
 
-    /* Ajustar el header para que no se desborde */
-    .header-order {
-        margin: 20px 15px;
-        border-radius: 15px;
+    /* Show cards */
+    .recipe-cards-container {
+        display: block !important;
+        padding: 0;
+    }
+
+    .recipe-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
         overflow: hidden;
+        border: 1px solid #e5e7eb;
     }
 
-    /* Ajustar los pasos para que no se desborden */
-    .fila-progress {
-        padding: 10px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    .recipe-card-header {
+        background: #2F5496;
+        color: white;
+        padding: 0.8rem 1rem;
+        font-weight: bold;
+        font-size: 0.9rem;
     }
 
-    .steps-row {
-        min-width: 600px; /* Mínimo ancho para los pasos */
+    .recipe-card-body {
+        padding: 1rem;
+    }
+
+    .recipe-card-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .recipe-info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .recipe-info-label {
+        font-size: 0.7rem;
+        color: #666;
+        text-transform: uppercase;
+        margin-bottom: 0.3rem;
+        font-weight: 600;
+    }
+
+    .recipe-info-value {
+        font-size: 0.9rem;
+        color: #333;
     }
 }
 
-/* Ajustes específicos para tablet portrait */
+/* Tablet Portrait */
 @media (max-width: 1024px) and (orientation: portrait) {
     .back-button-container {
         top: 75px;
@@ -1825,17 +1236,34 @@ button.btn-t {
         margin-top: 30px;
     }
 
-    .hcol1, .hcol2 {
+    .hcol1,
+    .hcol2 {
         padding: 1.5rem;
     }
 
     .hcol1 {
         border-right: none;
         border-bottom: 1px dotted;
+        padding: 2rem 1.5rem;
+    }
+
+    .col1-rh1 img {
+        max-height: 100px;
+        width: auto;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .col1-rh2 {
+        text-align: center;
+        justify-content: center;
+        display: flex;
+        gap: 0.5rem;
+        font-size: 1.2rem;
     }
 }
 
-/* Ajustes para móvil */
+/* Mobile */
 @media (max-width: 768px) {
     .back-button-container {
         top: 65px;
@@ -1852,27 +1280,46 @@ button.btn-t {
             height: 24px;
         }
 
-    /* Header responsive */
     .header-order {
         grid-template-columns: 1fr;
-        margin: 15px 10px;
+        margin: 20px 10px;
+        border-radius: 15px;
     }
 
-    .hcol1, .hcol2 {
+    .hcol1,
+    .hcol2 {
         padding: 1rem;
     }
 
-    /* Ajustar tamaños de texto */
+    /* Logo centered */
+    .row1-1 {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .col1-rh1 {
+        width: 100%;
+        text-align: center;
+    }
+
+        .col1-rh1 img {
+            max-height: 90px;
+            width: auto;
+            margin: 0 auto;
+            display: block;
+        }
+
     .col1-rh2 {
-        font-size: 1rem;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+        text-align: center;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
     }
 
-    .col2-rh3 p:nth-child(1),
-    .col3-rh3 span:nth-child(1) > p {
-        font-size: 1rem;
-    }
-
-    /* Language selector más pequeño */
     .language-selector-products {
         top: 10px;
         right: 10px;
@@ -1883,9 +1330,76 @@ button.btn-t {
         font-size: 12px;
         min-width: 100px;
     }
+
+    /* Bottle/packaging responsive */
+    .bottle-container {
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 1rem;
+        margin: 1rem 0;
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+
+    .Cap-img {
+        width: 100px;
+        padding: 0.5rem;
+        order: 1;
+    }
+
+    .bottle-img {
+        width: 150px;
+        padding: 0.5rem;
+        order: 2;
+    }
 }
 
-/* Móvil pequeño */
+/* Mobile Portrait Specific */
+@media (max-width: 768px) and (orientation: portrait) {
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    section {
+        width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden;
+    }
+
+    .content-t.content-t-pdb {
+        padding: 1.5rem 1rem !important;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .header-order {
+        width: calc(100% - 20px) !important;
+        margin: 65px 10px 15px 10px !important;
+        box-sizing: border-box !important;
+    }
+
+    .toggle-from {
+        width: calc(100% - 20px) !important;
+        margin: 10px !important;
+        box-sizing: border-box !important;
+    }
+
+    .content-others {
+        width: calc(100% - 40px) !important;
+        margin: 0 20px !important;
+        box-sizing: border-box !important;
+    }
+
+    .recipe-card-info {
+        gap: 0.8rem;
+    }
+}
+
+/* Small Mobile */
 @media (max-width: 480px) {
     .back-button-container {
         top: 60px;
@@ -1902,1171 +1416,52 @@ button.btn-t {
             width: 20px;
             height: 20px;
         }
-}
 
-/* HEADER RESPONSIVE */
-
-/* Desktop - Mantener diseño original */
-.header-order {
-    padding: 0;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-    border: 1px dotted;
-    display: grid;
-    grid-template-columns: 70% 30%;
-}
-
-/* Tablet Landscape */
-@media (max-width: 1024px) and (orientation: landscape) {
-    .header-order {
-        margin: 20px 15px;
-        grid-template-columns: 60% 40%;
-    }
-
-    .hcol1, .hcol2 {
-        padding: 1.5rem;
-    }
-
-    /* Reducir tamaños de fuente */
-    .col1-rh2 {
-        font-size: 1.1rem;
-    }
-
-    .col2-rh3 p:nth-child(1) {
-        font-size: 1.1rem;
-    }
-
-    .col3-rh3 span:nth-child(1) > p {
-        font-size: 1.1rem;
-    }
-}
-
-/* Tablet Portrait */
-@media (max-width: 1024px) and (orientation: portrait) {
-    .header-order {
-        grid-template-columns: 1fr;
-        margin: 30px 15px 20px;
-    }
-
-    .hcol1 {
-        border-right: none;
-        border-bottom: 1px dotted;
-        padding: 2rem 1.5rem;
-    }
-
-    .hcol2 {
-        padding: 1.5rem;
-    }
-
-    /* Logo y país en la misma línea */
-    .row1-1 {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .col1-rh1 img {
-        max-height: 80px;
-        width: auto;
-    }
-
-    .country-rh1 {
-        text-align: right;
-    }
-
-    /* Ajustar el botón de descargar reportes */
-    .colh1-r4 button {
-        font-size: 1rem;
-        padding: 0.8rem;
-    }
-}
-
-/* Móvil (768px y menos) */
-@media (max-width: 768px) {
-    .header-order {
-        grid-template-columns: 1fr;
-        margin: 20px 10px;
-        border-radius: 15px;
-    }
-
-    .hcol1, .hcol2 {
-        padding: 1rem;
-    }
-
-    /* Logo centrado */
-    .row1-1 {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .col1-rh1 {
-        width: 100%;
-        text-align: center;
-    }
-
-        .col1-rh1 img {
-            max-height: 60px;
-            margin: 0 auto;
-        }
-
-    /* País centrado */
-    .country-rh1 {
-        width: 100%;
-        text-align: center;
-    }
-
-        .country-rh1 p:first-child {
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .country-rh1 .d-flex {
-            justify-content: center !important;
-        }
-
-    /* Código del producto */
-    .col1-rh2 {
-        font-size: 1rem;
-        margin-top: 1rem;
-        text-align: center;
-    }
-
-    /* Información del producto en columna */
-    .row3-1 {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
-
-    .col2-rh3, .col3-rh3 {
-        width: 100%;
-    }
-
-        .col2-rh3 p:nth-child(1) {
-            font-size: 1.1rem;
-        }
-
-        .col2-rh3 p:nth-child(2) {
-            font-size: 0.9rem;
-        }
-
-        .col3-rh3 span p {
-            text-align: center !important;
-            font-size: 1rem;
-        }
-
-    /* Segunda columna (hcol2) */
-    .rowh1-2 {
-        flex-direction: column;
-        text-align: center;
-        padding-bottom: 1rem;
-    }
-
-    .colh1-r1, .colh2-r1 {
-        width: 100%;
-        text-align: center;
-    }
-
-        .colh2-r1 p {
-            text-align: center !important;
-            font-size: 1.5rem;
-        }
-
-    /* Fechas */
-    .rowh3-2 {
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1rem 0;
-    }
-
-    .colh2-r3, .colh3-r3 {
-        width: 100%;
-        flex-direction: column;
-        text-align: center;
-        gap: 0.5rem;
-    }
-
-    /* Botón descargar reportes */
-    .colh1-r4 {
-        margin-top: 1rem;
-    }
-
-        .colh1-r4 button {
-            font-size: 0.9rem;
-            padding: 0.7rem;
-            gap: 0.5rem;
-        }
-
-            .colh1-r4 button img {
-                width: 16px;
-                height: 16px;
-            }
-
-    /* Dropdown de reportes */
-    .download-t {
-        top: 35px;
-        left: 0;
-        right: 0;
-        width: 100%;
-    }
-
-        .download-t ul {
-            padding: 1rem;
-        }
-}
-
-/* Móvil pequeño */
-@media (max-width: 480px) {
     .header-order {
         margin: 15px 5px;
     }
 
-    .hcol1, .hcol2 {
-        padding: 0.8rem;
-    }
-
-    /* Logo más pequeño */
-    .col1-rh1 img {
-        max-height: 50px;
-    }
-
-    /* Banderas más pequeñas */
-    .col2-rh1 img {
-        width: 16px;
-        height: 16px;
-    }
-
-    .col2-rh1 p {
-        font-size: 0.85rem;
-    }
-
-    /* Textos más pequeños */
-    .col1-rh2 {
-        font-size: 0.9rem;
-    }
-
-    .col2-rh3 p:nth-child(1) {
-        font-size: 1rem;
-    }
-
-    .col2-rh3 p:nth-child(2) {
-        font-size: 0.85rem;
-    }
-
-    .col3-rh3 span p {
-        font-size: 0.9rem;
-    }
-
-    /* Fechas más compactas */
-    .colh2-r3 p, .colh3-r3 p {
-        font-size: 0.85rem;
-    }
-
-    /* Tooltip más pequeño */
-    .colh2-r3 svg, .colh3-r3 svg {
-        width: 18px !important;
-    }
-
-    /* Botón más pequeño */
-    .colh1-r4 button {
-        font-size: 0.85rem;
-        padding: 0.6rem;
-    }
-}
-
-/* Ajustes para modo landscape móvil */
-@media (max-height: 600px) and (orientation: landscape) {
-    .header-order {
-        grid-template-columns: 1fr 1fr;
-        margin: 10px;
-    }
-
-    .hcol1, .hcol2 {
-        padding: 0.8rem;
-    }
-
-    .col1-rh1 img {
-        max-height: 40px;
-    }
-
-    /* Ocultar algunos elementos para ganar espacio */
-    .row2-1 {
-        display: none;
-    }
-
-    .rowh1-2 {
-        display: none;
-    }
-}
-/* Móvil (768px y menos) - ACTUALIZADO */
-@media (max-width: 768px) {
-    .header-order {
-        grid-template-columns: 1fr;
-        margin: 20px 10px;
-        border-radius: 15px;
-    }
-
-    .hcol1, .hcol2 {
-        padding: 1rem;
-    }
-
-    /* Logo más grande y centrado */
-    .row1-1 {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .col1-rh1 {
-        width: 100%;
-        text-align: center;
-    }
-
-        .col1-rh1 img {
-            max-height: 90px; /* Aumentado de 60px a 90px */
-            width: auto;
-            margin: 0 auto;
-            display: block;
-        }
-
-    /* País centrado */
-    .country-rh1 {
-        width: 100%;
-        text-align: center;
-    }
-
-        .country-rh1 p:first-child {
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .country-rh1 .d-flex {
-            justify-content: center !important;
-        }
-
-    /* Código del producto CENTRADO */
-    .row2-1 {
-        margin: 1rem 0;
-    }
-
-    .col1-rh2 {
-        font-size: 1.1rem; /* Un poco más grande */
-        margin-top: 1rem;
-        text-align: center;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-
-        .col1-rh2 p,
-        .col1-rh2 span p {
-            text-align: center;
-            margin: 0;
-        }
-
-    /* Resto del contenido... */
-}
-
-/* Móvil pequeño - ACTUALIZADO */
-@media (max-width: 480px) {
-    .header-order {
-        margin: 15px 5px;
-    }
-
-    .hcol1, .hcol2 {
-        padding: 0.8rem;
-    }
-
-    /* Logo ajustado para móvil pequeño */
-    .col1-rh1 img {
-        max-height: 70px; /* Aumentado de 50px a 70px */
-        width: auto;
-    }
-
-    /* Código centrado */
-    .col1-rh2 {
-        font-size: 1rem;
-        text-align: center;
-        justify-content: center;
-    }
-
-    /* Banderas más pequeñas */
-    .col2-rh1 img {
-        width: 16px;
-        height: 16px;
-    }
-
-    .col2-rh1 p {
-        font-size: 0.85rem;
-    }
-}
-
-/* Tablet Portrait - ACTUALIZADO */
-@media (max-width: 1024px) and (orientation: portrait) {
-    .header-order {
-        grid-template-columns: 1fr;
-        margin: 30px 15px 20px;
-    }
-
-    .hcol1 {
-        border-right: none;
-        border-bottom: 1px dotted;
-        padding: 2rem 1.5rem;
-    }
-
+    .hcol1,
     .hcol2 {
-        padding: 1.5rem;
-    }
-
-    /* Logo más grande en tablet */
-    .col1-rh1 img {
-        max-height: 100px; /* Más grande en tablet */
-        width: auto;
-        display: block;
-        margin: 0 auto;
-    }
-
-    /* Código centrado en tablet */
-    .col1-rh2 {
-        text-align: center;
-        justify-content: center;
-        display: flex;
-        gap: 0.5rem;
-        font-size: 1.2rem;
-    }
-}
-/* TABLA DE RECETAS - Desktop */
-.body-t-flex.header-row,
-.body-t-flex.data-row {
-    display: flex;
-}
-
-/* Vista móvil - Oculta por defecto */
-.mobile-recipe-groups {
-    display: none;
-}
-
-/* MÓVIL - Mostrar grupos y ocultar tabla */
-@media (max-width: 768px) {
-    /* Ocultar tabla original */
-    .body-t-flex.header-row,
-    .body-t-flex.data-row {
-        display: none !important;
-    }
-
-    /* Mostrar vista móvil */
-    .mobile-recipe-groups {
-        display: block;
-    }
-
-    .mobile-recipe-group {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border: 1px solid #e5e5e5;
-    }
-
-        .mobile-recipe-group h4 {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #2F5496;
-            text-transform: uppercase;
-            margin-bottom: 0.8rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #2F5496;
-        }
-
-    .mobile-recipe-item {
-        background: white;
-        padding: 0.6rem;
-        margin-bottom: 0.5rem;
-        border-radius: 5px;
-        border: 1px solid #dee2e6;
-        font-size: 0.9rem;
-    }
-
-        .mobile-recipe-item:last-child {
-            margin-bottom: 0;
-        }
-}
-
-/* Desktop y Tablet - Asegurar que solo se ve la tabla */
-@media (min-width: 769px) {
-    /* Mostrar tabla */
-    .body-t-flex.header-row,
-    .body-t-flex.data-row {
-        display: flex !important;
-    }
-
-    /* Ocultar vista móvil */
-    .mobile-recipe-groups {
-        display: none !important;
-    }
-}
-/* TABLA DE RECETAS - Desktop */
-.body-t-flex.header-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.5rem 0;
-    border-bottom: 2px solid #e5e5e5;
-}
-
-    /* Títulos más pequeños en desktop */
-    .body-t-flex.header-row .body-data p {
-        font-size: 0.85rem !important; /* Reducido */
-        font-weight: 700;
-        color: #999A9B;
-        text-transform: uppercase;
-    }
-
-.body-t-flex.data-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-/* Vista móvil - Oculta por defecto */
-.mobile-recipe-groups {
-    display: none;
-}
-
-/* MÓVIL - Ocultar tabla y mostrar grupos */
-@media (max-width: 768px) {
-    /* Ocultar TODA la tabla desktop incluyendo el contenedor */
-    .content-t.content-t-pdb .body-t-flex.header-row,
-    .content-t.content-t-pdb .body-t-flex.data-row,
-    .content-t.content-t-pdb .d-flex.gap-lg-4.data-row {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        overflow: hidden !important;
-    }
-
-    /* Mostrar vista móvil */
-    .mobile-recipe-groups {
-        display: block !important;
-    }
-
-    .mobile-recipe-group {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border: 1px solid #e5e5e5;
-    }
-
-        .mobile-recipe-group h4 {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #2F5496;
-            text-transform: uppercase;
-            margin: 0 0 0.8rem 0;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #2F5496;
-        }
-
-    .mobile-recipe-item {
-        background: white;
-        padding: 0.6rem;
-        margin-bottom: 0.5rem;
-        border-radius: 5px;
-        border: 1px solid #dee2e6;
-        font-size: 0.9rem;
-    }
-
-        .mobile-recipe-item:last-child {
-            margin-bottom: 0;
-        }
-}
-
-/* Móvil pequeño */
-@media (max-width: 480px) {
-    .mobile-recipe-group {
         padding: 0.8rem;
-        margin-bottom: 0.8rem;
     }
 
-        .mobile-recipe-group h4 {
-            font-size: 0.8rem;
-        }
+    .col1-rh1 img {
+        max-height: 70px;
+        width: auto;
+    }
 
-    .mobile-recipe-item {
-        padding: 0.5rem;
-        font-size: 0.85rem;
+    .recipe-card-info {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
     }
 }
 
-/* Desktop y Tablet - Asegurar visibilidad correcta */
-@media (min-width: 769px) {
-    /* Mostrar tabla */
+/* Desktop Only - Show table */
+@media (min-width: 1025px) {
     .content-t.content-t-pdb .body-t-flex.header-row,
     .content-t.content-t-pdb .body-t-flex.data-row,
     .content-t.content-t-pdb .d-flex.gap-lg-4.data-row {
         display: flex !important;
-        visibility: visible !important;
-        height: auto !important;
     }
 
-    /* Ocultar vista móvil completamente */
-    .mobile-recipe-groups {
+    .recipe-cards-container {
         display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-    }
-}
-/* SECCIÓN PACKAGING/ENVASADO - Responsive */
-
-/* Desktop - mantener diseño original */
-.body-t-bottle {
-    width: 100%;
-    max-width: 833px;
-}
-
-.bottle-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-}
-
-.Cap-img, .bottle-img {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 213px;
-    padding: 1.89rem;
-    background-color: rgba(0, 0, 0, 0);
-    border-radius: 10px;
-}
-
-/* Móvil - Reorganizar contenido */
-@media (max-width: 768px) {
-    /* Contenedor principal */
-    .content-t.content-t-pdb .d-xl-flex {
-        flex-direction: column !important;
-        gap: 1.5rem;
-    }
-
-    /* Información de la botella */
-    .body-t.body-t-bottle {
-        width: 100%;
-        max-width: 100%;
-    }
-
-    .body-t-bottle .body-td {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.8rem 0;
-    }
-
-        .body-t-bottle .body-td p {
-            flex: 1;
-            font-size: 0.9rem;
-            margin-bottom: 0;
-        }
-
-    .body-t-bottle .data-t {
-        flex: 1;
-        justify-content: flex-end;
-        gap: 0.5rem;
-    }
-
-        .body-t-bottle .data-t span p {
-            font-size: 0.85rem;
-            text-align: right;
-        }
-
-    /* Imágenes de botella y tapa */
-    .bottle-container {
-        flex-direction: row;
-        justify-content: center;
-        align-items: flex-end;
-        gap: 1rem;
-        margin: 1rem 0;
-        background: #f8f9fa;
-        border-radius: 15px;
-        padding: 1.5rem;
-    }
-
-    .Cap-img {
-        width: 100px;
-        padding: 0.5rem;
-        order: 1;
-    }
-
-    .bottle-img {
-        width: 150px;
-        padding: 0.5rem;
-        order: 2;
-    }
-
-    .Cap-img img {
-        width: 100%;
-        max-width: 60px;
-        height: auto;
-    }
-
-    .bottle-img img {
-        width: 100%;
-        max-width: 120px;
-        height: auto;
-    }
-
-    /* Botón de editar */
-    .btn-edit-bottle {
-        width: 100% !important;
-        margin-top: 1rem;
-    }
-
-        .btn-edit-bottle .btn-t {
-            width: 100%;
-            justify-content: center;
-            padding: 0.8rem;
-        }
-
-    /* Ocultar líneas decorativas en móvil */
-    .body-t-bottle .line-from {
-        display: none;
-    }
-
-    /* Check marks más pequeños */
-    .body-t-bottle img[alt="check"] {
-        width: 20px;
-        height: 20px;
     }
 }
 
-/* Sección de instrucciones de llenado */
-@media (max-width: 768px) {
-    /* Contenedor de instrucciones */
-    .body-t-filling {
-        width: 100%;
-    }
-
-        .body-t-filling .body-td {
-            flex-direction: column;
-            gap: 0.5rem;
-            padding: 1rem 0;
-        }
-
-            .body-t-filling .body-td p {
-                width: 100%;
-                margin-bottom: 0.5rem;
-                font-weight: 600;
-            }
-
-        .body-t-filling .data-t {
-            width: 100%;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        /* Selectores y campos */
-        .body-t-filling select.form-select,
-        .body-t-filling input[type="text"] {
-            width: 100%;
-            font-size: 0.9rem;
-            padding: 0.5rem;
-        }
-
-    /* Imagen de instrucciones */
-    .bottle-img-1 {
-        width: 100%;
-        margin: 1rem 0;
-        text-align: center;
-    }
-
-        .bottle-img-1 img {
-            width: 100%;
-            max-width: 250px;
-            height: auto;
-        }
-}
-
-/* Móvil pequeño */
-@media (max-width: 480px) {
-    .bottle-container {
-        padding: 1rem;
-        gap: 0.5rem;
-    }
-
-    .Cap-img {
-        width: 80px;
-    }
-
-    .bottle-img {
-        width: 120px;
-    }
-
-    .Cap-img img {
-        max-width: 50px;
-    }
-
-    .bottle-img img {
-        max-width: 100px;
-    }
-
-    /* Textos más pequeños */
-    .body-t-bottle .body-td p {
-        font-size: 0.85rem;
-    }
-
-    .body-t-bottle .data-t span p {
-        font-size: 0.8rem;
-    }
-
-    /* Imagen de instrucciones más pequeña */
-    .bottle-img-1 img {
-        max-width: 200px;
-    }
-}
-
-/* Landscape móvil */
-@media (max-height: 600px) and (orientation: landscape) {
-    .bottle-container {
-        flex-direction: row;
-        padding: 1rem;
-    }
-
-    .Cap-img, .bottle-img {
-        width: auto;
-        height: 120px;
-    }
-
-        .Cap-img img, .bottle-img img {
-            height: 100%;
-            width: auto;
-        }
-}
-
-/* Tablet Portrait */
-@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-    .bottle-container {
-        margin: 1rem auto;
-        max-width: 400px;
-    }
-
-    .body-t-bottle {
-        max-width: 100%;
-    }
-
-    .btn-edit-bottle {
-        margin-top: 1rem;
-    }
-}
-/* SECCIÓN PACKAGING/ENVASADO - Responsive */
-
-/* Desktop grande - mantener diseño original */
-@media (min-width: 1369px) {
-    .body-t-bottle {
-        width: 100%;
-        max-width: 833px;
-    }
-
-    .bottle-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0;
-    }
-
-    .Cap-img, .bottle-img {
-        width: 213px;
-        padding: 1.89rem;
-    }
-}
-
-/* TABLETS Y MÓVILES - Diseño unificado desde 1368px hacia abajo */
+/* Analytics Cards - Tablets and Mobile */
 @media (max-width: 1368px) {
-    /* FORZAR que todo se apile */
-    .content-t.content-t-pdb .d-xl-flex,
-    .content-t.content-t-pdb .d-lg-flex,
-    .content-t.content-t-pdb .row,
-    .content-t.content-t-pdb > div {
-        display: block !important;
-        flex-direction: column !important;
-        width: 100% !important;
-    }
-
-    /* Forzar que el botón editar sea visible */
-    .d-none.d-xl-flex.btn-edit-bottle,
-    .btn-edit-bottle.col-12.col-lg-2,
-    .d-flex.btn-edit-bottle {
-        display: block !important;
-    }
-
-    /* Información de la botella */
-    .body-t.body-t-bottle {
-        width: 100%;
-        max-width: 100%;
-    }
-
-    .body-t-bottle .body-td {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.8rem 0;
-    }
-
-        .body-t-bottle .body-td p {
-            flex: 1;
-            font-size: 0.95rem;
-            margin-bottom: 0;
-        }
-
-    .body-t-bottle .data-t {
-        flex: 1;
-        justify-content: flex-end;
-        gap: 0.5rem;
-    }
-
-    /* Imágenes de botella y tapa */
-    .bottle-container {
-        flex-direction: row;
-        justify-content: center;
-        align-items: flex-end;
-        gap: 1rem;
-        margin: 1.5rem auto;
-        background: #f8f9fa;
-        border-radius: 15px;
-        padding: 2rem;
-        max-width: 500px;
-    }
-
-    .Cap-img {
-        width: 120px;
-        padding: 0.5rem;
-        order: 1;
-    }
-
-    .bottle-img {
-        width: 180px;
-        padding: 0.5rem;
-        order: 2;
-    }
-
-    .Cap-img img {
-        width: 100%;
-        max-width: 80px;
-        height: auto;
-    }
-
-    .bottle-img img {
-        width: 100%;
-        max-width: 150px;
-        height: auto;
-    }
-
-    /* Botón de editar */
-    .btn-edit-bottle {
-        width: 100% !important;
-        margin-top: 1rem;
-    }
-
-        .btn-edit-bottle .btn-t {
-            width: 100%;
-            justify-content: center;
-            padding: 0.8rem;
-        }
-
-    /* Ocultar líneas decorativas */
-    .body-t-bottle .line-from {
-        display: none;
-    }
-
-    /* Sección de instrucciones */
-    .body-t-filling {
-        width: 100%;
-    }
-
-        .body-t-filling .body-td {
-            flex-direction: column;
-            gap: 0.5rem;
-            padding: 1rem 0;
-        }
-
-            .body-t-filling .body-td p {
-                width: 100%;
-                margin-bottom: 0.5rem;
-                font-weight: 600;
-            }
-
-        .body-t-filling .data-t {
-            width: 100%;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .body-t-filling select.form-select,
-        .body-t-filling input[type="text"] {
-            width: 100%;
-            font-size: 0.95rem;
-            padding: 0.6rem;
-        }
-
-    /* Imagen de instrucciones */
-    .bottle-img-1 {
-        width: 100%;
-        margin: 1.5rem 0;
-        text-align: center;
-    }
-
-        .bottle-img-1 img {
-            width: 100%;
-            max-width: 300px;
-            height: auto;
-        }
-}
-/* iPad Pro Landscape específico - Forzar diseño móvil */
-@media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) {
-    /* Ocultar clases de Bootstrap que interfieren */
-    .d-xl-flex {
-        display: block !important;
-    }
-
-    .d-lg-flex {
-        display: block !important;
-    }
-
-    /* Forzar botón visible */
-    .d-none.d-xl-block,
-    .d-none.d-xl-flex {
-        display: block !important;
-    }
-
-    /* El contenido debe apilarse */
-    .content-t.content-t-pdb .row {
-        display: block !important;
-    }
-
-    .content-t.content-t-pdb .col-12.col-xl-12 {
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-}
-/* Ajustes para móvil mediano */
-@media (max-width: 768px)  {
-    .bottle-container {
-        padding: 1.5rem;
-        max-width: 400px;
-    }
-
-    .Cap-img {
-        width: 100px;
-    }
-
-    .bottle-img {
-        width: 150px;
-    }
-
-    .Cap-img img {
-        max-width: 60px;
-    }
-
-    .bottle-img img {
-        max-width: 120px;
-    }
-
-    .body-t-bottle .body-td p {
-        font-size: 0.9rem;
-    }
-
-    .bottle-img-1 img {
-        max-width: 250px;
-    }
-}
-
-/* Móvil pequeño */
-@media (max-width: 480px) {
-    .bottle-container {
-        padding: 1rem;
-        gap: 0.5rem;
-    }
-
-    .Cap-img {
-        width: 80px;
-    }
-
-    .bottle-img {
-        width: 120px;
-    }
-
-    .Cap-img img {
-        max-width: 50px;
-    }
-
-    .bottle-img img {
-        max-width: 100px;
-    }
-
-    .body-t-bottle .body-td p {
-        font-size: 0.85rem;
-    }
-
-    .bottle-img-1 img {
-        max-width: 200px;
-    }
-}
-/* Tablet - Diseño de dos niveles */
-@media (min-width: 769px) and (max-width: 1368px) {
-    .table-responsive {
-        overflow: visible;
-    }
-
-    .table tbody tr {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        padding: 1rem;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-
-        .table tbody tr td {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-            .table tbody tr td::before {
-                content: attr(data-label);
-                font-size: 0.75rem;
-                color: #666;
-                font-weight: 600;
-            }
-
-            /* Primera columna ocupa todo el ancho */
-            .table tbody tr td:first-child {
-                grid-column: 1 / -1;
-                background: #2F5496;
-                color: white;
-                padding: 0.5rem;
-                border-radius: 5px;
-            }
-}
-/* Tablets y móvil - Diseño de tarjetas */
-@media (max-width: 1368px) {
-    /* Ocultar header de tabla */
     .text-table-th {
         display: none !important;
     }
 
-    /* Contenedor de analíticas */
     .content-others {
         padding: 1rem;
         width: 100%;
         border-radius: 10px;
     }
 
-    /* Convertir cada fila en una tarjeta */
     .table-responsive table tbody tr {
         display: block;
         background: white;
@@ -3078,7 +1473,6 @@ button.btn-t {
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
-        /* Primer TD - Título de la tarjeta */
         .table-responsive table tbody tr td:first-child {
             display: block;
             width: 100% !important;
@@ -3092,7 +1486,6 @@ button.btn-t {
             text-align: center;
         }
 
-        /* Resto de TDs - Ocupar todo el ancho */
         .table-responsive table tbody tr td:not(:first-child) {
             display: block;
             width: 100%;
@@ -3104,90 +1497,28 @@ button.btn-t {
             text-align: center;
         }
 
-        /* Eliminar borde del último elemento */
-        .table-responsive table tbody tr td:last-child {
-            border-bottom: none;
-        }
-
-        /* Añadir labels antes del contenido */
-        .table-responsive table tbody tr td:nth-child(2)::before {
-            content: "CANTIDAD";
-        }
-
-        .table-responsive table tbody tr td:nth-child(3)::before {
-            content: "ORIGEN";
-        }
-
-        .table-responsive table tbody tr td:nth-child(4)::before {
-            content: "ANALÍTICA";
-        }
-
-        .table-responsive table tbody tr td:nth-child(5)::before {
-            content: "PERIODICIDAD";
-        }
-
-        .table-responsive table tbody tr td:nth-child(6)::before {
-            content: "OBSERVACIONES";
-        }
-
-        /* Estilo de los labels */
-        .table-responsive table tbody tr td:not(:first-child)::before {
-            display: block;
-            font-size: 0.7rem;
-            color: #666;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.5px;
-        }
-
-        /* Contenido de las celdas */
-        .table-responsive table tbody tr td {
-            font-size: 0.9rem;
-            color: #333;
-        }
-
-            /* Inputs centrados y con mejor estilo */
-            .table-responsive table tbody tr td input.form-control {
-                font-size: 0.85rem;
-                padding: 0.5rem;
-                width: 80%;
-                max-width: 250px;
-                margin: 0 auto;
-                border: 1px solid #ddd;
-                border-radius: 6px;
-                background: white;
-                text-align: center;
-            }
-
-            /* Checkbox centrado */
-            .table-responsive table tbody tr td:nth-child(4) {
-                text-align: center;
-            }
-
-                .table-responsive table tbody tr td:nth-child(4) .check-from-label-2 {
-                    display: inline-block;
-                    margin: 0 auto;
-                }
-
-            /* Alternar colores de fondo */
-            .table-responsive table tbody tr td:nth-child(odd):not(:first-child) {
-                background: #f8f9fa;
-            }
-
-            .table-responsive table tbody tr td:nth-child(even):not(:first-child) {
-                background: white;
-            }
+    .bottle-container {
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 1rem;
+        margin: 1.5rem auto;
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 2rem;
+        max-width: 500px;
+    }
 }
 
-/* Móvil pequeño - mantener igual */
-@media (max-width: 480px) {
-    .table-responsive table tbody tr td:not(:first-child) {
-        padding: 0.8rem 1rem;
+/* Overflow Prevention */
+@media (max-width: 768px) and (orientation: portrait) {
+    * {
+        max-width: 100vw !important;
     }
 
-    .table-responsive table tbody tr td input.form-control {
-        width: 90%;
-        font-size: 0.8rem;
+    html,
+    body {
+        overflow-x: hidden !important;
+        width: 100% !important;
     }
 }
