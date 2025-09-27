@@ -325,51 +325,46 @@
                                                 }
                                            
                                             </div>
-                                          @*   <div class="line-from" id="line-from-gommy"></div> *@
-                                           @*  @if (!string.IsNullOrEmpty(GummyShapeImg))
+                                            @if (!string.IsNullOrEmpty(GummyShapeImg_1))
                                             {
-                                                <img src="img/check-icon.svg" alt="check">
+                                                <h3 class="font-20 MulishBold">@Shape_1</h3>
+                                                <div class="flex-gomi">
+
+                                               
+                                                        <div class="gomi-img">
+                                                        <img alt="gummy" src="@GummyShapeImg_1">
+                                                        </div>
+                                               
+
+                                                </div>
                                             }
-                                            else
+                                            @if (!string.IsNullOrEmpty(GummyShapeImg_2))
                                             {
-                                                <div class="line-from"></div>
-                                                <img src="img/cancelar.svg" alt="check">
-                                            } *@
-                                            <h3 class="font-20 MulishBold">@Shape_1</h3>
-                                            <div class="flex-gomi">
+                                                 <h3 class="font-20 MulishBold">@Shape_2</h3>
+                                                <div class="flex-gomi">
 
-                                                @if (!string.IsNullOrEmpty(GummyShapeImg_1))
-                                                {
-                                                    <div class="gomi-img">
-                                                    <img alt="gummy" src="@GummyShapeImg_1">
-                                                    </div>
-                                                }
+                                               
+                                                        <div class="gomi-img">
+                                                            <img alt="gummy" src="@GummyShapeImg_2">
+                                                        </div>
+                                                
 
-                                            </div>
-                                             <h3 class="font-20 MulishBold">@Shape_2</h3>
-                                            <div class="flex-gomi">
+                                                </div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(GummyShapeImg_3))
+                                            {
+                                                <h3 class="font-20 MulishBold">@Shape_3</h3>
+                                                <div class="flex-gomi">
 
-                                                @if (!string.IsNullOrEmpty(GummyShapeImg_2))
-                                                {
-                                                    <div class="gomi-img">
-                                                        <img alt="gummy" src="@GummyShapeImg_2">
-                                                    </div>
-                                                }
+                                                
+                                                        <div class="gomi-img">
+                                                            <img alt="gummy" src="@GummyShapeImg_3">
+                                                        </div>
+                                               
 
-                                            </div>
-                                            <h3 class="font-20 MulishBold">@Shape_3</h3>
-                                            <div class="flex-gomi">
-
-                                                @if (!string.IsNullOrEmpty(GummyShapeImg_3))
-                                                {
-                                                    <div class="gomi-img">
-                                                        <img alt="gummy" src="@GummyShapeImg_3">
-                                                    </div>
-                                                }
-
-                                            </div>
-                                            <div class="line-from" id="line-from-gommy"></div>
-                                            
+                                                </div>
+                                                <div class="line-from" id="line-from-gommy"></div>
+                                            }
                                         </div>
                                     </div>
                                 </div>

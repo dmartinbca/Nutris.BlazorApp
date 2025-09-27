@@ -708,3 +708,111 @@
         display: none !important;
     }
 }
+/* Agregar estas reglas al MainLayout.css existente */
+
+/* Botón de cierre X en el sidebar */
+.sidebar-close-btn {
+    display: none;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    padding: 5px;
+    transition: transform 0.2s ease;
+}
+
+    .sidebar-close-btn:hover {
+        transform: scale(1.1);
+        background: rgba(47, 84, 150, 0.1);
+        border-radius: 50%;
+    }
+
+/* Overlay mejorado con animación */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    z-index: 998;
+    opacity: 0;
+    pointer-events: none;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+    .sidebar-overlay.active {
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+/* Animación mejorada del sidebar */
+.sidebar {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+    .sidebar.mobile-active {
+        transform: translateX(0) !important;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    }
+
+/* RESPONSIVE - Mostrar botón X solo en móvil */
+@media screen and (max-width: 1024px) {
+    .sidebar-close-btn {
+        display: block !important;
+    }
+
+    /* Añadir padding top para dar espacio al botón X */
+    .sidebar .logo {
+        margin-top: 50px;
+    }
+}
+
+/* Animación suave del hamburger menu */
+.hamburger-menu {
+    transition: transform 0.2s ease;
+}
+
+    .hamburger-menu:active {
+        transform: scale(0.95);
+    }
+
+    .hamburger-menu span {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Mejorar la animación de las líneas del hamburger */
+    .hamburger-menu.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .hamburger-menu.active span:nth-child(2) {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    .hamburger-menu.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+    }
+
+/* Prevenir scroll del body cuando el sidebar está abierto en móvil */
+@media screen and (max-width: 1024px) {
+    body.sidebar-open {
+        overflow: hidden;
+    }
+}
+
+/* Transición más suave para el contenido cuando se abre el sidebar */
+@media screen and (max-width: 1024px) {
+    .content-area {
+        transition: opacity 0.3s ease;
+    }
+
+    .sidebar.mobile-active ~ .content-area {
+        opacity: 0.4;
+    }
+}

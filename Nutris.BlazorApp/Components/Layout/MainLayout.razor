@@ -16,15 +16,19 @@
             <span></span>
         </button>
 
-        <!-- Overlay para móvil cuando el menú está abierto -->
-        @if (isSidebarOpen)
-        {
-            <div class="sidebar-overlay" @onclick="CloseSidebar"></div>
-        }
+        <!-- Overlay para móvil cuando el menú está abierto - MEJORADO -->
+        <div class="sidebar-overlay @(isSidebarOpen ? "active" : "")" @onclick="CloseSidebar"></div>
 
         <!-- Sidebar con clase condicional para móvil -->
         <div class="sidebar @(isSidebarOpen ? "mobile-active" : "")">
             <div class="content-sidebar">
+                <!-- Botón X para cerrar en móvil -->
+                <button class="sidebar-close-btn" @onclick="CloseSidebar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="#2F5496" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+
                 <div>
                     <a href="/home">
                         <div class="logo">
@@ -34,19 +38,19 @@
 
                     <div class="nav-container">
                         <nav class="font-20">
-                            <NavLink href="/home" Match="NavLinkMatch.All">
+                            <NavLink href="/home" Match="NavLinkMatch.All" @onclick="CloseSidebar">
                                 <div class="navgrid">
                                     <img src="/menu/feamehome.svg" alt="home">
                                     <span>@Localization["NavBar.Home"]</span>
                                 </div>
                             </NavLink>
-                            <NavLink href="/yourproducts">
+                            <NavLink href="/yourproducts" @onclick="CloseSidebar">
                                 <div class="navgrid">
                                     <img src="/menu/yourproducts.svg" alt="yourproducts">
                                     <span>@Localization["NavBar.YourProducts"]</span>
                                 </div>
                             </NavLink>
-                            <NavLink href="/customize">
+                            <NavLink href="/customize" @onclick="CloseSidebar">
                                 <div class="navgrid">
                                     <img src="/menu/customize.svg" alt="customize">
                                     <span>@Localization["NavBar.Customize"]</span>
@@ -58,7 +62,6 @@
                 </div>
 
                 <div class="perfil-container">
-                    <!-- AQUÍ ESTÁ EL CAMBIO - Avatar clickeable -->
                     <div class="avatar-container" @onclick="NavigateToProfile" style="cursor: pointer;">
                         @if (!string.IsNullOrEmpty(customerLogo))
                         {
@@ -75,7 +78,6 @@
                              @onmouseover="() => isTooltipVisible = true"
                              @onmouseleave="() => isTooltipVisible = false"
                              @onclick="ShowContactPopup">
-                        <!-- TAMBIÉN PUEDES HACER CLICKEABLE EL ICONO DE PERFIL -->
                         <img @onclick="NavigateToProfile"
                              src="/menu/perfil.svg"
                              alt="perfil"
@@ -237,15 +239,9 @@
         }
     }
 
-    private void ToggleSidebar()
-    {
-        isSidebarOpen = !isSidebarOpen;
-    }
+   
 
-    private void CloseSidebar()
-    {
-        isSidebarOpen = false;
-    }
+    
 
     // NUEVO MÉTODO PARA NAVEGAR AL PERFIL
     private void NavigateToProfile()
@@ -258,4 +254,33 @@
         Navigation.LocationChanged -= HandleLocationChanged;
         Localization.OnLanguageChanged -= OnLanguageChanged;
     }
+    // En el @code del MainLayout.razor, modifica estos métodos:
+
+    private void ToggleSidebar()
+    {
+        isSidebarOpen = !isSidebarOpen;
+
+        // Prevenir scroll del body cuando está abierto
+        if (isSidebarOpen)
+        {
+            _ = JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = 'hidden'");
+        }
+        else
+        {
+            _ = JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = ''");
+        }
+    }
+
+    private void CloseSidebar()
+    {
+        if (isSidebarOpen)
+        {
+            isSidebarOpen = false;
+            _ = JSRuntime.InvokeVoidAsync("eval", "document.body.style.overflow = ''");
+            StateHasChanged();
+        }
+    }
+
+    // No olvides inyectar IJSRuntime al principio del componente:
+    @inject IJSRuntime JSRuntime
 }

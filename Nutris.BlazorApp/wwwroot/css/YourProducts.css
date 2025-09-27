@@ -1,5 +1,5 @@
 ﻿/* ========================================
-   YOURPRODUCTSCOMPONENT.CSS - AJUSTES FINALES
+   YOURPRODUCTS.CSS - VERSIÓN LIMPIA Y CORREGIDA
    ======================================== */
 
 /* ========================================
@@ -87,29 +87,7 @@ html, body {
         background-color: #f8f9fa;
     }
 
-/* Back Button */
-.back-button-container {
-    position: fixed;
-    top: 100px;
-    left: 20px;
-    z-index: 100;
-    transition: all var(--transition-speed) ease;
-}
-
-.back-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-    padding: 0;
-    display: block;
-}
-
-    .back-button:hover {
-        transform: scale(1.1);
-    }
-
-/* Loading Overlay */
+/* Loading */
 .loading-overlay {
     position: fixed;
     top: 0;
@@ -139,13 +117,13 @@ html, body {
 }
 
 /* ========================================
-   3. CONTENEDOR PRINCIPAL
+   3. CONTENEDOR PRINCIPAL - DESKTOP
    ======================================== */
 
 .products-main-content {
     width: 100%;
     max-width: 100%;
-    padding: 2rem;
+    padding: 80px 2rem 2rem 2rem; /* Margen superior aumentado para desktop */
     margin: 0;
     font-family: 'Museo', sans-serif;
     box-sizing: border-box;
@@ -213,7 +191,7 @@ html, body {
 }
 
 /* ========================================
-   5. TABLA RESPONSIVE
+   5. TABLA - DESKTOP
    ======================================== */
 
 .products-table-container {
@@ -267,7 +245,7 @@ table.products-customize {
     border-bottom: none;
 }
 
-/* Columnas optimizadas */
+/* Columnas */
 .products-customize th:nth-child(1),
 .products-customize td:nth-child(1) {
     width: 15%;
@@ -318,7 +296,7 @@ table.products-customize {
 }
 
 /* ========================================
-   6. STATUS PILLS
+   6. STATUS BADGES
    ======================================== */
 
 .products-status-finish,
@@ -375,7 +353,7 @@ table.products-customize {
 }
 
 /* ========================================
-   7. BOTÓN DE ORDEN - DESKTOP
+   7. BOTONES
    ======================================== */
 
 .products-order-btn {
@@ -586,7 +564,7 @@ table.products-customize {
     }
 
 /* ========================================
-   10. TARJETAS MÓVIL
+   10. TARJETAS MÓVIL - OCULTAS POR DEFECTO
    ======================================== */
 
 .products-cards-container {
@@ -649,11 +627,10 @@ table.products-customize {
     color: #333;
 }
 
-/* Status en tarjetas - ALINEADO A LA IZQUIERDA */
 .product-card-status {
     margin-bottom: 1rem;
     display: flex;
-    justify-content: flex-start; /* Cambiado de center a flex-start */
+    justify-content: flex-start;
     position: relative;
 }
 
@@ -671,34 +648,26 @@ table.products-customize {
         max-width: 90%;
         width: auto;
         position: relative;
-        margin: 0; /* Sin margen automático */
+        margin: 0;
     }
 
 /* ========================================
-   11. RESPONSIVE DESIGN
+   11. RESPONSIVE - TABLET LANDSCAPE
    ======================================== */
 
-/* Desktop grande */
-@media screen and (min-width: 1400px) {
+@media (min-width: 1025px) and (max-width: 1366px) and (orientation: landscape) {
     .products-main-content {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 2rem 3rem;
-    }
-
-    .products-customize td:nth-child(2) p {
-        max-width: 400px;
+        padding: 80px 2rem 2rem 2rem;
     }
 }
 
-/* Tablet */
-@media (max-width: 1024px) {
-    .back-button-container {
-        display: none;
-    }
+/* ========================================
+   12. RESPONSIVE - TABLET
+   ======================================== */
 
+@media (max-width: 1024px) {
     .products-main-content {
-        padding: 1.5rem;
+        padding: 80px 1.5rem 1.5rem 1.5rem; /* Margen superior para hamburguesa y selector de idioma */
     }
 
     .products-search-form-grid {
@@ -707,8 +676,45 @@ table.products-customize {
     }
 }
 
-/* Móvil Portrait - Mostrar tarjetas */
+/* ========================================
+   13. RESPONSIVE - TABLET PORTRAIT
+   ======================================== */
+
+@media (max-width: 1024px) and (orientation: portrait) {
+    .products-main-content {
+        padding: 80px 1rem 1rem 1rem; /* Espacio para controles superiores */
+    }
+}
+
+/* ========================================
+   14. RESPONSIVE - MÓVIL LANDSCAPE
+   ======================================== */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .products-main-content {
+        padding: 70px 1rem 1rem 1rem; /* Ajustado para landscape */
+    }
+
+    /* Tabla visible en landscape */
+    .products-table-container {
+        display: block !important;
+    }
+
+    .products-cards-container {
+        display: none !important;
+    }
+}
+
+/* ========================================
+   15. RESPONSIVE - MÓVIL PORTRAIT
+   ======================================== */
+
 @media (max-width: 768px) and (orientation: portrait) {
+    .products-main-content {
+        padding: 70px 1rem 1rem 1rem; /* Espacio para hamburguesa y selector de idioma */
+    }
+
+    /* Ocultar tabla, mostrar tarjetas */
     .products-table-container {
         display: none !important;
     }
@@ -719,33 +725,31 @@ table.products-customize {
         width: 100%;
     }
 
-    /* BOTÓN DETALLES EN MÓVIL - TEXTO CENTRADO */
+    /* Ajustes del selector de idioma en móvil */
+    .language-selector-products {
+        top: 10px;
+        right: 10px;
+    }
+
+    .language-button {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-width: 100px;
+    }
+
+    /* Botón detalles en móvil */
     .product-card .products-order-btn {
         display: flex !important;
         width: auto !important;
-        height: auto !important;
-        min-height: auto !important;
-        max-height: none !important;
-        padding: 0.5rem 1.5rem !important; /* Más padding horizontal */
+        padding: 0.5rem 1.5rem !important;
         margin: 0 auto !important;
         font-size: 0.85rem !important;
-        text-align: center !important;
-        justify-content: center !important; /* Centrar contenido */
+        justify-content: center !important;
         align-items: center !important;
-        background: white !important;
-        color: #2F5496 !important;
-        border: 2px solid #2F5496 !important;
-        border-radius: 30px !important;
     }
-
-        .product-card .products-order-btn:hover {
-            background: #2F5496 !important;
-            color: white !important;
-        }
 
         .product-card .products-order-btn span {
             display: inline !important;
-            text-align: center !important;
         }
 
         .product-card .products-order-btn svg {
@@ -753,18 +757,15 @@ table.products-customize {
             width: 16px !important;
             height: 16px !important;
         }
-
-    /* Status alineado a la izquierda en móvil */
-    .product-card-status {
-        justify-content: flex-start !important;
-        padding-left: 0 !important;
-    }
 }
 
-/* Móvil pequeño */
+/* ========================================
+   16. RESPONSIVE - MÓVIL PEQUEÑO
+   ======================================== */
+
 @media (max-width: 480px) {
     .products-main-content {
-        padding: 0.8rem;
+        padding: 65px 0.8rem 0.8rem 0.8rem; /* Margen superior reducido para pantallas muy pequeñas */
     }
 
     .products-cards-container {
@@ -779,15 +780,37 @@ table.products-customize {
             font-size: 0.8rem !important;
             padding: 0.4rem 1.2rem !important;
         }
+
+    /* Selector de idioma aún más pequeño */
+    .language-button {
+        padding: 5px 10px;
+        font-size: 11px;
+        min-width: 80px;
+    }
 }
 
-/* Asegurar tabla visible en desktop y landscape */
+/* ========================================
+   17. VISIBILIDAD DE TABLA VS TARJETAS
+   ======================================== */
+
+/* Desktop y tablets landscape - Tabla visible */
 @media (min-width: 769px), (orientation: landscape) {
     .products-cards-container {
         display: none !important;
     }
 
     .products-table-container {
+        display: block !important;
+    }
+}
+
+/* Solo móvil portrait - Tarjetas visibles */
+@media (max-width: 768px) and (orientation: portrait) {
+    .products-table-container {
+        display: none !important;
+    }
+
+    .products-cards-container {
         display: block !important;
     }
 }

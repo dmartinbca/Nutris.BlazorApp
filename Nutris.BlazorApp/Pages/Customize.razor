@@ -137,7 +137,7 @@
                 }
                 else
                 {
-                    //  Ficheros = RG35Data.Files ?? new List<FileItem>();
+                    // Descargar ficha técnica si está cerrada
                     // 1) payload como en Vue
                     var payload = new { numeroRG = Id };
 
@@ -182,6 +182,55 @@
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Error processing base64 file: {ex}");
+                    }
+                    if(RG35Data.Status == "Cerrado cliente y calidad")
+                    {
+                        // Descargar Informe Cliente si está cerrada
+                        // 1) payload como en Vue
+                        var payloadCR = new { numeroRG = Id };
+
+                        // 2) POST al mismo endpoint (con tu prefijo api/)
+                        var respCR = await Api.PostAsync(
+                            "customReports(1)/Microsoft.NAV.GenerateReportWithLayout?tenant=nutris",
+                            payloadCR
+                        );
+
+                        resp.EnsureSuccessStatusCode();
+
+                        // 3) Leer y extraer base64 (acepta dos formatos)
+                        var jsonCR = await respCR.Content.ReadAsStringAsync();
+                        using var docCR = JsonDocument.Parse(jsonCR);
+
+                        string? b64CR = null;
+                        var rootCR = docCR.RootElement;
+
+                        if (rootCR.TryGetProperty("data", out var dataElCR) &&
+                            dataElCR.ValueKind == JsonValueKind.Object &&
+                            dataElCR.TryGetProperty("value", out var valueEl1CR))
+                        {
+                            b64CR = valueEl1CR.GetString();
+                        }
+                        else if (rootCR.TryGetProperty("value", out var valueEl2CR))
+                        {
+                            b64CR = valueEl2CR.GetString();
+                        }
+                        try
+                        {
+                            if (!string.IsNullOrWhiteSpace(b64) && RG35Data.Status == "Cerrado cliente y calidad")
+                            {
+                                Ficheros.Add(new FileItem
+                                {
+                                    Code = Id,
+                                    Name = "CUSTOMER RG REPORT " + RG35Data.Code+ ".pdf",
+                                    File = b64CR
+                                });
+                                RG35Data.Files = Ficheros;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error processing base64 file: {ex}");
+                        }
                     }
                 
 
