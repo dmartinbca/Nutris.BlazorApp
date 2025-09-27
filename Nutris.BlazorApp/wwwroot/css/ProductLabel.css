@@ -1,0 +1,81 @@
+﻿ 
+.product-label-container {
+    display: inline-block;
+    padding: 20px;
+}
+
+.product-label {
+    background: white;
+    border: 2px solid #d0d0d0;
+    border-radius: 12px;
+    padding: 25px 30px;
+    width:auto;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.label-row {
+    margin: 8px 0;
+    line-height: 1.4;
+}
+
+.label-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    display: inline-block;
+}
+
+.label-value {
+    font-weight: 400;
+    font-size: 14px;
+    color: #333;
+    display: inline-block;
+}
+
+/* Estilos específicos para cada fila */
+.label-row:nth-child(1) {
+    margin-bottom: 2px;
+}
+
+.label-row:nth-child(2) {
+    margin-bottom: 2px;
+   
+}
+
+    .label-row:nth-child(2) .label-value {
+        font-style: italic;
+    }
+
+.quantity-row {
+    min-height: 40px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-top: 5px;
+    padding-bottom: 10px;
+}
+
+/* Responsive */
+ @media (max-width: 480px) {
+    .product-label-container {
+        padding: 10px;
+    }
+
+    .product-label {
+        width: 100%;
+        max-width: 280px;
+        padding: 20px;
+    }
+}
+
+/* Para impresión */
+ @media print {
+    .product-label-container {
+        padding: 0;
+    }
+
+    .product-label {
+        border: 1px solid #000;
+        box-shadow: none;
+    }
+}
+ 

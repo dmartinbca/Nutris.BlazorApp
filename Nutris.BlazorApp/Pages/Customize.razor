@@ -137,6 +137,16 @@
                 }
                 else
                 {
+                    // Transformamos Lotes y BBD  
+
+                    if(RG35Data.Box_Lote.Contains(":"))
+                    {
+                        RG35Data.Box_Lote = RG35Data.Box_Lote.Substring(RG35Data.Box_Lote.IndexOf(":") + 1);
+                    }
+                    if(RG35Data.Box_BBD.Contains(":"))
+                    {
+                        RG35Data.Box_BBD = RG35Data.Box_BBD.Substring(RG35Data.Box_BBD.IndexOf(":") + 1);
+                    }
                     // Descargar ficha técnica si está cerrada
                     // 1) payload como en Vue
                     var payload = new { numeroRG = Id };

@@ -883,12 +883,12 @@
                                            
                                        
                                         <div class="body-td" id="body-td-pallet">
-                                            <p class="font-18 RalewayRegular w-100">@Localization["orderView.BoxLabel"]</p>
-                                            <div class="data-t">
+                                         @*    <p class="font-18 RalewayRegular w-100">@Localization["orderView.BoxLabel"]</p>
+                                         *@    <div class="data-t">
                                                 <div class="tags-pallet">
                                                     <div class="tag-flex">
                                                         <div class="tag-pallet-text">
-                                                            <p class="RalewayRegular font-16">@Localization["orderView.Size"] A8</p>
+                                                            <p class="RalewayRegular font-16">@Localization["orderView.BoxLabel"] @Localization["orderView.Size"] A8</p>
                                                         </div>
                                                         <div class="tags-pallet-img">
                                                             @if (!string.IsNullOrEmpty(BoxLabelImg))
