@@ -8,6 +8,7 @@ using NutrisBlazor.Models;
 using NutrisBlazor.Services;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -373,7 +374,9 @@ public class OrdersComponentBase : ComponentBase
                 Capacidad = RG35.Bote_capacidad,
                 Diametro = RG35.Bote_boca,
                 Material = RG35.Bote_material,
-                Color = RG35.Bote_color
+                Color = RG35.Bote_color,
+                ImagenBote = $"data:image/png;base64,{RG35.Bote_imagen}" 
+
             };
 
             selectedCapOption = new BoteCapDataModal.CapDataItem
@@ -381,7 +384,8 @@ public class OrdersComponentBase : ComponentBase
                 Forma = RG35.Cap_tapa,
                 Diametro = RG35.Cap_Boca,
                 Color = RG35.Cap_color,
-                Sleeve = RG35.Cap_sleever ?? false
+                Sleeve = RG35.Cap_sleever ?? false,
+                ImagenCap = $"data:image/png;base64,{RG35.Cap_imagen}" 
             };
 
             characteristics = RG35.Characteristics ?? "";
@@ -569,11 +573,37 @@ public class OrdersComponentBase : ComponentBase
                     var hex = v.TryGetProperty("Color_HEX", out var he) ? (he.GetString() ?? "") : "";
                     if (string.IsNullOrWhiteSpace(hex)) hex = ColorToHexFallback(label);
 
+                    // Imagenes
+                    var Round = v.TryGetProperty("Round", out var ro) ? (ro.GetString() ?? "") : "";
+                    if (string.IsNullOrWhiteSpace(Round)) Round = "";
+
+                    var Square = v.TryGetProperty("Square", out var sq) ? (sq.GetString() ?? "") : "";
+                    if (string.IsNullOrWhiteSpace(Square)) Square = "";
+
+                    var Cylindrical = v.TryGetProperty("Cylindrical", out var cy) ? (cy.GetString() ?? "") : "";
+                    if (string.IsNullOrWhiteSpace(Cylindrical)) Cylindrical = "";
+
+                    var Simple = v.TryGetProperty("Simple", out var si) ? (si.GetString() ?? "") : "";
+                    if (string.IsNullOrWhiteSpace(Simple)) Simple = "";
+
+                    var Metal = v.TryGetProperty("Metal", out var me) ? (me.GetString() ?? "") : "";
+                    if (string.IsNullOrWhiteSpace(Metal)) Metal = "";
+
+                    var Childproof = v.TryGetProperty("Childproof", out var ch) ? (ch.GetString() ?? "") : "";
+                    if (string.IsNullOrWhiteSpace(Childproof)) Childproof = "";
+
                     list.Add(new BoteCapDataModal.ColorOption
                     {
                         ID = id++,
                         Value = label.Trim(),
-                        ColorHex = hex.Trim()
+                        ColorHex = hex.Trim(),
+                        Round = $"data:image/png;base64,{Round}" ,
+                        Square = $"data:image/png;base64,{Square}",
+                        Cylindrical = $"data:image/png;base64,{Cylindrical}",
+                        Simple = $"data:image/png;base64,{Simple}",
+                        Metal = $"data:image/png;base64,{Metal}",
+                        Childproof = $"data:image/png;base64,{Childproof}"
+
                     });
                 }
 

@@ -14,7 +14,9 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 @inject ILogger<BoteCapDataModal> Logger
-<link href="css/BoteCapDataModal.css" rel="stylesheet" />
+
+<link href="/css/BoteCapDataModal.css" rel="stylesheet" />
+<link href="/css/fonts.css" rel="stylesheet" />
 
 @if (IsVisible)
 {
@@ -86,7 +88,7 @@
                                         
                                         <!-- Botella según forma -->
                                         <div class="bottle-svg-container" id="bottle-container-@(ComponentId)">
-                                            @switch (BoteConfig.Forma?.ToUpper())
+                                           @*  @switch (BoteConfig.Forma?.ToUpper())
                                             {
                                                 case "ROUND":
                                                     <BoteRound @key="@($"{BoteConfig.Forma}_{BoteConfig.Color}_{DateTime.Now.Ticks}")"
@@ -103,7 +105,8 @@
                                                 default:
                                                     <BoteRound ColorBote="#CCCCCC" />
                                                     break;
-                                            }
+                                            } *@
+                                            <img src="@BoteConfig.ImagenBote" alt="@BoteConfig.ImagenBote" />
                                         </div>
 
                                        
@@ -228,7 +231,7 @@
                                             Console.WriteLine($"Renderizando tapa: Forma={capFormaUpper}, Color={CapConfig.Color}, Hex={currentCapHexColor}");
                                         }
 
-                                        @switch (capFormaUpper)
+                                        @* @switch (capFormaUpper)
                                         {
                                             case "SIMPLE":
                                                 <CoverSimple @key="@($"simple_{currentCapHexColor}_{CapConfig.Diametro}")"
@@ -245,7 +248,9 @@
                                             default:
                                                 <CoverSimple ColorCover="#FFFFFF" />
                                                 break;
-                                        }
+                                        } *@
+                                        <img src="@CapConfig.ImagenCap" alt="@CapConfig.ImagenCap" />
+
                                     </div>
                                 </div>
                             </div>
@@ -346,400 +351,7 @@
         </div>
     </div>
 }
- <style>
-    /* Ajuste fino de posición de tabs */
-    .custom-tabs .nav-link:first-child {
-        margin-left: 48px !important;
-    }
 
- 
-    /* ========================================
-       DIMENSIONES FINALES AJUSTADAS
-       ======================================== */
-    .bottle-visual-wrapper {
-        position: relative;
-        width: 100%;
-        max-width: 500px;
-        height: 450px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .bottle-visual-wrapper > svg {
-        width: 220px;
-        height: auto;
-        max-height: 300px;
-        position: relative;
-        z-index: 5;
-    }
-
-    /* Dimensión superior del bote - 40px a la derecha y 30px más arriba */
-    .dimension-top {
-        position: absolute;
-        top: 35px; /* 30px más arriba (era 65px) */
-        left: calc(50% + 40px); /* 40px a la derecha del centro */
-        transform: translateX(-50%);
-        width: 100px;
-        height: 20px;
-    }
-
-        .dimension-top::before {
-            content: '';
-            position: absolute;
-            bottom: 8px;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #C4C2C2;
-        }
-
-        .dimension-top::after {
-            content: '';
-            position: absolute;
-            bottom: 3px;
-            left: 0;
-            right: 0;
-            height: 10px;
-            border-left: 1px solid #C4C2C2;
-            border-right: 1px solid #C4C2C2;
-        }
-
-        .dimension-top .dimension-text {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ede9fe;
-            padding: 2px 8px;
-            color: #6B6B83;
-            font-size: 13px;
-            font-family: 'RalewayLight', sans-serif;
-            white-space: nowrap;
-            z-index: 2;
-        }
-
-    /* Dimensión izquierda - ajustada para no salir del área */
-    .dimension-left {
-        position: absolute;
-        left: 80px;
-        top: 75px; /* Ajustado para empezar dentro del área */
-        height: 285px; /* Altura ajustada */
-        width: 20px;
-    }
-
-        .dimension-left::before {
-            content: '';
-            position: absolute;
-            right: 8px;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background: #C4C2C2;
-        }
-
-        .dimension-left::after {
-            content: '';
-            position: absolute;
-            right: 3px;
-            top: 0;
-            bottom: 0;
-            width: 10px;
-            border-top: 1px solid #C4C2C2;
-            border-bottom: 1px solid #C4C2C2;
-        }
-
-        .dimension-left .dimension-text {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%) rotate(-90deg);
-            transform-origin: center;
-            background: #ede9fe;
-            padding: 2px 8px;
-            color: #6B6B83;
-            font-size: 13px;
-            font-family: 'RalewayLight', sans-serif;
-            white-space: nowrap;
-            z-index: 2;
-        }
-
-    /* Dimensión inferior - 40px a la derecha y 25px más abajo */
-    .dimension-bottom {
-        position: absolute;
-        bottom: 40px; /* 25px más abajo (era 65px) */
-        left: calc(50% + 40px); /* 40px a la derecha del centro */
-        transform: translateX(-50%);
-        width: 160px;
-        height: 20px;
-    }
-
-        .dimension-bottom::before {
-            content: '';
-            position: absolute;
-            top: 8px;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #C4C2C2;
-        }
-
-        .dimension-bottom::after {
-            content: '';
-            position: absolute;
-            top: 3px;
-            left: 0;
-            right: 0;
-            height: 10px;
-            border-left: 1px solid #C4C2C2;
-            border-right: 1px solid #C4C2C2;
-        }
-
-        .dimension-bottom .dimension-text {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ede9fe;
-            padding: 2px 8px;
-            color: #6B6B83;
-            font-size: 13px;
-            font-family: 'RalewayLight', sans-serif;
-            white-space: nowrap;
-            z-index: 2;
-        }
-
-    /* ========================================
-       AJUSTES PARA DIFERENTES TAMAÑOS
-       ======================================== */
-
-    /* Botes pequeños (100-150cc) */
-    .bottle-visual-wrapper[data-size="100"] .dimension-left,
-    .bottle-visual-wrapper[data-size="150"] .dimension-left {
-        height: 240px;
-        top: 95px;
-    }
-
-    .bottle-visual-wrapper[data-size="100"] .dimension-top,
-    .bottle-visual-wrapper[data-size="150"] .dimension-top {
-        top: 55px;
-        left: calc(50% + 40px);
-    }
-
-    .bottle-visual-wrapper[data-size="100"] .dimension-bottom,
-    .bottle-visual-wrapper[data-size="150"] .dimension-bottom {
-        bottom: 60px;
-        left: calc(50% + 40px);
-    }
-
-    /* Botes medianos (200-300cc) */
-    .bottle-visual-wrapper[data-size="200"] .dimension-left,
-    .bottle-visual-wrapper[data-size="250"] .dimension-left,
-    .bottle-visual-wrapper[data-size="300"] .dimension-left {
-        height: 270px;
-        top: 80px;
-    }
-
-    .bottle-visual-wrapper[data-size="200"] .dimension-top,
-    .bottle-visual-wrapper[data-size="250"] .dimension-top,
-    .bottle-visual-wrapper[data-size="300"] .dimension-top {
-        top: 45px;
-        left: calc(50% + 40px);
-    }
-
-    .bottle-visual-wrapper[data-size="200"] .dimension-bottom,
-    .bottle-visual-wrapper[data-size="250"] .dimension-bottom,
-    .bottle-visual-wrapper[data-size="300"] .dimension-bottom {
-        bottom: 50px;
-        left: calc(50% + 40px);
-    }
-
-    /* Botes grandes (400-500cc) */
-    .bottle-visual-wrapper[data-size="400"] .dimension-left,
-    .bottle-visual-wrapper[data-size="500"] .dimension-left {
-        height: 300px;
-        top: 70px;
-    }
-
-    .bottle-visual-wrapper[data-size="400"] .dimension-top,
-    .bottle-visual-wrapper[data-size="500"] .dimension-top {
-        top: 30px;
-        left: calc(50% + 40px);
-    }
-
-    .bottle-visual-wrapper[data-size="400"] .dimension-bottom,
-    .bottle-visual-wrapper[data-size="500"] .dimension-bottom {
-        bottom: 35px;
-        left: calc(50% + 40px);
-    }
- 
-    /* ========================================
-       DIMENSIONES DE TAPA - MÁS CORTAS Y MÁS ARRIBA
-       ======================================== */
-    .cap-visual-wrapper {
-        position: relative;
-        width: 100%;
-        max-width: 500px;
-        height: 400px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .cap-visual-wrapper > svg {
-        width: auto;
-        height: 80px;
-        max-width: 180px;
-        position: relative;
-        z-index: 5;
-    }
-
-    /* Dimensión superior de la tapa - MÁS CORTA Y UN POCO MÁS ARRIBA */
-    .cap-dimension-top {
-        position: absolute;
-        top:0;
-        left: calc(60%);
-        transform: translateX(-60%);
-        width: 40px; /* Reducido de 100px a 80px */
-        height: 10px;
-    }
-
-        .cap-dimension-top::before {
-            content: '';
-            position: absolute;
-            bottom: 8px;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #C4C2C2;
-        }
-
-        .cap-dimension-top::after {
-            content: '';
-            position: absolute;
-            bottom: 3px;
-            left: 0;
-            right: 0;
-            height: 10px;
-            border-left: 1px solid #C4C2C2;
-            border-right: 1px solid #C4C2C2;
-        }
-
-        .cap-dimension-top .dimension-text {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ffe8e8;
-            padding: 2px 8px;
-            color: #6B6B83;
-            font-size: 13px;
-            font-family: 'RalewayLight', sans-serif;
-            white-space: nowrap;
-            z-index: 2;
-        }
-
-    /* Dimensión izquierda de la tapa - MÁS CORTA Y UN POCO MÁS ARRIBA */
-    .cap-dimension-left {
-        position: absolute;
-        left: 120px;
-        top: 180px; /* Subido 10px (era 190px) */
-        height: 35px; /* Reducido de 60px a 45px */
-        width: 20px;
-    }
-
-        .cap-dimension-left::before {
-            content: '';
-            position: absolute;
-            right: 8px;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background: #C4C2C2;
-        }
-
-        .cap-dimension-left::after {
-            content: '';
-            position: absolute;
-            right: 3px;
-            top: 0;
-            bottom: 0;
-            width: 10px;
-            border-top: 1px solid #C4C2C2;
-            border-bottom: 1px solid #C4C2C2;
-        }
-
-        .cap-dimension-left .dimension-text {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%) rotate(-90deg);
-            transform-origin: center;
-            background: #ffe8e8;
-            padding: 2px 8px;
-            color: #6B6B83;
-            font-size: 13px;
-            font-family: 'RalewayLight', sans-serif;
-            white-space: nowrap;
-            z-index: 2;
-        }
-    /* Spinner para el botón save */
-    .spinner-save {
-        display: inline-block;
-        width: 14px;
-        height: 14px;
-        margin-right: 8px;
-        vertical-align: middle;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: #ffffff;
-        border-radius: 50%;
-        animation: spinner-rotate 0.8s linear infinite;
-    }
-
-    @@keyframes spinner-rotate {
-        to
-
-    {
-        transform: rotate(360deg);
-    }
-
-    }
-
-    /* Mantener el estilo del botón cuando está deshabilitado */
-    .btn-primary:disabled {
-        background-color: #2F5496 !important; /* Mantener el color morado original */
-        border-color: #2F5496 !important;
-        opacity: 0.8; /* Solo reducir ligeramente la opacidad */
-        cursor: not-allowed;
-        /* NO cambiar el tamaño ni padding */
-    }
-
-        /* Prevenir cambios de hover cuando está deshabilitado */
-        .btn-primary:disabled:hover {
-            background-color: #2F5496 !important;
-            border-color: #2F5496 !important;
-            transform: none !important; /* Evitar cualquier transformación */
-        }
-
-    /* Asegurar que el botón mantenga su altura */
-    .modal-footer .btn-primary {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 48px; /* Altura fija */
-        transition: opacity 0.3s ease; /* Solo transición de opacidad */
-    }
-
-    /* Cancelar también debe verse deshabilitado apropiadamente */
-    .btn-cancel:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    
- 
-</style>
 @code {
     // ===== Props =====
     [Parameter] public bool IsVisible { get; set; } = false;
@@ -891,7 +503,7 @@
         public string? BoteMaterial { get; set; }
     }
     // Props opcionales (fallbacks externos)
- 
+
     // Formas habilitadas según los filtros actuales
     private HashSet<string> AvailableBottleForms = new(StringComparer.OrdinalIgnoreCase);
     private HashSet<string> AvailableCapForms = new(StringComparer.OrdinalIgnoreCase);
@@ -955,7 +567,7 @@
     private List<ColorOption> OptionsColorBoteFiltered = new();
     private List<ColorOption> OptionsColorCoverFiltered = new();
 
- 
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
@@ -1097,12 +709,12 @@
             Logger?.LogWarning("Error adjusting dimension lines: {Message}", ex.Message);
         }
     }
-     
-     
 
-    
 
-    
+
+
+
+
     private async Task AdjustDimensionLinesAlternative()
     {
         var jsCode = @"
@@ -1308,7 +920,7 @@
         StateHasChanged();
     }
 
-   
+
 
     // ===== Handlers =====
     private async void SetFormaBote(string forma) 
@@ -1376,6 +988,7 @@
     private void OnBoteColorChanged(ChangeEventArgs e)
     {
         BoteConfig.Color = e?.Value?.ToString() ?? BoteConfig.Color;
+      
         // Forzar actualización completa
         InvokeAsync(StateHasChanged);
     }
@@ -1407,19 +1020,21 @@
         // Cargar seleccionados
         if (SelectedOption != null)
         {
-            BoteConfig.Forma = SelectedOption.Forma?.ToUpperInvariant() ?? "ROUND";
-            BoteConfig.Capacidad = SelectedOption.Capacidad ?? "150";
-            BoteConfig.Diametro = SelectedOption.Diametro ?? "D45";
-            BoteConfig.Material = SelectedOption.Material ?? "PET";
-            BoteConfig.Color = SelectedOption.Color ?? "Clear";
+            BoteConfig.Forma = SelectedOption.Forma?.ToUpperInvariant() ?? "";
+            BoteConfig.Capacidad = SelectedOption.Capacidad ?? "";
+            BoteConfig.Diametro = SelectedOption.Diametro ?? "";
+            BoteConfig.Material = SelectedOption.Material ?? "";
+            BoteConfig.Color = SelectedOption.Color ?? "";
+            BoteConfig.ImagenBote = SelectedOption.ImagenBote ?? "";
         }
 
         if (SelectedOptionCap != null)
         {
-            CapConfig.Forma = SelectedOptionCap.Forma?.ToUpperInvariant() ?? "SIMPLE";
-            CapConfig.Diametro = SelectedOptionCap.Diametro ?? "D45";
-            CapConfig.Color = SelectedOptionCap.Color ?? "Black";
+            CapConfig.Forma = SelectedOptionCap.Forma?.ToUpperInvariant() ?? "";
+            CapConfig.Diametro = SelectedOptionCap.Diametro ?? "";
+            CapConfig.Color = SelectedOptionCap.Color ?? "";
             CapConfig.Sleeve = SelectedOptionCap.Sleeve;
+            CapConfig.ImagenCap = SelectedOptionCap.ImagenCap ?? "";
         }
 
         NormalizeForma();
@@ -1556,6 +1171,12 @@
         public int ID { get; set; }
         public string Value { get; set; } = "";     // etiqueta
         public string ColorHex { get; set; } = "";  // #RRGGBB
+        public string Round { get; set; } = "";
+        public string Square { get; set; } = "";
+        public string Cylindrical { get; set; } = "";
+        public string Simple { get; set; } = "";
+        public string Metal { get; set; } = "";
+        public string Childproof { get; set; } = "";
 
         public string Label { get => Value; set => Value = value; }
         public string Hex { get => ColorHex; set => ColorHex = value; }
@@ -1571,6 +1192,7 @@
         public string? Diametro { get; set; }
         public string? Material { get; set; }
         public string? Color { get; set; }
+        public string? ImagenBote { get; set; }
     }
 
     public sealed class CapDataItem
@@ -1579,23 +1201,26 @@
         public string? Diametro { get; set; }
         public string? Color { get; set; }
         public bool Sleeve { get; set; }
+        public string? ImagenCap { get; set; }
     }
 
     private sealed class BoteConfigModel
     {
-        public string Forma { get; set; } = "ROUND";
-        public string Capacidad { get; set; } = "150";
-        public string Diametro { get; set; } = "D45";
-        public string Material { get; set; } = "PET";
-        public string Color { get; set; } = "Clear";
+        public string Forma { get; set; } = "";
+        public string Capacidad { get; set; } = "";
+        public string Diametro { get; set; } = "";
+        public string Material { get; set; } = "";
+        public string Color { get; set; } = "";
+        public string ImagenBote { get; set; } = "";
     }
 
     private sealed class CapConfigModel
     {
-        public string Forma { get; set; } = "SIMPLE";
-        public string Diametro { get; set; } = "D45";
-        public string Color { get; set; } = "Black";
+        public string Forma { get; set; } = "";
+        public string Diametro { get; set; } = "";
+        public string Color { get; set; } = "";
         public bool Sleeve { get; set; } = false;
+        public string ImagenCap { get; set; } = "";
     }
 
     private sealed record BoteDimension(double Altura, double DiametroBase, double DiametroBoca);
