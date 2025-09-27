@@ -1,11 +1,93 @@
 ﻿/* ========================================
-   MODAL LABEL - ESTILOS COMPLETOS
+   MODAL LABEL - DISEÑO RESPONSIVO CORREGIDO
    ======================================== */
 
 /* Variables CSS */
 :root {
     --blackBlue: #2F5496;
     --textButton: #2F5496;
+    --bg-primary: #ede9fe;
+    --bg-secondary: #faf5ff;
+    --border-color: #c2c2c2;
+    --text-dark: #333333;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset Body Padding */
+body.modal-open {
+    padding-right: 0 !important;
+    overflow: hidden;
+}
+
+/* Modal Base */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(222, 230, 243, 0.85);
+    z-index: 1040;
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal Sidebar Configuration */
+.modal.sidebar-right {
+    padding: 0 !important;
+}
+
+    .modal.sidebar-right .modal-dialog {
+        position: fixed;
+        margin: 0;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 100%;
+        max-width: 1300px;
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1050;
+        display: flex;
+        align-items: stretch;
+    }
+
+    .modal.sidebar-right.show .modal-dialog {
+        transform: translateX(0);
+    }
+
+.modal-dialog-sidebar {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    align-items: stretch;
+}
+
+.modal-content {
+    height: 100vh;
+    width: 100%;
+    border: none;
+    background: #ffffff;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Modal Header */
@@ -13,162 +95,172 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    padding: 20px 50px 20px 80px;
-    margin-top: 20px;
+    padding: 24px 40px;
+    background: white;
+    flex-shrink: 0;
 }
 
 .b-close {
-    background: transparent;
+    background: #f5f5f5;
     border: none;
     cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+    .b-close:hover {
+        background: var(--blackBlue);
+        transform: rotate(90deg);
+    }
+
+        .b-close:hover .btn-close {
+            filter: brightness(0) invert(1);
+        }
 
 .btn-close {
     width: 24px;
     height: 24px;
-    cursor: pointer;
-}
-
-/* Modal Overlay */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #DEE6F38C;
-    z-index: 999;
-    backdrop-filter: blur(2px);
-}
-
-/* Modal Sidebar Right */
-.modal.sidebar-right .modal-dialog {
-    position: fixed;
-    margin: 0;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: 1300px;
-    max-width: 90vw;
-    transform: translateX(100%);
-    transition: transform 0.5s ease-in-out;
-    z-index: 1051;
-}
-
-.modal.sidebar-right.show .modal-dialog {
-    transform: translateX(0);
-}
-
-.modal-dialog-sidebar {
-    max-height: 100%;
-    margin: 0;
-}
-
-.modal-content {
-    height: 100%;
-    max-height: calc(120vh);
-    overflow-y: auto;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border: none;
-}
-
-.modal {
-    width: 100% !important;
-    --bs-modal-width: 1263px !important;
+    transition: var(--transition);
 }
 
 /* Modal Body */
 .modal-body {
-    padding: 0;
+    padding: 0 40px 30px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .modal-body_header {
-    padding-left: 50px;
-    padding-bottom: 30px;
+    padding: 0 0 32px;
+    flex-shrink: 0;
 }
 
 .modal-container-title {
-    font-size: 2rem;
+    font-size: 2.25rem;
     color: var(--blackBlue);
+    font-weight: 600;
+    margin: 0;
 }
 
-/* Parent Container */
+/* Main Content Container */
+.tabs-inline {
+    flex: 1;
+    min-height: 0;
+}
+
+.content-bottle {
+    height: 100%;
+}
+
 .parent-label {
     display: flex;
-    height: 550px;
-    width: 1107px;
+    gap: 0;
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    min-height: 450px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
 /* Left Section - Form */
 .child-bottles-form {
-    background-color: #ede9fe;
-    border-bottom-left-radius: 1.75rem;
-    border-top-left-radius: 1.75rem;
+    background: linear-gradient(135deg, #ede9fe 0%, #e6dffe 100%);
     width: 50%;
-    padding: 0 30px;
+    padding: 30px 25px;
+    display: flex;
+    flex-direction: column;
 }
 
 .child-bottle-title_features {
-    padding: 30px;
-    font-size: 24px;
+    font-size: 1.5rem;
     font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 20px;
 }
 
-/* Form Fields Container */
+/* Form Layout */
 .child_content_features-bottle-form {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 15px;
+    margin-bottom: 20px;
 }
 
-/* Form Groups */
 .form-grup-input-field {
-    padding: 5px;
-    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .form-group-label-size {
-    display: block;
-    width: 100%;
-    padding: 0;
-    text-align: left;
-    font-weight: 400;
-    margin-bottom: 10px;
-    font-size: 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .form-select-config {
-    width: 238px;
-    height: 60px;
-    border: 1px solid #c2c2c2;
-    border-radius: 5px;
-    padding-left: 20px;
+    width: 100%;
+    height: 48px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 0 35px 0 14px;
     background: white;
-    font-size: 16px;
-    background-image: linear-gradient(45deg, transparent 50%, rgb(17, 17, 17) 60%), linear-gradient(135deg, rgb(17, 17, 17) 40%, transparent 50%);
-    background-position: calc(100% - 30px) 25px, calc(100% - 20px) 25px;
-    background-size: 10px 10px, 10px 10px;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: var(--transition);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%232F5496' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+    background-position: right 12px center;
+    background-size: 12px;
 }
 
-    .form-select-config:disabled {
-        background-color: #f5f5f5;
-        cursor: not-allowed;
+    .form-select-config:hover:not(:disabled) {
+        border-color: var(--blackBlue);
+        box-shadow: 0 0 0 3px rgba(47, 84, 150, 0.1);
     }
 
-/* Download Container */
+    .form-select-config:focus {
+        outline: none;
+        border-color: var(--blackBlue);
+        box-shadow: 0 0 0 3px rgba(47, 84, 150, 0.2);
+    }
+
+    .form-select-config:disabled {
+        background-color: #f8f8f8;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+/* Download Section */
 .container-download-file {
-    border: 1px dotted #c2c2c2;
-    height: 200px;
-    width: 70%;
-    margin: 20px auto;
+    border: 2px dashed var(--border-color);
+    border-radius: 16px;
+    min-height: 150px;
+    margin: 24px 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: white;
+    transition: var(--transition);
 }
+
+    .container-download-file:hover {
+        border-color: var(--blackBlue);
+        background: #f8faff;
+    }
 
 .container-download-file-button {
     text-align: center;
@@ -177,204 +269,237 @@
 .container-donload-file-text {
     text-decoration: none !important;
     color: var(--textButton);
-    font-size: 14px;
-    display: inline-block;
-    padding: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    transition: var(--transition);
 }
 
     .container-donload-file-text:hover {
-        opacity: 0.8;
+        transform: translateY(-2px);
     }
 
     .container-donload-file-text img {
-        width: 24px;
-        height: 24px;
-        margin-bottom: 5px;
+        width: 28px;
+        height: 28px;
+        background: var(--blackBlue);
+        padding: 5px;
+        border-radius: 50%;
+        filter: brightness(0) invert(1);
     }
 
 /* Right Section - Upload */
 .child_content_info-bottle-label {
     width: 50%;
     padding: 30px 25px;
-    background: #faf5ff;
-    border-bottom-right-radius: 1.75rem;
-    border-top-right-radius: 1.75rem;
+    background: linear-gradient(135deg, #faf5ff 0%, #f5edff 100%);
+    display: flex;
+    flex-direction: column;
 }
 
 .chil_content_info_upload {
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-}
-
-.child_content-label-info-title {
-    width: 100%;
-    font-weight: 500;
-    font-size: 24px;
     margin-bottom: 20px;
 }
 
-/* Upload Button */
-.child_content-label-button {
-    width: 100%;
-    display: flex;
-    justify-content: center;
+.child_content-label-info-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 16px;
 }
 
-.child_content-label-button-upload {
-    border: 1px solid var(--textButton);
-    padding: 15px 30px;
-    border-radius: 25px;
-    color: var(--textButton);
-    width: 360px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 30px 0;
-    font-size: 20px;
-    font-weight: bold;
-    height: 54px;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-    .child_content-label-button-upload:hover {
-        background: var(--textButton);
-        color: white;
-        text-decoration: none;
-    }
-
-/* Upload Content Button */
+/* Upload Area */
 .upload-content-btn2 {
     display: block;
     cursor: pointer;
     width: 100%;
-    text-align: center;
 }
 
 .img-btn-upload {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    padding: 24px;
+    border: 2px solid var(--textButton);
+    border-radius: 16px;
+    background: white;
+    transition: var(--transition);
 }
 
-/* Save/Upload Button */
-.btn-save-atr-upload {
-    display: inline-block;
-    border: 1px solid var(--textButton);
-    border-radius: 30px;
-    background-color: var(--textButton);
-    line-height: 1rem;
+    .img-btn-upload:hover {
+        background: #f8faff;
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+.child_content-label-button-upload {
+    color: var(--textButton);
     font-size: 1rem;
-    padding: 1rem 1.57rem;
-    color: #fff;
-    margin: 1rem auto 0;
+    font-weight: bold;
+    text-decoration: none;
     cursor: pointer;
-    transition: all 0.3s ease;
-    min-width: 120px;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 28px;
+    border: 2px solid var(--textButton);
+    border-radius: 50px;
+    background: white;
+    min-width: 180px;
+}
+
+    .child_content-label-button-upload:hover {
+        background: var(--textButton);
+        color: white;
+        transform: scale(1.05);
+    }
+
+/* Preview Section */
+.preview-container {
+    text-align: center;
+    padding: 16px;
+}
+
+.preview-image {
+    max-width: 180px;
+    max-height: 180px;
+    object-fit: contain;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 6px;
+    background: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.paragraph-upload {
+    text-align: center;
+    margin-top: 16px;
+}
+
+/* Upload Button */
+.btn-save-atr-upload {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, var(--textButton) 0%, #1e3a6f 100%);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 12px 32px;
+    color: white;
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 140px;
+    box-shadow: var(--shadow-md);
 }
 
     .btn-save-atr-upload:hover:not(:disabled) {
-        color: var(--textButton);
-        background: white;
-        border-color: var(--textButton);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
     }
 
     .btn-save-atr-upload:disabled {
         opacity: 0.6;
         cursor: not-allowed;
+        transform: none;
     }
 
-    .btn-save-atr-upload.loading {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
-
-/* Preview Container */
-.preview-container {
-    text-align: center;
-    margin: 20px 0;
-}
-
-.preview-image {
-    max-width: 150px;
-    max-height: 150px;
-    object-fit: contain;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 5px;
-}
-
-.paragraph-upload {
-    text-align: center;
-    margin-top: 15px;
-}
-
-/* Border Dotted Separator */
+/* Border Separator */
 .border-doted {
-    border-bottom: 1px dotted #c2c2c2;
-    height: 1px;
+    border-bottom: 2px dotted #e0e0e0;
+    margin: 24px 0;
     width: 100%;
-    margin: 30px 0;
+}
+
+/* Final Label Section */
+.final-label-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
 }
 
 /* Modal Footer */
 .modal-footer-bts {
-    padding: 60px 30px 30px;
-    justify-content: flex-end;
+    padding: 24px 40px;
     display: flex;
-    max-width: 95%;
-    gap: 15px;
+    justify-content: flex-end;
+    gap: 16px;
+    border-top: 1px solid #e0e0e0;
+    margin-top: auto;
+    flex-shrink: 0;
+    background: white;
 }
 
 .modal-footer-btc-cancel,
 .modal-footer-btc-save {
-    border-radius: 25px;
-    border: 2px solid var(--blackBlue);
-    width: 163px;
-    text-align: center;
-    padding: 10px;
+    border-radius: 50px;
+    padding: 12px 36px;
     font-weight: 700;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-size: 20px;
+    font-size: 1.05rem;
     cursor: pointer;
+    transition: var(--transition);
+    min-width: 150px;
+    text-align: center;
+    border: none;
+    position: relative;
+    overflow: hidden;
 }
 
 .modal-footer-btc-cancel {
-    color: var(--blackBlue);
     background: white;
+    color: var(--blackBlue);
+    border: 2px solid var(--blackBlue);
 }
 
-    .modal-footer-btc-cancel:hover {
-        background: var(--blackBlue);
-        color: white;
+    .modal-footer-btc-cancel:hover:not(:disabled) {
+        background: #f8faff;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
 
 .modal-footer-btc-save {
-    background-color: var(--blackBlue);
-    color: #fff;
+    background: linear-gradient(135deg, var(--blackBlue) 0%, #1e3a6f 100%);
+    color: white;
+    border: 2px solid transparent;
+    box-shadow: var(--shadow-md);
 }
 
-    .modal-footer-btc-save:hover {
-        background: white;
-        color: var(--blackBlue);
+    .modal-footer-btc-save:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
     }
 
-/* Spinner Inline */
-.spinner-inline {
+    .modal-footer-btc-cancel:disabled,
+    .modal-footer-btc-save:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+/* Spinner */
+.spinner-label {
     display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #ffffff;
-    border-top-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    width: 14px;
+    height: 14px;
     margin-right: 8px;
     vertical-align: middle;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
@@ -401,24 +526,24 @@
 }
 
 .mt-2 {
-    margin-top: 0.5rem;
+    margin-top: 1rem;
 }
 
-/* Font Classes */
+/* Font Sizes */
 .font-16 {
-    font-size: 16px;
+    font-size: 1rem;
 }
 
 .font-20 {
-    font-size: 20px;
+    font-size: 1.25rem;
 }
 
 .font-24 {
-    font-size: 24px;
+    font-size: 1.5rem;
 }
 
 .font-32 {
-    font-size: 32px;
+    font-size: 2rem;
 }
 
 /* Font Families */
@@ -446,179 +571,282 @@
     font-family: 'RalewayBold', sans-serif;
 }
 
-/* Responsive */
-@media (max-width: 767px) {
-    .modal.sidebar-right .modal-dialog {
-        width: 100%;
-        max-width: 100%;
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Desktop Grande */
+@media (min-width: 1600px) {
+    .parent-label {
+        max-width: 1400px;
     }
 
+    .modal-container-title {
+        font-size: 2.5rem;
+    }
+}
+
+/* Desktop Mediano */
+@media (max-width: 1400px) {
+    .modal.sidebar-right .modal-dialog {
+        max-width: 1200px;
+    }
+}
+
+/* Laptop */
+@media (max-width: 1200px) {
+    .modal.sidebar-right .modal-dialog {
+        max-width: 1000px;
+    }
+
+    .parent-label {
+        max-width: 95%;
+    }
+}
+
+/* iPad Pro y Tablets grandes */
+@media (max-width: 1024px) {
+    .modal-body {
+        padding: 0 30px 20px;
+    }
+
+    .modal-footer-bts {
+        padding: 20px 30px;
+    }
+}
+
+/* iPad Mini Portrait - CORREGIDO PARA PERMITIR SCROLL */
+@media (min-width: 744px) and (max-width: 834px) and (orientation: portrait) {
+    .modal-content {
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal_header {
+        flex-shrink: 0;
+        z-index: 10;
+    }
+
+    .modal-body {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0 25px 20px;
+        -webkit-overflow-scrolling: touch;
+        min-height: 0;
+    }
+
+    .parent-label {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .child-bottles-form,
+    .child_content_info-bottle-label {
+        width: 100%;
+        padding: 25px 30px;
+    }
+
+    .child-bottles-form {
+        border-radius: 24px 24px 0 0;
+    }
+
+    .child_content_info-bottle-label {
+        border-radius: 0 0 24px 24px;
+    }
+
+    .child_content_features-bottle-form {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto 20px;
+    }
+
+    .container-download-file {
+        max-width: 500px;
+        margin: 20px auto;
+    }
+
+    .modal-footer-bts {
+        flex-shrink: 0;
+        background: white;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        padding: 16px 25px;
+        z-index: 10;
+    }
+}
+
+/* Tablets pequeñas y móviles grandes */
+@media (max-width: 768px) {
     .modal-content {
         border-radius: 0;
     }
 
     .parent-label {
         flex-direction: column;
-        width: 100%;
-        height: auto;
     }
 
     .child-bottles-form,
     .child_content_info-bottle-label {
         width: 100%;
-        border-radius: 0;
     }
 
     .child_content_features-bottle-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Móviles */
+@media (max-width: 667px) {
+    .modal-content {
+        position: relative;
+        height: 100vh;
+        border-radius: 0;
+        overflow: hidden;
+    }
+
+    .modal_header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        z-index: 1000;
+        box-shadow: var(--shadow-sm);
+        padding: 12px 16px;
+    }
+
+    .modal-body {
+        position: fixed;
+        top: 56px;
+        bottom: 70px;
+        left: 0;
+        right: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 16px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-body_header {
+        padding: 8px 0 16px;
+    }
+
+    .modal-container-title {
+        font-size: 1.25rem;
+        text-align: center;
+    }
+
+    .parent-label {
         flex-direction: column;
+        border-radius: 12px;
+        min-height: auto;
+        margin-bottom: 20px;
+    }
+
+    .child-bottles-form,
+    .child_content_info-bottle-label {
+        width: 100%;
+        padding: 20px 16px;
+    }
+
+    .child-bottles-form {
+        border-radius: 12px 12px 0 0;
+    }
+
+    .child_content_info-bottle-label {
+        border-radius: 0 0 12px 12px;
+    }
+
+    .child-bottle-title_features,
+    .child_content-label-info-title {
+        font-size: 1.15rem;
+        text-align: center;
+    }
+
+    .child_content_features-bottle-form {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 
     .form-select-config {
-        width: 100%;
+        height: 44px;
+        font-size: 0.9rem;
     }
 
     .container-download-file {
-        width: 90%;
-    }
-
-    .child_content-label-button-upload {
-        width: 100%;
-        max-width: 300px;
+        min-height: 100px;
     }
 
     .modal-footer-bts {
-        flex-direction: column;
-        align-items: center;
-        padding: 30px 15px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+        z-index: 1000;
+        padding: 12px 16px;
+        display: flex;
+        gap: 10px;
     }
 
     .modal-footer-btc-cancel,
     .modal-footer-btc-save {
-        width: 100%;
-        max-width: 200px;
-        margin: 5px 0;
+        flex: 1;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        min-width: auto;
     }
 }
-/* Que los inputs de esa fila ocupen todo el ancho disponible */
-.child_content_features-bottle-form {
-    display: flex;
-    gap: 1rem;
-}
 
-    .child_content_features-bottle-form .form-grup-input-field {
-        flex: 1 1 0;
-        min-width: 220px;
+/* Móvil landscape */
+@media (max-width: 667px) and (orientation: landscape) {
+    .modal-body {
+        bottom: 60px;
     }
 
-    .child_content_features-bottle-form .form-select-config {
-        width: 100% !important; /* antes eran 238px */
+    .child_content_features-bottle-form {
+        grid-template-columns: 1fr 1fr;
     }
 
-/* Sólo para el select de “Tamaño máximo” */
-.size-select {
-    font-size: 0.85rem; /* un pelín más pequeño */
-    padding-right: 2.0rem; /* para el caret */
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    height: 60px; /* mantiene altura del diseño */
-}
-
-/* Si tienes pantallas grandes, aún más ancho visual */
-@media (min-width: 1280px) {
-    .size-select {
-        min-width: 360px;
-    }
-}
-/* Quita el padding que bootstrap mete al body cuando hay modal (por la scrollbar) */
-body.modal-open {
-    padding-right: 0 !important;
-}
-
-/* El overlay del modal a pantalla completa, sin padding extra */
-.modal.sidebar-right {
-    padding-right: 0 !important;
-}
-
-    /* El diálogo pegado al borde derecho y sin márgenes */
-    .modal.sidebar-right .modal-dialog {
-        position: fixed;
-        top: 0;
-        right: 0;
-        margin: 0 !important;
-        width: 100vw; /* ocupa todo el ancho posible */
-        max-width: 1263px; /* tu ancho objetivo */
-        height: 100%;
-        transform: translateX(0); /* ya visible */
+    .modal-footer-bts {
+        padding: 8px 16px;
     }
 
-/* Asegura que el contenido no genera espacio */
-.modal-dialog.modal-dialog-right {
-    margin: 0 !important;
-}
-.final-label-actions {
-    display: flex;
-    flex-direction: column; /* botón encima, texto debajo */
-    align-items: flex-start;
-    gap: .5rem;
+    .modal-footer-btc-cancel,
+    .modal-footer-btc-save {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
 }
 
-    /* Si quieres que el botón no ocupe todo el ancho */
-    .final-label-actions .child_content-label-button-upload {
-        width: auto;
-        min-width: 240px; /* opcional */
-        text-align: center;
+/* Móvil pequeño */
+@media (max-width: 375px) {
+    .modal-body {
+        padding: 12px;
     }
 
-/* Centrar botón + texto en "Etiqueta final" */
-.chil_content_info_upload .child_content-label-button {
-    display: flex;
-    flex-direction: column; /* botón arriba, texto debajo */
-    align-items: center; /* centro horizontal perfecto */
-    justify-content: center;
-    gap: 12px; /* aire entre botón y texto */
-    text-align: center;
-}
-
-.child_content-label-button-upload {
-    margin: 0 auto; /* por si algún estilo previo lo desalineaba */
-}
-/* Elimina el padding que mete Bootstrap cuando el modal está abierto */
-body.modal-open {
-    padding-right: 0 !important;
-}
-
-/* Asegura que el modal no herede padding extra a la derecha */
-.modal {
-    padding-right: 0 !important;
-}
-
-    /* Márgenes simétricos del cuadro del modal (evita “aire” extra a la derecha) */
-    .modal .modal-dialog {
-        margin: 1.25rem auto !important; /* centrado perfecto */
-        /* opcional: controla el ancho máximo del modal */
-        max-width: 980px;
-        width: calc(100% - 2.5rem);
-    }
-    /* Redondeo global del contenido del modal */
-    .modal .modal-content {
-        border-radius: 28px !important;
-        overflow: hidden; /* recorta hijos con fondos */
-        border: none;
+    .child-bottles-form,
+    .child_content_info-bottle-label {
+        padding: 16px 12px;
     }
 
-/* Asegura radios en las dos mitades (izq./der.) si llevan fondo */
-.child-bottles-form {
-    border-top-left-radius: 28px;
-    border-bottom-left-radius: 28px;
+    .form-select-config {
+        height: 42px;
+        font-size: 0.85rem;
+    }
 }
 
-.child_content_info-bottle-label {
-    border-top-right-radius: 28px;
-    border-bottom-right-radius: 28px;
-}
-@media (max-width: 768px) {
-    .chil_content_info_upload .child_content-label-button {
-        gap: 10px;
+/* Print */
+@media print {
+    .modal-overlay {
+        display: none;
+    }
+
+    .modal-content {
+        box-shadow: none;
     }
 }

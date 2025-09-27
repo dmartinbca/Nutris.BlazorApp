@@ -57,6 +57,7 @@ public class OrdersComponentBase : ComponentBase
     private bool isBoteCapOpen;
     private bool accordionOpen;
     // Propiedades del Header
+    protected bool IsProcessingNoAnalytics { get; set; } = false;
     protected string Prefix => Id?.Split('-')[0]?.ToUpper() ?? "";
     protected string Code { get; set; } = "-";
     protected string Name { get; set; } = "-";
@@ -184,7 +185,7 @@ public class OrdersComponentBase : ComponentBase
     private string? _boteResumen;
     private string? _tapaResumen;
     public readonly OptionLookups _opts = new();
-
+    protected bool IsProcessingNoLabel { get; set; } = false;
     protected bool isThankYouModalVisible = false;
     private sealed class LabelOptionsDto
     {
@@ -1589,18 +1590,45 @@ public class OrdersComponentBase : ComponentBase
 
     protected async Task OnNoLabelChanged()
     {
-        if (OnPatchRG35.HasDelegate)
+        IsProcessingNoLabel = true;
+        StateHasChanged(); // Actualizar UI inmediatamente para deshabilitar el checkbox
+
+        try
         {
-            var labelConfig = NoLabel ? "No label" : "Label";
-            await OnPatchRG35.InvokeAsync(new { Label_config = labelConfig });
+            if (OnPatchRG35.HasDelegate)
+            {
+                var labelConfig = NoLabel ? "No label" : "Label";
+                await OnPatchRG35.InvokeAsync(new { Label_config = labelConfig });
+            }
+
+            // Recalcular porcentajes después del cambio
+            CalculateLabelPercentage();
+        }
+        finally
+        {
+            IsProcessingNoLabel = false;
+            StateHasChanged(); // Volver a habilitar el checkbox
         }
     }
 
     protected async Task OnNoAnalyticsChanged()
     {
-        if (OnPatchRG35.HasDelegate)
+        IsProcessingNoAnalytics = true;
+        StateHasChanged();
+
+        try
         {
-            await OnPatchRG35.InvokeAsync(new { No_analitycs = NoAnalytics });
+            if (OnPatchRG35.HasDelegate)
+            {
+                await OnPatchRG35.InvokeAsync(new { No_analitycs = NoAnalytics });
+            }
+
+            CalculateAnalyticsPercentage();
+        }
+        finally
+        {
+            IsProcessingNoAnalytics = false;
+            StateHasChanged();
         }
     }
 

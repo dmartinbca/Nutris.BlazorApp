@@ -403,11 +403,11 @@
     {
 
         isLoading = true;
-        await Task.Delay(500); // Allow UI to update
+     
 
         StateHasChanged();
 
-     
+        await Task.Delay(500); // Allow UI to update
         var data = new
         {
             Label_size = labelSize,
@@ -731,7 +731,7 @@
         }
     };
 
-    window.revokeBloblUrl = (url) => {
+       window.revokeBlobUrl = (url) => {
         try {
             if (url) {
                 URL.revokeObjectURL(url);

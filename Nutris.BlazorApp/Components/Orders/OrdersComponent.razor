@@ -731,9 +731,20 @@
                                 <div class="etiqueta-section">
                                     <h2 class="RalewayBold font-24">@Localization["orderView.Label"]</h2>
                                     <div class="etiqueta-checkbox">
-                                        <input type="checkbox" @bind="NoLabel" @bind:after="OnNoLabelChanged"
-                                               disabled="@(Status == "Cerrado cliente y calidad")" />
-                                        <label class="RalewayBold font-18">@Localization["orderView.NoLabel"]</label>
+                                        <input type="checkbox"
+                                               @bind="NoLabel"
+                                               @bind:after="OnNoLabelChanged"
+                                               disabled="@(Status == "Cerrado cliente y calidad" || IsProcessingNoLabel)" />
+                                        <label class="RalewayBold font-18">
+                                            @if (IsProcessingNoLabel)
+                                            {
+                                                <span>@Localization["orderView.NoLabel"] <span class="spinner-inline"></span></span>
+                                            }
+                                            else
+                                            {
+                                                @Localization["orderView.NoLabel"]
+                                            }
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -1018,9 +1029,20 @@
                             <div class="requisitos-section">
                                 <h2 class="RalewayBold font-24">@Localization["orderView.OtherRequirements"]</h2>
                                 <div class="etiqueta-checkbox">
-                                    <input type="checkbox" @bind="NoAnalytics" @bind:after="OnNoAnalyticsChanged"
-                                           disabled="@(Status == "Cerrado cliente y calidad")" />
-                                    <label class="RalewayBold font-18">@Localization["orderView.NoAnalytics"]</label>
+                                    <input type="checkbox" 
+                                           @bind="NoAnalytics" 
+                                           @bind:after="OnNoAnalyticsChanged"
+                                           disabled="@(Status == "Cerrado cliente y calidad" || IsProcessingNoAnalytics)" />
+                                    <label class="RalewayBold font-18">
+                                        @if (IsProcessingNoAnalytics)
+                                        {
+                                            <span>@Localization["orderView.NoAnalytics"] <span class="spinner-inline"></span></span>
+                                        }
+                                        else
+                                        {
+                                            @Localization["orderView.NoAnalytics"]
+                                        }
+                                    </label>
                                 </div>
                             </div>
                         </div>
