@@ -52,8 +52,8 @@
                                                 @Localization["modalLabel.Maximumsize"]
                                             </label>
                                             <select class="form-select-config Museo size-select"
-                                                    @bind="labelSize"
-                                                    @bind:after="FetchPdfOnSizeChange"
+                                                    value="@labelSize"
+                                                    @onchange="OnSizeChanged"
                                                     disabled>
                                                 <option value="">Select Size</option>
                                                 @foreach (var optionMX in OptionsSizeLabel)
@@ -282,74 +282,144 @@
     private string labelMaterial = "";
     private string labelFinish = "";
     private string labelColors = "";
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (SelectedOptionLabels != null)
-        {
-            labelSize = SelectedOptionLabels.LabelSize ?? "";
-            labelMaterial = SelectedOptionLabels.LabelMaterial ?? "";
-            labelFinish = SelectedOptionLabels.LabelFinish ?? "";
-            labelColors = SelectedOptionLabels.LabelColors ?? "";
-
-            if (!string.IsNullOrEmpty(labelSize))
-                await FetchPdfOnSizeChange();
-        }
-    }
+    private string? lastFetchedSize = null;
+    private bool isFetchingPdf = false;
+    private CancellationTokenSource? fetchCancellationToken;
+  
 
     protected override async Task OnParametersSetAsync()
     {
-        // Update when parameters change
+        // Solo actualizar si realmente cambió SelectedOptionLabels
         if (SelectedOptionLabels != null)
         {
+            bool sizeChanged = labelSize != (SelectedOptionLabels.LabelSize ?? "");
+
             labelSize = SelectedOptionLabels.LabelSize ?? "";
             labelMaterial = SelectedOptionLabels.LabelMaterial ?? "";
             labelFinish = SelectedOptionLabels.LabelFinish ?? "";
             labelColors = SelectedOptionLabels.LabelColors ?? "";
 
-            if (!string.IsNullOrEmpty(labelSize))
+            // Solo fetch si el size cambió y es diferente al último fetcheado
+            if (sizeChanged && !string.IsNullOrEmpty(labelSize) && labelSize != lastFetchedSize)
+            {
                 await FetchPdfOnSizeChange();
+            }
+        }
+    }
+
+    private async Task OnSizeChanged(ChangeEventArgs e)
+    {
+        var newSize = e.Value?.ToString() ?? "";
+        if (labelSize != newSize)
+        {
+            labelSize = newSize;
+            await FetchPdfOnSizeChange();
         }
     }
 
     private async Task FetchPdfOnSizeChange()
     {
-        var response = await ApiService.PostAsync2("troquelPDF(1)/Microsoft.NAV.Download?tenant=nutris", new { numeroTroquel = labelSize }
-);
-
-        if (response.IsSuccessStatusCode)
+        // Evitar llamadas concurrentes
+        if (isFetchingPdf)
         {
-            var responseContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"FetchPdfOnSizeChange: Ya se está ejecutando una llamada para size {labelSize}");
+            return;
+        }
 
-            string? base64 = null;
-            using var jsonDoc = JsonDocument.Parse(responseContent);
+        // Evitar refetch del mismo size
+        if (labelSize == lastFetchedSize && !string.IsNullOrEmpty(pdfDownloadUrl))
+        {
+            Console.WriteLine($"FetchPdfOnSizeChange: Size {labelSize} ya fue cargado");
+            return;
+        }
 
-            // OData actual (como en Vue): { "value": "..." }
-            if (jsonDoc.RootElement.TryGetProperty("value", out var valueEl))
-                base64 = valueEl.GetString();
-            // fallback por si viene anidado: { "data": { "value": "..." } }
-            else if (jsonDoc.RootElement.TryGetProperty("data", out var dataEl) &&
-                     dataEl.TryGetProperty("value", out var nestedVal))
-                base64 = nestedVal.GetString();
+        // Validar que hay un size válido
+        if (string.IsNullOrEmpty(labelSize))
+        {
+            Console.WriteLine("FetchPdfOnSizeChange: No hay size seleccionado");
+            pdfDownloadUrl = null;
+            return;
+        }
 
-            if (!string.IsNullOrWhiteSpace(base64))
+        try
+        {
+            isFetchingPdf = true;
+
+            // Cancelar cualquier fetch anterior en progreso
+            fetchCancellationToken?.Cancel();
+            fetchCancellationToken = new CancellationTokenSource();
+            var cancellationToken = fetchCancellationToken.Token;
+
+            Console.WriteLine($"FetchPdfOnSizeChange: Iniciando fetch para size {labelSize}");
+
+            var response = await ApiService.PostAsync2(
+                "troquelPDF(1)/Microsoft.NAV.Download?tenant=nutris",
+                new { numeroTroquel = labelSize }
+            );
+
+            // Verificar si fue cancelado
+            if (cancellationToken.IsCancellationRequested)
             {
-                if (base64.StartsWith("data:application/pdf;base64,", StringComparison.OrdinalIgnoreCase))
-                    base64 = base64.Substring("data:application/pdf;base64,".Length);
-                base64 = base64.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+                Console.WriteLine($"FetchPdfOnSizeChange: Fetch cancelado para size {labelSize}");
+                return;
+            }
 
-                pdfDownloadUrl = await CreateBlobUrl(base64, "application/pdf");
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                string? base64 = null;
+                using var jsonDoc = JsonDocument.Parse(responseContent);
+
+                // OData actual (como en Vue): { "value": "..." }
+                if (jsonDoc.RootElement.TryGetProperty("value", out var valueEl))
+                    base64 = valueEl.GetString();
+                // fallback por si viene anidado: { "data": { "value": "..." } }
+                else if (jsonDoc.RootElement.TryGetProperty("data", out var dataEl) &&
+                         dataEl.TryGetProperty("value", out var nestedVal))
+                    base64 = nestedVal.GetString();
+
+                if (!string.IsNullOrWhiteSpace(base64))
+                {
+                    // Limpiar el blob URL anterior si existe
+                    if (!string.IsNullOrEmpty(pdfDownloadUrl))
+                    {
+                        await JSRuntime.InvokeVoidAsync("revokeBlobUrl", pdfDownloadUrl);
+                    }
+
+                    if (base64.StartsWith("data:application/pdf;base64,", StringComparison.OrdinalIgnoreCase))
+                        base64 = base64.Substring("data:application/pdf;base64,".Length);
+                    base64 = base64.Replace(" ", "").Replace("\n", "").Replace("\r", "");
+
+                    pdfDownloadUrl = await CreateBlobUrl(base64, "application/pdf");
+                    lastFetchedSize = labelSize; // Guardar el size fetcheado exitosamente
+
+                    Console.WriteLine($"FetchPdfOnSizeChange: PDF cargado exitosamente para size {labelSize}");
+                }
+                else
+                {
+                    pdfDownloadUrl = null;
+                    Console.WriteLine($"FetchPdfOnSizeChange: No se recibió base64 para size {labelSize}");
+                }
             }
             else
             {
                 pdfDownloadUrl = null;
+                lastFetchedSize = null;
+                Console.WriteLine($"FetchPdfOnSizeChange: Error en respuesta para size {labelSize}: {response.StatusCode}");
             }
         }
-        else
+        catch (Exception ex)
         {
+            Console.WriteLine($"FetchPdfOnSizeChange: Excepción para size {labelSize}: {ex.Message}");
             pdfDownloadUrl = null;
+            lastFetchedSize = null;
         }
-
+        finally
+        {
+            isFetchingPdf = false;
+            StateHasChanged();
+        }
     }
 
     private async Task<string> CreateBlobUrl(string base64, string mimeType)
@@ -530,22 +600,32 @@
 
     private async Task CloseModal()
     {
+        // Cancelar cualquier fetch en progreso
+        fetchCancellationToken?.Cancel();
+
         // Clean up blob URL if exists
         if (!string.IsNullOrEmpty(pdfDownloadUrl))
         {
-           await JSRuntime.InvokeVoidAsync("revokeBlobUrl", pdfDownloadUrl);
+            await JSRuntime.InvokeVoidAsync("revokeBlobUrl", pdfDownloadUrl);
             pdfDownloadUrl = null;
+            lastFetchedSize = null; // Reset para la próxima vez que se abra el modal
         }
-        
+
         // Reset state
         previewImage = null;
         base64Data = null;
-        
+        isFetchingPdf = false;
+
         // Notify parent component
         await OnClose.InvokeAsync();
-        
+
         // Hide Bootstrap modal if needed
         await JSRuntime.InvokeVoidAsync("hideBootstrapModal", "sidebarRightModal2");
+    }
+    public void Dispose()
+    {
+        fetchCancellationToken?.Cancel();
+        fetchCancellationToken?.Dispose();
     }
 
     private async Task ShowAlert(string message)

@@ -307,7 +307,7 @@ body.modal-open {
 }
 
 /* ========================================
-   8. IMAGEN DEL BOTE Y TAPA - TAMAÑO MÁXIMO ABSOLUTO
+   8. IMAGEN DEL BOTE Y TAPA
    ======================================== */
 
 .bottle-visual-wrapper {
@@ -338,6 +338,8 @@ body.modal-open {
         max-width: 520px;
         max-height: 530px;
         object-fit: contain;
+        position: relative;
+        z-index: 2;
     }
 
 .cap-visual-wrapper {
@@ -358,10 +360,12 @@ body.modal-open {
         max-width: 450px;
         max-height: 250px;
         object-fit: contain;
+        position: relative;
+        z-index: 2;
     }
 
 /* ========================================
-   9. LÍNEAS DE DIMENSIÓN
+   9. LÍNEAS DE DIMENSIÓN - DINÁMICAS
    ======================================== */
 
 .dimension-lines-container {
@@ -371,7 +375,7 @@ body.modal-open {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 1;
+    z-index: 10;
 }
 
 .dimension-text {
@@ -381,18 +385,23 @@ body.modal-open {
     font-size: 13px;
     font-family: 'RalewayLight', sans-serif;
     white-space: nowrap;
-    z-index: 10;
+    z-index: 20;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: absolute;
 }
 
+/* DIMENSIONES DEL BOTE */
+
+/* Línea superior (diámetro de boca) */
 .dimension-top {
     position: absolute;
-    top: 5px;
     left: 50%;
     transform: translateX(-50%);
-    width: 160px;
     height: 30px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
 }
 
     .dimension-top::before {
@@ -417,25 +426,22 @@ body.modal-open {
     }
 
     .dimension-top .dimension-text {
-        position: absolute;
-        bottom: 5px;
-        left: 50%;
-        transform: translateX(-50%);
+        position: relative;
+        bottom: -5px;
     }
 
+/* Línea izquierda (altura) del bote */
 .dimension-left {
     position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 500px;
-    width: 30px;
+    width: 40px;
+    display: flex;
+    align-items: center;
 }
 
     .dimension-left::before {
         content: '';
         position: absolute;
-        right: 15px;
+        left: 15px;
         top: 0;
         bottom: 0;
         width: 1px;
@@ -445,7 +451,7 @@ body.modal-open {
     .dimension-left::after {
         content: '';
         position: absolute;
-        right: 10px;
+        left: 10px;
         top: 0;
         bottom: 0;
         width: 10px;
@@ -455,19 +461,21 @@ body.modal-open {
 
     .dimension-left .dimension-text {
         position: absolute;
-        right: 5px;
+        left: 25px;
         top: 50%;
         transform: translateY(-50%) rotate(-90deg);
         transform-origin: center;
     }
 
+/* Línea inferior (diámetro base) */
 .dimension-bottom {
     position: absolute;
-    bottom: 5px;
     left: 50%;
     transform: translateX(-50%);
-    width: 280px;
     height: 30px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
 }
 
     .dimension-bottom::before {
@@ -492,25 +500,27 @@ body.modal-open {
     }
 
     .dimension-bottom .dimension-text {
-        position: absolute;
-        top: 5px;
-        left: 50%;
-        transform: translateX(-50%);
+        position: relative;
+        top: -5px;
     }
 
+/* DIMENSIONES DE LA TAPA - AJUSTADAS */
+
+/* Línea superior de la tapa (diámetro) */
 .cap-dimension-top {
     position: absolute;
-    top: 80px;
     left: 50%;
     transform: translateX(-50%);
-    width: 220px;
-    height: 20px;
+    height: 30px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
 }
 
     .cap-dimension-top::before {
         content: '';
         position: absolute;
-        bottom: 10px;
+        bottom: 15px;
         left: 0;
         right: 0;
         height: 1px;
@@ -520,7 +530,7 @@ body.modal-open {
     .cap-dimension-top::after {
         content: '';
         position: absolute;
-        bottom: 5px;
+        bottom: 10px;
         left: 0;
         right: 0;
         height: 10px;
@@ -529,26 +539,24 @@ body.modal-open {
     }
 
     .cap-dimension-top .dimension-text {
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
+        position: relative;
+        bottom: -5px;
         background: rgba(255, 232, 232, 0.95);
     }
 
+/* Línea izquierda de la tapa (altura) - POSICIÓN AJUSTADA MÁS A LA IZQUIERDA */
 .cap-dimension-left {
     position: absolute;
-    left: 60px;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 120px;
-    width: 20px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    /* Se posicionará dinámicamente, pero con un desplazamiento mayor a la izquierda */
 }
 
     .cap-dimension-left::before {
         content: '';
         position: absolute;
-        right: 10px;
+        right: 25px; /* Cambio: línea más a la derecha dentro del contenedor */
         top: 0;
         bottom: 0;
         width: 1px;
@@ -558,7 +566,7 @@ body.modal-open {
     .cap-dimension-left::after {
         content: '';
         position: absolute;
-        right: 5px;
+        right: 20px; /* Cambio: marcadores más a la derecha */
         top: 0;
         bottom: 0;
         width: 10px;
@@ -568,48 +576,10 @@ body.modal-open {
 
     .cap-dimension-left .dimension-text {
         position: absolute;
-        right: 0;
+        right: 35px; /* Cambio: texto más a la derecha para alinearse con la línea */
         top: 50%;
         transform: translateY(-50%) rotate(-90deg);
         transform-origin: center;
-        background: rgba(255, 232, 232, 0.95);
-    }
-
-.cap-dimension-bottom {
-    position: absolute;
-    bottom: 160px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 200px;
-    height: 30px;
-}
-
-    .cap-dimension-bottom::before {
-        content: '';
-        position: absolute;
-        top: 15px;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: #C4C2C2;
-    }
-
-    .cap-dimension-bottom::after {
-        content: '';
-        position: absolute;
-        top: 10px;
-        left: 0;
-        right: 0;
-        height: 10px;
-        border-left: 1px solid #C4C2C2;
-        border-right: 1px solid #C4C2C2;
-    }
-
-    .cap-dimension-bottom .dimension-text {
-        position: absolute;
-        top: 5px;
-        left: 50%;
-        transform: translateX(-50%);
         background: rgba(255, 232, 232, 0.95);
     }
 
@@ -876,7 +846,27 @@ body.modal-open {
 }
 
 /* ========================================
-   16. RESPONSIVE - TABLET LANDSCAPE
+   16. AJUSTES DINÁMICOS POR TAMAÑO
+   ======================================== */
+
+.bottle-visual-wrapper[data-size="100"] .bottle-svg-container img,
+.bottle-visual-wrapper[data-size="150"] .bottle-svg-container img {
+    max-height: 450px;
+}
+
+.bottle-visual-wrapper[data-size="200"] .bottle-svg-container img,
+.bottle-visual-wrapper[data-size="250"] .bottle-svg-container img,
+.bottle-visual-wrapper[data-size="300"] .bottle-svg-container img {
+    max-height: 490px;
+}
+
+.bottle-visual-wrapper[data-size="400"] .bottle-svg-container img,
+.bottle-visual-wrapper[data-size="500"] .bottle-svg-container img {
+    max-height: 530px;
+}
+
+/* ========================================
+   17. RESPONSIVE - TABLET LANDSCAPE
    ======================================== */
 
 @media (max-width: 1200px) {
@@ -892,7 +882,7 @@ body.modal-open {
 }
 
 /* ========================================
-   17. RESPONSIVE - TABLET PORTRAIT (CORREGIDO)
+   18. RESPONSIVE - TABLET PORTRAIT
    ======================================== */
 
 @media (max-width: 834px) {
@@ -911,7 +901,6 @@ body.modal-open {
         height: 100vh;
     }
 
-    /* Header con título desplazado */
     .modal-header {
         padding: 20px 30px;
         border-bottom: 1px solid #eee;
@@ -919,16 +908,14 @@ body.modal-open {
 
     .modal-title {
         font-size: 24px;
-        margin-left: 40px; /* Desplazado para evitar hamburguesa */
+        margin-left: 40px;
     }
 
-    /* Body con padding para reset button */
     .modal-body {
-        padding-top: 60px; /* Espacio para reset button */
+        padding-top: 60px;
         overflow-y: auto;
     }
 
-    /* Reset button fijo debajo del header */
     .reset-filters-btn {
         position: fixed !important;
         top: 70px !important;
@@ -941,7 +928,6 @@ body.modal-open {
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    /* Tabs visibles y accesibles */
     .custom-tabs {
         display: flex;
         margin: 10px 20px;
@@ -1010,7 +996,6 @@ body.modal-open {
         max-width: 100%;
     }
 
-    /* Footer fijo */
     .modal-footer {
         position: fixed;
         bottom: 0;
@@ -1019,10 +1004,15 @@ body.modal-open {
         padding: 15px 30px;
         z-index: 100;
     }
+
+    .dimension-text {
+        font-size: 11px;
+        padding: 2px 6px;
+    }
 }
 
 /* ========================================
-   18. RESPONSIVE - TABLET LANDSCAPE (CORREGIDO)
+   19. RESPONSIVE - TABLET LANDSCAPE
    ======================================== */
 
 @media (max-width: 1024px) and (orientation: landscape) {
@@ -1040,7 +1030,6 @@ body.modal-open {
         border-radius: 0;
     }
 
-    /* Header compacto con título desplazado */
     .modal-header {
         padding: 15px 30px;
         border-bottom: 1px solid #eee;
@@ -1048,10 +1037,9 @@ body.modal-open {
 
     .modal-title {
         font-size: 22px;
-        margin-left: 35px; /* Desplazado */
+        margin-left: 35px;
     }
 
-    /* Reset button como botón flotante */
     .reset-filters-btn {
         position: absolute !important;
         top: 15px !important;
@@ -1062,7 +1050,6 @@ body.modal-open {
         font-size: 12px;
     }
 
-    /* Tabs compactos pero visibles */
     .custom-tabs {
         display: flex;
         margin: 0 30px;
@@ -1081,7 +1068,6 @@ body.modal-open {
         height: 35px;
     }
 
-    /* Layout horizontal mejorado */
     .config-container {
         display: flex;
         flex-direction: row;
@@ -1137,7 +1123,6 @@ body.modal-open {
         height: 38px;
     }
 
-    /* Footer visible */
     .modal-footer {
         position: fixed;
         bottom: 0;
@@ -1157,11 +1142,10 @@ body.modal-open {
 }
 
 /* ========================================
-   19. RESPONSIVE - MOBILE PORTRAIT  
+   20. RESPONSIVE - MOBILE PORTRAIT
    ======================================== */
 
 @media (max-width: 480px) and (orientation: portrait) {
-    /* [Código anterior de móvil portrait se mantiene igual] */
     .modal-dialog-custom {
         position: fixed;
         top: 0;
@@ -1241,38 +1225,171 @@ body.modal-open {
         height: 36px;
     }
 
-    /* [Resto del código móvil se mantiene] */
+    .config-container {
+        flex-direction: column;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .preview-section {
+        width: 100%;
+        min-height: 280px;
+        padding: 15px;
+        border-radius: 0;
+    }
+
+    .bottle-visual-wrapper {
+        height: 250px;
+    }
+
+    .bottle-svg-container img {
+        max-width: 200px;
+        max-height: 230px;
+    }
+
+    .cap-visual-wrapper {
+        height: 200px;
+    }
+
+        .cap-visual-wrapper img {
+            max-width: 180px;
+            max-height: 100px;
+        }
+
+    .form-section {
+        width: 100%;
+        padding: 20px 15px;
+    }
+
+    .field {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-size: 14px;
+        padding-left: 10px;
+    }
+
+    .form-select {
+        height: 48px;
+        font-size: 16px;
+        padding: 0 35px 0 15px;
+    }
+
+    .segmented {
+        padding: 0 10px;
+        margin-top: 20px;
+    }
+
+    .segmented-item {
+        font-size: 13px;
+        padding: 8px;
+        height: 36px;
+    }
+
+    .radio-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .segmented-item.active .radio-icon::after {
+        width: 8px;
+        height: 8px;
+    }
+
+    .modal-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 12px 15px;
+        background: white;
+        border-top: 1px solid #dee2e6;
+        z-index: 100;
+    }
+
+    .btn-cancel,
+    .btn-primary {
+        font-size: 16px;
+        padding: 10px 20px;
+        height: 40px;
+        min-width: 120px;
+    }
+
+    .dimension-lines-container {
+        display: none;
+    }
 }
 
 /* ========================================
-   20. RESPONSIVE - MOBILE LANDSCAPE
+   21. RESPONSIVE - MOBILE LANDSCAPE
    ======================================== */
 
 @media (max-width: 896px) and (orientation: landscape) {
-    /* [Código anterior de móvil landscape se mantiene igual] */
+    .modal-dialog-custom {
+        width: 100%;
+        height: 100vh;
+        transform: none;
+        max-width: 100%;
+    }
+
+    .modal-content-custom {
+        border-radius: 0;
+    }
+
+    .modal-header {
+        padding: 10px 20px;
+    }
+
+    .modal-title {
+        font-size: 20px;
+    }
+
+    .config-container {
+        height: calc(100vh - 120px);
+    }
+
+    .preview-section {
+        width: 40%;
+        padding: 10px;
+    }
+
+    .bottle-visual-wrapper {
+        height: 250px;
+    }
+
+    .bottle-svg-container img {
+        max-width: 200px;
+        max-height: 230px;
+    }
+
+    .cap-visual-wrapper {
+        height: 200px;
+    }
+
+        .cap-visual-wrapper img {
+            max-width: 160px;
+            max-height: 80px;
+        }
+
+    .form-section {
+        width: 60%;
+        padding: 10px 15px;
+    }
+
+    .field {
+        margin-bottom: 15px;
+    }
+
+    .modal-footer {
+        padding: 10px 20px;
+    }
 }
 
 /* ========================================
-   21-24. AJUSTES DINÁMICOS Y UTILIDADES
+   22. CLASES UTILITARIAS
    ======================================== */
-
-/* [El resto del código se mantiene igual] */
-
-.bottle-visual-wrapper[data-size="100"] .bottle-svg-container img,
-.bottle-visual-wrapper[data-size="150"] .bottle-svg-container img {
-    max-height: 450px;
-}
-
-.bottle-visual-wrapper[data-size="200"] .bottle-svg-container img,
-.bottle-visual-wrapper[data-size="250"] .bottle-svg-container img,
-.bottle-visual-wrapper[data-size="300"] .bottle-svg-container img {
-    max-height: 490px;
-}
-
-.bottle-visual-wrapper[data-size="400"] .bottle-svg-container img,
-.bottle-visual-wrapper[data-size="500"] .bottle-svg-container img {
-    max-height: 530px;
-}
 
 .font-12 {
     font-size: 12px;
@@ -1298,6 +1415,10 @@ body.modal-open {
     font-size: 32px;
 }
 
+/* ========================================
+   23. ACCESIBILIDAD
+   ======================================== */
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -1307,6 +1428,10 @@ body.modal-open {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ========================================
+   24. IMPRESIÓN
+   ======================================== */
 
 @media print {
     .modal-backdrop-custom {

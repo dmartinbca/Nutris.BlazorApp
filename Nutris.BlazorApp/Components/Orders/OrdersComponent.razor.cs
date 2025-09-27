@@ -178,6 +178,8 @@ public class OrdersComponentBase : ComponentBase
     protected List<BoteCapDataModal.CapDataItem> capDataList = new();
     protected List<BoteCapDataModal.ColorOption> boteColorOptions = new();
     protected List<BoteCapDataModal.ColorOption> capColorOptions = new();
+    private const string NO_IMAGE_AVAILABLE = "data:image/png;base64,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";
+    private const string NO_IMAGE_AVAILABLE_BASE64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+CiAgPHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNmMGYwZjAiLz4KICA8ZyBmaWxsPSIjYWFhIj4KICAgIDxwYXRoIGQ9Ik0xMDAgNjBjLTIyLjEgMC00MCAzNS44LTQwIDgwczE3LjkgODAgNDAgODAgNDAtMzUuOCA0MC04MC0xNy45LTgwLTQwLTgwem0wIDE0MGMtMTEgMC0yMC0yNi45LTIwLTYwczktNjAgMjAtNjAgMjAgMjYuOSAyMCA2MC05IDYwLTIwIDYweiIvPgogICAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iODUiIHI9IjgiLz4KICAgIDxwYXRoIGQ9Ik05NSAxMDBoMTB2NjBoLTEweiIvPgogIDwvZz4KPC9zdmc+";
 
     protected BoteCapDataModal.BoteDataItem? selectedBoteOption;
     protected BoteCapDataModal.CapDataItem? selectedCapOption;
@@ -597,12 +599,12 @@ public class OrdersComponentBase : ComponentBase
                         ID = id++,
                         Value = label.Trim(),
                         ColorHex = hex.Trim(),
-                        Round = $"data:image/png;base64,{Round}" ,
-                        Square = $"data:image/png;base64,{Square}",
-                        Cylindrical = $"data:image/png;base64,{Cylindrical}",
-                        Simple = $"data:image/png;base64,{Simple}",
-                        Metal = $"data:image/png;base64,{Metal}",
-                        Childproof = $"data:image/png;base64,{Childproof}"
+                        Round = !string.IsNullOrWhiteSpace(Round) ? $"data:image/png;base64,{Round}" : NO_IMAGE_AVAILABLE,
+                        Square = !string.IsNullOrWhiteSpace(Square) ? $"data:image/png;base64,{Square}" : NO_IMAGE_AVAILABLE,
+                        Cylindrical = !string.IsNullOrWhiteSpace(Cylindrical) ? $"data:image/png;base64,{Cylindrical}" : NO_IMAGE_AVAILABLE,
+                        Simple = !string.IsNullOrWhiteSpace(Simple) ? $"data:image/png;base64,{Simple}" : NO_IMAGE_AVAILABLE,
+                        Metal = !string.IsNullOrWhiteSpace(Metal) ? $"data:image/png;base64,{Metal}" : NO_IMAGE_AVAILABLE,
+                        Childproof = !string.IsNullOrWhiteSpace(Childproof) ? $"data:image/png;base64,{Childproof}" : NO_IMAGE_AVAILABLE
 
                     });
                 }
