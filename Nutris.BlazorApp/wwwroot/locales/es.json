@@ -110,6 +110,8 @@
   "units_per_container": "Unidad por envase",
   "status": "Estatus",
   "Edit": "Editar",
+  "Atention": "Atención",
+  "AtentionMsg": "No hay botes disponibles para el peso",
   "Returntoyourproductspage": "Regresar a la página de sus productos",
   "ModalThankYou": {
     "Thankyou": "¡Muchas gracias por confirmar el diseño! Estamos ",

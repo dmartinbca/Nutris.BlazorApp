@@ -31,7 +31,7 @@ namespace NutrisBlazor.Models
         public string Box_label_imagen { get; set; } = "";
         public string Label_imagen { get; set; } = "";
         public string Bote_imagen { get; set; } = "";
-
+        public double Peso_total { get; set; } = 0;
         public string Cap_imagen { get; set; } = "";
         public string Pallet_label_imagen { get; set; } = "";
 

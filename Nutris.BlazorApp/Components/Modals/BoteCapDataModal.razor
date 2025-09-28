@@ -65,7 +65,12 @@
                                 <h3 class="section-title">
                                     @Localization["modalContainer.Characteristics"]
                                 </h3>
-
+                                @if (!string.IsNullOrEmpty(PesoTotal) && !CapacidadOptionsFiltered.Any())
+                                {
+                                    <div class="alert alert-warning" style="margin: 10px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 5px;">
+                                        <strong> @Localization["Atention"]:</strong> @Localization["AtentionMsg"]
+                                    </div>
+                                }
                                 <div class="preview-content">
                                     <div class="bottle-visual-wrapper" data-size="@BoteConfig.Capacidad">
                                         <div class="dimension-lines-container" id="dimension-lines-@(ComponentId)">
@@ -296,7 +301,7 @@
                     <button type="button"
                             class="btn-primary"
                             @onclick="SaveAsync"
-                            disabled="@IsSaving"
+                            disabled="@IsSaving" 
                             style="min-width: 100px;">
                         @if (IsSaving)
                         {
@@ -323,6 +328,7 @@
     [Parameter] public EventCallback<UpdatedOptions> OnOptionsUpdated { get; set; }
     // Props de datos
     [Parameter] public string CodeRG35 { get; set; } = string.Empty;
+    [Parameter] public string PesoTotal { get; set; } = string.Empty;
     [Parameter] public BoteDataItem? SelectedOption { get; set; }
     [Parameter] public CapDataItem? SelectedOptionCap { get; set; }
 
@@ -541,7 +547,12 @@
             BoteConfig.ImagenBote = NO_IMAGE_AVAILABLE;
             return;
         }
-
+        // NUEVO: Filtrar por peso si existe PesoTotal
+        var availableBotes = BoteData.AsEnumerable();
+        if (!string.IsNullOrEmpty(PesoTotal) && decimal.TryParse(PesoTotal, out decimal pesoTotalDecimal))
+        {
+            availableBotes = availableBotes.Where(b => b.PesoMaximo >= pesoTotalDecimal);
+        }
         // Buscar en RelacionBote una coincidencia con los atributos seleccionados
         var matchingBote = BoteData.FirstOrDefault(b =>
             (string.IsNullOrEmpty(BoteConfig.Forma) || 
@@ -573,7 +584,7 @@
         {
             // Si no hay coincidencia exacta, buscar coincidencia parcial (relajando condiciones)
             var partialMatch = FindBestPartialMatchBote();
-
+            partialMatch = null;    
             if (partialMatch != null && !string.IsNullOrWhiteSpace(partialMatch.ImagenBote))
             {
                 if (partialMatch.ImagenBote.StartsWith("data:image"))
@@ -598,6 +609,17 @@
 
         // Prioridad de coincidencia: Forma > Capacidad > Diámetro > Material > Color
         // Intentar encontrar la mejor coincidencia posible
+        // NUEVO: Filtrar por peso si existe PesoTotal
+        var availableBotes = BoteData.AsEnumerable();
+        if (!string.IsNullOrEmpty(PesoTotal) && decimal.TryParse(PesoTotal, out decimal pesoTotalDecimal))
+        {
+            availableBotes = availableBotes.Where(b => b.PesoMaximo >= pesoTotalDecimal);
+            if (!availableBotes.Any())
+            {
+                Console.WriteLine($"No hay botes que soporten el peso de {pesoTotalDecimal}");
+                return null;
+            }
+        }
 
         // Primero intentar con forma, capacidad y diámetro
         var match = BoteData.FirstOrDefault(b =>
@@ -980,7 +1002,13 @@
     private void RecomputeBottleFilters()
     {
         var all = (BoteData ?? Enumerable.Empty<BoteDataItem>()).ToList();
-
+        // NUEVO: Filtrar por peso máximo si hay PesoTotal
+        if (!string.IsNullOrEmpty(PesoTotal) && decimal.TryParse(PesoTotal, out decimal pesoTotalDecimal))
+        {
+            Console.WriteLine($"Filtrando botes por peso: PesoTotal = {pesoTotalDecimal}");
+            all = all.Where(b => b.PesoMaximo >= pesoTotalDecimal).ToList();
+            Console.WriteLine($"Botes después del filtro de peso: {all.Count}");
+        }
         string forma = NormFormaBote(BoteConfig.Forma);
         string capSel = N(BoteConfig.Capacidad);
         string diaSel = NormDiam(BoteConfig.Diametro);
@@ -1101,14 +1129,14 @@
 
         // ===== Sincroniza diámetro de tapa cuando exista
         var previousCapDiameter = CapConfig.Diametro;
-    CapConfig.Diametro = string.IsNullOrEmpty(BoteConfig.Diametro) ? "" : BoteConfig.Diametro;
-    
+        CapConfig.Diametro = string.IsNullOrEmpty(BoteConfig.Diametro) ? "" : BoteConfig.Diametro;
+
         // Si el diámetro de la tapa cambió, actualizar su imagen
         if (previousCapDiameter != CapConfig.Diametro)
         {
             UpdateCapImage();
         }
-         UpdateCapImage();
+        UpdateCapImage();
         UpdateBoteImage(); // Actualizar la imagen después de recomputar filtros
         UpdateCurrentDimensions();
     }
@@ -1150,7 +1178,7 @@
         UpdateCapDimensions();
     }
 
-   private void RecomputeAllFilters()
+    private void RecomputeAllFilters()
     {
         RecomputeBottleFilters();
         RecomputeCapFilters();
@@ -1163,7 +1191,7 @@
 
 
     // ===== Handlers =====
-   private async void SetFormaBote(string forma)
+    private async void SetFormaBote(string forma)
     {
         BoteConfig.Forma = forma;
         UpdateBoteImage(); // Ya existe esta llamada
@@ -1279,7 +1307,7 @@
             Logger?.LogWarning("Error adjusting cap dimension lines: {Message}", ex.Message);
         }
     }
-    
+
     private async Task OnBoteColorChangedAsync()
     {
         UpdateBoteImage();
@@ -1558,6 +1586,7 @@
         public string? Material { get; set; }
         public string? Color { get; set; }
         public string? ImagenBote { get; set; }
+        public int PesoMaximo { get; set; }
     }
 
     public sealed class CapDataItem
@@ -1600,7 +1629,7 @@
         await InvokeAsync(StateHasChanged);
     }
     // Mapa sencillo para mostrar dimensiones aproximadas por capacidad/diámetro
-    
+
     private static List<ColorOption> MapNamesToColorOptions(
     IEnumerable<string> names,
     IEnumerable<ColorOption> catalog)
@@ -1627,87 +1656,92 @@
     }
     private async Task SaveAsync()
     {
-        IsSaving = true;
-        StateHasChanged();
-        try
+        if (CapacidadOptionsFiltered.Any())
         {
-            // Valores actuales del modal
-            var capacidad = BoteConfig.Capacidad ?? "";
-            var boca = BoteConfig.Diametro ?? "";
-            var material = BoteConfig.Material ?? "";
-            var color = BoteConfig.Color ?? "";
-            var forma = BoteConfig.Forma ?? "ROUND";
 
-            var capForma = MapCapFormaToApi(CapConfig.Forma);
-            var capColor = CapConfig.Color ?? "";
-            var capSleeve = CapConfig.Sleeve;
 
-            // Igual que en ContainerPackagingModal.UpdateSelectedOption()
-            var data = new
+            IsSaving = true;
+            StateHasChanged();
+            try
             {
-                Bote_forma = forma,
-                Bote_capacidad = capacidad,
-                Bote_boca = boca,
-                Bote_color = color,
-                Bote_material = material,
+                // Valores actuales del modal
+                var capacidad = BoteConfig.Capacidad ?? "";
+                var boca = BoteConfig.Diametro ?? "";
+                var material = BoteConfig.Material ?? "";
+                var color = BoteConfig.Color ?? "";
+                var forma = BoteConfig.Forma ?? "ROUND";
 
-                Cap_tapa = capForma,
-                Cap_Boca = boca,       // sincronizado con el bote
-                Cap_color = capColor,
-                Cap_sleever = capSleeve,
+                var capForma = MapCapFormaToApi(CapConfig.Forma);
+                var capColor = CapConfig.Color ?? "";
+                var capSleeve = CapConfig.Sleeve;
 
-                Characteristics = $"{color} {capacidad}cc {material} {boca}"
-            };
+                // Igual que en ContainerPackagingModal.UpdateSelectedOption()
+                var data = new
+                {
+                    Bote_forma = forma,
+                    Bote_capacidad = capacidad,
+                    Bote_boca = boca,
+                    Bote_color = color,
+                    Bote_material = material,
 
-            Logger?.LogInformation("Saving Packaging: Size={capacidad}, Diameter={boca}", capacidad, boca);
+                    Cap_tapa = capForma,
+                    Cap_Boca = boca,       // sincronizado con el bote
+                    Cap_color = capColor,
+                    Cap_sleever = capSleeve,
 
-            var url = $"CustomizeRG35('{CodeRG35}')?$expand=Formulation,Recipe,Analytics&tenant=nutris";
-            var response = await ApiService.PatchAsync(url, data);
+                    Characteristics = $"{color} {capacidad}cc {material} {boca}"
+                };
 
-            if (!response.IsSuccessStatusCode)
-            {
-                var err = await response.Content.ReadAsStringAsync();
-                Logger?.LogError("API error response: {err}", err);
-                await ShowAlert("Error actualizando datos. Inténtalo de nuevo.");
-                return;
+                Logger?.LogInformation("Saving Packaging: Size={capacidad}, Diameter={boca}", capacidad, boca);
+
+                var url = $"CustomizeRG35('{CodeRG35}')?$expand=Formulation,Recipe,Analytics&tenant=nutris";
+                var response = await ApiService.PatchAsync(url, data);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var err = await response.Content.ReadAsStringAsync();
+                    Logger?.LogError("API error response: {err}", err);
+                    await ShowAlert("Error actualizando datos. Inténtalo de nuevo.");
+                    return;
+                }
+
+                Logger?.LogInformation("Packaging updated successfully");
+
+                // Notifica al padre (mismo shape que el modal antiguo)
+                var updated = new UpdatedOptions
+                    {
+                        BoteOption = new SelectedBoteOption
+                        {
+                            BoteForma = forma,
+                            BoteCapacidad = capacidad,
+                            BoteBoca = boca,
+                            BoteColor = color,
+                            BoteMaterial = material
+                        },
+                        CapOption = new SelectedCapOption
+                        {
+                            CapTapa = capForma,
+                            CapBoca = boca,
+                            CapColor = capColor,
+                            CapSleever = capSleeve
+                        },
+                        Characteristics = data.Characteristics
+                    };
+
+                if (OnOptionsUpdated.HasDelegate)
+                    await OnOptionsUpdated.InvokeAsync(updated);
+
+                // Cierra el modal…
+                await HideModal();
+
+                // …y recarga duro (igual que el otro modal)
+                Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
             }
-
-            Logger?.LogInformation("Packaging updated successfully");
-
-            // Notifica al padre (mismo shape que el modal antiguo)
-            var updated = new UpdatedOptions
+            catch (Exception ex)
             {
-                BoteOption = new SelectedBoteOption
-                {
-                    BoteForma = forma,
-                    BoteCapacidad = capacidad,
-                    BoteBoca = boca,
-                    BoteColor = color,
-                    BoteMaterial = material
-                },
-                CapOption = new SelectedCapOption
-                {
-                    CapTapa = capForma,
-                    CapBoca = boca,
-                    CapColor = capColor,
-                    CapSleever = capSleeve
-                },
-                Characteristics = data.Characteristics
-            };
-
-            if (OnOptionsUpdated.HasDelegate)
-                await OnOptionsUpdated.InvokeAsync(updated);
-
-            // Cierra el modal…
-            await HideModal();
-
-            // …y recarga duro (igual que el otro modal)
-            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
-        }
-        catch (Exception ex)
-        {
-            Logger?.LogError(ex, "Error saving Packaging");
-            await ShowAlert("Se produjo un error. Inténtalo de nuevo.");
+                Logger?.LogError(ex, "Error saving Packaging");
+                await ShowAlert("Se produjo un error. Inténtalo de nuevo.");
+            }
         }
     }
 

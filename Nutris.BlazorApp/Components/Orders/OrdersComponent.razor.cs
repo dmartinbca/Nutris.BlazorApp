@@ -344,7 +344,8 @@ public class OrdersComponentBase : ComponentBase
                     Diametro = item.TryGetProperty("Diametro", out var d) ? d.GetString() : null,
                     Material = item.TryGetProperty("Material", out var m) ? m.GetString() : null,
                     Color = item.TryGetProperty("Color", out var col) ? col.GetString() : null,
-                    ImagenBote = item.TryGetProperty("ImagenBote", out var img) ? img.GetString() : null
+                    ImagenBote = item.TryGetProperty("ImagenBote", out var img) ? img.GetString() : null,
+                    PesoMaximo  = item.TryGetProperty("Peso_Maximo", out var pm) ? pm.GetUInt16(): 0
                 })
                 .Where(b => b.Forma != null)
                 .ToList();

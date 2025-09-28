@@ -109,6 +109,8 @@
   "units_per_container": "Units per container",
   "status": "Status",
   "Edit": "Edit",
+  "Atention": "Atention",
+  "AtentionMsg": "No bottle available for this weight",
   "Returntoyourproductspage": "Return to your products page",
   "ModalThankYou": {
     "Thankyou": "Thank you very much for confirming the design! We are ",
