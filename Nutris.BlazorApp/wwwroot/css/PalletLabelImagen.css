@@ -1,161 +1,381 @@
-﻿/* Modal centrado */
+﻿/* ========================================
+   PALLET LABEL IMAGEN MODAL - ULTRA COMPACTO
+   ======================================== */
+
+/* ========================================
+   VARIABLES
+   ======================================== */
+:root {
+    --modal-bg: #E8F4F8;
+    --primary-color: #4B7BCD;
+    --primary-hover: #3A5FA8;
+    --danger-color: #e74c3c;
+    --text-dark: #333;
+    --text-medium: #555;
+    --text-light: #666;
+    --upload-bg: #f4f9ff;
+    --upload-bg-hover: #F8FBFF;
+    --border-dashed: #4B7BCD;
+}
+
+/* ========================================
+   FORZAR ALTURA DEL MODAL - MÁXIMA ESPECIFICIDAD
+   ======================================== */
+
+/* Override completo de Bootstrap */
+body .modal#PalletLabelImagen .modal-dialog {
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 30px auto !important;
+}
+
+body .modal#PalletLabelImagen .modal-dialog-centered {
+    min-height: 0 !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+body .modal#PalletLabelImagen .modal-content {
+    min-height: 0 !important;
+    /*height: 320px !important;*/ /* ALTURA ÓPTIMA */
+    max-height: 320px !important;
+    overflow: hidden !important;
+}
+
+body .modal#PalletLabelImagen .upload-modal-container {
+    background-color: var(--modal-bg);
+    border-radius: 15px;
+    border: none;
+    width: 100%;
+    max-width: 500px;
+    height: 320px !important; /* ALTURA ÓPTIMA */
+    min-height: 320px !important;
+    max-height: 320px !important;
+    overflow: hidden !important;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+}
+
+body .modal#PalletLabelImagen .modal-body {
+    padding: 25px 30px 20px !important;
+    height: 320px !important;
+    min-height: 0 !important;
+    max-height: 320px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    overflow: hidden !important;
+}
 .modal-dialog-centered {
+    min-height: calc(100vh - 60px) !important;
     display: flex;
     align-items: center;
-    min-height: calc(100vh - 60px);
+    justify-content: center;
 }
+/* ========================================
+   ELEMENTOS INTERNOS COMPACTOS
+   ======================================== */
 
-/* Contenedor principal */
-.upload-modal-container {
-    background-color: #E8F4F8;
-    border-radius: 20px;
-    border: none;
-    position: relative;
-    max-width: 650px;
-    margin: 0 auto;
-    overflow: hidden; /* Eliminar scroll */
-}
-
-/* Body */
-.modal-body {
-    padding: 60px 50px 50px;
-    min-height: 340px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Centrar verticalmente */
-    overflow: visible; /* Sin scroll */
-}
-
-/* Título */
-.modal-title {
+#PalletLabelImagen .modal-title {
     text-align: center;
-    font-size: 24px;
+    font-size: 18px !important;
     font-weight: 600;
-    color: #333;
-    margin: 0 0 35px 0;
+    color: var(--text-dark);
+    margin: 0 0 15px 0 !important;
+    padding: 0 !important;
+    line-height: 1.3 !important;
+    font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
-/* Contenido de upload */
-.upload-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center; /* Centrar contenido */
-    gap: 20px;
+#PalletLabelImagen .upload-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
-/* Área de upload */
-.upload-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 2px dashed #4B7BCD;
-    border-radius: 10px;
-    padding: 0px;
-    background-color: #f4f9ff;
-    cursor: pointer;
-    width: 50%;
-    min-height: 150px;
-    text-align: center;
-    position: relative;
+#PalletLabelImagen .upload-area {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 2px dashed var(--border-dashed) !important;
+    border-radius: 8px !important;
+    padding: 15px 20px !important;
+    background-color: var(--upload-bg) !important;
+    cursor: pointer !important;
+    width: 200px !important;
+    height: 80px !important;
+    min-height: 80px !important;
+    max-height: 80px !important;
+    text-align: center !important;
+    transition: all 0.2s ease !important;
+    margin: 0 !important;
 }
 
-    .upload-area:hover {
-        border-color: #4B7BCD;
-        background: #F8FBFF;
+    #PalletLabelImagen .upload-area:hover {
+        border-color: var(--primary-color) !important;
+        background: var(--upload-bg-hover) !important;
+        box-shadow: 0 3px 10px rgba(75, 123, 205, 0.15) !important;
+        transform: translateY(-1px) !important;
     }
 
-.upload-text {
-    font-size: 14px;
-    color: #555;
-    margin-top: 10px;
-}
-
-/* Preview */
-.preview-box {
-    position: relative;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.preview-image {
-    max-width: 100%;
-    max-height: 160px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
-
-.btn-delete {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    background: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 16px;
-    line-height: 18px;
-    text-align: center;
-    cursor: pointer;
-}
-
-    .btn-delete:hover {
-        background: #CC0000;
+    #PalletLabelImagen .upload-area svg {
+        width: 24px !important;
+        height: 24px !important;
+        margin: 0 0 5px 0 !important;
     }
 
-/* Texto formato */
-.format-info {
-    font-size: 14px;
-    color: #666;
-    margin: 15px 0;
-    text-align: center;
+#PalletLabelImagen .upload-text {
+    font-size: 12px !important;
+    color: var(--text-medium) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
 }
 
-/* Botón submit */
-.btn-submit {
-    padding: 12px 45px;
-    background: #4B7BCD;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s;
+#PalletLabelImagen .preview-box {
+    position: relative !important;
+    padding: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 80px !important;
+    margin: 0 !important;
 }
 
-    .btn-submit:hover:not(:disabled) {
-        background: #3A5FA8;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(75,123,205,0.3);
+#PalletLabelImagen .preview-image {
+    max-width: 180px !important;
+    max-height: 70px !important;
+    height: auto !important;
+    width: auto !important;
+    border-radius: 4px !important;
+    border: 1px solid #ddd !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+    object-fit: contain !important;
+}
+
+#PalletLabelImagen .btn-delete {
+    position: absolute !important;
+    top: 5px !important;
+    right: calc(50% - 90px) !important;
+    background: var(--danger-color) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+    #PalletLabelImagen .btn-delete:hover {
+        background: #CC0000 !important;
+        transform: scale(1.1) !important;
     }
 
-    .btn-submit:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+#PalletLabelImagen .format-info {
+    font-size: 11px !important;
+    color: var(--text-light) !important;
+    margin: 8px 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+    font-style: italic !important;
+    line-height: 1.3 !important;
+}
+
+#PalletLabelImagen .btn-submit {
+    padding: 8px 28px !important;
+    background: var(--primary-color) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 22px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    min-width: 100px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    margin: 5px 0 0 0 !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 5px rgba(75, 123, 205, 0.2) !important;
+}
+
+    #PalletLabelImagen .btn-submit:hover:not(:disabled) {
+        background: var(--primary-hover) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 10px rgba(75, 123, 205, 0.3) !important;
     }
 
-/* Ocultar input */
-.d-none {
+    #PalletLabelImagen .btn-submit:disabled {
+        opacity: 0.5 !important;
+        cursor: not-allowed !important;
+        box-shadow: none !important;
+    }
+
+/* ========================================
+   UTILIDADES
+   ======================================== */
+
+#PalletLabelImagen .d-none {
     display: none !important;
 }
 
-/* Responsive */
-@media (max-width: 576px) {
-    .modal-body {
-        padding: 50px 30px 40px;
-    }
+#PalletLabelImagen .spinner-border-sm {
+    width: 12px !important;
+    height: 12px !important;
+    border-width: 2px !important;
+}
 
-    .upload-area {
-        height: 180px;
-    }
+/* ========================================
+   RESPONSIVE MANTENIENDO ALTURA COMPACTA
+   ======================================== */
 
-    .upload-modal-container {
+/* Tablets */
+@media (max-width: 768px) {
+    body .modal#PalletLabelImagen .upload-modal-container {
         max-width: 90%;
+        height: 170px !important;
+    }
+
+    body .modal#PalletLabelImagen .modal-content {
+        height: 170px !important;
+    }
+
+    body .modal#PalletLabelImagen .modal-body {
+        height: 170px !important;
+        padding: 8px 15px 6px !important;
+    }
+
+    #PalletLabelImagen .modal-title {
+        font-size: 13px !important;
+    }
+
+    #PalletLabelImagen .upload-area {
+        width: 150px !important;
+        height: 38px !important;
+    }
+}
+
+/* Móviles */
+@media (max-width: 480px) {
+    body .modal#PalletLabelImagen .modal-dialog {
+        margin: 10px !important;
+    }
+
+    body .modal#PalletLabelImagen .upload-modal-container {
+        max-width: calc(100% - 20px);
+        height: 160px !important;
+        border-radius: 10px;
+    }
+
+    body .modal#PalletLabelImagen .modal-content {
+        height: 160px !important;
+    }
+
+    body .modal#PalletLabelImagen .modal-body {
+        height: 160px !important;
+        padding: 6px 12px !important;
+    }
+
+    #PalletLabelImagen .modal-title {
+        font-size: 12px !important;
+        margin-bottom: 4px !important;
+    }
+
+    #PalletLabelImagen .upload-area {
+        width: 140px !important;
+        height: 35px !important;
+        padding: 4px 8px !important;
+    }
+
+        #PalletLabelImagen .upload-area svg {
+            width: 14px !important;
+            height: 14px !important;
+        }
+
+    #PalletLabelImagen .upload-text {
+        font-size: 9px !important;
+    }
+
+    #PalletLabelImagen .format-info {
+        font-size: 8px !important;
+    }
+
+    #PalletLabelImagen .btn-submit {
+        padding: 3px 12px !important;
+        font-size: 10px !important;
+        height: 20px !important;
+    }
+}
+
+/* Landscape móvil */
+@media (max-height: 500px) and (orientation: landscape) {
+    body .modal#PalletLabelImagen .modal-content,
+    body .modal#PalletLabelImagen .upload-modal-container,
+    body .modal#PalletLabelImagen .modal-body {
+        height: 150px !important;
+        min-height: 150px !important;
+        max-height: 150px !important;
+    }
+
+    #PalletLabelImagen .upload-area {
+        height: 32px !important;
+    }
+
+    #PalletLabelImagen .modal-title {
+        margin-bottom: 3px !important;
+    }
+
+    #PalletLabelImagen .upload-content {
+        gap: 2px !important;
+    }
+}
+
+/* ========================================
+   MODO OSCURO (OPCIONAL)
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --modal-bg: #1a2332;
+        --text-dark: #e0e0e0;
+        --text-medium: #b0b0b0;
+        --text-light: #999;
+        --upload-bg: #253341;
+        --upload-bg-hover: #2a3a4a;
+    }
+}
+
+/* ========================================
+   ACCESIBILIDAD
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    #PalletLabelImagen * {
+        animation: none !important;
+        transition: none !important;
     }
 }

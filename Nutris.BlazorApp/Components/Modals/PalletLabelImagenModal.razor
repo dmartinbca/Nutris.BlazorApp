@@ -32,18 +32,24 @@ else
                         <label for="fileInputPallet" class="upload-area">
                             @if (string.IsNullOrEmpty(PreviewImage))
                             {
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" class="mb-2">
-                                    <path d="M12 2L12 14M12 14L17 9M12 14L7 9" stroke="#4B7BCD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M2 17L2 19C2 20.1046 2.89543 21 4 21L20 21C21.1046 21 22 20.1046 22 19L22 17" stroke="#4B7BCD" stroke-width="2" stroke-linecap="round" />
-                                </svg>
+                                <div class="upload-icon-wrapper">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                                        <path d="M12 2L12 14M12 14L17 9M12 14L7 9" stroke="#4B7BCD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M2 17L2 19C2 20.1046 2.89543 21 4 21L20 21C21.1046 21 22 20.1046 22 19L22 17" stroke="#4B7BCD" stroke-width="2" stroke-linecap="round" />
+                                    </svg>
+                                </div>
                                 <p class="upload-text">@Localization["Uploadadocument"]</p>
                             }
                             else
                             {
                                 <div class="preview-box">
                                     <img src="@PreviewImage" alt="Preview" class="preview-image">
-                                    <button type="button" class="btn-delete" @onclick="RemoveImage" @onclick:stopPropagation="true">
-                                        &times;
+                                    <button type="button"
+                                            class="btn-delete"
+                                            @onclick="RemoveImage"
+                                            @onclick:stopPropagation="true"
+                                            aria-label="Eliminar imagen">
+                                        <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                             }
@@ -57,7 +63,12 @@ else
                                 disabled="@(string.IsNullOrEmpty(PreviewImage) || IsLoading)">
                             @if (IsLoading)
                             {
-                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                <div class="loading-overlay">
+                                    <div class="spinner-wrapper">
+                                        <span class="spinner-border"></span>
+                                        <span class="loading-text">@GetTranslation("Message.Loading", "Cargando...")</span>
+                                    </div>
+                                </div>
                             }
                             Subir
                         </button>
