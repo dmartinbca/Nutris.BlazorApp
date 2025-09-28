@@ -278,7 +278,8 @@
                                 <!-- Sleeve -->
                                 <div class="field">
                                     <label class="checkbox">
-                                        <input type="checkbox" @bind="CapConfig.Sleeve" />
+                                          <input type="checkbox" @bind="CapConfig.Sleeve" @bind:after="OnSleeveChanged" />
+      
                                         <span>Sleever</span>
                                     </label>
                                 </div>
@@ -532,108 +533,108 @@
     // ===== MÉTODOS NUEVOS PARA OBTENER LAS IMÁGENES =====
     // Agregar estos métodos en la sección de código del componente:
 
- private void UpdateBoteImage()
-{
-    // Si no hay datos de RelacionBote, usar imagen por defecto
-    if (BoteData == null || !BoteData.Any())
+    private void UpdateBoteImage()
     {
-        BoteConfig.ImagenBote = NO_IMAGE_AVAILABLE;
-        return;
-    }
-
-    // Buscar en RelacionBote una coincidencia con los atributos seleccionados
-    var matchingBote = BoteData.FirstOrDefault(b =>
-        (string.IsNullOrEmpty(BoteConfig.Forma) || 
-         string.Equals(NormFormaBote(b.Forma), NormFormaBote(BoteConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrEmpty(BoteConfig.Capacidad) || 
-         string.Equals(b.Capacidad, BoteConfig.Capacidad, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrEmpty(BoteConfig.Diametro) || 
-         string.Equals(NormDiam(b.Diametro), NormDiam(BoteConfig.Diametro), StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrEmpty(BoteConfig.Material) || 
-         string.Equals(b.Material, BoteConfig.Material, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrEmpty(BoteConfig.Color) || 
-         string.Equals(b.Color, BoteConfig.Color, StringComparison.OrdinalIgnoreCase))
-    );
-
-    if (matchingBote != null && !string.IsNullOrWhiteSpace(matchingBote.ImagenBote))
-    {
-        // Si la imagen ya viene con el prefijo data:image, usarla tal cual
-        if (matchingBote.ImagenBote.StartsWith("data:image"))
+        // Si no hay datos de RelacionBote, usar imagen por defecto
+        if (BoteData == null || !BoteData.Any())
         {
-            BoteConfig.ImagenBote = matchingBote.ImagenBote;
+            BoteConfig.ImagenBote = NO_IMAGE_AVAILABLE;
+            return;
         }
-        else
+
+        // Buscar en RelacionBote una coincidencia con los atributos seleccionados
+        var matchingBote = BoteData.FirstOrDefault(b =>
+            (string.IsNullOrEmpty(BoteConfig.Forma) || 
+             string.Equals(NormFormaBote(b.Forma), NormFormaBote(BoteConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(BoteConfig.Capacidad) || 
+             string.Equals(b.Capacidad, BoteConfig.Capacidad, StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(BoteConfig.Diametro) || 
+             string.Equals(NormDiam(b.Diametro), NormDiam(BoteConfig.Diametro), StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(BoteConfig.Material) || 
+             string.Equals(b.Material, BoteConfig.Material, StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(BoteConfig.Color) || 
+             string.Equals(b.Color, BoteConfig.Color, StringComparison.OrdinalIgnoreCase))
+        );
+
+        if (matchingBote != null && !string.IsNullOrWhiteSpace(matchingBote.ImagenBote))
         {
-            // Si no, agregar el prefijo base64
-            BoteConfig.ImagenBote = $"data:image/png;base64,{matchingBote.ImagenBote}";
-        }
-    }
-    else
-    {
-        // Si no hay coincidencia exacta, buscar coincidencia parcial (relajando condiciones)
-        var partialMatch = FindBestPartialMatchBote();
-        
-        if (partialMatch != null && !string.IsNullOrWhiteSpace(partialMatch.ImagenBote))
-        {
-            if (partialMatch.ImagenBote.StartsWith("data:image"))
+            // Si la imagen ya viene con el prefijo data:image, usarla tal cual
+            if (matchingBote.ImagenBote.StartsWith("data:image"))
             {
-                BoteConfig.ImagenBote = partialMatch.ImagenBote;
+                BoteConfig.ImagenBote = matchingBote.ImagenBote;
             }
             else
             {
-                BoteConfig.ImagenBote = $"data:image/png;base64,{partialMatch.ImagenBote}";
+                // Si no, agregar el prefijo base64
+                BoteConfig.ImagenBote = $"data:image/png;base64,{matchingBote.ImagenBote}";
             }
         }
         else
         {
-            BoteConfig.ImagenBote = NO_IMAGE_AVAILABLE;
+            // Si no hay coincidencia exacta, buscar coincidencia parcial (relajando condiciones)
+            var partialMatch = FindBestPartialMatchBote();
+
+            if (partialMatch != null && !string.IsNullOrWhiteSpace(partialMatch.ImagenBote))
+            {
+                if (partialMatch.ImagenBote.StartsWith("data:image"))
+                {
+                    BoteConfig.ImagenBote = partialMatch.ImagenBote;
+                }
+                else
+                {
+                    BoteConfig.ImagenBote = $"data:image/png;base64,{partialMatch.ImagenBote}";
+                }
+            }
+            else
+            {
+                BoteConfig.ImagenBote = NO_IMAGE_AVAILABLE;
+            }
         }
     }
-}
-private BoteDataItem? FindBestPartialMatchBote()
-{
-    if (BoteData == null || !BoteData.Any())
-        return null;
+    private BoteDataItem? FindBestPartialMatchBote()
+    {
+        if (BoteData == null || !BoteData.Any())
+            return null;
 
-    // Prioridad de coincidencia: Forma > Capacidad > Diámetro > Material > Color
-    // Intentar encontrar la mejor coincidencia posible
-    
-    // Primero intentar con forma, capacidad y diámetro
-    var match = BoteData.FirstOrDefault(b =>
-        !string.IsNullOrWhiteSpace(b.ImagenBote) &&
-        (string.IsNullOrEmpty(BoteConfig.Forma) || 
-         string.Equals(NormFormaBote(b.Forma), NormFormaBote(BoteConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrEmpty(BoteConfig.Capacidad) || 
-         string.Equals(b.Capacidad, BoteConfig.Capacidad, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrEmpty(BoteConfig.Diametro) || 
-         string.Equals(NormDiam(b.Diametro), NormDiam(BoteConfig.Diametro), StringComparison.OrdinalIgnoreCase))
-    );
+        // Prioridad de coincidencia: Forma > Capacidad > Diámetro > Material > Color
+        // Intentar encontrar la mejor coincidencia posible
 
-    if (match != null) return match;
+        // Primero intentar con forma, capacidad y diámetro
+        var match = BoteData.FirstOrDefault(b =>
+            !string.IsNullOrWhiteSpace(b.ImagenBote) &&
+            (string.IsNullOrEmpty(BoteConfig.Forma) || 
+             string.Equals(NormFormaBote(b.Forma), NormFormaBote(BoteConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(BoteConfig.Capacidad) || 
+             string.Equals(b.Capacidad, BoteConfig.Capacidad, StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(BoteConfig.Diametro) || 
+             string.Equals(NormDiam(b.Diametro), NormDiam(BoteConfig.Diametro), StringComparison.OrdinalIgnoreCase))
+        );
 
-    // Si no hay coincidencia, intentar solo con forma y capacidad
-    match = BoteData.FirstOrDefault(b =>
-        !string.IsNullOrWhiteSpace(b.ImagenBote) &&
-        (string.IsNullOrEmpty(BoteConfig.Forma) || 
-         string.Equals(NormFormaBote(b.Forma), NormFormaBote(BoteConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrEmpty(BoteConfig.Capacidad) || 
-         string.Equals(b.Capacidad, BoteConfig.Capacidad, StringComparison.OrdinalIgnoreCase))
-    );
+        if (match != null) return match;
 
-    if (match != null) return match;
+        // Si no hay coincidencia, intentar solo con forma y capacidad
+        match = BoteData.FirstOrDefault(b =>
+            !string.IsNullOrWhiteSpace(b.ImagenBote) &&
+            (string.IsNullOrEmpty(BoteConfig.Forma) || 
+             string.Equals(NormFormaBote(b.Forma), NormFormaBote(BoteConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(BoteConfig.Capacidad) || 
+             string.Equals(b.Capacidad, BoteConfig.Capacidad, StringComparison.OrdinalIgnoreCase))
+        );
 
-    // Si aún no hay coincidencia, intentar solo con forma
-    match = BoteData.FirstOrDefault(b =>
-        !string.IsNullOrWhiteSpace(b.ImagenBote) &&
-        !string.IsNullOrEmpty(BoteConfig.Forma) &&
-        string.Equals(NormFormaBote(b.Forma), NormFormaBote(BoteConfig.Forma), StringComparison.OrdinalIgnoreCase)
-    );
+        if (match != null) return match;
 
-    if (match != null) return match;
+        // Si aún no hay coincidencia, intentar solo con forma
+        match = BoteData.FirstOrDefault(b =>
+            !string.IsNullOrWhiteSpace(b.ImagenBote) &&
+            !string.IsNullOrEmpty(BoteConfig.Forma) &&
+            string.Equals(NormFormaBote(b.Forma), NormFormaBote(BoteConfig.Forma), StringComparison.OrdinalIgnoreCase)
+        );
 
-    // Como último recurso, devolver cualquier imagen disponible
-    return BoteData.FirstOrDefault(b => !string.IsNullOrWhiteSpace(b.ImagenBote));
-}
+        if (match != null) return match;
+
+        // Como último recurso, devolver cualquier imagen disponible
+        return BoteData.FirstOrDefault(b => !string.IsNullOrWhiteSpace(b.ImagenBote));
+    }
 
     private async Task OnImageLoaded()
     {
@@ -655,7 +656,11 @@ private BoteDataItem? FindBestPartialMatchBote()
         }}
     ");
     }
-
+    private async Task OnSleeveChanged()
+    {
+        UpdateCapImage(); // Actualizar imagen cuando cambie el sleeve
+        await InvokeAsync(StateHasChanged);
+    }
     private async Task OnCapImageLoaded()
     {
         await Task.Delay(100); // Pequeño delay para asegurar el renderizado
@@ -664,101 +669,111 @@ private BoteDataItem? FindBestPartialMatchBote()
             await AdjustCapDimensionLines();
         }
     }
-   private void UpdateCapImage()
-{
-    // Si no hay datos de RelacionTapa, usar imagen por defecto
-    if (CapData == null || !CapData.Any())
+    private void UpdateCapImage()
     {
-        CapConfig.ImagenCap = NO_IMAGE_AVAILABLE;
-        return;
-    }
+        Console.WriteLine($"UpdateCapImage - Forma: {CapConfig.Forma}, Diametro: {CapConfig.Diametro}, Color: {CapConfig.Color}, Sleeve: {CapConfig.Sleeve}");
 
-    // Buscar en RelacionTapa una coincidencia con los atributos seleccionados
-    var matchingCap = CapData.FirstOrDefault(c =>
-        (string.IsNullOrEmpty(CapConfig.Forma) || 
-         string.Equals(NormFormaCap(c.Forma), NormFormaCap(CapConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrEmpty(CapConfig.Diametro) || 
-         string.Equals(NormDiam(c.Diametro), NormDiam(CapConfig.Diametro), StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrEmpty(CapConfig.Color) || 
-         string.Equals(c.Color, CapConfig.Color, StringComparison.OrdinalIgnoreCase)) &&
-        (c.Sleeve == CapConfig.Sleeve)
-    );
+        // Si no hay datos de RelacionTapa, usar imagen por defecto
+        if (CapData == null || !CapData.Any())
+        {
+            Console.WriteLine("No hay datos de CapData");
+            CapConfig.ImagenCap = NO_IMAGE_AVAILABLE;
+            return;
+        }
 
-    if (matchingCap != null && !string.IsNullOrWhiteSpace(matchingCap.ImagenCap))
-    {
-        // Si la imagen ya viene con el prefijo data:image, usarla tal cual
-        if (matchingCap.ImagenCap.StartsWith("data:image"))
+        Console.WriteLine($"Total de registros en CapData: {CapData.Count()}");
+
+        // Buscar en RelacionTapa una coincidencia con los atributos seleccionados
+        var matchingCap = CapData.FirstOrDefault(c =>
+            (string.IsNullOrEmpty(CapConfig.Forma) || 
+             string.Equals(NormFormaCap(c.Forma), NormFormaCap(CapConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(CapConfig.Diametro) || 
+             string.Equals(NormDiam(c.Diametro), NormDiam(CapConfig.Diametro), StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(CapConfig.Color) || 
+             string.Equals(c.Color, CapConfig.Color, StringComparison.OrdinalIgnoreCase)) &&
+            (c.Sleeve == CapConfig.Sleeve)
+        );
+
+        if (matchingCap != null && !string.IsNullOrWhiteSpace(matchingCap.ImagenCap))
         {
-            CapConfig.ImagenCap = matchingCap.ImagenCap;
-        }
-        else
-        {
-            // Si no, agregar el prefijo base64
-            CapConfig.ImagenCap = $"data:image/png;base64,{matchingCap.ImagenCap}";
-        }
-    }
-    else
-    {
-        // Si no hay coincidencia exacta, buscar coincidencia parcial
-        var partialMatch = FindBestPartialMatchCap();
-        
-        if (partialMatch != null && !string.IsNullOrWhiteSpace(partialMatch.ImagenCap))
-        {
-            if (partialMatch.ImagenCap.StartsWith("data:image"))
+            Console.WriteLine("Coincidencia exacta encontrada");
+            // Si la imagen ya viene con el prefijo data:image, usarla tal cual
+            if (matchingCap.ImagenCap.StartsWith("data:image"))
             {
-                CapConfig.ImagenCap = partialMatch.ImagenCap;
+                CapConfig.ImagenCap = matchingCap.ImagenCap;
             }
             else
             {
-                CapConfig.ImagenCap = $"data:image/png;base64,{partialMatch.ImagenCap}";
+                // Si no, agregar el prefijo base64
+                CapConfig.ImagenCap = $"data:image/png;base64,{matchingCap.ImagenCap}";
             }
         }
         else
         {
-            CapConfig.ImagenCap = NO_IMAGE_AVAILABLE;
+            Console.WriteLine("No hay coincidencia exacta, buscando coincidencia parcial");
+            // Si no hay coincidencia exacta, buscar coincidencia parcial
+            var partialMatch = FindBestPartialMatchCap();
+            partialMatch = null; // Desactivar coincidencia parcial por ahora
+            if (partialMatch != null && !string.IsNullOrWhiteSpace(partialMatch.ImagenCap))
+            {
+                Console.WriteLine("Coincidencia parcial encontrada");
+                if (partialMatch.ImagenCap.StartsWith("data:image"))
+                {
+                    CapConfig.ImagenCap = partialMatch.ImagenCap;
+                }
+                else
+                {
+                    CapConfig.ImagenCap = $"data:image/png;base64,{partialMatch.ImagenCap}";
+                }
+            }
+            else
+            {
+                Console.WriteLine("No se encontró ninguna imagen, usando imagen por defecto");
+                CapConfig.ImagenCap = NO_IMAGE_AVAILABLE;
+            }
         }
+
+        Console.WriteLine($"Imagen final de tapa: {CapConfig.ImagenCap?.Substring(0, Math.Min(50, CapConfig.ImagenCap.Length))}...");
     }
-}
+    private CapDataItem? FindBestPartialMatchCap()
+    {
+        if (CapData == null || !CapData.Any())
+            return null;
 
-private CapDataItem? FindBestPartialMatchCap()
-{
-    if (CapData == null || !CapData.Any())
-        return null;
+        // Prioridad de coincidencia: Forma > Diámetro > Color
 
-    // Prioridad de coincidencia: Forma > Diámetro > Color
-    
-    // Primero intentar con forma y diámetro
-    var match = CapData.FirstOrDefault(c =>
-        !string.IsNullOrWhiteSpace(c.ImagenCap) &&
-        (string.IsNullOrEmpty(CapConfig.Forma) || 
-         string.Equals(NormFormaCap(c.Forma), NormFormaCap(CapConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrEmpty(CapConfig.Diametro) || 
-         string.Equals(NormDiam(c.Diametro), NormDiam(CapConfig.Diametro), StringComparison.OrdinalIgnoreCase))
-    );
+        // Primero intentar con forma y diámetro
+        var match = CapData.FirstOrDefault(c =>
+            !string.IsNullOrWhiteSpace(c.ImagenCap) &&
+            (string.IsNullOrEmpty(CapConfig.Forma) || 
+             string.Equals(NormFormaCap(c.Forma), NormFormaCap(CapConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(CapConfig.Diametro) || 
+             string.Equals(NormDiam(c.Diametro), NormDiam(CapConfig.Diametro), StringComparison.OrdinalIgnoreCase))
+        );
 
-    if (match != null) return match;
+        if (match != null) return match;
 
-    // Si no hay coincidencia, intentar solo con forma
-    match = CapData.FirstOrDefault(c =>
-        !string.IsNullOrWhiteSpace(c.ImagenCap) &&
-        !string.IsNullOrEmpty(CapConfig.Forma) &&
-        string.Equals(NormFormaCap(c.Forma), NormFormaCap(CapConfig.Forma), StringComparison.OrdinalIgnoreCase)
-    );
+        // Si no hay coincidencia, intentar solo con forma
+        match = CapData.FirstOrDefault(c =>
+            !string.IsNullOrWhiteSpace(c.ImagenCap) &&
+            !string.IsNullOrEmpty(CapConfig.Forma) &&
+            string.Equals(NormFormaCap(c.Forma), NormFormaCap(CapConfig.Forma), StringComparison.OrdinalIgnoreCase)
+        );
 
-    if (match != null) return match;
+        if (match != null) return match;
 
-    // Si no hay coincidencia, intentar solo con diámetro
-    match = CapData.FirstOrDefault(c =>
-        !string.IsNullOrWhiteSpace(c.ImagenCap) &&
-        !string.IsNullOrEmpty(CapConfig.Diametro) &&
-        string.Equals(NormDiam(c.Diametro), NormDiam(CapConfig.Diametro), StringComparison.OrdinalIgnoreCase)
-    );
+        // Si no hay coincidencia, intentar solo con diámetro
+        match = CapData.FirstOrDefault(c =>
+            !string.IsNullOrWhiteSpace(c.ImagenCap) &&
+            !string.IsNullOrEmpty(CapConfig.Diametro) &&
+            string.Equals(NormDiam(c.Diametro), NormDiam(CapConfig.Diametro), StringComparison.OrdinalIgnoreCase)
+        );
 
-    if (match != null) return match;
+        if (match != null) return match;
 
-    // Como último recurso, devolver cualquier imagen disponible
-    return CapData.FirstOrDefault(c => !string.IsNullOrWhiteSpace(c.ImagenCap));
-}
+        // Como último recurso, devolver cualquier imagen disponible
+        return CapData.FirstOrDefault(c => !string.IsNullOrWhiteSpace(c.ImagenCap));
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender && IsVisible)
@@ -773,17 +788,19 @@ private CapDataItem? FindBestPartialMatchCap()
         }
         await base.OnAfterRenderAsync(firstRender);
 
-        
+
     }
     private async Task SwitchToBottleTab()
     {
         IsBottleTab = true;
+        UpdateBoteImage(); // Asegurar actualización
         await ForceAdjustDimensions();
     }
 
     private async Task SwitchToCapTab()
     {
         IsBottleTab = false;
+        UpdateCapImage(); // Asegurar actualización
         await ForceAdjustDimensions();
     }
     public string GetCapDiameterText()
@@ -845,6 +862,7 @@ private CapDataItem? FindBestPartialMatchCap()
     private async Task OnBottleConfigChanged()
     {
         RecomputeAllFilters();
+        UpdateBoteImage();
         await InvokeAsync(StateHasChanged);
 
         // Esperar un momento para que el DOM se actualice
@@ -1082,7 +1100,15 @@ private CapDataItem? FindBestPartialMatchCap()
         }
 
         // ===== Sincroniza diámetro de tapa cuando exista
-        CapConfig.Diametro = string.IsNullOrEmpty(BoteConfig.Diametro) ? "" : BoteConfig.Diametro;
+        var previousCapDiameter = CapConfig.Diametro;
+    CapConfig.Diametro = string.IsNullOrEmpty(BoteConfig.Diametro) ? "" : BoteConfig.Diametro;
+    
+        // Si el diámetro de la tapa cambió, actualizar su imagen
+        if (previousCapDiameter != CapConfig.Diametro)
+        {
+            UpdateCapImage();
+        }
+         UpdateCapImage();
         UpdateBoteImage(); // Actualizar la imagen después de recomputar filtros
         UpdateCurrentDimensions();
     }
