@@ -448,21 +448,7 @@ public class OrdersComponentBase : ComponentBase
         if (modalRef != null) await modalRef.HideModal();
     }
 
-    protected async Task LoadBoteData()
-    {
-         
-    }
-
-    protected async Task LoadCapData()
-    {
-         
-    }
-
-    protected async Task LoadColorOptions()
-    {
-         
-    }
-
+   
     protected override async Task OnParametersSetAsync()
     {
         currentLanguage = Localization.CurrentLanguage ?? "es";

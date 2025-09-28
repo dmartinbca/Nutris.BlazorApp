@@ -20,7 +20,7 @@ else
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content upload-modal-container">
                   <div class="modal-body">
-                    <h2 class="modal-title">¿Quieres cargar tu propia etiqueta de pallet?</h2>
+                    <h2 class="modal-title"> @Localization["Wouldyoulike"]</h2>
 
                     <div class="upload-content">
                         <InputFile @ref="fileInput"
@@ -36,7 +36,7 @@ else
                                     <path d="M12 2L12 14M12 14L17 9M12 14L7 9" stroke="#4B7BCD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     <path d="M2 17L2 19C2 20.1046 2.89543 21 4 21L20 21C21.1046 21 22 20.1046 22 19L22 17" stroke="#4B7BCD" stroke-width="2" stroke-linecap="round" />
                                 </svg>
-                                <p class="upload-text">Subir un documento con la etiqueta</p>
+                                <p class="upload-text">@Localization["Uploadadocument"]</p>
                             }
                             else
                             {
@@ -49,7 +49,7 @@ else
                             }
                         </label>
 
-                        <p class="format-info">Formato de archivo aceptado: jpg, png, SVG</p>
+                        <p class="format-info">@Localization["Acceptedfileformat"]</p>
 
                         <button type="button"
                                 class="btn-submit"

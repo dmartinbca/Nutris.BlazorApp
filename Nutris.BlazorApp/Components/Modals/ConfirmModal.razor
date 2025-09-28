@@ -103,6 +103,15 @@
                 var responseContent = await response.Content.ReadAsStringAsync();
                 Logger.LogInformation($"Data updated successfully: {responseContent}");
 
+                var payloadCR = new { numeroRG = CodeRG35 };
+
+                // 2) POST al mismo endpoint (con tu prefijo api/)
+                var respCR = await Http.PostAsync(
+                    "customReports(1)/Microsoft.NAV.AlertaCierreRG?tenant=nutris",
+                    payloadCR
+                );
+
+                respCR.EnsureSuccessStatusCode();
                 // Cerrar modal
                 await CloseModal();
 
