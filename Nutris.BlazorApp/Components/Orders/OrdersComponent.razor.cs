@@ -343,7 +343,8 @@ public class OrdersComponentBase : ComponentBase
                     Capacidad = item.TryGetProperty("Capacidad", out var c) ? c.GetString() : null,
                     Diametro = item.TryGetProperty("Diametro", out var d) ? d.GetString() : null,
                     Material = item.TryGetProperty("Material", out var m) ? m.GetString() : null,
-                    Color = item.TryGetProperty("Color", out var col) ? col.GetString() : null
+                    Color = item.TryGetProperty("Color", out var col) ? col.GetString() : null,
+                    ImagenBote = item.TryGetProperty("ImagenBote", out var img) ? img.GetString() : null
                 })
                 .Where(b => b.Forma != null)
                 .ToList();
@@ -359,7 +360,8 @@ public class OrdersComponentBase : ComponentBase
                     Forma = item.TryGetProperty("Forma", out var f) ? f.GetString() : null,
                     Diametro = item.TryGetProperty("Diametro", out var d) ? d.GetString() : null,
                     Color = item.TryGetProperty("Color", out var c) ? c.GetString() : null,
-                    Sleeve = item.TryGetProperty("Sleeve", out var s) && s.ValueKind == JsonValueKind.True
+                    Sleeve = item.TryGetProperty("Sleeve", out var s) && s.ValueKind == JsonValueKind.True,
+                    ImagenCap = item.TryGetProperty("ImagenCap", out var img) ? img.GetString() : null
                 })
                 .Where(c => c.Forma != null)
                 .ToList();
