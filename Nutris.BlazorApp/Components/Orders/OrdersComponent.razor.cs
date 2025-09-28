@@ -451,6 +451,7 @@ public class OrdersComponentBase : ComponentBase
    
     protected override async Task OnParametersSetAsync()
     {
+        
         currentLanguage = Localization.CurrentLanguage ?? "es";
          BuildBoteLookups(RelacionBote, out capacidades, out capacidadToDiametros, out materiales);
         LoadBoteAndCapData();  // <-- NUEVA LÍNEA
@@ -656,6 +657,7 @@ public class OrdersComponentBase : ComponentBase
             _ => "#CCCCCC"
         };
     }
+   
     public sealed class OptionLookups
     {
         public List<string> Capacidades { get; set; } = new();
@@ -1022,6 +1024,14 @@ public class OrdersComponentBase : ComponentBase
         FillingBatchOther = data.Filling_batch_others ?? "";
         FillingExpDateOther = data.Filling_exp_date_others ?? "";
 
+        if (FillingBatchOther.Contains(":"))
+        {
+            FillingBatchOther = FillingBatchOther.Substring(FillingBatchOther.IndexOf(":") + 1);
+        }
+        if (FillingExpDateOther.Contains(":"))
+        {
+            FillingExpDateOther = FillingExpDateOther.Substring(FillingExpDateOther.IndexOf(":") + 1);
+        }
         // Label
         NoLabel = data.Label_config == "No label";
         if (!string.IsNullOrEmpty(data.Label_imagen))
@@ -1043,7 +1053,7 @@ public class OrdersComponentBase : ComponentBase
             PalletLabelImg = $"data:image/png;base64,{data.Pallet_label_imagen}";
 
         PalletComments = data.Pallet_comments ?? "";
-        if(data.Box_label_config=="Standard")
+        if(data?.Box_label_config=="Standard")
         {
             PalletInfo = new List<InputItem>
         {
@@ -1224,6 +1234,10 @@ public class OrdersComponentBase : ComponentBase
         }).ToList() ?? new List<RecipeRow>();
 
         ReportFiles = data.Files ?? new List<FileItem>();
+        BottleInfo = new List<InputItem>();
+        LabelInfo = new List<InputItem>();
+        PalletInfo = new List<InputItem>();
+        PalletizingInfo = new List<InputItem>();
     }
 
     private void LoadCatalogOptions()
@@ -1349,7 +1363,7 @@ public class OrdersComponentBase : ComponentBase
 
         if (!string.IsNullOrEmpty(BoxLabelImg)) fields.Add(BoxLabelImg);
         if (!string.IsNullOrEmpty(PalletLabelImg)) fields.Add(PalletLabelImg);
-        if(RG35.Box_label_config=="Standard")
+        if(RG35?.Box_label_config=="Standard")
         {
             var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-");
             PercentFilledPalettizing = fields.Count > 0 ? (filled * 100 / fields.Count) : 0;

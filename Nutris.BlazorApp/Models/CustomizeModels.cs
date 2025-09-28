@@ -35,6 +35,11 @@ namespace NutrisBlazor.Models
         public string Cap_imagen { get; set; } = "";
         public string Pallet_label_imagen { get; set; } = "";
 
+
+        //Formatos Other
+        public string Filling_LoteOthers { get; set; } = "";
+        public string Box_FormatoLoteCaja { get; set; } = "";
+        public string Pallet_FormatoLotePalet { get; set; } = "";
         // Tipo de producto
         public string Tipo { get; set; } = "";
 

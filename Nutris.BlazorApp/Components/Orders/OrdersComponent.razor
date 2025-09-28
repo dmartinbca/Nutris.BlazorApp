@@ -7,6 +7,7 @@
 
 @using NutrisBlazor.Services
 @using System.Text.Json
+@using System.Text.Json
 @inherits OrdersComponentBase
 @inject ILocalizationService Localization
 @inject IJSRuntime JSRuntime
@@ -479,7 +480,7 @@
                     }
                 </div>
 
-                @if (CustomerAccepted && Prefix == "RG35")
+            @if (CustomerAccepted && Prefix == "RG35" )
                 {
                     @if (ProductType == "Bote")
                     {
@@ -908,12 +909,12 @@
                                                             }
                                                             else
                                                             {
-                                                                @if (RG35.Box_label_config == "Standard")
+                                                                @if (RG35?.Box_label_config == "Standard")
                                                                 {
-                                                                    <ProductLabel ProductName=@RG35.Box_Nombre_Producto
-                                                                    BatchNumber=@RG35.Box_Lote
-                                                                    ExpirationDate=@RG35.Box_BBD
-                                                                     Quantity=@RG35.Box_Quantity />
+                                                                    <ProductLabel ProductName=@RG35?.Box_Nombre_Producto
+                                                                              BatchNumber=   "@(RG35?.Box_Lote?.StartsWith("OTHER") == true ? FillingBatchOther : RG35?.Box_Lote)"
+                                                                              ExpirationDate="@(RG35?.Box_BBD?.StartsWith("OTHER") == true  ? FillingExpDateOther :RG35?.Box_BBD)"
+                                                                              Quantity=@RG35?.Box_Quantity />
                                                                 }
                                                                 else
                                                                 {
@@ -922,7 +923,7 @@
                                                             }
                                                         </div>
                                                     </div>
-                                                    @if (Status == "Desarrollo" &&  RG35.Box_label_config !="Standard")
+                                                    @if (Status == "Desarrollo" &&  RG35?.Box_label_config !="Standard")
                                                     {
                                                         <div>
                                                             <div class="btn-pallet-tag">
