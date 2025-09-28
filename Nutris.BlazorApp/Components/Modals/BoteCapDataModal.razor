@@ -1,5 +1,5 @@
 ﻿@* -------------------------------------------------------------
-   BoteCapDataModal.razor — modal lateral derecho estilo Vue
+   BoteCapDataModal.razor — modal lateral derecho responsive
    ------------------------------------------------------------- *@
 
 @using Microsoft.AspNetCore.Components
@@ -38,21 +38,21 @@
 
                 <!-- Body que contiene TODO -->
                 <div class="modal-body">
-                    <!-- Botón reset posicionado absolutamente -->
-                    <button class="reset-filters-btn" @onclick="ResetFilters">
-                        <img src="img/refresh.svg" alt="" aria-hidden="true" />
-                        @Localization["modalContainer.Resetfilter"]
-                    </button>
-
-                    <!-- Tabs directamente en el body -->
-                    <div class="custom-tabs">
-                        <button class="nav-link @(IsBottleTab ? "active bottle-tab" : "")"
-                                @onclick="() => SwitchToBottleTab()">
-                            @Localization["modalContainer.Bottle"]
-                        </button>
-                        <button class="nav-link @(!IsBottleTab ? "active cap-tab" : "")"
-                                @onclick="() => SwitchToCapTab()">
-                            @Localization["modalContainer.CAP"]
+                    <!-- Contenedor wrapper para tabs y botón reset -->
+                    <div class="tabs-wrapper">
+                        <div class="custom-tabs">
+                            <button class="nav-link @(IsBottleTab ? "active bottle-tab" : "")"
+                                    @onclick="() => SwitchToBottleTab()">
+                                @Localization["modalContainer.Bottle"]
+                            </button>
+                            <button class="nav-link @(!IsBottleTab ? "active cap-tab" : "")"
+                                    @onclick="() => SwitchToCapTab()">
+                                @Localization["modalContainer.CAP"]
+                            </button>
+                        </div>
+                        <button class="reset-filters-btn" @onclick="ResetFilters">
+                            <img src="img/refresh.svg" alt="" aria-hidden="true" />
+                            @Localization["modalContainer.Resetfilter"]
                         </button>
                     </div>
 
@@ -63,11 +63,10 @@
                         <div class="config-container">
                             <div class="preview-section">
                                 <h3 class="section-title">
-                                    @Localization["modalContainer.Characteristics"]</h3>
+                                    @Localization["modalContainer.Characteristics"]
+                                </h3>
 
                                 <div class="preview-content">
-
-
                                     <div class="bottle-visual-wrapper" data-size="@BoteConfig.Capacidad">
                                         <div class="dimension-lines-container" id="dimension-lines-@(ComponentId)">
                                             @* Dimensión superior (diámetro de boca) *@
@@ -85,35 +84,15 @@
                                                 <span class="dimension-text">@GetDiamBaseText()</span>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- Botella según forma -->
                                         <div class="bottle-svg-container" id="bottle-container-@(ComponentId)">
-                                           @*  @switch (BoteConfig.Forma?.ToUpper())
-                                            {
-                                                case "ROUND":
-                                                    <BoteRound @key="@($"{BoteConfig.Forma}_{BoteConfig.Color}_{DateTime.Now.Ticks}")"
-                                                               ColorBote="@GetBoteHexColor()" />
-                                                    break;
-                                                case "SQUARE":
-                                                    <BoteSquare @key="@($"{BoteConfig.Forma}_{BoteConfig.Color}_{DateTime.Now.Ticks}")"
-                                                                ColorBote="@GetBoteHexColor()" />
-                                                    break;
-                                                case "CYLINDRICAL":
-                                                    <BoteCylindrical @key="@($"{BoteConfig.Forma}_{BoteConfig.Color}_{DateTime.Now.Ticks}")"
-                                                                     ColorBote="@GetBoteHexColor()" />
-                                                    break;
-                                                default:
-                                                    <BoteRound ColorBote="#CCCCCC" />
-                                                    break;
-                                            } *@
                                             @if (!string.IsNullOrEmpty(BoteConfig.ImagenBote))
                                             {
                                                 <img src="@BoteConfig.ImagenBote" alt="Imagen del bote"
                                                      style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />
                                             }
                                         </div>
-
-                                       
                                     </div>
                                 </div>
                             </div>
@@ -143,14 +122,14 @@
                                                 @onclick='() => SetFormaBote("CYLINDRICAL")'>
                                             <span class="radio-icon"></span> Cylindrical
                                         </button>
-
                                     </div>
                                 </div>
 
                                 <!-- Tamaño -->
                                 <div class="field">
                                     <label class="form-label">
-                                        @Localization["modalContainer.Size"]</label>
+                                        @Localization["modalContainer.Size"]
+                                    </label>
                                     <InputSelect class="form-select"
                                                  TValue="string"
                                                  @bind-Value="BoteConfig.Capacidad"
@@ -165,7 +144,7 @@
 
                                 <!-- Diámetro -->
                                 <div class="field">
-                                    <label class="form-label"> @Localization["modalContainer.Diameter"]</label>
+                                    <label class="form-label">@Localization["modalContainer.Diameter"]</label>
                                     <InputSelect class="form-select"
                                                  TValue="string"
                                                  @bind-Value="BoteConfig.Diametro"
@@ -207,8 +186,6 @@
                                         }
                                     </InputSelect>
                                 </div>
-
-
                             </div>
                         </div>
                     }
@@ -229,37 +206,12 @@
                                         <div class="cap-dimension-left">
                                             <span class="dimension-text">@GetCapHeightText()</span>
                                         </div>
-                                        @{
-                                            var currentCapHexColor = GetCapHexColor();
-                                            var capFormaUpper = CapConfig.Forma?.ToUpper();
-                                            Console.WriteLine($"Renderizando tapa: Forma={capFormaUpper}, Color={CapConfig.Color}, Hex={currentCapHexColor}");
-                                        }
 
-                                        @* @switch (capFormaUpper)
-                                        {
-                                            case "SIMPLE":
-                                                <CoverSimple @key="@($"simple_{currentCapHexColor}_{CapConfig.Diametro}")"
-                                                             ColorCover="@currentCapHexColor" />
-                                                break;
-                                            case "METAL":
-                                                <CoverMetal @key="@($"metal_{currentCapHexColor}_{CapConfig.Diametro}")"
-                                                            ColorCover="@currentCapHexColor" />
-                                                break;
-                                            case "CHILDPROFF":
-                                                <CoverChildproff @key="@($"childproff_{currentCapHexColor}_{CapConfig.Diametro}")"
-                                                                 ColorCover="@currentCapHexColor" />
-                                                break;
-                                            default:
-                                                <CoverSimple ColorCover="#FFFFFF" />
-                                                break;
-                                        } *@
                                         @if (!string.IsNullOrEmpty(CapConfig.ImagenCap))
                                         {
                                             <img src="@CapConfig.ImagenCap" alt="Imagen de la tapa"
                                                  style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />
                                         }
-                                     
-
                                     </div>
                                 </div>
                             </div>
@@ -289,7 +241,6 @@
                                                 @onclick='() => SetFormaCap("CHILDPROFF")'>
                                             <span class="radio-icon"></span> Childproff
                                         </button>
-
                                     </div>
                                 </div>
 
@@ -321,7 +272,6 @@
                                     </InputSelect>
                                 </div>
 
-
                                 <!-- Sleeve -->
                                 <div class="field">
                                     <label class="checkbox">
@@ -329,7 +279,6 @@
                                         <span>Sleever</span>
                                     </label>
                                 </div>
-
                             </div>
                         </div>
                     }

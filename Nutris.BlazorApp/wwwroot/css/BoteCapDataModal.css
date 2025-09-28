@@ -1,5 +1,5 @@
 ﻿/* ========================================
-   BOTECAPDATAMODAL.CSS - DISEÑO RESPONSIVO CON IMÁGENES MAXIMIZADAS
+   BOTECAPDATAMODAL.CSS - DISEÑO RESPONSIVE CORREGIDO
    ======================================== */
 
 @import url('fonts.css');
@@ -28,6 +28,9 @@
     --border-radius-lg: 40px;
     --border-radius-md: 28px;
     --border-radius-sm: 10px;
+    --header-height: 80px;
+    --footer-height: 90px;
+    --dimension-line-color: #C4C2C2;
 }
 
 /* ========================================
@@ -115,6 +118,8 @@ body.modal-open {
     padding: 30px 50px;
     border-bottom: none;
     background: white;
+    position: relative;
+    z-index: 10;
 }
 
 .modal-title {
@@ -154,16 +159,24 @@ body.modal-open {
     display: flex;
     flex-direction: column;
     flex: 1;
-    overflow-y: auto;
-    padding: 10px 0 0 0;
+    overflow: hidden;
+    padding: 0;
     position: relative;
+    min-height: 0;
+    max-height: calc(100vh - var(--header-height) - var(--footer-height));
+}
+
+/* Contenedor para tabs y reset button */
+.tabs-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 10px 50px 0 50px;
+    background: white;
+    flex-shrink: 0; /* No se encoge */
 }
 
 .reset-filters-btn {
-    position: absolute !important;
-    right: 50px !important;
-    top: 10px !important;
-    z-index: 100 !important;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -177,6 +190,7 @@ body.modal-open {
     font-family: 'RalewayMedium', sans-serif;
     font-size: 14px;
     transition: var(--transition);
+    margin-bottom: -1px; /* Alinear con tabs */
 }
 
     .reset-filters-btn img {
@@ -198,14 +212,14 @@ body.modal-open {
     display: flex;
     gap: 0;
     padding: 0;
-    margin: 0 0 0 50px;
+    margin: 0;
     position: relative;
     height: 40px;
     z-index: 2;
 }
 
     .custom-tabs .nav-link:first-child {
-        margin-left: 48px;
+        margin-left: 0;
     }
 
 .nav-link {
@@ -255,38 +269,124 @@ body.modal-open {
         }
 
 /* ========================================
-   6. CONFIG CONTAINER
+   6. CONFIG CONTAINER - FLEXIBLE CON SCROLL INTELIGENTE
    ======================================== */
 
 .config-container {
     display: flex;
     gap: 0;
-    padding: 0;
-    width: 1107px;
-    max-width: calc(100% - 100px);
-    margin: -1px auto 0 auto;
+    padding: 0 50px;
+    flex: 1;
     border-top: 1px solid var(--border-light);
     position: relative;
+    min-height: 0;
+    overflow: hidden;
+    height: calc(100vh - var(--header-height) - var(--footer-height) - 50px); /* 50px para tabs */
+}
+
+/* Media query para permitir scroll cuando sea necesario */
+@media (max-height: 800px), (max-width: 1366px) {
+    .config-container {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
 }
 
 /* ========================================
-   7. PREVIEW SECTION
+   7. PREVIEW SECTION - SIMPLIFICADA Y RESPONSIVE
    ======================================== */
 
 .preview-section {
     background-color: var(--bg-primary);
     border-bottom-left-radius: var(--border-radius-md);
-    padding: 15px 20px;
+    padding: 15px;
     width: 50%;
-    min-height: 580px;
+    min-height: 400px;
     position: relative;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
     .preview-section.cap-preview {
         background-color: var(--bg-cap);
     }
+
+.section-title {
+    padding: 5px 0 5px 20px;
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'RalewayMedium', sans-serif;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+    flex-shrink: 0;
+}
+
+.preview-content {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+}
+
+/* Mobile - preview más compacto */
+@media (max-width: 834px) {
+    .preview-section {
+        width: 100%;
+        min-height: 320px;
+        padding: 10px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        margin-bottom: 5px;
+        padding-left: 15px;
+    }
+
+    .preview-content {
+        min-height: 200px;
+    }
+}
+
+/* Tablet landscape */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .preview-section {
+        min-height: 280px;
+        padding: 10px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    .preview-content {
+        min-height: 180px;
+    }
+}
+
+/* Mobile landscape */
+@media (max-width: 896px) and (orientation: landscape) {
+    .preview-section {
+        min-height: 240px;
+        padding: 8px;
+    }
+
+    .section-title {
+        font-size: 15px;
+        margin-bottom: 3px;
+    }
+
+    .preview-content {
+        min-height: 150px;
+    }
+}
+
+.preview-section.cap-preview {
+    background-color: var(--bg-cap);
+}
 
 .section-title {
     padding: 5px 0 5px 30px;
@@ -307,7 +407,7 @@ body.modal-open {
 }
 
 /* ========================================
-   8. IMAGEN DEL BOTE Y TAPA
+   8. IMÁGENES DEL BOTE Y TAPA
    ======================================== */
 
 .bottle-visual-wrapper {
@@ -365,7 +465,7 @@ body.modal-open {
     }
 
 /* ========================================
-   9. LÍNEAS DE DIMENSIÓN - DINÁMICAS
+   9. LÍNEAS DE DIMENSIÓN - RESPONSIVE
    ======================================== */
 
 .dimension-lines-container {
@@ -380,9 +480,9 @@ body.modal-open {
 
 .dimension-text {
     background: rgba(237, 233, 254, 0.95);
-    padding: 4px 10px;
+    padding: 3px 8px;
     color: #6B6B83;
-    font-size: 13px;
+    font-size: 12px;
     font-family: 'RalewayLight', sans-serif;
     white-space: nowrap;
     z-index: 20;
@@ -391,7 +491,155 @@ body.modal-open {
     position: absolute;
 }
 
-/* DIMENSIONES DEL BOTE */
+/* Línea superior (diámetro de boca) */
+.dimension-top {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 25px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+    .dimension-top::before {
+        content: '';
+        position: absolute;
+        bottom: 15px;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--dimension-line-color);
+    }
+
+    .dimension-top::after {
+        content: '';
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+        height: 10px;
+        border-left: 1px solid var(--dimension-line-color);
+        border-right: 1px solid var(--dimension-line-color);
+    }
+
+/* Línea izquierda (altura) */
+.dimension-left {
+    position: absolute;
+    width: 35px;
+    display: flex;
+    align-items: center;
+}
+
+    .dimension-left::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: var(--dimension-line-color);
+    }
+
+    .dimension-left::after {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 10px;
+        border-top: 1px solid var(--dimension-line-color);
+        border-bottom: 1px solid var(--dimension-line-color);
+    }
+
+    .dimension-left .dimension-text {
+        position: absolute;
+        left: 25px;
+        top: 50%;
+        transform: translateY(-50%) rotate(-90deg);
+        transform-origin: center;
+    }
+
+/* Línea inferior (diámetro base) */
+.dimension-bottom {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 25px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+    .dimension-bottom::before {
+        content: '';
+        position: absolute;
+        top: 15px;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--dimension-line-color);
+    }
+
+    .dimension-bottom::after {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 0;
+        right: 0;
+        height: 10px;
+        border-left: 1px solid var(--dimension-line-color);
+        border-right: 1px solid var(--dimension-line-color);
+    }
+
+/* Dimensiones de la tapa - igual estructura */
+.cap-dimension-top,
+.cap-dimension-left {
+    position: absolute;
+}
+
+    .cap-dimension-top .dimension-text,
+    .cap-dimension-left .dimension-text {
+        background: rgba(255, 232, 232, 0.95);
+    }
+
+/* RESPONSIVE - Ocultar líneas en móvil */
+@media (max-width: 834px) {
+    .dimension-lines-container,
+    .cap-dimension-top,
+    .cap-dimension-left {
+        display: none;
+    }
+}
+
+/* Reducir tamaño en tablets */
+@media (max-width: 1024px) and (min-width: 835px) {
+    .dimension-text {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+
+    .dimension-top,
+    .dimension-bottom {
+        height: 20px;
+    }
+
+    .dimension-left {
+        width: 30px;
+    }
+}
+
+/* Líneas muy pequeñas en landscape móvil */
+@media (max-width: 896px) and (orientation: landscape) {
+    .dimension-text {
+        font-size: 9px;
+        padding: 2px 4px;
+    }
+
+    .dimension-lines-container {
+        opacity: 0.7;
+    }
+}
 
 /* Línea superior (diámetro de boca) */
 .dimension-top {
@@ -411,7 +659,7 @@ body.modal-open {
         left: 0;
         right: 0;
         height: 1px;
-        background: #C4C2C2;
+        background: var(--dimension-line-color);
     }
 
     .dimension-top::after {
@@ -421,8 +669,8 @@ body.modal-open {
         left: 0;
         right: 0;
         height: 10px;
-        border-left: 1px solid #C4C2C2;
-        border-right: 1px solid #C4C2C2;
+        border-left: 1px solid var(--dimension-line-color);
+        border-right: 1px solid var(--dimension-line-color);
     }
 
     .dimension-top .dimension-text {
@@ -430,7 +678,7 @@ body.modal-open {
         bottom: -5px;
     }
 
-/* Línea izquierda (altura) del bote */
+/* Línea izquierda (altura) */
 .dimension-left {
     position: absolute;
     width: 40px;
@@ -445,7 +693,7 @@ body.modal-open {
         top: 0;
         bottom: 0;
         width: 1px;
-        background: #C4C2C2;
+        background: var(--dimension-line-color);
     }
 
     .dimension-left::after {
@@ -455,8 +703,8 @@ body.modal-open {
         top: 0;
         bottom: 0;
         width: 10px;
-        border-top: 1px solid #C4C2C2;
-        border-bottom: 1px solid #C4C2C2;
+        border-top: 1px solid var(--dimension-line-color);
+        border-bottom: 1px solid var(--dimension-line-color);
     }
 
     .dimension-left .dimension-text {
@@ -485,7 +733,7 @@ body.modal-open {
         left: 0;
         right: 0;
         height: 1px;
-        background: #C4C2C2;
+        background: var(--dimension-line-color);
     }
 
     .dimension-bottom::after {
@@ -495,8 +743,8 @@ body.modal-open {
         left: 0;
         right: 0;
         height: 10px;
-        border-left: 1px solid #C4C2C2;
-        border-right: 1px solid #C4C2C2;
+        border-left: 1px solid var(--dimension-line-color);
+        border-right: 1px solid var(--dimension-line-color);
     }
 
     .dimension-bottom .dimension-text {
@@ -504,9 +752,7 @@ body.modal-open {
         top: -5px;
     }
 
-/* DIMENSIONES DE LA TAPA - AJUSTADAS */
-
-/* Línea superior de la tapa (diámetro) */
+/* Dimensiones de la tapa */
 .cap-dimension-top {
     position: absolute;
     left: 50%;
@@ -524,7 +770,7 @@ body.modal-open {
         left: 0;
         right: 0;
         height: 1px;
-        background: #C4C2C2;
+        background: var(--dimension-line-color);
     }
 
     .cap-dimension-top::after {
@@ -534,8 +780,8 @@ body.modal-open {
         left: 0;
         right: 0;
         height: 10px;
-        border-left: 1px solid #C4C2C2;
-        border-right: 1px solid #C4C2C2;
+        border-left: 1px solid var(--dimension-line-color);
+        border-right: 1px solid var(--dimension-line-color);
     }
 
     .cap-dimension-top .dimension-text {
@@ -544,39 +790,37 @@ body.modal-open {
         background: rgba(255, 232, 232, 0.95);
     }
 
-/* Línea izquierda de la tapa (altura) - POSICIÓN AJUSTADA MÁS A LA IZQUIERDA */
 .cap-dimension-left {
     position: absolute;
     width: 40px;
     display: flex;
     align-items: center;
-    /* Se posicionará dinámicamente, pero con un desplazamiento mayor a la izquierda */
 }
 
     .cap-dimension-left::before {
         content: '';
         position: absolute;
-        right: 25px; /* Cambio: línea más a la derecha dentro del contenedor */
+        right: 25px;
         top: 0;
         bottom: 0;
         width: 1px;
-        background: #C4C2C2;
+        background: var(--dimension-line-color);
     }
 
     .cap-dimension-left::after {
         content: '';
         position: absolute;
-        right: 20px; /* Cambio: marcadores más a la derecha */
+        right: 20px;
         top: 0;
         bottom: 0;
         width: 10px;
-        border-top: 1px solid #C4C2C2;
-        border-bottom: 1px solid #C4C2C2;
+        border-top: 1px solid var(--dimension-line-color);
+        border-bottom: 1px solid var(--dimension-line-color);
     }
 
     .cap-dimension-left .dimension-text {
         position: absolute;
-        right: 35px; /* Cambio: texto más a la derecha para alinearse con la línea */
+        right: 35px;
         top: 50%;
         transform: translateY(-50%) rotate(-90deg);
         transform-origin: center;
@@ -584,14 +828,108 @@ body.modal-open {
     }
 
 /* ========================================
-   10. FORM SECTION
+   10. FORM SECTION - ADAPTATIVA COMPLETA
    ======================================== */
 
 .form-section {
-    padding: 20px 25px;
+    padding: 15px 20px;
     width: 50%;
     background: var(--bg-secondary);
     border-bottom-right-radius: var(--border-radius-md);
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* Ajustar espaciado de campos dinámicamente */
+.field {
+    margin-bottom: clamp(10px, 2vh, 25px);
+}
+
+.form-label {
+    display: block;
+    width: 100%;
+    padding-left: clamp(10px, 2vw, 20px);
+    text-align: left;
+    font-weight: 400;
+    font-size: clamp(13px, 1.5vw, 16px);
+    margin-bottom: clamp(4px, 1vh, 8px);
+    font-family: 'RalewayRegular', sans-serif;
+    color: var(--text-dark);
+}
+
+.form-select {
+    width: 100%;
+    max-width: 100%;
+    height: clamp(38px, 5vh, 60px);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 0 35px 0 15px;
+    font-size: clamp(14px, 1.8vw, 20px);
+    font-family: 'Museo', sans-serif;
+    background: white;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%232F5496' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+    transition: var(--transition);
+}
+
+/* ========================================
+   11. SEGMENTED CONTROLS - RESPONSIVE
+   ======================================== */
+
+.segmented {
+    display: flex;
+    gap: 3px;
+    padding: 0 clamp(10px, 2vw, 20px);
+    margin-top: clamp(8px, 1.5vh, 20px);
+}
+
+.segmented-item {
+    flex: 1;
+    padding: clamp(6px, 1vh, 12px) 4px;
+    border: 1px solid #A7BDE3;
+    background: #F0E7F9;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+    font-size: clamp(11px, 1.5vw, 18px);
+    font-family: 'RalewayMedium', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(2px, 0.5vw, 6px);
+    height: clamp(30px, 4vh, 44px);
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.radio-icon {
+    width: clamp(13px, 1.8vw, 19px);
+    height: clamp(13px, 1.8vw, 19px);
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.segmented-item.active .radio-icon::after {
+    content: '';
+    display: block;
+    width: clamp(6px, 0.8vw, 9px);
+    height: clamp(6px, 0.8vw, 9px);
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .field {
@@ -846,7 +1184,7 @@ body.modal-open {
 }
 
 /* ========================================
-   16. AJUSTES DINÁMICOS POR TAMAÑO
+   16. AJUSTES DINÁMICOS POR TAMAÑO DE BOTE
    ======================================== */
 
 .bottle-visual-wrapper[data-size="100"] .bottle-svg-container img,
@@ -866,23 +1204,384 @@ body.modal-open {
 }
 
 /* ========================================
-   17. RESPONSIVE - TABLET LANDSCAPE
+   17. RESPONSIVE - DESKTOP PEQUEÑO (1600px y menor)
    ======================================== */
 
-@media (max-width: 1200px) {
+@media (max-width: 1600px) {
     .modal-dialog-custom {
         width: 100%;
         max-width: 100vw;
     }
 
+    .modal-content-custom {
+        border-radius: 0;
+    }
+
     .config-container {
-        width: 95%;
-        max-width: 95%;
+        padding: 0 40px;
+    }
+
+    .tabs-wrapper {
+        padding: 10px 40px 0 40px;
     }
 }
 
 /* ========================================
-   18. RESPONSIVE - TABLET PORTRAIT
+   18. RESPONSIVE - LAPTOP ESTÁNDAR (1440px)
+   ======================================== */
+
+@media (max-width: 1440px) {
+    .modal-header {
+        padding: 20px 30px;
+    }
+
+    .modal-title {
+        font-size: 26px;
+    }
+
+    .tabs-wrapper {
+        padding: 10px 30px 0 30px;
+    }
+
+    .nav-link {
+        font-size: 18px;
+        padding: 8px 25px;
+        min-width: 130px;
+    }
+
+    .reset-filters-btn {
+        font-size: 13px;
+        padding: 6px 12px;
+    }
+
+    .config-container {
+        padding: 0 30px;
+    }
+
+    .preview-section {
+        padding: 12px 15px;
+    }
+
+    .section-title {
+        font-size: 22px;
+    }
+
+    .form-section {
+        padding: 12px 20px;
+    }
+
+    .modal-footer {
+        padding: 20px 30px;
+    }
+
+    /* Ajustar tamaños para caber mejor */
+    .bottle-visual-wrapper,
+    .cap-visual-wrapper {
+        max-height: 400px;
+    }
+
+    .bottle-svg-container img {
+        max-width: 380px;
+        max-height: 380px;
+    }
+}
+
+/* ========================================
+   19. RESPONSIVE - LAPTOP PEQUEÑO (1366px)
+   ======================================== */
+
+@media (max-width: 1366px) {
+    .modal-header {
+        padding: 15px 25px;
+    }
+
+    .modal-title {
+        font-size: 22px;
+    }
+
+    .tabs-wrapper {
+        padding: 6px 25px 0 25px;
+    }
+
+    .nav-link {
+        font-size: 16px;
+        padding: 6px 20px;
+        height: 36px;
+    }
+
+    .config-container {
+        padding: 0 25px;
+    }
+
+    .preview-section {
+        width: 48%;
+        padding: 8px 12px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        margin-bottom: 3px;
+    }
+
+    .form-section {
+        width: 52%;
+        padding: 10px 15px;
+    }
+
+    .bottle-visual-wrapper,
+    .cap-visual-wrapper {
+        max-height: calc(100vh - 400px);
+    }
+
+    .bottle-svg-container img {
+        max-width: min(85%, 320px);
+        max-height: min(85%, 320px);
+    }
+
+    .cap-visual-wrapper img {
+        max-width: min(80%, 260px);
+        max-height: min(55%, 140px);
+    }
+
+    .modal-footer {
+        padding: 12px 25px;
+    }
+
+    .btn-cancel,
+    .btn-primary {
+        font-size: 16px;
+        padding: 8px 20px;
+        min-width: 130px;
+        height: 40px;
+    }
+}
+
+/* ========================================
+   20. RESPONSIVE - LAPTOP MUY PEQUEÑO (1280px)
+   ======================================== */
+
+@media (max-width: 1280px) {
+    .modal-header {
+        padding: 12px 20px;
+    }
+
+    .modal-title {
+        font-size: 20px;
+    }
+
+    .tabs-wrapper {
+        padding: 5px 20px 0 20px;
+    }
+
+    .nav-link {
+        font-size: 14px;
+        padding: 5px 15px;
+        min-width: 100px;
+        height: 33px;
+    }
+
+    .reset-filters-btn {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    .config-container {
+        padding: 0 20px;
+    }
+
+    .preview-section {
+        padding: 6px 10px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        padding-left: 12px;
+    }
+
+    .bottle-visual-wrapper,
+    .cap-visual-wrapper {
+        max-height: calc(100vh - 420px);
+    }
+
+    .bottle-svg-container img {
+        max-width: min(80%, 280px);
+        max-height: min(80%, 280px);
+    }
+
+    .cap-visual-wrapper img {
+        max-width: min(75%, 220px);
+        max-height: min(50%, 120px);
+    }
+
+    .form-section {
+        padding: 8px 12px;
+    }
+
+    .modal-footer {
+        padding: 10px 20px;
+    }
+
+    .btn-cancel,
+    .btn-primary {
+        font-size: 14px;
+        min-width: 110px;
+        height: 36px;
+        padding: 6px 16px;
+    }
+}
+
+/* ========================================
+   RESPONSIVE - ALTURA CRÍTICA (max-height: 650px)
+   ======================================== */
+
+@media (max-height: 650px) and (min-width: 1024px) {
+    .modal-header {
+        padding: 8px 20px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+    }
+
+    .tabs-wrapper {
+        padding: 4px 20px 0 20px;
+    }
+
+    .nav-link {
+        font-size: 13px;
+        height: 30px;
+        padding: 4px 12px;
+    }
+
+    .reset-filters-btn {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+
+    .bottle-visual-wrapper,
+    .cap-visual-wrapper {
+        max-height: calc(100vh - 450px);
+        min-height: 120px;
+    }
+
+    .bottle-svg-container img {
+        max-width: min(75%, 240px);
+        max-height: min(75%, 240px);
+    }
+
+    .cap-visual-wrapper img {
+        max-width: min(70%, 180px);
+        max-height: min(45%, 100px);
+    }
+
+    .field {
+        margin-bottom: 8px;
+    }
+
+    .form-label {
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+
+    .form-select {
+        height: 34px;
+        font-size: 13px;
+    }
+
+    .segmented {
+        margin-top: 6px;
+    }
+
+    .segmented-item {
+        height: 28px;
+        font-size: 11px;
+    }
+
+    .radio-icon {
+        width: 12px;
+        height: 12px;
+    }
+
+    .modal-footer {
+        padding: 8px 20px;
+    }
+
+    .btn-cancel,
+    .btn-primary {
+        font-size: 13px;
+        height: 32px;
+        padding: 4px 12px;
+        min-width: 100px;
+    }
+}
+
+/* ========================================
+   20. RESPONSIVE - TABLET LANDSCAPE (1024px)
+   ======================================== */
+
+@media (max-width: 1024px) and (orientation: landscape) {
+    .modal-header {
+        padding: 15px 25px;
+    }
+
+    .modal-title {
+        font-size: 24px;
+    }
+
+    .config-container {
+        width: calc(100% - 50px);
+        margin: -1px 25px 0 25px;
+    }
+
+    .preview-section {
+        min-height: 400px;
+        padding: 15px;
+    }
+
+    .bottle-visual-wrapper,
+    .cap-visual-wrapper {
+        max-width: 300px;
+        max-height: 280px;
+    }
+
+    .bottle-svg-container img {
+        max-width: 280px;
+        max-height: 260px;
+    }
+
+    .cap-visual-wrapper img {
+        max-width: 240px;
+        max-height: 140px;
+    }
+
+    .form-section {
+        padding: 15px 20px;
+    }
+
+    .field {
+        margin-bottom: 15px;
+    }
+
+    .modal-footer {
+        padding: 15px 25px;
+    }
+
+    .btn-cancel,
+    .btn-primary {
+        min-width: 120px;
+        height: 40px;
+        padding: 8px 20px;
+        font-size: 18px;
+    }
+
+    .dimension-text {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+}
+
+/* ========================================
+   21. RESPONSIVE - TABLET PORTRAIT (834px)
    ======================================== */
 
 @media (max-width: 834px) {
@@ -908,61 +1607,59 @@ body.modal-open {
 
     .modal-title {
         font-size: 24px;
-        margin-left: 40px;
     }
 
     .modal-body {
-        padding-top: 60px;
-        overflow-y: auto;
+        flex: 1;
+        overflow-y: auto; /* Permitir scroll en mobile */
+        padding: 0;
     }
 
-    .reset-filters-btn {
-        position: fixed !important;
-        top: 70px !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        margin: 0 !important;
-        border-radius: 0;
-        z-index: 98;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    .tabs-wrapper {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        padding: 10px 20px;
+        flex-direction: column;
+        gap: 10px;
+        border-bottom: 1px solid var(--border-light);
     }
 
     .custom-tabs {
-        display: flex;
-        margin: 10px 20px;
-        padding: 0;
+        width: 100%;
         justify-content: center;
-        background: white;
-        gap: 10px;
+        gap: 5px;
     }
-
-        .custom-tabs .nav-link:first-child {
-            margin-left: 0;
-        }
 
     .nav-link {
         flex: 1;
-        min-width: 120px;
-        max-width: 200px;
+        min-width: 100px;
+        padding: 8px 15px;
         font-size: 16px;
-        padding: 10px 20px;
     }
 
+    .reset-filters-btn {
+        width: 100%;
+        justify-content: center;
+        margin: 0;
+    }
+
+    /* Stack layout vertical */
     .config-container {
         flex-direction: column;
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0;
+        width: 100%;
+        height: auto;
         padding: 0;
         border: none;
+        overflow: visible;
     }
 
     .preview-section,
     .form-section {
         width: 100%;
         border-radius: 0;
-        margin-bottom: 0;
+        overflow: visible;
     }
 
     .preview-section {
@@ -971,7 +1668,7 @@ body.modal-open {
     }
 
     .bottle-visual-wrapper {
-        height: 400px;
+        max-height: 400px;
     }
 
     .bottle-svg-container img {
@@ -980,7 +1677,7 @@ body.modal-open {
     }
 
     .cap-visual-wrapper {
-        height: 350px;
+        max-height: 350px;
     }
 
         .cap-visual-wrapper img {
@@ -992,10 +1689,6 @@ body.modal-open {
         padding: 20px 30px 100px 30px;
     }
 
-    .form-select {
-        max-width: 100%;
-    }
-
     .modal-footer {
         position: fixed;
         bottom: 0;
@@ -1003,47 +1696,28 @@ body.modal-open {
         right: 0;
         padding: 15px 30px;
         z-index: 100;
-    }
-
-    .dimension-text {
-        font-size: 11px;
-        padding: 2px 6px;
+        background: white;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
     }
 }
 
 /* ========================================
-   19. RESPONSIVE - TABLET LANDSCAPE
+   22. RESPONSIVE - TABLET LANDSCAPE PEQUEÑO
    ======================================== */
 
-@media (max-width: 1024px) and (orientation: landscape) {
-    .modal-dialog-custom {
-        width: 100%;
-        height: 100vh;
-        transform: none;
-        max-width: 100%;
-        top: 0;
-        left: 0;
-        right: 0;
-    }
-
-    .modal-content-custom {
-        border-radius: 0;
-    }
-
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 700px) {
     .modal-header {
-        padding: 15px 30px;
-        border-bottom: 1px solid #eee;
+        padding: 10px 20px;
     }
 
     .modal-title {
-        font-size: 22px;
-        margin-left: 35px;
+        font-size: 20px;
     }
 
     .reset-filters-btn {
         position: absolute !important;
-        top: 15px !important;
-        right: 30px !important;
+        top: 10px !important;
+        right: 20px !important;
         left: auto !important;
         width: auto !important;
         padding: 6px 12px;
@@ -1051,15 +1725,9 @@ body.modal-open {
     }
 
     .custom-tabs {
-        display: flex;
-        margin: 0 30px;
+        margin: 0 20px;
         padding: 10px 0;
-        gap: 8px;
     }
-
-        .custom-tabs .nav-link:first-child {
-            margin-left: 0;
-        }
 
     .nav-link {
         min-width: 100px;
@@ -1071,10 +1739,8 @@ body.modal-open {
     .config-container {
         display: flex;
         flex-direction: row;
-        width: 100% !important;
-        margin: 0;
-        padding: 0;
-        border: none;
+        width: calc(100% - 40px);
+        margin: 0 20px;
         height: calc(100vh - 150px);
     }
 
@@ -1082,7 +1748,6 @@ body.modal-open {
         width: 45%;
         min-height: 100%;
         padding: 15px;
-        border-radius: 0;
     }
 
     .bottle-visual-wrapper {
@@ -1142,10 +1807,10 @@ body.modal-open {
 }
 
 /* ========================================
-   20. RESPONSIVE - MOBILE PORTRAIT
+   23. RESPONSIVE - MOBILE (480px)
    ======================================== */
 
-@media (max-width: 480px) and (orientation: portrait) {
+@media (max-width: 480px) {
     .modal-dialog-custom {
         position: fixed;
         top: 0;
@@ -1323,7 +1988,7 @@ body.modal-open {
 }
 
 /* ========================================
-   21. RESPONSIVE - MOBILE LANDSCAPE
+   24. RESPONSIVE - MOBILE LANDSCAPE
    ======================================== */
 
 @media (max-width: 896px) and (orientation: landscape) {
@@ -1388,7 +2053,7 @@ body.modal-open {
 }
 
 /* ========================================
-   22. CLASES UTILITARIAS
+   25. CLASES UTILITARIAS
    ======================================== */
 
 .font-12 {
@@ -1416,7 +2081,7 @@ body.modal-open {
 }
 
 /* ========================================
-   23. ACCESIBILIDAD
+   26. ACCESIBILIDAD
    ======================================== */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1430,7 +2095,7 @@ body.modal-open {
 }
 
 /* ========================================
-   24. IMPRESIÓN
+   27. IMPRESIÓN
    ======================================== */
 
 @media print {
