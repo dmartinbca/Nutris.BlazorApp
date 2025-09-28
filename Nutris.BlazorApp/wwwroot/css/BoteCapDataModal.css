@@ -1,14 +1,15 @@
 ﻿/* ========================================
-   BOTECAPDATAMODAL.CSS - DISEÑO RESPONSIVE CORREGIDO
+   BOTECAPDATAMODAL.CSS - DISEÑO RESPONSIVE PROFESIONAL
    ======================================== */
 
 @import url('fonts.css');
 
 /* ========================================
-   1. VARIABLES Y CONFIGURACIÓN BASE
+   1. VARIABLES CSS Y CONFIGURACIÓN BASE
    ======================================== */
 
 :root {
+    /* Colores */
     --blackBlue: #2F5496;
     --textButton: #2F5496;
     --bg-primary: #ede9fe;
@@ -19,22 +20,62 @@
     --text-dark: #333333;
     --text-gray: #6c757d;
     --text-light: #999A9B;
+    --dimension-line-color: #C4C2C2;
+    /* Sombras */
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
     --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
     --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
     --shadow-xl: -5px 0 15px rgba(0, 0, 0, 0.2);
+    /* Transiciones */
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --modal-width: 1300px;
+    /* Dimensiones base */
+    --modal-width-desktop: 1300px;
+    --modal-width-laptop: 1100px;
+    --modal-width-tablet: 100%;
+    /* Border radius */
     --border-radius-lg: 40px;
     --border-radius-md: 28px;
     --border-radius-sm: 10px;
+    /* Alturas dinámicas */
     --header-height: 80px;
     --footer-height: 90px;
-    --dimension-line-color: #C4C2C2;
+    --tabs-height: 50px;
+}
+
+/* Ajustes responsive de variables */
+@media (max-width: 1366px) {
+    :root {
+        --header-height: 70px;
+        --footer-height: 70px;
+    }
+}
+
+@media (max-width: 1024px) {
+    :root {
+        --header-height: 60px;
+        --footer-height: 60px;
+        --tabs-height: 45px;
+    }
+}
+
+@media (max-width: 834px) {
+    :root {
+        --header-height: 56px;
+        --footer-height: 56px;
+        --tabs-height: 40px;
+    }
 }
 
 /* ========================================
-   2. MODAL BASE Y OVERLAY
+   2. RESET Y BASE
+   ======================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+/* ========================================
+   3. MODAL BACKDROP
    ======================================== */
 
 .modal-backdrop-custom {
@@ -59,12 +100,13 @@
     }
 }
 
+/* ========================================
+   4. MODAL CONTAINER
+   ======================================== */
+
 .modal-custom {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    position: fixed;
+    inset: 0;
     z-index: 1050;
     pointer-events: none;
 }
@@ -75,11 +117,10 @@
 
 .modal-dialog-custom {
     position: fixed;
-    margin: 0;
     top: 0;
     right: 0;
     height: 100vh;
-    width: var(--modal-width);
+    width: var(--modal-width-desktop);
     max-width: 90vw;
     transform: translateX(100%);
     transition: transform 0.3s ease-in-out;
@@ -102,39 +143,64 @@
     overflow: hidden;
 }
 
-body.modal-open {
-    overflow: hidden !important;
-}
-
 /* ========================================
-   3. MODAL HEADER
+   5. MODAL HEADER - RESPONSIVE
    ======================================== */
 
 .modal-header {
     display: flex;
-    flex-shrink: 0;
     align-items: center;
     justify-content: space-between;
-    padding: 30px 50px;
-    border-bottom: none;
+    padding: 20px 30px;
+    min-height: var(--header-height);
+    border-bottom: 1px solid var(--border-light);
     background: white;
+    flex-shrink: 0;
     position: relative;
-    z-index: 10;
+    z-index: 100;
 }
 
 .modal-title {
-    font-size: 32px;
+    font-size: clamp(20px, 3vw, 32px);
     font-weight: 700;
-    margin: 0;
     color: var(--blackBlue);
     font-family: 'MuseoSemiBold', sans-serif;
+    margin: 0;
+    line-height: 1.2;
+    /* Sin margen en desktop */
+    margin-left: 0;
+    max-width: calc(100% - 60px);
+    word-wrap: break-word;
+}
+
+/* Ajuste cuando aparece el menú hamburguesa */
+@media (max-width: 1366px) {
+    .modal-title {
+        margin-left: 60px; /* Mayor espacio para el menú hamburguesa */
+        max-width: calc(100% - 120px);
+    }
+}
+
+@media (max-width: 834px) {
+    .modal-title {
+        margin-left: 55px; /* Más espacio en tablet */
+        max-width: calc(100% - 100px);
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-title {
+        margin-left: 50px; /* Espacio consistente en móvil */
+        max-width: calc(100% - 90px);
+        font-size: 16px;
+    }
 }
 
 .btn-close {
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 0;
+    padding: 8px;
     width: 40px;
     height: 40px;
     display: flex;
@@ -144,6 +210,8 @@ body.modal-open {
     line-height: 1;
     opacity: 0.5;
     transition: var(--transition);
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
     .btn-close:hover {
@@ -152,35 +220,88 @@ body.modal-open {
     }
 
 /* ========================================
-   4. MODAL BODY
+   6. MODAL BODY - CONTAINER PRINCIPAL
    ======================================== */
 
 .modal-body {
-    display: flex;
-    flex-direction: column;
     flex: 1;
     overflow: hidden;
     padding: 0;
-    position: relative;
+    display: flex;
+    flex-direction: column;
     min-height: 0;
-    max-height: calc(100vh - var(--header-height) - var(--footer-height));
 }
 
-/* Contenedor para tabs y reset button */
+/* ========================================
+   7. TABS WRAPPER - RESPONSIVE
+   ======================================== */
+
 .tabs-wrapper {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    padding: 10px 50px 0 50px;
+    padding: 10px 30px 0 30px;
     background: white;
-    flex-shrink: 0; /* No se encoge */
+    flex-shrink: 0;
+    min-height: var(--tabs-height);
+    gap: 15px;
 }
+
+.custom-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0;
+    margin: 0;
+    height: 40px;
+    flex-wrap: nowrap;
+}
+
+.nav-link {
+    padding: 8px clamp(15px, 2vw, 30px);
+    border: 1px solid var(--border-light);
+    border-bottom: none;
+    background: white;
+    color: #bbb;
+    font-weight: 600;
+    font-size: clamp(14px, 1.5vw, 20px);
+    font-family: 'RalewayMedium', sans-serif;
+    border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: clamp(80px, 10vw, 150px);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+    .nav-link:hover:not(.active) {
+        color: #888;
+        background: #f8f9fa;
+    }
+
+    .nav-link.active {
+        color: #555;
+        font-family: 'RalewayBold', sans-serif;
+        font-weight: 800;
+        z-index: 2;
+        position: relative;
+    }
+
+        .nav-link.active.bottle-tab {
+            background: var(--bg-primary);
+        }
+
+        .nav-link.active.cap-tab {
+            background: var(--bg-cap);
+        }
 
 .reset-filters-btn {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
+    padding: 6px 12px;
     background: var(--text-gray);
     color: white;
     border: none;
@@ -188,9 +309,10 @@ body.modal-open {
     cursor: pointer;
     font-weight: 600;
     font-family: 'RalewayMedium', sans-serif;
-    font-size: 14px;
+    font-size: clamp(12px, 1.3vw, 14px);
     transition: var(--transition);
-    margin-bottom: -1px; /* Alinear con tabs */
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
     .reset-filters-btn img {
@@ -205,106 +327,31 @@ body.modal-open {
     }
 
 /* ========================================
-   5. TABS
-   ======================================== */
-
-.custom-tabs {
-    display: flex;
-    gap: 0;
-    padding: 0;
-    margin: 0;
-    position: relative;
-    height: 40px;
-    z-index: 2;
-}
-
-    .custom-tabs .nav-link:first-child {
-        margin-left: 0;
-    }
-
-.nav-link {
-    padding: 10px 30px;
-    margin: 0;
-    border: 1px solid var(--border-light);
-    border-bottom: none;
-    background: white;
-    color: #bbb;
-    font-weight: 600;
-    font-size: 20px;
-    font-family: 'RalewayMedium', sans-serif;
-    border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
-    cursor: pointer;
-    transition: var(--transition);
-    min-width: 150px;
-    text-align: center;
-    position: relative;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-    .nav-link:hover:not(.active) {
-        color: #888;
-        background: #f8f9fa;
-    }
-
-    .nav-link.active {
-        color: #555;
-        font-family: 'RalewayBold', sans-serif !important;
-        font-weight: 800;
-        border: 1px solid var(--border-light);
-        border-bottom: none;
-        z-index: 2;
-        position: relative;
-        height: 41px;
-    }
-
-        .nav-link.active.bottle-tab {
-            background: var(--bg-primary);
-        }
-
-        .nav-link.active.cap-tab {
-            background: var(--bg-cap);
-        }
-
-/* ========================================
-   6. CONFIG CONTAINER - FLEXIBLE CON SCROLL INTELIGENTE
+   8. CONFIG CONTAINER - LAYOUT RESPONSIVE
    ======================================== */
 
 .config-container {
     display: flex;
     gap: 0;
-    padding: 0 50px;
     flex: 1;
     border-top: 1px solid var(--border-light);
-    position: relative;
     min-height: 0;
     overflow: hidden;
-    height: calc(100vh - var(--header-height) - var(--footer-height) - 50px); /* 50px para tabs */
-}
-
-/* Media query para permitir scroll cuando sea necesario */
-@media (max-height: 800px), (max-width: 1366px) {
-    .config-container {
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
+    padding: 0 30px;
 }
 
 /* ========================================
-   7. PREVIEW SECTION - SIMPLIFICADA Y RESPONSIVE
+   9. PREVIEW SECTION - RESPONSIVE
    ======================================== */
 
 .preview-section {
     background-color: var(--bg-primary);
     border-bottom-left-radius: var(--border-radius-md);
-    padding: 15px;
+    padding: 20px;
     width: 50%;
-    min-height: 400px;
-    position: relative;
     display: flex;
     flex-direction: column;
+    position: relative;
     overflow: hidden;
 }
 
@@ -313,116 +360,41 @@ body.modal-open {
     }
 
 .section-title {
-    padding: 5px 0 5px 20px;
-    font-size: 20px;
+    font-size: clamp(18px, 2vw, 24px);
     font-weight: 600;
     font-family: 'RalewayMedium', sans-serif;
     color: var(--text-dark);
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    padding-left: 10px;
     flex-shrink: 0;
 }
 
 .preview-content {
-    position: relative;
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 250px;
-}
-
-/* Mobile - preview más compacto */
-@media (max-width: 834px) {
-    .preview-section {
-        width: 100%;
-        min-height: 320px;
-        padding: 10px;
-    }
-
-    .section-title {
-        font-size: 18px;
-        margin-bottom: 5px;
-        padding-left: 15px;
-    }
-
-    .preview-content {
-        min-height: 200px;
-    }
-}
-
-/* Tablet landscape */
-@media (max-width: 1024px) and (orientation: landscape) {
-    .preview-section {
-        min-height: 280px;
-        padding: 10px;
-    }
-
-    .section-title {
-        font-size: 16px;
-        margin-bottom: 5px;
-    }
-
-    .preview-content {
-        min-height: 180px;
-    }
-}
-
-/* Mobile landscape */
-@media (max-width: 896px) and (orientation: landscape) {
-    .preview-section {
-        min-height: 240px;
-        padding: 8px;
-    }
-
-    .section-title {
-        font-size: 15px;
-        margin-bottom: 3px;
-    }
-
-    .preview-content {
-        min-height: 150px;
-    }
-}
-
-.preview-section.cap-preview {
-    background-color: var(--bg-cap);
-}
-
-.section-title {
-    padding: 5px 0 5px 30px;
-    font-size: 24px;
-    font-weight: 600;
-    font-family: 'RalewayMedium', sans-serif;
-    color: var(--text-dark);
-    margin-bottom: 5px;
-}
-
-.preview-content {
     position: relative;
-    flex: 1;
-    min-height: 520px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    min-height: 300px;
 }
 
 /* ========================================
-   8. IMÁGENES DEL BOTE Y TAPA
+   10. IMÁGENES - RESPONSIVE Y ADAPTATIVAS
    ======================================== */
 
-.bottle-visual-wrapper {
+.bottle-visual-wrapper,
+.cap-visual-wrapper {
     position: relative;
     width: 100%;
-    max-width: 650px;
-    height: 550px;
-    margin: 0 auto;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 20px;
 }
 
-.bottle-svg-container {
+.bottle-svg-container,
+.cap-visual-wrapper {
     position: relative;
     z-index: 5;
     display: flex;
@@ -432,40 +404,35 @@ body.modal-open {
     height: 100%;
 }
 
-    .bottle-svg-container img {
-        width: auto;
-        height: auto;
-        max-width: 520px;
-        max-height: 530px;
-        object-fit: contain;
-        position: relative;
-        z-index: 2;
-    }
-
-.cap-visual-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 650px;
-    height: 520px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-}
-
+    .bottle-svg-container img,
     .cap-visual-wrapper img {
         width: auto;
         height: auto;
-        max-width: 450px;
-        max-height: 250px;
+        max-width: 90%;
+        max-height: 90%;
         object-fit: contain;
-        position: relative;
-        z-index: 2;
+        display: block;
     }
 
+/* Ajustes por tamaño de bote */
+.bottle-visual-wrapper[data-size="100"] img,
+.bottle-visual-wrapper[data-size="150"] img {
+    max-height: 85%;
+}
+
+.bottle-visual-wrapper[data-size="200"] img,
+.bottle-visual-wrapper[data-size="250"] img,
+.bottle-visual-wrapper[data-size="300"] img {
+    max-height: 88%;
+}
+
+.bottle-visual-wrapper[data-size="400"] img,
+.bottle-visual-wrapper[data-size="500"] img {
+    max-height: 90%;
+}
+
 /* ========================================
-   9. LÍNEAS DE DIMENSIÓN - RESPONSIVE
+   11. LÍNEAS DE DIMENSIÓN - RESPONSIVE
    ======================================== */
 
 .dimension-lines-container {
@@ -482,7 +449,7 @@ body.modal-open {
     background: rgba(237, 233, 254, 0.95);
     padding: 3px 8px;
     color: #6B6B83;
-    font-size: 12px;
+    font-size: clamp(10px, 1vw, 12px);
     font-family: 'RalewayLight', sans-serif;
     white-space: nowrap;
     z-index: 20;
@@ -491,39 +458,17 @@ body.modal-open {
     position: absolute;
 }
 
-/* Línea superior (diámetro de boca) */
-.dimension-top {
+.dimension-top,
+.dimension-bottom {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     height: 25px;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
 }
 
-    .dimension-top::before {
-        content: '';
-        position: absolute;
-        bottom: 15px;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: var(--dimension-line-color);
-    }
-
-    .dimension-top::after {
-        content: '';
-        position: absolute;
-        bottom: 10px;
-        left: 0;
-        right: 0;
-        height: 10px;
-        border-left: 1px solid var(--dimension-line-color);
-        border-right: 1px solid var(--dimension-line-color);
-    }
-
-/* Línea izquierda (altura) */
 .dimension-left {
     position: absolute;
     width: 35px;
@@ -531,228 +476,58 @@ body.modal-open {
     align-items: center;
 }
 
-    .dimension-left::before {
-        content: '';
-        position: absolute;
-        left: 15px;
-        top: 0;
-        bottom: 0;
-        width: 1px;
-        background: var(--dimension-line-color);
-    }
-
-    .dimension-left::after {
-        content: '';
-        position: absolute;
-        left: 10px;
-        top: 0;
-        bottom: 0;
-        width: 10px;
-        border-top: 1px solid var(--dimension-line-color);
-        border-bottom: 1px solid var(--dimension-line-color);
-    }
-
-    .dimension-left .dimension-text {
-        position: absolute;
-        left: 25px;
-        top: 50%;
-        transform: translateY(-50%) rotate(-90deg);
-        transform-origin: center;
-    }
-
-/* Línea inferior (diámetro base) */
-.dimension-bottom {
+/* Líneas - elementos pseudo */
+.dimension-top::before,
+.dimension-bottom::before {
+    content: '';
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 25px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--dimension-line-color);
 }
 
-    .dimension-bottom::before {
-        content: '';
-        position: absolute;
-        top: 15px;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: var(--dimension-line-color);
-    }
-
-    .dimension-bottom::after {
-        content: '';
-        position: absolute;
-        top: 10px;
-        left: 0;
-        right: 0;
-        height: 10px;
-        border-left: 1px solid var(--dimension-line-color);
-        border-right: 1px solid var(--dimension-line-color);
-    }
-
-/* Dimensiones de la tapa - igual estructura */
-.cap-dimension-top,
-.cap-dimension-left {
+.dimension-top::after,
+.dimension-bottom::after {
+    content: '';
     position: absolute;
+    left: 0;
+    right: 0;
+    height: 10px;
+    border-left: 1px solid var(--dimension-line-color);
+    border-right: 1px solid var(--dimension-line-color);
 }
 
-    .cap-dimension-top .dimension-text,
-    .cap-dimension-left .dimension-text {
-        background: rgba(255, 232, 232, 0.95);
-    }
-
-/* RESPONSIVE - Ocultar líneas en móvil */
-@media (max-width: 834px) {
-    .dimension-lines-container,
-    .cap-dimension-top,
-    .cap-dimension-left {
-        display: none;
-    }
-}
-
-/* Reducir tamaño en tablets */
-@media (max-width: 1024px) and (min-width: 835px) {
-    .dimension-text {
-        font-size: 10px;
-        padding: 2px 6px;
-    }
-
-    .dimension-top,
-    .dimension-bottom {
-        height: 20px;
-    }
-
-    .dimension-left {
-        width: 30px;
-    }
-}
-
-/* Líneas muy pequeñas en landscape móvil */
-@media (max-width: 896px) and (orientation: landscape) {
-    .dimension-text {
-        font-size: 9px;
-        padding: 2px 4px;
-    }
-
-    .dimension-lines-container {
-        opacity: 0.7;
-    }
-}
-
-/* Línea superior (diámetro de boca) */
-.dimension-top {
+.dimension-left::before {
+    content: '';
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 30px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--dimension-line-color);
 }
 
-    .dimension-top::before {
-        content: '';
-        position: absolute;
-        bottom: 15px;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: var(--dimension-line-color);
-    }
-
-    .dimension-top::after {
-        content: '';
-        position: absolute;
-        bottom: 10px;
-        left: 0;
-        right: 0;
-        height: 10px;
-        border-left: 1px solid var(--dimension-line-color);
-        border-right: 1px solid var(--dimension-line-color);
-    }
-
-    .dimension-top .dimension-text {
-        position: relative;
-        bottom: -5px;
-    }
-
-/* Línea izquierda (altura) */
-.dimension-left {
+.dimension-left::after {
+    content: '';
     position: absolute;
-    width: 40px;
-    display: flex;
-    align-items: center;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    border-top: 1px solid var(--dimension-line-color);
+    border-bottom: 1px solid var(--dimension-line-color);
 }
 
-    .dimension-left::before {
-        content: '';
-        position: absolute;
-        left: 15px;
-        top: 0;
-        bottom: 0;
-        width: 1px;
-        background: var(--dimension-line-color);
-    }
-
-    .dimension-left::after {
-        content: '';
-        position: absolute;
-        left: 10px;
-        top: 0;
-        bottom: 0;
-        width: 10px;
-        border-top: 1px solid var(--dimension-line-color);
-        border-bottom: 1px solid var(--dimension-line-color);
-    }
-
-    .dimension-left .dimension-text {
-        position: absolute;
-        left: 25px;
-        top: 50%;
-        transform: translateY(-50%) rotate(-90deg);
-        transform-origin: center;
-    }
-
-/* Línea inferior (diámetro base) */
-.dimension-bottom {
+.dimension-left .dimension-text {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 30px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
+    left: 25px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    transform-origin: center;
 }
 
-    .dimension-bottom::before {
-        content: '';
-        position: absolute;
-        top: 15px;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: var(--dimension-line-color);
-    }
-
-    .dimension-bottom::after {
-        content: '';
-        position: absolute;
-        top: 10px;
-        left: 0;
-        right: 0;
-        height: 10px;
-        border-left: 1px solid var(--dimension-line-color);
-        border-right: 1px solid var(--dimension-line-color);
-    }
-
-    .dimension-bottom .dimension-text {
-        position: relative;
-        top: -5px;
-    }
-
-/* Dimensiones de la tapa */
+/* Dimensiones de tapa - CORREGIDO Y CENTRADO */
 .cap-dimension-top {
     position: absolute;
     left: 50%;
@@ -761,6 +536,8 @@ body.modal-open {
     display: flex;
     align-items: flex-end;
     justify-content: center;
+    width: auto;
+    pointer-events: none; /* No interferir con la interacción */
 }
 
     .cap-dimension-top::before {
@@ -788,6 +565,7 @@ body.modal-open {
         position: relative;
         bottom: -5px;
         background: rgba(255, 232, 232, 0.95);
+        z-index: 1;
     }
 
 .cap-dimension-left {
@@ -795,12 +573,14 @@ body.modal-open {
     width: 40px;
     display: flex;
     align-items: center;
+    height: auto;
+    pointer-events: none; /* No interferir con la interacción */
 }
 
     .cap-dimension-left::before {
         content: '';
         position: absolute;
-        right: 25px;
+        left: 15px;
         top: 0;
         bottom: 0;
         width: 1px;
@@ -810,7 +590,7 @@ body.modal-open {
     .cap-dimension-left::after {
         content: '';
         position: absolute;
-        right: 20px;
+        left: 10px;
         top: 0;
         bottom: 0;
         width: 10px;
@@ -820,19 +600,20 @@ body.modal-open {
 
     .cap-dimension-left .dimension-text {
         position: absolute;
-        right: 35px;
+        left: 25px;
         top: 50%;
         transform: translateY(-50%) rotate(-90deg);
         transform-origin: center;
         background: rgba(255, 232, 232, 0.95);
+        z-index: 1;
     }
 
 /* ========================================
-   10. FORM SECTION - ADAPTATIVA COMPLETA
+   12. FORM SECTION - RESPONSIVE
    ======================================== */
 
 .form-section {
-    padding: 15px 20px;
+    padding: 20px;
     width: 50%;
     background: var(--bg-secondary);
     border-bottom-right-radius: var(--border-radius-md);
@@ -840,122 +621,29 @@ body.modal-open {
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    min-height: 0;
 }
 
-/* Ajustar espaciado de campos dinámicamente */
 .field {
-    margin-bottom: clamp(10px, 2vh, 25px);
+    margin-bottom: clamp(15px, 2vh, 25px);
 }
 
 .form-label {
     display: block;
-    width: 100%;
-    padding-left: clamp(10px, 2vw, 20px);
-    text-align: left;
+    padding-left: clamp(10px, 1.5vw, 20px);
     font-weight: 400;
-    font-size: clamp(13px, 1.5vw, 16px);
-    margin-bottom: clamp(4px, 1vh, 8px);
+    font-size: clamp(14px, 1.3vw, 16px);
+    margin-bottom: 8px;
     font-family: 'RalewayRegular', sans-serif;
     color: var(--text-dark);
 }
 
 .form-select {
     width: 100%;
-    max-width: 100%;
-    height: clamp(38px, 5vh, 60px);
+    height: clamp(40px, 5vh, 60px);
     border: 1px solid var(--border-color);
     border-radius: 5px;
     padding: 0 35px 0 15px;
-    font-size: clamp(14px, 1.8vw, 20px);
-    font-family: 'Museo', sans-serif;
-    background: white;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%232F5496' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 12px;
-    transition: var(--transition);
-}
-
-/* ========================================
-   11. SEGMENTED CONTROLS - RESPONSIVE
-   ======================================== */
-
-.segmented {
-    display: flex;
-    gap: 3px;
-    padding: 0 clamp(10px, 2vw, 20px);
-    margin-top: clamp(8px, 1.5vh, 20px);
-}
-
-.segmented-item {
-    flex: 1;
-    padding: clamp(6px, 1vh, 12px) 4px;
-    border: 1px solid #A7BDE3;
-    background: #F0E7F9;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: var(--transition);
-    font-weight: 600;
-    font-size: clamp(11px, 1.5vw, 18px);
-    font-family: 'RalewayMedium', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(2px, 0.5vw, 6px);
-    height: clamp(30px, 4vh, 44px);
-    min-width: 0;
-    white-space: nowrap;
-}
-
-.radio-icon {
-    width: clamp(13px, 1.8vw, 19px);
-    height: clamp(13px, 1.8vw, 19px);
-    border: 2px solid currentColor;
-    border-radius: 50%;
-    display: inline-block;
-    position: relative;
-    flex-shrink: 0;
-}
-
-.segmented-item.active .radio-icon::after {
-    content: '';
-    display: block;
-    width: clamp(6px, 0.8vw, 9px);
-    height: clamp(6px, 0.8vw, 9px);
-    background: white;
-    border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.field {
-    margin-bottom: 25px;
-}
-
-.form-label {
-    display: block;
-    width: 100%;
-    padding-left: 20px;
-    text-align: left;
-    font-weight: 400;
-    font-size: 16px;
-    margin-bottom: 10px;
-    font-family: 'RalewayRegular', sans-serif;
-    color: var(--text-dark);
-}
-
-.form-select {
-    width: 100%;
-    max-width: 327px;
-    height: 60px;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    padding: 0 40px 0 20px;
-    font-size: 20px;
+    font-size: clamp(14px, 1.5vw, 20px);
     font-family: 'Museo', sans-serif;
     background: white;
     appearance: none;
@@ -976,39 +664,33 @@ body.modal-open {
         box-shadow: 0 0 0 2px rgba(47, 84, 150, 0.1);
     }
 
-    .form-select:disabled {
-        background-color: #f8f8f8;
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-
 /* ========================================
-   11. SEGMENTED CONTROLS
+   13. SEGMENTED CONTROLS - RESPONSIVE
    ======================================== */
 
 .segmented {
     display: flex;
     gap: 4px;
-    padding: 0 20px;
-    margin-top: 30px;
+    padding: 0 clamp(10px, 1.5vw, 20px);
+    margin-top: clamp(15px, 2vh, 30px);
 }
 
 .segmented-item {
     flex: 1;
-    padding: 12px;
+    padding: clamp(8px, 1vh, 12px) 4px;
     border: 1px solid #A7BDE3;
     background: #F0E7F9;
     border-radius: 25px;
     cursor: pointer;
     transition: var(--transition);
     font-weight: 600;
-    font-size: 20px;
+    font-size: clamp(12px, 1.3vw, 20px);
     font-family: 'RalewayMedium', sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    height: 44px;
+    gap: clamp(4px, 0.5vw, 8px);
+    height: clamp(36px, 4vh, 44px);
     min-width: 0;
     white-space: nowrap;
 }
@@ -1029,8 +711,8 @@ body.modal-open {
     }
 
 .radio-icon {
-    width: 19px;
-    height: 19px;
+    width: clamp(14px, 1.5vw, 19px);
+    height: clamp(14px, 1.5vw, 19px);
     border: 2px solid currentColor;
     border-radius: 50%;
     display: inline-block;
@@ -1041,8 +723,8 @@ body.modal-open {
 .segmented-item.active .radio-icon::after {
     content: '';
     display: block;
-    width: 9px;
-    height: 9px;
+    width: clamp(6px, 0.7vw, 9px);
+    height: clamp(6px, 0.7vw, 9px);
     background: white;
     border-radius: 50%;
     position: absolute;
@@ -1052,7 +734,7 @@ body.modal-open {
 }
 
 /* ========================================
-   12. CHECKBOX
+   14. CHECKBOX
    ======================================== */
 
 .checkbox {
@@ -1060,7 +742,7 @@ body.modal-open {
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    padding-left: 20px;
+    padding-left: clamp(10px, 1.5vw, 20px);
 }
 
     .checkbox input[type="checkbox"] {
@@ -1070,33 +752,34 @@ body.modal-open {
     }
 
     .checkbox span {
-        font-size: 16px;
+        font-size: clamp(14px, 1.3vw, 16px);
         font-family: 'RalewayRegular', sans-serif;
         color: var(--text-dark);
     }
 
 /* ========================================
-   13. HINT TEXT
+   15. HINT TEXT
    ======================================== */
 
 .hint {
     display: block;
     margin-top: 5px;
-    padding-left: 20px;
-    font-size: 14px;
+    padding-left: clamp(10px, 1.5vw, 20px);
+    font-size: clamp(12px, 1.2vw, 14px);
     color: var(--text-gray);
     font-family: 'RalewayRegular', sans-serif;
 }
 
 /* ========================================
-   14. MODAL FOOTER
+   16. MODAL FOOTER - RESPONSIVE
    ======================================== */
 
 .modal-footer {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    padding: 30px 50px;
+    padding: 15px 30px;
+    min-height: var(--footer-height);
     border-top: 1px solid #dee2e6;
     gap: 1rem;
     flex-shrink: 0;
@@ -1106,19 +789,18 @@ body.modal-open {
 .btn-cancel,
 .btn-primary {
     border-radius: 25px;
-    padding: 12px 30px;
+    padding: clamp(8px, 1vh, 12px) clamp(20px, 2vw, 30px);
     font-weight: 700;
-    font-size: 20px;
+    font-size: clamp(14px, 1.5vw, 20px);
     font-family: 'RalewayBold', sans-serif;
-    text-decoration: none;
-    transition: var(--transition);
     cursor: pointer;
-    min-width: 163px;
+    min-width: clamp(100px, 12vw, 163px);
     text-align: center;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 48px;
+    height: clamp(36px, 4vh, 48px);
+    transition: var(--transition);
 }
 
 .btn-cancel {
@@ -1132,11 +814,6 @@ body.modal-open {
         color: white;
     }
 
-    .btn-cancel:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
 .btn-primary {
     border: 2px solid var(--blackBlue);
     background-color: var(--blackBlue);
@@ -1148,21 +825,14 @@ body.modal-open {
         color: var(--blackBlue);
     }
 
+    .btn-cancel:disabled,
     .btn-primary:disabled {
-        background-color: var(--blackBlue) !important;
-        border-color: var(--blackBlue) !important;
-        opacity: 0.8;
+        opacity: 0.5;
         cursor: not-allowed;
     }
 
-        .btn-primary:disabled:hover {
-            background-color: var(--blackBlue) !important;
-            color: white !important;
-            transform: none !important;
-        }
-
 /* ========================================
-   15. SPINNER
+   17. SPINNER
    ======================================== */
 
 .spinner-save {
@@ -1184,574 +854,152 @@ body.modal-open {
 }
 
 /* ========================================
-   16. AJUSTES DINÁMICOS POR TAMAÑO DE BOTE
+   18. MEDIA QUERIES - DESKTOP A MOBILE
    ======================================== */
 
-.bottle-visual-wrapper[data-size="100"] .bottle-svg-container img,
-.bottle-visual-wrapper[data-size="150"] .bottle-svg-container img {
-    max-height: 450px;
-}
-
-.bottle-visual-wrapper[data-size="200"] .bottle-svg-container img,
-.bottle-visual-wrapper[data-size="250"] .bottle-svg-container img,
-.bottle-visual-wrapper[data-size="300"] .bottle-svg-container img {
-    max-height: 490px;
-}
-
-.bottle-visual-wrapper[data-size="400"] .bottle-svg-container img,
-.bottle-visual-wrapper[data-size="500"] .bottle-svg-container img {
-    max-height: 530px;
-}
-
-/* ========================================
-   17. RESPONSIVE - DESKTOP PEQUEÑO (1600px y menor)
-   ======================================== */
-
+/* LAPTOP GRANDE (1600px) */
 @media (max-width: 1600px) {
     .modal-dialog-custom {
+        width: var(--modal-width-laptop);
+    }
+}
+
+/* LAPTOP ESTÁNDAR (1366px) */
+@media (max-width: 1366px) {
+    .modal-dialog-custom {
         width: 100%;
-        max-width: 100vw;
+        max-width: 100%;
     }
 
     .modal-content-custom {
         border-radius: 0;
-    }
-
-    .config-container {
-        padding: 0 40px;
-    }
-
-    .tabs-wrapper {
-        padding: 10px 40px 0 40px;
-    }
-}
-
-/* ========================================
-   18. RESPONSIVE - LAPTOP ESTÁNDAR (1440px)
-   ======================================== */
-
-@media (max-width: 1440px) {
-    .modal-header {
-        padding: 20px 30px;
-    }
-
-    .modal-title {
-        font-size: 26px;
-    }
-
-    .tabs-wrapper {
-        padding: 10px 30px 0 30px;
-    }
-
-    .nav-link {
-        font-size: 18px;
-        padding: 8px 25px;
-        min-width: 130px;
-    }
-
-    .reset-filters-btn {
-        font-size: 13px;
-        padding: 6px 12px;
-    }
-
-    .config-container {
-        padding: 0 30px;
-    }
-
-    .preview-section {
-        padding: 12px 15px;
-    }
-
-    .section-title {
-        font-size: 22px;
-    }
-
-    .form-section {
-        padding: 12px 20px;
-    }
-
-    .modal-footer {
-        padding: 20px 30px;
-    }
-
-    /* Ajustar tamaños para caber mejor */
-    .bottle-visual-wrapper,
-    .cap-visual-wrapper {
-        max-height: 400px;
-    }
-
-    .bottle-svg-container img {
-        max-width: 380px;
-        max-height: 380px;
-    }
-}
-
-/* ========================================
-   19. RESPONSIVE - LAPTOP PEQUEÑO (1366px)
-   ======================================== */
-
-@media (max-width: 1366px) {
-    .modal-header {
-        padding: 15px 25px;
-    }
-
-    .modal-title {
-        font-size: 22px;
-    }
-
-    .tabs-wrapper {
-        padding: 6px 25px 0 25px;
-    }
-
-    .nav-link {
-        font-size: 16px;
-        padding: 6px 20px;
-        height: 36px;
     }
 
     .config-container {
         padding: 0 25px;
     }
 
-    .preview-section {
-        width: 48%;
-        padding: 8px 12px;
+    .tabs-wrapper {
+        padding: 10px 25px 0 25px;
     }
 
-    .section-title {
-        font-size: 18px;
-        margin-bottom: 3px;
-    }
-
-    .form-section {
-        width: 52%;
-        padding: 10px 15px;
-    }
-
-    .bottle-visual-wrapper,
-    .cap-visual-wrapper {
-        max-height: calc(100vh - 400px);
-    }
-
-    .bottle-svg-container img {
-        max-width: min(85%, 320px);
-        max-height: min(85%, 320px);
-    }
-
-    .cap-visual-wrapper img {
-        max-width: min(80%, 260px);
-        max-height: min(55%, 140px);
+    .modal-header {
+        padding: 15px 25px;
     }
 
     .modal-footer {
         padding: 12px 25px;
     }
-
-    .btn-cancel,
-    .btn-primary {
-        font-size: 16px;
-        padding: 8px 20px;
-        min-width: 130px;
-        height: 40px;
-    }
 }
 
-/* ========================================
-   20. RESPONSIVE - LAPTOP MUY PEQUEÑO (1280px)
-   ======================================== */
-
-@media (max-width: 1280px) {
-    .modal-header {
-        padding: 12px 20px;
-    }
-
-    .modal-title {
-        font-size: 20px;
-    }
-
-    .tabs-wrapper {
-        padding: 5px 20px 0 20px;
-    }
-
-    .nav-link {
-        font-size: 14px;
-        padding: 5px 15px;
-        min-width: 100px;
-        height: 33px;
-    }
-
-    .reset-filters-btn {
-        font-size: 11px;
-        padding: 4px 8px;
-    }
-
-    .config-container {
-        padding: 0 20px;
-    }
-
-    .preview-section {
-        padding: 6px 10px;
-    }
-
-    .section-title {
-        font-size: 16px;
-        padding-left: 12px;
-    }
-
-    .bottle-visual-wrapper,
-    .cap-visual-wrapper {
-        max-height: calc(100vh - 420px);
-    }
-
-    .bottle-svg-container img {
-        max-width: min(80%, 280px);
-        max-height: min(80%, 280px);
-    }
-
-    .cap-visual-wrapper img {
-        max-width: min(75%, 220px);
-        max-height: min(50%, 120px);
-    }
-
-    .form-section {
-        padding: 8px 12px;
-    }
-
-    .modal-footer {
-        padding: 10px 20px;
-    }
-
-    .btn-cancel,
-    .btn-primary {
-        font-size: 14px;
-        min-width: 110px;
-        height: 36px;
-        padding: 6px 16px;
-    }
-}
-
-/* ========================================
-   RESPONSIVE - ALTURA CRÍTICA (max-height: 650px)
-   ======================================== */
-
-@media (max-height: 650px) and (min-width: 1024px) {
-    .modal-header {
-        padding: 8px 20px;
-    }
-
-    .modal-title {
-        font-size: 18px;
-    }
-
-    .tabs-wrapper {
-        padding: 4px 20px 0 20px;
-    }
-
-    .nav-link {
-        font-size: 13px;
-        height: 30px;
-        padding: 4px 12px;
-    }
-
-    .reset-filters-btn {
-        font-size: 10px;
-        padding: 3px 6px;
-    }
-
-    .bottle-visual-wrapper,
-    .cap-visual-wrapper {
-        max-height: calc(100vh - 450px);
-        min-height: 120px;
-    }
-
-    .bottle-svg-container img {
-        max-width: min(75%, 240px);
-        max-height: min(75%, 240px);
-    }
-
-    .cap-visual-wrapper img {
-        max-width: min(70%, 180px);
-        max-height: min(45%, 100px);
-    }
-
-    .field {
-        margin-bottom: 8px;
-    }
-
-    .form-label {
-        font-size: 12px;
-        margin-bottom: 3px;
-    }
-
-    .form-select {
-        height: 34px;
-        font-size: 13px;
-    }
-
-    .segmented {
-        margin-top: 6px;
-    }
-
-    .segmented-item {
-        height: 28px;
-        font-size: 11px;
-    }
-
-    .radio-icon {
-        width: 12px;
-        height: 12px;
-    }
-
-    .modal-footer {
-        padding: 8px 20px;
-    }
-
-    .btn-cancel,
-    .btn-primary {
-        font-size: 13px;
-        height: 32px;
-        padding: 4px 12px;
-        min-width: 100px;
-    }
-}
-
-/* ========================================
-   20. RESPONSIVE - TABLET LANDSCAPE (1024px)
-   ======================================== */
-
+/* LANDSCAPE TABLETS (1024px) */
 @media (max-width: 1024px) and (orientation: landscape) {
-    .modal-header {
-        padding: 15px 25px;
-    }
-
-    .modal-title {
-        font-size: 24px;
-    }
-
     .config-container {
-        width: calc(100% - 50px);
-        margin: -1px 25px 0 25px;
-    }
-
-    .preview-section {
-        min-height: 400px;
-        padding: 15px;
+        overflow-y: auto;
     }
 
     .bottle-visual-wrapper,
     .cap-visual-wrapper {
-        max-width: 300px;
-        max-height: 280px;
-    }
-
-    .bottle-svg-container img {
-        max-width: 280px;
-        max-height: 260px;
-    }
-
-    .cap-visual-wrapper img {
-        max-width: 240px;
-        max-height: 140px;
-    }
-
-    .form-section {
-        padding: 15px 20px;
-    }
-
-    .field {
-        margin-bottom: 15px;
-    }
-
-    .modal-footer {
-        padding: 15px 25px;
-    }
-
-    .btn-cancel,
-    .btn-primary {
-        min-width: 120px;
-        height: 40px;
-        padding: 8px 20px;
-        font-size: 18px;
-    }
-
-    .dimension-text {
-        font-size: 11px;
-        padding: 3px 8px;
+        max-height: calc(100vh - 200px);
     }
 }
 
-/* ========================================
-   21. RESPONSIVE - TABLET PORTRAIT (834px)
-   ======================================== */
-
+/* IPAD MINI Y TABLETS PORTRAIT (834px) */
 @media (max-width: 834px) {
+    /* Modal fullscreen */
     .modal-dialog-custom {
         width: 100%;
         height: 100vh;
-        transform: none;
         max-width: 100%;
-        top: 0;
-        left: 0;
-        right: 0;
+        transform: none;
+        position: fixed;
+        inset: 0;
     }
 
     .modal-content-custom {
         border-radius: 0;
-        height: 100vh;
     }
 
+    /* Header ajustado para evitar solapamiento */
     .modal-header {
-        padding: 20px 30px;
-        border-bottom: 1px solid #eee;
+        padding: 12px 20px;
+        min-height: 56px;
+        gap: 10px;
     }
 
     .modal-title {
+        font-size: 18px;
+        padding-right: 10px;
+        margin-left: 35px; /* Espacio para menú hamburguesa */
+    }
+
+    .btn-close {
+        width: 36px;
+        height: 36px;
         font-size: 24px;
     }
 
+    /* Body scrolleable */
     .modal-body {
-        flex: 1;
-        overflow-y: auto; /* Permitir scroll en mobile */
-        padding: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
+    /* Tabs responsive */
     .tabs-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 10px 20px;
+        gap: 10px;
         position: sticky;
         top: 0;
         background: white;
-        z-index: 10;
-        padding: 10px 20px;
-        flex-direction: column;
-        gap: 10px;
-        border-bottom: 1px solid var(--border-light);
+        z-index: 50;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .custom-tabs {
+        justify-content: stretch;
         width: 100%;
-        justify-content: center;
-        gap: 5px;
     }
 
     .nav-link {
         flex: 1;
-        min-width: 100px;
-        padding: 8px 15px;
-        font-size: 16px;
+        font-size: 14px;
+        min-width: 0;
+        padding: 8px 10px;
     }
 
     .reset-filters-btn {
         width: 100%;
         justify-content: center;
-        margin: 0;
     }
 
-    /* Stack layout vertical */
+    /* Layout vertical */
     .config-container {
         flex-direction: column;
-        width: 100%;
-        height: auto;
         padding: 0;
-        border: none;
         overflow: visible;
+        height: auto;
     }
 
     .preview-section,
     .form-section {
         width: 100%;
         border-radius: 0;
-        overflow: visible;
     }
 
     .preview-section {
         min-height: 350px;
-        padding: 20px;
-    }
-
-    .bottle-visual-wrapper {
         max-height: 400px;
-    }
-
-    .bottle-svg-container img {
-        max-width: 350px;
-        max-height: 380px;
-    }
-
-    .cap-visual-wrapper {
-        max-height: 350px;
-    }
-
-        .cap-visual-wrapper img {
-            max-width: 300px;
-            max-height: 160px;
-        }
-
-    .form-section {
-        padding: 20px 30px 100px 30px;
-    }
-
-    .modal-footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 15px 30px;
-        z-index: 100;
-        background: white;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    }
-}
-
-/* ========================================
-   22. RESPONSIVE - TABLET LANDSCAPE PEQUEÑO
-   ======================================== */
-
-@media (max-width: 1024px) and (orientation: landscape) and (max-height: 700px) {
-    .modal-header {
-        padding: 10px 20px;
-    }
-
-    .modal-title {
-        font-size: 20px;
-    }
-
-    .reset-filters-btn {
-        position: absolute !important;
-        top: 10px !important;
-        right: 20px !important;
-        left: auto !important;
-        width: auto !important;
-        padding: 6px 12px;
-        font-size: 12px;
-    }
-
-    .custom-tabs {
-        margin: 0 20px;
-        padding: 10px 0;
-    }
-
-    .nav-link {
-        min-width: 100px;
-        font-size: 14px;
-        padding: 8px 15px;
-        height: 35px;
-    }
-
-    .config-container {
-        display: flex;
-        flex-direction: row;
-        width: calc(100% - 40px);
-        margin: 0 20px;
-        height: calc(100vh - 150px);
-    }
-
-    .preview-section {
-        width: 45%;
-        min-height: 100%;
         padding: 15px;
     }
 
-    .bottle-visual-wrapper {
-        height: 350px;
+    /* Imágenes adaptadas a tablet */
+    .bottle-visual-wrapper,
+    .cap-visual-wrapper {
+        height: 100%;
+        padding: 10px;
     }
 
     .bottle-svg-container img {
@@ -1759,329 +1007,213 @@ body.modal-open {
         max-height: 320px;
     }
 
-    .cap-visual-wrapper {
-        height: 300px;
+    .cap-visual-wrapper img {
+        max-width: 240px;
+        max-height: 140px;
     }
 
-        .cap-visual-wrapper img {
-            max-width: 240px;
-            max-height: 120px;
-        }
-
+    /* Form section con padding bottom para footer fijo */
     .form-section {
-        width: 55%;
-        padding: 15px 20px;
-        overflow-y: auto;
+        padding: 20px 20px 100px 20px;
     }
 
-    .field {
-        margin-bottom: 18px;
-    }
-
-    .segmented {
-        margin-top: 15px;
-    }
-
-    .segmented-item {
-        font-size: 14px;
-        padding: 8px;
-        height: 38px;
-    }
-
+    /* Footer fijo abajo */
     .modal-footer {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        padding: 12px 30px;
+        padding: 12px 20px;
+        background: white;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
         z-index: 100;
     }
 
-    .btn-cancel,
-    .btn-primary {
-        font-size: 16px;
-        padding: 10px 20px;
-        height: 40px;
-        min-width: 140px;
-    }
-}
-
-/* ========================================
-   23. RESPONSIVE - MOBILE (480px)
-   ======================================== */
-
-@media (max-width: 480px) {
-    .modal-dialog-custom {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        height: 100vh;
-        transform: none;
-        max-width: 100%;
-    }
-
-    .modal-content-custom {
-        border-radius: 0;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .modal-header {
-        padding: 12px 15px;
-        background: white;
-        border-bottom: 1px solid #eee;
-        flex-shrink: 0;
-    }
-
-    .modal-title {
-        font-size: 18px;
-        margin-left: 35px;
-    }
-
-    .btn-close {
-        width: 30px;
-        height: 30px;
-        font-size: 24px;
-    }
-
-    .modal-body {
-        flex: 1;
-        overflow-y: auto;
-        padding: 0;
-        padding-top: 50px;
-        padding-bottom: 140px;
-    }
-
-    .reset-filters-btn {
-        position: fixed !important;
-        top: 56px !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        margin: 0 !important;
-        border-radius: 0;
-        z-index: 98;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .custom-tabs {
-        display: flex;
-        margin: 0;
-        padding: 10px 15px 0 15px;
-        gap: 5px;
-        background: white;
-        position: relative;
-        z-index: 1;
-    }
-
-        .custom-tabs .nav-link:first-child {
-            margin-left: 0;
-        }
-
-    .nav-link {
-        flex: 1;
-        min-width: 0;
-        padding: 8px 10px;
-        font-size: 14px;
-        height: 36px;
-    }
-
-    .config-container {
-        flex-direction: column;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-    }
-
-    .preview-section {
-        width: 100%;
-        min-height: 280px;
-        padding: 15px;
-        border-radius: 0;
-    }
-
-    .bottle-visual-wrapper {
-        height: 250px;
-    }
-
-    .bottle-svg-container img {
-        max-width: 200px;
-        max-height: 230px;
-    }
-
-    .cap-visual-wrapper {
-        height: 200px;
-    }
-
-        .cap-visual-wrapper img {
-            max-width: 180px;
-            max-height: 100px;
-        }
-
-    .form-section {
-        width: 100%;
-        padding: 20px 15px;
-    }
-
-    .field {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
-        font-size: 14px;
-        padding-left: 10px;
-    }
-
-    .form-select {
-        height: 48px;
-        font-size: 16px;
-        padding: 0 35px 0 15px;
-    }
-
-    .segmented {
-        padding: 0 10px;
-        margin-top: 20px;
-    }
-
-    .segmented-item {
-        font-size: 13px;
-        padding: 8px;
-        height: 36px;
-    }
-
-    .radio-icon {
-        width: 16px;
-        height: 16px;
-    }
-
-    .segmented-item.active .radio-icon::after {
-        width: 8px;
-        height: 8px;
-    }
-
-    .modal-footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 12px 15px;
-        background: white;
-        border-top: 1px solid #dee2e6;
-        z-index: 100;
-    }
-
-    .btn-cancel,
-    .btn-primary {
-        font-size: 16px;
-        padding: 10px 20px;
-        height: 40px;
-        min-width: 120px;
-    }
-
+    /* Mostrar líneas de dimensión en tablets (pero no en móviles) */
     .dimension-lines-container {
-        display: none;
+        display: block;
+        opacity: 0.8;
+    }
+
+    .cap-dimension-top,
+    .cap-dimension-left {
+        display: flex;
+        opacity: 0.8;
+    }
+
+    /* Ocultar solo en móviles pequeños */
+    @media (max-width: 600px) {
+        .dimension-lines-container,
+        .cap-dimension-top,
+        .cap-dimension-left {
+            display: none;
+        }
     }
 }
 
-/* ========================================
-   24. RESPONSIVE - MOBILE LANDSCAPE
-   ======================================== */
-
-@media (max-width: 896px) and (orientation: landscape) {
-    .modal-dialog-custom {
-        width: 100%;
-        height: 100vh;
-        transform: none;
-        max-width: 100%;
-    }
-
-    .modal-content-custom {
-        border-radius: 0;
-    }
-
-    .modal-header {
-        padding: 10px 20px;
-    }
-
-    .modal-title {
-        font-size: 20px;
-    }
-
+/* MOBILE LANDSCAPE (768px) */
+@media (max-width: 768px) and (orientation: landscape) {
     .config-container {
-        height: calc(100vh - 120px);
+        flex-direction: row;
     }
 
     .preview-section {
         width: 40%;
+        min-height: auto;
         padding: 10px;
     }
 
-    .bottle-visual-wrapper {
-        height: 250px;
+    .form-section {
+        width: 60%;
+        padding: 10px 15px 80px 15px;
     }
 
     .bottle-svg-container img {
-        max-width: 200px;
-        max-height: 230px;
+        max-width: 180px;
+        max-height: 200px;
     }
 
-    .cap-visual-wrapper {
-        height: 200px;
+    .cap-visual-wrapper img {
+        max-width: 150px;
+        max-height: 80px;
     }
+}
 
-        .cap-visual-wrapper img {
-            max-width: 160px;
-            max-height: 80px;
-        }
-
-    .form-section {
-        width: 60%;
+/* MOBILE PORTRAIT (480px) */
+@media (max-width: 480px) {
+    /* Header más compacto */
+    .modal-header {
         padding: 10px 15px;
+        min-height: 48px;
+    }
+
+    .modal-title {
+        font-size: 16px;
+    }
+
+    .btn-close {
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+        padding: 4px;
+    }
+
+    /* Tabs más pequeñas */
+    .tabs-wrapper {
+        padding: 8px 15px;
+    }
+
+    .nav-link {
+        font-size: 13px;
+        height: 32px;
+        padding: 6px 8px;
+    }
+
+    .reset-filters-btn {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    /* Preview más pequeño */
+    .preview-section {
+        min-height: 280px;
+        max-height: 320px;
+        padding: 10px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    /* Imágenes móvil */
+    .bottle-svg-container img {
+        max-width: 200px;
+        max-height: 240px;
+    }
+
+    .cap-visual-wrapper img {
+        max-width: 160px;
+        max-height: 90px;
+    }
+
+    /* Form más compacto */
+    .form-section {
+        padding: 15px 15px 90px 15px;
     }
 
     .field {
-        margin-bottom: 15px;
+        margin-bottom: 12px;
     }
 
+    .form-label {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .form-select {
+        height: 38px;
+        font-size: 14px;
+    }
+
+    .segmented {
+        margin-top: 12px;
+    }
+
+    .segmented-item {
+        font-size: 11px;
+        height: 32px;
+        padding: 6px 2px;
+    }
+
+    .radio-icon {
+        width: 12px;
+        height: 12px;
+    }
+
+    /* Footer móvil */
     .modal-footer {
-        padding: 10px 20px;
+        padding: 10px 15px;
+        min-height: 48px;
+    }
+
+    .btn-cancel,
+    .btn-primary {
+        font-size: 14px;
+        height: 36px;
+        min-width: 90px;
+        padding: 6px 15px;
+    }
+}
+
+/* MOBILE MUY PEQUEÑO (320px) */
+@media (max-width: 320px) {
+    .modal-title {
+        font-size: 14px;
+    }
+
+    .nav-link {
+        font-size: 11px;
+    }
+
+    .segmented-item {
+        font-size: 10px;
+        gap: 2px;
+    }
+
+    .bottle-svg-container img {
+        max-width: 160px;
+        max-height: 200px;
+    }
+
+    .cap-visual-wrapper img {
+        max-width: 140px;
+        max-height: 70px;
     }
 }
 
 /* ========================================
-   25. CLASES UTILITARIAS
-   ======================================== */
-
-.font-12 {
-    font-size: 12px;
-}
-
-.font-14 {
-    font-size: 14px;
-}
-
-.font-16 {
-    font-size: 16px;
-}
-
-.font-20 {
-    font-size: 20px;
-}
-
-.font-24 {
-    font-size: 24px;
-}
-
-.font-32 {
-    font-size: 32px;
-}
-
-/* ========================================
-   26. ACCESIBILIDAD
+   19. UTILIDADES DE ACCESIBILIDAD
    ======================================== */
 
 @media (prefers-reduced-motion: reduce) {
@@ -2095,7 +1227,15 @@ body.modal-open {
 }
 
 /* ========================================
-   27. IMPRESIÓN
+   20. MODO OSCURO (OPCIONAL)
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    /* Puedes agregar soporte para modo oscuro aquí si lo necesitas */
+}
+
+/* ========================================
+   21. PRINT STYLES
    ======================================== */
 
 @media print {
@@ -2111,5 +1251,62 @@ body.modal-open {
     .reset-filters-btn,
     .modal-footer {
         display: none;
+    }
+}
+
+/* ========================================
+   22. AJUSTES ESPECÍFICOS PARA SCROLL
+   ======================================== */
+
+/* Scrollbar personalizado para webkit */
+.form-section::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.form-section::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.form-section::-webkit-scrollbar-thumb,
+.modal-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+    .form-section::-webkit-scrollbar-thumb:hover,
+    .modal-body::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+/* Firefox scrollbar */
+.form-section,
+.modal-body {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+}
+
+/* ========================================
+   23. SAFE AREAS PARA DISPOSITIVOS CON NOTCH
+   ======================================== */
+
+@supports (padding: max(0px)) {
+    .modal-header {
+        padding-top: max(20px, env(safe-area-inset-top));
+    }
+
+    .modal-footer {
+        padding-bottom: max(15px, env(safe-area-inset-bottom));
+    }
+
+    @media (max-width: 834px) {
+        .modal-header {
+            padding-top: max(12px, env(safe-area-inset-top));
+        }
+
+        .modal-footer {
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        }
     }
 }

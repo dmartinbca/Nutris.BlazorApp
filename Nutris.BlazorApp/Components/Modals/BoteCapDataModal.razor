@@ -89,8 +89,10 @@
                                         <div class="bottle-svg-container" id="bottle-container-@(ComponentId)">
                                             @if (!string.IsNullOrEmpty(BoteConfig.ImagenBote))
                                             {
-                                                <img src="@BoteConfig.ImagenBote" alt="Imagen del bote"
-                                                     style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />
+                                                <img src="@BoteConfig.ImagenBote"
+                                                     alt="Imagen del bote"
+                                                     loading="lazy"
+                                                     @onload="OnImageLoaded" />
                                             }
                                         </div>
                                     </div>
@@ -198,7 +200,7 @@
 
                                 <div class="preview-content">
                                     <div class="cap-visual-wrapper" id="cap-wrapper-@(ComponentId)">
-                                        @* Dimensiones para la tapa *@
+                                        @* Contenedor de líneas de dimensión *@
                                         <div class="cap-dimension-top">
                                             <span class="dimension-text">@GetCapDiameterText()</span>
                                         </div>
@@ -209,8 +211,9 @@
 
                                         @if (!string.IsNullOrEmpty(CapConfig.ImagenCap))
                                         {
-                                            <img src="@CapConfig.ImagenCap" alt="Imagen de la tapa"
-                                                 style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />
+                                            <img src="@CapConfig.ImagenCap"
+                                                 alt="Imagen de la tapa"
+                                                 @onload="OnCapImageLoaded" />
                                         }
                                     </div>
                                 </div>
@@ -575,7 +578,35 @@
 
         BoteConfig.ImagenBote = imageBase64;
     }
+    private async Task OnImageLoaded()
+    {
+        if (IsBottleTab)
+        {
+            await Task.Delay(50); // Pequeño delay para asegurar el renderizado
+            await AdjustDimensionLines();
+        }
+    }
+    private async Task UpdateBodyScroll()
+    {
+        await JSRuntime.InvokeVoidAsync("eval", $@"
+        if ({IsVisible.ToString().ToLower()}) {{
+            document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
+        }} else {{
+            document.body.style.overflow = '';
+            document.body.classList.remove('modal-open');
+        }}
+    ");
+    }
 
+    private async Task OnCapImageLoaded()
+    {
+        await Task.Delay(100); // Pequeño delay para asegurar el renderizado
+        if (!IsBottleTab) // Solo si estamos en la pestaña de tapa
+        {
+            await AdjustCapDimensionLines();
+        }
+    }
     private void UpdateCapImage()
     {
         // Si no hay forma o color, mostrar imagen de no disponible
@@ -625,55 +656,30 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender && IsVisible)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", @"
+            window.addEventListener('orientationchange', function() {
+                setTimeout(() => {
+                    window.dispatchEvent(new Event('resize'));
+                }, 300);
+            });
+        ");
+        }
         await base.OnAfterRenderAsync(firstRender);
 
-        if (IsVisible)
-        {
-            // Esperar un momento para que las imágenes se carguen
-            await Task.Delay(200);
-
-            if (IsBottleTab)
-            {
-                // Si estamos en la pestaña del bote y hay una imagen
-                if (!string.IsNullOrEmpty(BoteConfig.ImagenBote))
-                {
-                    await AdjustDimensionLines();
-                }
-            }
-            else
-            {
-                // Si estamos en la pestaña de la tapa y hay una imagen
-                if (!string.IsNullOrEmpty(CapConfig.ImagenCap))
-                {
-                    await AdjustCapDimensionLines();
-                }
-            }
-        }
+        
     }
     private async Task SwitchToBottleTab()
     {
         IsBottleTab = true;
-        await InvokeAsync(StateHasChanged);
-
-        // Esperar y ajustar las líneas del bote
-        await Task.Delay(100);
-        if (!string.IsNullOrEmpty(BoteConfig.ImagenBote))
-        {
-            await AdjustDimensionLines();
-        }
+        await ForceAdjustDimensions();
     }
 
     private async Task SwitchToCapTab()
     {
         IsBottleTab = false;
-        await InvokeAsync(StateHasChanged);
-
-        // Esperar y ajustar las líneas de la tapa
-        await Task.Delay(100);
-        if (!string.IsNullOrEmpty(CapConfig.ImagenCap))
-        {
-            await AdjustCapDimensionLines();
-        }
+        await ForceAdjustDimensions();
     }
     public string GetCapDiameterText()
     {
@@ -742,71 +748,64 @@
     }
     // ===== REEMPLAZAR EL MÉTODO AdjustDimensionLines =====
     // ===== 1. CORREGIR EL MÉTODO AdjustDimensionLines PARA POSICIONAR CORRECTAMENTE LA LÍNEA =====
+
     private async Task AdjustDimensionLines()
     {
         try
         {
             var script = $@"
         (function() {{
-            // Obtener el contenedor del bote
-            var bottleContainer = document.getElementById('bottle-container-{ComponentId}');
-            if (!bottleContainer) {{
-                console.log('No se encontró el contenedor del bote');
+            const container = document.getElementById('bottle-container-{ComponentId}');
+            if (!container) return;
+
+            const img = container.querySelector('img');
+            if (!img) return;
+
+            // Esperar a que la imagen esté completamente cargada
+            if (!img.complete) {{
+                img.onload = function() {{
+                    adjustDimensions();
+                }};
                 return;
             }}
 
-            // Buscar primero una imagen, si no hay, buscar un SVG
-            var bottleElement = bottleContainer.querySelector('img') || bottleContainer.querySelector('svg');
-            if (!bottleElement) {{
-                console.log('No se encontró imagen ni SVG en el contenedor del bote');
-                return;
+            function adjustDimensions() {{
+                const imgRect = img.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+
+                // Calcular posiciones responsivas
+                const viewportWidth = window.innerWidth;
+                const scaleFactor = viewportWidth < 834 ? 0.8 : 1;
+
+                // Línea superior (diámetro de boca)
+                const dimTop = document.querySelector('#dimension-lines-{ComponentId} .dimension-top');
+                if (dimTop) {{
+                    dimTop.style.top = (imgRect.top - containerRect.top - 25) + 'px';
+                    dimTop.style.width = (imgRect.width * 0.3 * scaleFactor) + 'px';
+                }}
+
+                // Línea izquierda (altura)
+                const dimLeft = document.getElementById('dim-left-{ComponentId}');
+                if (dimLeft) {{
+                    const neckOffset = imgRect.height * 0.15;
+                    const bodyHeight = imgRect.height * 0.85;
+                    dimLeft.style.top = (imgRect.top - containerRect.top + neckOffset) + 'px';
+                    dimLeft.style.height = bodyHeight + 'px';
+                    dimLeft.style.left = (imgRect.left - containerRect.left - 40) + 'px';
+                }}
+
+                // Línea inferior (diámetro base)
+                const dimBottom = document.querySelector('#dimension-lines-{ComponentId} .dimension-bottom');
+                if (dimBottom) {{
+                    dimBottom.style.bottom = (containerRect.height - imgRect.bottom + containerRect.top - 25) + 'px';
+                    dimBottom.style.width = (imgRect.width * 0.7 * scaleFactor) + 'px';
+                }}
             }}
 
-            // Obtener las dimensiones reales del elemento (imagen o SVG)
-            var elementRect = bottleElement.getBoundingClientRect();
-            var containerRect = bottleContainer.getBoundingClientRect();
+            adjustDimensions();
 
-            console.log('Element rect:', elementRect);
-            console.log('Container rect:', containerRect);
-
-            // Para la imagen del bote, la línea de altura debe cubrir desde el cuello hasta la base
-            // Ajustamos para que comience justo después del cuello (aproximadamente 15% desde arriba)
-            var neckOffset = elementRect.height * 0.15; // El cuello ocupa aproximadamente el 15% superior
-            var bottleBodyHeight = elementRect.height * 0.85; // El cuerpo del bote es el 85% restante
-
-            // Posición relativa dentro del contenedor
-            var relativeTop = elementRect.top - containerRect.top;
-
-            // Ajustar la línea de altura
-            var dimLeft = document.getElementById('dim-left-{ComponentId}');
-            if (dimLeft) {{
-                // La línea debe comenzar después del cuello
-                dimLeft.style.position = 'absolute';
-                dimLeft.style.left = '10px'; // Ajusta según necesites
-                dimLeft.style.top = (relativeTop + neckOffset) + 'px';
-                dimLeft.style.height = bottleBodyHeight + 'px';
-                console.log('Línea ajustada - Top:', (relativeTop + neckOffset), 'Height:', bottleBodyHeight);
-            }}
-
-            // Ajustar la posición de la línea superior (diámetro de boca)
-            var dimTop = document.querySelector('#dimension-lines-{ComponentId} .dimension-top');
-            if (dimTop) {{
-                dimTop.style.position = 'absolute';
-                dimTop.style.top = (relativeTop - 20) + 'px'; // 20px por encima de la imagen
-                dimTop.style.left = '50%';
-                dimTop.style.transform = 'translateX(-50%)';
-                dimTop.style.width = (elementRect.width * 0.6) + 'px';
-            }}
-
-            // Ajustar la posición de la línea inferior (diámetro base)
-            var dimBottom = document.querySelector('#dimension-lines-{ComponentId} .dimension-bottom');
-            if (dimBottom) {{
-                dimBottom.style.position = 'absolute';
-                dimBottom.style.bottom = (containerRect.height - elementRect.bottom + containerRect.top - 20) + 'px';
-                dimBottom.style.left = '50%';
-                dimBottom.style.transform = 'translateX(-50%)';
-                dimBottom.style.width = (elementRect.width * 0.85) + 'px';
-            }}
+            // Re-ajustar en cambio de tamaño
+            window.addEventListener('resize', adjustDimensions);
         }})();
         ";
 
@@ -817,8 +816,6 @@
             Logger?.LogWarning("Error adjusting dimension lines: {Message}", ex.Message);
         }
     }
-
-
 
     private async Task AdjustDimensionLinesAlternative()
     {
@@ -853,6 +850,9 @@
         // Luego, llamar la función
         await JSRuntime.InvokeVoidAsync("adjustBottleDimensions", ComponentId);
     }
+
+
+
     // ====================== RECOMPUTES (CASCADA) ======================
     private void RecomputeBottleFilters()
     {
@@ -1061,8 +1061,6 @@
             await AdjustCapDimensionLines();
         }
     }
-
-    // ===== REEMPLAZAR EL MÉTODO AdjustCapDimensionLines =====
     private async Task AdjustCapDimensionLines()
     {
         try
@@ -1070,68 +1068,77 @@
             var script = $@"
         (function() {{
             // Obtener el contenedor de la tapa
-            var capContainer = document.getElementById('cap-wrapper-{ComponentId}');
-            if (!capContainer) {{
+            var capWrapper = document.getElementById('cap-wrapper-{ComponentId}');
+            if (!capWrapper) {{
                 console.log('No se encontró el contenedor de la tapa');
                 return;
             }}
 
-            // Buscar primero una imagen, si no hay, buscar un SVG
-            var capElement = capContainer.querySelector('img') || capContainer.querySelector('svg');
-            if (!capElement) {{
-                console.log('No se encontró imagen ni SVG en el contenedor de la tapa');
+            // Buscar la imagen de la tapa
+            var capImg = capWrapper.querySelector('img');
+            if (!capImg) {{
+                console.log('No se encontró imagen en el contenedor de la tapa');
                 return;
             }}
 
-            // Obtener las dimensiones reales del elemento
-            var elementRect = capElement.getBoundingClientRect();
-            var containerRect = capContainer.getBoundingClientRect();
-
-            console.log('Cap element rect:', elementRect);
-            console.log('Cap container rect:', containerRect);
-
-            // ===== LÍNEA SUPERIOR (DIÁMETRO) - AJUSTADA AL ANCHO REAL =====
-            var dimTop = capContainer.querySelector('.cap-dimension-top');
-            if (dimTop) {{
-                // Posicionar la línea justo encima de la tapa
-                var topPosition = elementRect.top - containerRect.top - 20;
-                dimTop.style.position = 'absolute';
-                dimTop.style.top = topPosition + 'px';
-                dimTop.style.left = '50%';
-                dimTop.style.transform = 'translateX(-50%)';
-
-                // CAMBIO: El ancho debe ser IGUAL o ligeramente mayor que el ancho de la tapa
-                // NO sumar 40px, usar el ancho real o sumar solo 10-20px máximo
-                dimTop.style.width = (elementRect.width + 10) + 'px'; // Reducido de +40 a +10
-
-                console.log('Línea superior ajustada - Top:', topPosition, 'Width:', (elementRect.width + 10));
+            // Esperar a que la imagen esté cargada
+            if (!capImg.complete) {{
+                capImg.onload = function() {{
+                    adjustCapDimensions();
+                }};
+                return;
             }}
 
-            // ===== LÍNEA IZQUIERDA (ALTURA) =====
-            var dimLeft = capContainer.querySelector('.cap-dimension-left');
-            if (dimLeft) {{
-                // Calcular la posición vertical centrada con la tapa
-                var capCenterY = elementRect.top - containerRect.top + (elementRect.height / 2);
+            function adjustCapDimensions() {{
+                // Obtener las dimensiones reales
+                var imgRect = capImg.getBoundingClientRect();
+                var wrapperRect = capWrapper.getBoundingClientRect();
 
-                dimLeft.style.position = 'absolute';
-                dimLeft.style.left = '20px'; // Más a la izquierda como solicitaste
-                // Centrar verticalmente con la tapa
-                dimLeft.style.top = (capCenterY - elementRect.height/2) + 'px';
-                dimLeft.style.height = elementRect.height + 'px';
+                console.log('Cap image rect:', imgRect);
+                console.log('Cap wrapper rect:', wrapperRect);
 
-                console.log('Línea izquierda ajustada - Left: 20px, Top:', (capCenterY - elementRect.height/2), 'Height:', elementRect.height);
+                // ===== LÍNEA SUPERIOR (DIÁMETRO) - CENTRADA =====
+                var dimTop = capWrapper.querySelector('.cap-dimension-top');
+                if (dimTop) {{
+                    // Calcular el centro horizontal de la imagen
+                    var imgCenterX = imgRect.left - wrapperRect.left + (imgRect.width / 2);
+
+                    // Posicionar justo encima de la imagen y centrada
+                    var topPosition = imgRect.top - wrapperRect.top - 30;
+                    var leftPosition = imgCenterX - (imgRect.width / 2);
+
+                    dimTop.style.position = 'absolute';
+                    dimTop.style.top = topPosition + 'px';
+                    dimTop.style.left = leftPosition + 'px';
+                    dimTop.style.width = imgRect.width + 'px';
+                    dimTop.style.transform = 'none'; // Quitar cualquier transform previo
+
+                    console.log('Línea superior centrada - Left:', leftPosition, 'Width:', imgRect.width, 'Center:', imgCenterX);
+                }}
+
+                // ===== LÍNEA IZQUIERDA (ALTURA) =====
+                var dimLeft = capWrapper.querySelector('.cap-dimension-left');
+                if (dimLeft) {{
+                    // Posicionar a la izquierda de la imagen
+                    var leftPosition = imgRect.left - wrapperRect.left - 40;
+                    var topPosition = imgRect.top - wrapperRect.top;
+
+                    dimLeft.style.position = 'absolute';
+                    dimLeft.style.left = leftPosition + 'px';
+                    dimLeft.style.top = topPosition + 'px';
+                    dimLeft.style.height = imgRect.height + 'px';
+
+                    console.log('Línea izquierda ajustada - Left:', leftPosition, 'Height:', imgRect.height);
+                }}
             }}
 
-            // Si necesitas una línea inferior (opcional)
-            var dimBottom = capContainer.querySelector('.cap-dimension-bottom');
-            if (dimBottom) {{
-                var bottomPosition = containerRect.height - (elementRect.bottom - containerRect.top) - 20;
-                dimBottom.style.position = 'absolute';
-                dimBottom.style.bottom = bottomPosition + 'px';
-                dimBottom.style.left = '50%';
-                dimBottom.style.transform = 'translateX(-50%)';
-                dimBottom.style.width = (elementRect.width + 10) + 'px'; // También ajustado
-            }}
+            // Ejecutar el ajuste
+            adjustCapDimensions();
+
+            // Re-ajustar cuando cambie el tamaño de la ventana
+            window.addEventListener('resize', function() {{
+                setTimeout(adjustCapDimensions, 100);
+            }});
         }})();
         ";
 
@@ -1142,6 +1149,7 @@
             Logger?.LogWarning("Error adjusting cap dimension lines: {Message}", ex.Message);
         }
     }
+    
     private async Task OnBoteColorChangedAsync()
     {
         UpdateBoteImage();
@@ -1186,7 +1194,20 @@
             StateHasChanged();
         });
     }
+    private async Task ForceAdjustDimensions()
+    {
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(150); // Dar tiempo al DOM para actualizarse
 
+        if (IsBottleTab)
+        {
+            await AdjustDimensionLines();
+        }
+        else
+        {
+            await AdjustCapDimensionLines();
+        }
+    }
     // ===== Ciclo de vida =====
     protected override void OnParametersSet()
     {
@@ -1255,14 +1276,17 @@
     {
         IsVisible = true;
         await InvokeAsync(StateHasChanged);
+        await UpdateBodyScroll();
         if (SetAccordionOpen.HasDelegate)
             await SetAccordionOpen.InvokeAsync(true);
+
     }
 
     public async Task HideModal()
     {
         IsVisible = false;
         await InvokeAsync(StateHasChanged);
+        await UpdateBodyScroll();
         if (SetAccordionOpen.HasDelegate)
             await SetAccordionOpen.InvokeAsync(false);
         if (OnClose.HasDelegate)
