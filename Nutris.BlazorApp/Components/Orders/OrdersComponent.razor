@@ -1185,7 +1185,7 @@
                       BoteData="@boteDataList"
                       CapData="@capDataList"
                       CodeRG35="@Code"
-                      PesoTotal=@RG35.Peso_total.ToString()
+                      PesoTotal="@(RG35?.Peso_total.ToString() ?? "0")"
                       OptionsColorBote="@_opts.ColorBote"
                       OptionsColorCover="@_opts.ColorCover"
                       Characteristics="@characteristics"
