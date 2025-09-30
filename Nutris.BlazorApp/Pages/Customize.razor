@@ -1,4 +1,4 @@
-﻿// Customize.razor - VERSIÓN CORREGIDA COMPLETA
+﻿ 
 @page "/customize-edit/{Id}"
 @using System.Text.Json
 @using Nutris.BlazorApp.Components.Orders
@@ -59,6 +59,7 @@
 
 @code {
     [Parameter] public string Id { get; set; } = string.Empty;
+    private bool _orderComponentInitialized = false;
 
     // Datos principales
     CustomizeRG35Response? RG35Data;
@@ -102,6 +103,7 @@
         // Solo recargar si el ID cambió
         if (_lastLoadedId != Id)
         {
+            _orderComponentInitialized = false; // Reset cuando cambia el ID
             await LoadAllAsync();
         }
     }
@@ -114,19 +116,11 @@
 
     private async Task PreloadCatalogsAsync()
     {
+        if (_catalogsLoaded) return;
+
         try
         {
-            var areCatalogsValid = await CatalogService.AreCatalogsValidAsync();
-
-            if (!areCatalogsValid)
-            {
-                await LoadCatalogsFromApiAsync();
-            }
-            else
-            {
-                await LoadCatalogsAsync();
-            }
-
+            await LoadCatalogsFromApiAsync(); // ✅ Solo esto
             _catalogsLoaded = true;
         }
         catch (Exception ex)
@@ -202,48 +196,51 @@
     {
         if (Prefix == "RG35")
         {
-            Console.WriteLine("Loading RG35 data...");
-            RG35Data = await CustomizeApi.GetRG35Async(Id);
+           
+                    Console.WriteLine("Loading RG35 data...");
+                    RG35Data = await CustomizeApi.GetRG35Async(Id);
 
-            if (RG35Data == null)
-            {
-                Error = $"No se encontraron datos RG35 para el ID: {Id}";
-                return;
-            }
+                    if (RG35Data == null)
+                    {
+                        Error = $"No se encontraron datos RG35 para el ID: {Id}";
+                        return;
+                    }
 
-            // Transformar lotes y BBD
-            if (RG35Data.Box_Lote?.Contains(":") == true)
-            {
-                RG35Data.Box_Lote = RG35Data.Box_Lote.Substring(RG35Data.Box_Lote.IndexOf(":") + 1);
-            }
-            if (RG35Data.Box_BBD?.Contains(":") == true)
-            {
-                RG35Data.Box_BBD = RG35Data.Box_BBD.Substring(RG35Data.Box_BBD.IndexOf(":") + 1);
-            }
+                    // Transformar lotes y BBD
+                    if (RG35Data.Box_Lote?.Contains(":") == true)
+                    {
+                        RG35Data.Box_Lote = RG35Data.Box_Lote.Substring(RG35Data.Box_Lote.IndexOf(":") + 1);
+                    }
+                    if (RG35Data.Box_BBD?.Contains(":") == true)
+                    {
+                        RG35Data.Box_BBD = RG35Data.Box_BBD.Substring(RG35Data.Box_BBD.IndexOf(":") + 1);
+                    }
 
-            // Cargar archivos si está cerrada
-            await LoadRG35FilesAsync();
+                    // Cargar archivos si está cerrada
+                    await LoadRG35FilesAsync();
 
-            // Limpiar fechas inválidas
-            if (RG35Data.Estimated_date == "0001-01-01")
-                RG35Data.Estimated_date = "";
-            if (RG35Data.Deadline_date == "0001-01-01")
-                RG35Data.Deadline_date = "";
+                    // Limpiar fechas inválidas
+                    if (RG35Data.Estimated_date == "0001-01-01")
+                        RG35Data.Estimated_date = "";
+                    if (RG35Data.Deadline_date == "0001-01-01")
+                        RG35Data.Deadline_date = "";
 
-            Console.WriteLine($"RG35 data loaded: Code={RG35Data.Code}");
+                    Console.WriteLine($"RG35 data loaded: Code={RG35Data.Code}");
+               
         }
         else if (Prefix == "RG37")
         {
-            Console.WriteLine("Loading RG37 data...");
-            RG37Data = await CustomizeApi.GetRG37Async(Id);
+              Console.WriteLine("Loading RG37 data...");
+                RG37Data = await CustomizeApi.GetRG37Async(Id);
 
-            if (RG37Data == null)
-            {
-                Error = $"No se encontraron datos RG37 para el ID: {Id}";
-                return;
-            }
+                if (RG37Data == null)
+                {
+                    Error = $"No se encontraron datos RG37 para el ID: {Id}";
+                    return;
+                }
 
-            Console.WriteLine($"RG37 data loaded: Code={RG37Data.Code}");
+                Console.WriteLine($"RG37 data loaded: Code={RG37Data.Code}");
+           
         }
         else
         {
@@ -295,38 +292,67 @@
             await LoadCatalogsFromApiAsync();
         }
     }
+ private async Task LoadCatalogsFromApiAsync()
+{
+    var sw = System.Diagnostics.Stopwatch.StartNew();
+    Console.WriteLine($"📥 Loading essential catalog...");
 
-    private async Task LoadCatalogsFromApiAsync()
+    // Solo Atributos es crítico
+    AtributosDoc = await CustomizeApi.GetAtributosAsync();
+    AtributosRoot = AtributosDoc?.RootElement ?? default;
+
+    _catalogsLoaded = true;
+    Console.WriteLine($"✅ Essential catalog loaded in {sw.ElapsedMilliseconds}ms");
+
+    // Los 3 catálogos pesados en background
+    _ = Task.Run(async () =>
     {
-        Console.WriteLine("Loading catalogs from API...");
-
-        var catalogTasks = new[]
+        try
         {
-            CustomizeApi.GetAtributosAsync(),
-            CustomizeApi.GetRelacionBoteAsync(),
-            CustomizeApi.GetRelacionTapaAsync(),
-            CustomizeApi.GetTiposCajastAsync()
-        };
+            Console.WriteLine($"📦 Loading RelacionBote (background)...");
+            RelacionBoteDoc = await CustomizeApi.GetRelacionBoteAsync();
+            RelacionBoteRoot = RelacionBoteDoc?.RootElement ?? default;
+            Console.WriteLine($"✅ RelacionBote loaded");
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ RelacionBote error: {ex.Message}");
+        }
+    });
 
-        var results = await Task.WhenAll(catalogTasks);
+    _ = Task.Run(async () =>
+    {
+        try
+        {
+            Console.WriteLine($"📦 Loading RelacionTapa (background)...");
+            RelacionTapaDoc = await CustomizeApi.GetRelacionTapaAsync();
+            RelacionTapaRoot = RelacionTapaDoc?.RootElement ?? default;
+            Console.WriteLine($"✅ RelacionTapa loaded");
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ RelacionTapa error: {ex.Message}");
+        }
+    });
 
-        AtributosDoc = results[0];
-        RelacionBoteDoc = results[1];
-        RelacionTapaDoc = results[2];
-        TiposCajasDoc = results[3];
-
-        // Asignar elementos root
-        AtributosRoot = AtributosDoc?.RootElement ?? default;
-        RelacionBoteRoot = RelacionBoteDoc?.RootElement ?? default;
-        RelacionTapaRoot = RelacionTapaDoc?.RootElement ?? default;
-        TiposCajas = TiposCajasDoc?.RootElement ?? default;
-
-        // Guardar en cache para futuras cargas
-        await CacheCatalogsAsync();
-
-        Console.WriteLine("Catalogs loaded from API and cached ✓");
-    }
-
+    _ = Task.Run(async () =>
+    {
+        try
+        {
+            Console.WriteLine($"📦 Loading TiposCaja (background)...");
+            TiposCajasDoc = await CustomizeApi.GetTiposCajastAsync();
+            TiposCajas = TiposCajasDoc?.RootElement ?? default;
+            Console.WriteLine($"✅ TiposCaja loaded");
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ TiposCaja error: {ex.Message}");
+        }
+    });
+}
     private async Task CacheCatalogsAsync()
     {
         try
@@ -393,7 +419,8 @@
         if (RG35Data == null) return;
 
         List<FileItem> Ficheros = new List<FileItem>();
-
+        _ = Task.Run(async () => 
+{
         try
         {
             // Cargar Technical Data Sheet
@@ -463,13 +490,14 @@
                     }
                 }
             }
-
+            
             RG35Data.Files = Ficheros;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading files: {ex.Message}");
         }
+        });
     }
 
     // ===== Callbacks para OrdersComponent =====

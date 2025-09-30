@@ -201,39 +201,44 @@ public class OrdersComponentBase : ComponentBase
     private const string NO_IMAGE_AVAILABLE = "data:image/png;base64,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";
 
     // ===== LIFECYCLE METHODS =====
+ 
+  
 
     protected override async Task OnInitializedAsync()
     {
-        await Task.CompletedTask;
-    }
+        // Este método SOLO se ejecuta UNA VEZ por instancia del componente
+        Console.WriteLine($"🟢 OrdersComponent.OnInitializedAsync - ID: {Id}");
 
-    protected override async Task OnParametersSetAsync()
-    {
         currentLanguage = Localization.CurrentLanguage ?? "es";
         Localization.OnLanguageChanged += OnLanguageChanged;
 
-        // Solo verificar cambio de ID (simple y rápido)
-        bool idChanged = _lastProcessedId != Id;
+        await Task.CompletedTask;
+    }
 
-        if (!idChanged && _catalogsProcessed)
-        {
-            Console.WriteLine("Skipping data processing - no changes detected");
-            return;
-        }
+    private int _lastRG35HashCode;
+    private int _lastRG37HashCode;
+ 
+    private bool _initialLoadComplete = false;
 
-        Console.WriteLine($"Processing data for ID: {Id}");
-
-        // Procesar catálogos solo la primera vez
+    protected override async Task OnParametersSetAsync()
+    {
+        // Este se ejecuta cuando cambian los parámetros
+        // Solo procesar si los catálogos no se han procesado aún
         if (!_catalogsProcessed && RelacionBote.ValueKind != JsonValueKind.Undefined)
         {
-            ProcessCatalogsOnce(); // Síncrono, sin Task.Run
+            Console.WriteLine($"🔄 ProcessCatalogsOnce - Primera vez");
+            ProcessCatalogsOnce();
             _catalogsProcessed = true;
         }
+        else if (_catalogsProcessed)
+        {
+            Console.WriteLine($"⏭️ Catálogos ya procesados, saltando");
+        }
 
-        // Cargar datos
+        // LoadDataAsync debe ejecutarse siempre que cambien los parámetros
         await LoadDataAsync();
 
-        _lastProcessedId = Id;
+        Console.WriteLine($"✅ OnParametersSetAsync completado " +DateTime.Now.ToString());
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -273,50 +278,77 @@ public class OrdersComponentBase : ComponentBase
         if (!RelacionBote.TryGetProperty("value", out var boteArray)) return;
         if (boteArray.ValueKind != JsonValueKind.Array) return;
 
-        var capsSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var diasDict = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-        var matsSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var boteList = new List<BoteCapDataModal.BoteDataItem>();
-        var boteColors = new List<BoteCapDataModal.ColorOption>();
-        var colorsSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+
+        var totalItems = boteArray.GetArrayLength();
+        var capsSet = new HashSet<string>(totalItems / 4, StringComparer.OrdinalIgnoreCase);
+        var diasDict = new Dictionary<string, HashSet<string>>(totalItems / 4, StringComparer.OrdinalIgnoreCase);
+        var matsSet = new HashSet<string>(totalItems / 8, StringComparer.OrdinalIgnoreCase);
+        var boteList = new List<BoteCapDataModal.BoteDataItem>(totalItems);
+        var colorsSeen = new HashSet<string>(20, StringComparer.OrdinalIgnoreCase);
+        var boteColors = new List<BoteCapDataModal.ColorOption>(20);
 
         int colorId = 1;
 
         foreach (var item in boteArray.EnumerateArray())
         {
-            // Procesar capacidades y diámetros
-            if (TryGetString(item, "Capacidad", out var cap) && !string.IsNullOrWhiteSpace(cap))
+            string? cap = null, dia = null, mat = null, forma = null, color = null;
+
+            // ⚡ NO extraer ImagenBote (es lo que mata el rendimiento)
+            if (item.TryGetProperty("Capacidad", out var capEl) && capEl.ValueKind == JsonValueKind.String)
+                cap = capEl.GetString();
+
+            if (item.TryGetProperty("Diametro", out var diaEl) && diaEl.ValueKind == JsonValueKind.String)
+                dia = diaEl.GetString();
+
+            if (item.TryGetProperty("Material", out var matEl) && matEl.ValueKind == JsonValueKind.String)
+                mat = matEl.GetString();
+
+            if (item.TryGetProperty("Forma", out var formaEl) && formaEl.ValueKind == JsonValueKind.String)
+                forma = formaEl.GetString();
+
+            if (item.TryGetProperty("Color", out var colEl) && colEl.ValueKind == JsonValueKind.String)
+                color = colEl.GetString();
+
+            // Capacidades y diámetros
+            if (!string.IsNullOrWhiteSpace(cap))
             {
                 capsSet.Add(cap);
-                if (!diasDict.ContainsKey(cap))
-                    diasDict[cap] = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                if (TryGetString(item, "Diametro", out var dia) && !string.IsNullOrWhiteSpace(dia))
-                    diasDict[cap].Add(dia);
+                if (!string.IsNullOrWhiteSpace(dia))
+                {
+                    if (!diasDict.TryGetValue(cap, out var diaSet))
+                    {
+                        diaSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        diasDict[cap] = diaSet;
+                    }
+                    diaSet.Add(dia);
+                }
             }
 
-            // Procesar materiales
-            if (TryGetString(item, "Material", out var mat) && !string.IsNullOrWhiteSpace(mat))
+            if (!string.IsNullOrWhiteSpace(mat))
                 matsSet.Add(mat);
 
-            // Procesar BoteDataItem
-            var forma = TryGetString(item, "Forma", out var f) ? f : null;
-            if (forma != null)
+            // ⚡ BoteDataItem SIN imagen
+            if (!string.IsNullOrWhiteSpace(forma))
             {
+                ushort pesoMax = 0;
+                if (item.TryGetProperty("Peso_Maximo", out var pmEl) && pmEl.ValueKind == JsonValueKind.Number)
+                    pesoMax = (ushort)pmEl.GetInt32();
+
                 boteList.Add(new BoteCapDataModal.BoteDataItem
                 {
                     Forma = forma,
                     Capacidad = cap,
-                    Diametro = TryGetString(item, "Diametro", out var d) ? d : null,
-                    Material = TryGetString(item, "Material", out var m) ? m : null,
-                    Color = TryGetString(item, "Color", out var col) ? col : null,
-                    ImagenBote = TryGetString(item, "ImagenBote", out var img) ? img : null,
-                    PesoMaximo = item.TryGetProperty("Peso_Maximo", out var pm) ? pm.GetUInt16() : (ushort)0
+                    Diametro = dia,
+                    Material = mat,
+                    Color = color,
+                    ImagenBote = null,  // ⚡ NO cargar ahora
+                    PesoMaximo = pesoMax
                 });
             }
 
-            // Procesar colores
-            if (TryGetString(item, "Color", out var color) && !string.IsNullOrWhiteSpace(color))
+            // Colores
+            if (!string.IsNullOrWhiteSpace(color))
             {
                 var norm = NormalizeColorName(color);
                 if (colorsSeen.Add(norm))
@@ -331,11 +363,10 @@ public class OrdersComponentBase : ComponentBase
             }
         }
 
-        // Asignar resultados
-        capacidades = capsSet
-            .OrderBy(c => int.TryParse(c, out var n) ? n : int.MaxValue)
-            .ThenBy(c => c, StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        capacidades = capsSet.OrderBy(c => {
+            if (int.TryParse(c, out var n)) return n;
+            return int.MaxValue;
+        }).ThenBy(c => c, StringComparer.OrdinalIgnoreCase).ToList();
 
         materiales = matsSet.OrderBy(m => m, StringComparer.OrdinalIgnoreCase).ToList();
 
@@ -349,6 +380,8 @@ public class OrdersComponentBase : ComponentBase
 
         for (int i = 0; i < boteColorOptions.Count; i++)
             boteColorOptions[i].ID = i + 1;
+
+        Console.WriteLine($"✅ ProcessRelacionBoteOnce: {sw.ElapsedMilliseconds}ms ({boteList.Count} botes)");
     }
 
     // Continúo con la parte 2...
@@ -361,28 +394,46 @@ public class OrdersComponentBase : ComponentBase
         if (!RelacionTapa.TryGetProperty("value", out var tapaArray)) return;
         if (tapaArray.ValueKind != JsonValueKind.Array) return;
 
-        var capList = new List<BoteCapDataModal.CapDataItem>();
-        var capColors = new List<BoteCapDataModal.ColorOption>();
-        var colorsSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+
+        var totalItems = tapaArray.GetArrayLength();
+        var capList = new List<BoteCapDataModal.CapDataItem>(totalItems);
+        var colorsSeen = new HashSet<string>(20, StringComparer.OrdinalIgnoreCase);
+        var capColors = new List<BoteCapDataModal.ColorOption>(20);
 
         int colorId = 1;
 
         foreach (var item in tapaArray.EnumerateArray())
         {
-            var forma = TryGetString(item, "Forma", out var f) ? f : null;
-            if (forma != null)
+            string? forma = null, dia = null, color = null;
+            bool sleeve = false;
+
+            if (item.TryGetProperty("Forma", out var formaEl) && formaEl.ValueKind == JsonValueKind.String)
+                forma = formaEl.GetString();
+
+            if (item.TryGetProperty("Diametro", out var diaEl) && diaEl.ValueKind == JsonValueKind.String)
+                dia = diaEl.GetString();
+
+            if (item.TryGetProperty("Color", out var colEl) && colEl.ValueKind == JsonValueKind.String)
+                color = colEl.GetString();
+
+            if (item.TryGetProperty("Sleeve", out var slEl))
+                sleeve = slEl.ValueKind == JsonValueKind.True;
+
+            // ⚡ NO extraer ImagenCap
+            if (!string.IsNullOrWhiteSpace(forma))
             {
                 capList.Add(new BoteCapDataModal.CapDataItem
                 {
                     Forma = forma,
-                    Diametro = TryGetString(item, "Diametro", out var d) ? d : null,
-                    Color = TryGetString(item, "Color", out var c) ? c : null,
-                    Sleeve = item.TryGetProperty("Sleeve", out var s) && s.ValueKind == JsonValueKind.True,
-                    ImagenCap = TryGetString(item, "ImagenCap", out var img) ? img : null
+                    Diametro = dia,
+                    Color = color,
+                    Sleeve = sleeve,
+                    ImagenCap = null  // ⚡ Lazy load
                 });
             }
 
-            if (TryGetString(item, "Color", out var color) && !string.IsNullOrWhiteSpace(color))
+            if (!string.IsNullOrWhiteSpace(color))
             {
                 var norm = NormalizeColorName(color);
                 if (colorsSeen.Add(norm))
@@ -402,8 +453,63 @@ public class OrdersComponentBase : ComponentBase
 
         for (int i = 0; i < capColorOptions.Count; i++)
             capColorOptions[i].ID = i + 1;
+
+        Console.WriteLine($"✅ ProcessRelacionTapaOnce: {sw.ElapsedMilliseconds}ms ({capList.Count} tapas)");
+    }
+    // ===== LAZY LOAD DE IMÁGENES =====
+
+    protected string? GetBoteImageLazy(string? forma, string? capacidad, string? diametro, string? material, string? color)
+    {
+        if (string.IsNullOrWhiteSpace(forma)) return NO_IMAGE_AVAILABLE;
+
+        if (RelacionBote.ValueKind != JsonValueKind.Object) return NO_IMAGE_AVAILABLE;
+        if (!RelacionBote.TryGetProperty("value", out var boteArray)) return NO_IMAGE_AVAILABLE;
+
+        foreach (var item in boteArray.EnumerateArray())
+        {
+            if (TryGetString(item, "Forma", out var f) && f == forma &&
+                TryGetString(item, "Capacidad", out var c) && c == capacidad &&
+                TryGetString(item, "Diametro", out var d) && d == diametro &&
+                TryGetString(item, "Material", out var m) && m == material &&
+                TryGetString(item, "Color", out var col) && col == color)
+            {
+                if (TryGetString(item, "ImagenBote", out var img) && !string.IsNullOrWhiteSpace(img))
+                {
+                    return $"data:image/png;base64,{img}";
+                }
+            }
+        }
+
+        return NO_IMAGE_AVAILABLE;
     }
 
+    protected string? GetCapImageLazy(string? forma, string? diametro, string? color, bool sleeve)
+    {
+        if (string.IsNullOrWhiteSpace(forma)) return NO_IMAGE_AVAILABLE;
+
+        if (RelacionTapa.ValueKind != JsonValueKind.Object) return NO_IMAGE_AVAILABLE;
+        if (!RelacionTapa.TryGetProperty("value", out var tapaArray)) return NO_IMAGE_AVAILABLE;
+
+        foreach (var item in tapaArray.EnumerateArray())
+        {
+            if (TryGetString(item, "Forma", out var f) && f == forma &&
+                TryGetString(item, "Diametro", out var d) && d == diametro &&
+                TryGetString(item, "Color", out var c) && c == color)
+            {
+                bool itemSleeve = item.TryGetProperty("Sleeve", out var slEl) && slEl.ValueKind == JsonValueKind.True;
+
+                if (itemSleeve == sleeve)
+                {
+                    if (TryGetString(item, "ImagenCap", out var img) && !string.IsNullOrWhiteSpace(img))
+                    {
+                        return $"data:image/png;base64,{img}";
+                    }
+                }
+            }
+        }
+
+        return NO_IMAGE_AVAILABLE;
+    }
     private void BuildOptionLookupsFromAtributos(JsonElement atributos)
     {
         try
@@ -590,14 +696,16 @@ public class OrdersComponentBase : ComponentBase
             if (HasRG35 && RG35 != null)
             {
                 LoadFromRG35(RG35);
+                LoadCatalogOptions();
+
+                InitializeSelectedOptions();
             }
             else if (HasRG37 && RG37 != null)
             {
                 LoadFromRG37(RG37);
             }
 
-            LoadCatalogOptions();
-            InitializeSelectedOptions();
+
 
             // Calcular porcentajes síncronamente (es rápido)
             CalculateAllPercentages();
@@ -853,9 +961,9 @@ public class OrdersComponentBase : ComponentBase
         {
             new() { Label = Localization["orderView.ListInputB[0]"], Value = data.Color ?? "-" },
             new() { Label = Localization["orderView.ListInputB[1]"], Value = data.Flavour ?? "-" },
-            new() { Label = Localization["orderView.ListInputB[2]"], Value = FormatNumericValue(data.Size) },
-            new() { Label = Localization["orderView.ListInputB[3]"], Value = FormatNumericValue(data.Serving) }
-        };
+            new() { Label = Localization["orderView.ListInputB[2]"], Value = data.Size?.ToString() ?? "-" },
+            new() { Label = Localization["orderView.ListInputB[3]"], Value = data.Serving?.ToString() ?? "-" }
+            };
 
         RecipeRows = data.Recipe?.Select(r => new RecipeRow
         {
@@ -992,29 +1100,44 @@ public class OrdersComponentBase : ComponentBase
 
     private void InitializeSelectedOptions()
     {
-        if (HasRG35 && RG35 != null)
+        if (HasRG35 && RG35 == null) return;
+
+        // ⚡ Cargar imágenes bajo demanda
+        var boteImg = GetBoteImageLazy(
+            RG35.Bote_forma,
+            RG35.Bote_capacidad,
+            RG35.Bote_boca,
+            RG35.Bote_material,
+            RG35.Bote_color
+        );
+
+        var capImg = GetCapImageLazy(
+            RG35.Cap_tapa,
+            RG35.Cap_Boca,
+            RG35.Cap_color,
+            RG35.Cap_sleever ?? false
+        );
+
+        selectedBoteOption = new BoteCapDataModal.BoteDataItem
         {
-            selectedBoteOption = new BoteCapDataModal.BoteDataItem
-            {
-                Forma = RG35.Bote_forma,
-                Capacidad = RG35.Bote_capacidad,
-                Diametro = RG35.Bote_boca,
-                Material = RG35.Bote_material,
-                Color = RG35.Bote_color,
-                ImagenBote = $"data:image/png;base64,{RG35.Bote_imagen}"
-            };
+            Forma = RG35.Bote_forma,
+            Capacidad = RG35.Bote_capacidad,
+            Diametro = RG35.Bote_boca,
+            Material = RG35.Bote_material,
+            Color = RG35.Bote_color,
+            ImagenBote = boteImg  // ⚡ Lazy loaded
+        };
 
-            selectedCapOption = new BoteCapDataModal.CapDataItem
-            {
-                Forma = RG35.Cap_tapa,
-                Diametro = RG35.Cap_Boca,
-                Color = RG35.Cap_color,
-                Sleeve = RG35.Cap_sleever ?? false,
-                ImagenCap = $"data:image/png;base64,{RG35.Cap_imagen}"
-            };
+        selectedCapOption = new BoteCapDataModal.CapDataItem
+        {
+            Forma = RG35.Cap_tapa,
+            Diametro = RG35.Cap_Boca,
+            Color = RG35.Cap_color,
+            Sleeve = RG35.Cap_sleever ?? false,
+            ImagenCap = capImg  // ⚡ Lazy loaded
+        };
 
-            characteristics = RG35.Characteristics ?? "";
-        }
+        characteristics = RG35.Characteristics ?? "";
     }
 
     // ===== CÁLCULOS DE PORCENTAJES (SÍNCRONO) =====

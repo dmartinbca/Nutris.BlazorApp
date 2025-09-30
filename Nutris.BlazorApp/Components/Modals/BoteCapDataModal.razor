@@ -10,6 +10,7 @@
 @using Nutris.BlazorApp.Components.Shared.Bote
 @using Nutris.BlazorApp.Components.Shared.Cover
 @using NutrisBlazor.Components.Shared
+@using System.Text.Json
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
@@ -331,7 +332,8 @@
     [Parameter] public string PesoTotal { get; set; } = string.Empty;
     [Parameter] public BoteDataItem? SelectedOption { get; set; }
     [Parameter] public CapDataItem? SelectedOptionCap { get; set; }
-
+    [Parameter] public JsonElement RelacionBote { get; set; }
+    [Parameter] public JsonElement RelacionTapa { get; set; }
     [Parameter] public IEnumerable<CapDataItem>? CapData { get; set; }
     [Parameter] public IEnumerable<BoteDataItem>? BoteData { get; set; }
     [Parameter] public IEnumerable<ColorOption>? OptionsColorBote { get; set; }
@@ -341,6 +343,7 @@
     [Parameter] public IEnumerable<string>? Materiales { get; set; }
     [Parameter] public string Characteristics { get; set; } = string.Empty;
     private bool IsSaving { get; set; } = false;
+   
     [Parameter] public EventCallback<bool> SetAccordionOpen { get; set; }
     private readonly Dictionary<string, Dictionary<string, (double Diameter, double Height)>> CapDimensionsMap = new()
     {
@@ -538,70 +541,44 @@
     private List<ColorOption> OptionsColorCoverFiltered = new();
     // ===== MÉTODOS NUEVOS PARA OBTENER LAS IMÁGENES =====
     // Agregar estos métodos en la sección de código del componente:
-
     private void UpdateBoteImage()
     {
-        // Si no hay datos de RelacionBote, usar imagen por defecto
         if (BoteData == null || !BoteData.Any())
         {
             BoteConfig.ImagenBote = NO_IMAGE_AVAILABLE;
             return;
         }
-        // NUEVO: Filtrar por peso si existe PesoTotal
+
         var availableBotes = BoteData.AsEnumerable();
         if (!string.IsNullOrEmpty(PesoTotal) && decimal.TryParse(PesoTotal, out decimal pesoTotalDecimal))
         {
             availableBotes = availableBotes.Where(b => b.PesoMaximo >= pesoTotalDecimal);
         }
-        // Buscar en RelacionBote una coincidencia con los atributos seleccionados
-        var matchingBote = BoteData.FirstOrDefault(b =>
-            (string.IsNullOrEmpty(BoteConfig.Forma) || 
+
+        var matchingBote = availableBotes.FirstOrDefault(b =>
+            (string.IsNullOrEmpty(BoteConfig.Forma) ||
              string.Equals(NormFormaBote(b.Forma), NormFormaBote(BoteConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
-            (string.IsNullOrEmpty(BoteConfig.Capacidad) || 
+            (string.IsNullOrEmpty(BoteConfig.Capacidad) ||
              string.Equals(b.Capacidad, BoteConfig.Capacidad, StringComparison.OrdinalIgnoreCase)) &&
-            (string.IsNullOrEmpty(BoteConfig.Diametro) || 
+            (string.IsNullOrEmpty(BoteConfig.Diametro) ||
              string.Equals(NormDiam(b.Diametro), NormDiam(BoteConfig.Diametro), StringComparison.OrdinalIgnoreCase)) &&
-            (string.IsNullOrEmpty(BoteConfig.Material) || 
+            (string.IsNullOrEmpty(BoteConfig.Material) ||
              string.Equals(b.Material, BoteConfig.Material, StringComparison.OrdinalIgnoreCase)) &&
-            (string.IsNullOrEmpty(BoteConfig.Color) || 
+            (string.IsNullOrEmpty(BoteConfig.Color) ||
              string.Equals(b.Color, BoteConfig.Color, StringComparison.OrdinalIgnoreCase))
         );
 
-        if (matchingBote != null && !string.IsNullOrWhiteSpace(matchingBote.ImagenBote))
+        if (matchingBote != null)
         {
-            // Si la imagen ya viene con el prefijo data:image, usarla tal cual
-            if (matchingBote.ImagenBote.StartsWith("data:image"))
-            {
-                BoteConfig.ImagenBote = matchingBote.ImagenBote;
-            }
-            else
-            {
-                // Si no, agregar el prefijo base64
-                BoteConfig.ImagenBote = $"data:image/png;base64,{matchingBote.ImagenBote}";
-            }
+            // ⚡ Cargar imagen bajo demanda
+            BoteConfig.ImagenBote = GetBoteImageLazy(matchingBote) ?? NO_IMAGE_AVAILABLE;
         }
         else
         {
-            // Si no hay coincidencia exacta, buscar coincidencia parcial (relajando condiciones)
-            var partialMatch = FindBestPartialMatchBote();
-            partialMatch = null;    
-            if (partialMatch != null && !string.IsNullOrWhiteSpace(partialMatch.ImagenBote))
-            {
-                if (partialMatch.ImagenBote.StartsWith("data:image"))
-                {
-                    BoteConfig.ImagenBote = partialMatch.ImagenBote;
-                }
-                else
-                {
-                    BoteConfig.ImagenBote = $"data:image/png;base64,{partialMatch.ImagenBote}";
-                }
-            }
-            else
-            {
-                BoteConfig.ImagenBote = NO_IMAGE_AVAILABLE;
-            }
+            BoteConfig.ImagenBote = NO_IMAGE_AVAILABLE;
         }
     }
+ 
     private BoteDataItem? FindBestPartialMatchBote()
     {
         if (BoteData == null || !BoteData.Any())
@@ -695,7 +672,6 @@
     {
         Console.WriteLine($"UpdateCapImage - Forma: {CapConfig.Forma}, Diametro: {CapConfig.Diametro}, Color: {CapConfig.Color}, Sleeve: {CapConfig.Sleeve}");
 
-        // Si no hay datos de RelacionTapa, usar imagen por defecto
         if (CapData == null || !CapData.Any())
         {
             Console.WriteLine("No hay datos de CapData");
@@ -705,54 +681,26 @@
 
         Console.WriteLine($"Total de registros en CapData: {CapData.Count()}");
 
-        // Buscar en RelacionTapa una coincidencia con los atributos seleccionados
         var matchingCap = CapData.FirstOrDefault(c =>
-            (string.IsNullOrEmpty(CapConfig.Forma) || 
+            (string.IsNullOrEmpty(CapConfig.Forma) ||
              string.Equals(NormFormaCap(c.Forma), NormFormaCap(CapConfig.Forma), StringComparison.OrdinalIgnoreCase)) &&
-            (string.IsNullOrEmpty(CapConfig.Diametro) || 
+            (string.IsNullOrEmpty(CapConfig.Diametro) ||
              string.Equals(NormDiam(c.Diametro), NormDiam(CapConfig.Diametro), StringComparison.OrdinalIgnoreCase)) &&
-            (string.IsNullOrEmpty(CapConfig.Color) || 
+            (string.IsNullOrEmpty(CapConfig.Color) ||
              string.Equals(c.Color, CapConfig.Color, StringComparison.OrdinalIgnoreCase)) &&
             (c.Sleeve == CapConfig.Sleeve)
         );
 
-        if (matchingCap != null && !string.IsNullOrWhiteSpace(matchingCap.ImagenCap))
+        if (matchingCap != null)
         {
-            Console.WriteLine("Coincidencia exacta encontrada");
-            // Si la imagen ya viene con el prefijo data:image, usarla tal cual
-            if (matchingCap.ImagenCap.StartsWith("data:image"))
-            {
-                CapConfig.ImagenCap = matchingCap.ImagenCap;
-            }
-            else
-            {
-                // Si no, agregar el prefijo base64
-                CapConfig.ImagenCap = $"data:image/png;base64,{matchingCap.ImagenCap}";
-            }
+            Console.WriteLine("Coincidencia exacta encontrada " +DateTime.Now.ToString());
+            // ⚡ Cargar imagen bajo demanda
+            CapConfig.ImagenCap = GetCapImageLazy(matchingCap) ?? NO_IMAGE_AVAILABLE;
         }
         else
         {
-            Console.WriteLine("No hay coincidencia exacta, buscando coincidencia parcial");
-            // Si no hay coincidencia exacta, buscar coincidencia parcial
-            var partialMatch = FindBestPartialMatchCap();
-            partialMatch = null; // Desactivar coincidencia parcial por ahora
-            if (partialMatch != null && !string.IsNullOrWhiteSpace(partialMatch.ImagenCap))
-            {
-                Console.WriteLine("Coincidencia parcial encontrada");
-                if (partialMatch.ImagenCap.StartsWith("data:image"))
-                {
-                    CapConfig.ImagenCap = partialMatch.ImagenCap;
-                }
-                else
-                {
-                    CapConfig.ImagenCap = $"data:image/png;base64,{partialMatch.ImagenCap}";
-                }
-            }
-            else
-            {
-                Console.WriteLine("No se encontró ninguna imagen, usando imagen por defecto");
-                CapConfig.ImagenCap = NO_IMAGE_AVAILABLE;
-            }
+            Console.WriteLine("No se encontró ninguna imagen");
+            CapConfig.ImagenCap = NO_IMAGE_AVAILABLE;
         }
 
         Console.WriteLine($"Imagen final de tapa: {CapConfig.ImagenCap?.Substring(0, Math.Min(50, CapConfig.ImagenCap.Length))}...");
@@ -1763,7 +1711,71 @@
             default: return forma ?? "";
         }
     }
+    // ===== LAZY LOAD DE IMÁGENES =====
 
+    private string? GetBoteImageLazy(BoteDataItem bote)
+    {
+        if (string.IsNullOrWhiteSpace(bote.Forma)) return NO_IMAGE_AVAILABLE;
+
+        if (RelacionBote.ValueKind != JsonValueKind.Object) return NO_IMAGE_AVAILABLE;
+        if (!RelacionBote.TryGetProperty("value", out var boteArray)) return NO_IMAGE_AVAILABLE;
+
+        foreach (var item in boteArray.EnumerateArray())
+        {
+            if (TryGetStringJson(item, "Forma", out var f) && f == bote.Forma &&
+                TryGetStringJson(item, "Capacidad", out var c) && c == bote.Capacidad &&
+                TryGetStringJson(item, "Diametro", out var d) && d == bote.Diametro &&
+                TryGetStringJson(item, "Material", out var m) && m == bote.Material &&
+                TryGetStringJson(item, "Color", out var col) && col == bote.Color)
+            {
+                if (TryGetStringJson(item, "ImagenBote", out var img) && !string.IsNullOrWhiteSpace(img))
+                {
+                    return $"data:image/png;base64,{img}";
+                }
+            }
+        }
+
+        return NO_IMAGE_AVAILABLE;
+    }
+
+    private string? GetCapImageLazy(CapDataItem cap)
+    {
+        if (string.IsNullOrWhiteSpace(cap.Forma)) return NO_IMAGE_AVAILABLE;
+
+        if (RelacionTapa.ValueKind != JsonValueKind.Object) return NO_IMAGE_AVAILABLE;
+        if (!RelacionTapa.TryGetProperty("value", out var tapaArray)) return NO_IMAGE_AVAILABLE;
+
+        foreach (var item in tapaArray.EnumerateArray())
+        {
+            if (TryGetStringJson(item, "Forma", out var f) && f == cap.Forma &&
+                TryGetStringJson(item, "Diametro", out var d) && d == cap.Diametro &&
+                TryGetStringJson(item, "Color", out var c) && c == cap.Color)
+            {
+                bool itemSleeve = item.TryGetProperty("Sleeve", out var slEl) && slEl.ValueKind == JsonValueKind.True;
+
+                if (itemSleeve == cap.Sleeve)
+                {
+                    if (TryGetStringJson(item, "ImagenCap", out var img) && !string.IsNullOrWhiteSpace(img))
+                    {
+                        return $"data:image/png;base64,{img}";
+                    }
+                }
+            }
+        }
+
+        return NO_IMAGE_AVAILABLE;
+    }
+
+    private static bool TryGetStringJson(JsonElement obj, string prop, out string value)
+    {
+        value = "";
+        if (obj.TryGetProperty(prop, out var el))
+        {
+            value = el.ValueKind == JsonValueKind.String ? (el.GetString() ?? "") : el.ToString();
+            return true;
+        }
+        return false;
+    }
     private static string ColorToHexFallback(string name)
     {
         var n = (name ?? "").Trim().ToLowerInvariant();

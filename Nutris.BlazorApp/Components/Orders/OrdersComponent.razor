@@ -1225,6 +1225,8 @@
                       SetAccordionOpen="OnSetAccordionOpen"
                       OnSaveData="@(data => HandleSaveData(data.Bote, data.Cap))"
                       OnClose="OnBoteCapClosed"
+                      RelacionBote="@RelacionBote"
+                      RelacionTapa="@RelacionTapa"
                       Capacidades="@_opts.Capacidades"
                       CapacidadToDiametros="@capacidadToDiametros"
                       OnOptionsUpdated="HandlePackagingUpdated"

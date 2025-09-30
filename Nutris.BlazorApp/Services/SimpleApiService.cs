@@ -30,7 +30,6 @@ namespace NutrisBlazor.Services
             _httpClient = httpClient;
             _configuration = configuration;
 
-            // Leer configuración desde appsettings.json
             _baseUrl = _configuration["ApiSettings:BaseUrl"] ?? "";
             _username = _configuration["ApiSettings:Username"] ?? "";
             _password = _configuration["ApiSettings:Password"] ?? "";
@@ -40,15 +39,11 @@ namespace NutrisBlazor.Services
 
         private void ConfigureHttpClient()
         {
-            // Configurar autenticación Basic
             var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{_username}:{_password}"));
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Basic", authToken);
 
-            // Agregar header Isolation
             _httpClient.DefaultRequestHeaders.Add("Isolation", "snapshot");
-
-            // Configurar timeout
             _httpClient.Timeout = TimeSpan.FromSeconds(30);
         }
 
@@ -59,12 +54,34 @@ namespace NutrisBlazor.Services
                 var fullUrl = path.StartsWith("http") ? path : $"{_baseUrl}{path}";
                 Console.WriteLine($"API GET: {fullUrl}");
 
-                var response = await _httpClient.GetFromJsonAsync<T>(fullUrl);
-                return response;
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+
+                var response = await _httpClient.GetAsync(fullUrl);
+                Console.WriteLine($"⏱️ HTTP response received in {sw.ElapsedMilliseconds}ms");
+
+                response.EnsureSuccessStatusCode();
+
+                if (typeof(T) == typeof(JsonDocument))
+                {
+                    Console.WriteLine($"📝 Starting JsonDocument.ParseAsync from stream...");
+                    using var stream = await response.Content.ReadAsStreamAsync();
+                    Console.WriteLine($"📝 Stream obtained in {sw.ElapsedMilliseconds}ms");
+
+                    var doc = await JsonDocument.ParseAsync(stream);
+                    Console.WriteLine($"✅ JsonDocument parsed in {sw.ElapsedMilliseconds}ms total");
+                    return (T)(object)doc;
+                }
+                else
+                {
+                    Console.WriteLine($"📝 Deserializing {typeof(T).Name}...");
+                    var result = await response.Content.ReadFromJsonAsync<T>();
+                    Console.WriteLine($"✅ {typeof(T).Name} deserialized in {sw.ElapsedMilliseconds}ms total");
+                    return result;
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error en GET request: {ex.Message}");
+                Console.WriteLine($"❌ Error en GET request to {path}: {ex.Message}");
                 throw;
             }
         }
@@ -76,7 +93,7 @@ namespace NutrisBlazor.Services
                 var fullUrl = path.StartsWith("http") ? path : $"{_baseUrl}{path}";
                 var json = JsonSerializer.Serialize(data);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
- 
+
                 Console.WriteLine($"API POST: {fullUrl}");
                 return await _httpClient.PostAsync(fullUrl, content);
             }
@@ -86,6 +103,7 @@ namespace NutrisBlazor.Services
                 throw;
             }
         }
+
         public async Task<HttpResponseMessage> PostAsync2(string path, object data)
         {
             try
@@ -120,7 +138,6 @@ namespace NutrisBlazor.Services
                     Content = content
                 };
 
-                // Agregar el header a la request, no al content
                 request.Headers.Add("If-Match", "*");
 
                 Console.WriteLine($"API PATCH: {fullUrl}");
