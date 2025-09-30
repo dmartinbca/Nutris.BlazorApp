@@ -870,26 +870,59 @@
                                         <h3 class="font-18 RalewayBold">@Localization["orderView.BOXLABEL"]</h3>
                                     </div>
                                     <div class="body-t">
-                                        
-                                            @foreach (var item in PalletInfo)
-                                            {
-                                                <div class="body-td">
-                                                    <p class="font-18 RalewayRegular">@item.Label</p>
-                                                    <div class="data-t">
-                                                        <input class="RalewayRegular font-20" type="text" readonly value="@item.Value">
-                                                        @if (item.Value != "-")
+
+                                    @foreach (var item in PalletInfo)
+                                    {
+                                        <div class="body-td">
+                                            <p class="font-18 RalewayRegular">@item.Label</p>
+                                            <div class="data-t">
+                                                @if (item.Label == Localization["orderView.Pallet[0]"] && Status == "Desarrollo")
+                                                {
+                                                    <!-- Selector para tipo de caja -->
+                                                    <div class="tipo-caja-selector">
+                                                        <select class="font-20 RalewayRegular form-select"
+                                                                value="@SelectedTipoCaja"
+                                                                @onchange="OnTipoCajaChanged"
+                                                                disabled="@IsLoadingTipoCaja">
+                                                            @if (!TiposCajaOptions.Any())
+                                                            {
+                                                                <option value="-">@Localization["NoOptionsAvailable"]</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                @foreach (var opt in TiposCajaOptions)
+                                                                {
+                                                                    <option value="@opt.Tipo_de_caja">
+                                                                        @opt.Tipo_de_caja (@opt.Unidades_por_caja @Localization["units"])
+                                                                    </option>
+                                                                }
+                                                            }
+                                                        </select>
+                                                        @if (IsLoadingTipoCaja)
                                                         {
-                                                            <div class="line-from"></div>
-                                                            <img src="img/check-icon.svg" alt="check">
-                                                        }
-                                                        else
-                                                        {
-                                                            <div class="line-from"></div>
-                                                            <img src="img/cancelar.svg" alt="check">
+                                                            <span class="spinner-inline"></span>
                                                         }
                                                     </div>
-                                                </div>
-                                            }
+                                                }
+                                                else
+                                                {
+                                                    <!-- Input readonly para otros campos o cuando no está en desarrollo -->
+                                                    <input class="RalewayRegular font-20" type="text" readonly value="@item.Value">
+                                                }
+
+                                                @if (item.Value != "-")
+                                                {
+                                                    <div class="line-from"></div>
+                                                    <img src="img/check-icon.svg" alt="check">
+                                                }
+                                                else
+                                                {
+                                                    <div class="line-from"></div>
+                                                    <img src="img/cancelar.svg" alt="check">
+                                                }
+                                            </div>
+                                        </div>
+                                    }
                                           
 
                                            

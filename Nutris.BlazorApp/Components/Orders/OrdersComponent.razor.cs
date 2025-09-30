@@ -124,6 +124,10 @@ public class OrdersComponentBase : ComponentBase
     protected List<InputItem> GummyListB { get; set; } = new();
     protected List<RecipeRow> RecipeRows { get; set; } = new();
 
+    protected List<TipoCajaOption> TiposCajaOptions { get; set; } = new();
+    protected string SelectedTipoCaja { get; set; } = "-";
+    protected bool IsLoadingTipoCaja { get; set; } = false;
+
     // PACKAGING
     protected int PercentFilledBottle { get; set; }
     protected string BottleType { get; set; } = "-";
@@ -331,6 +335,184 @@ public class OrdersComponentBase : ComponentBase
         // vuelve a pedir los datos y refresca UI
         // ...
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void LoadTiposCajaOptions()
+    {
+        try
+        {
+            TiposCajaOptions.Clear();
+
+            if (TiposCajas.ValueKind != JsonValueKind.Object) return;
+            if (!TiposCajas.TryGetProperty("value", out var cajasArray)) return;
+            if (cajasArray.ValueKind != JsonValueKind.Array) return;
+
+            // Obtener los datos del bote seleccionado del RG35
+            var boteForma = RG35?.Bote_forma?.ToUpperInvariant() ?? "";
+            var boteCapacidad = RG35?.Bote_capacidad ?? "";
+            var boteBoca = RG35?.Bote_boca ?? "";
+
+            if (string.IsNullOrEmpty(boteForma) || string.IsNullOrEmpty(boteCapacidad) || string.IsNullOrEmpty(boteBoca))
+            {
+                Console.WriteLine("No hay datos de bote para filtrar tipos de caja");
+                return;
+            }
+
+            Console.WriteLine($"Filtrando cajas por: Forma={boteForma}, Capacidad={boteCapacidad}, Boca={boteBoca}");
+
+            int id = 1;
+            foreach (var item in cajasArray.EnumerateArray())
+            {
+                var forma = item.TryGetProperty("Forma", out var f) ? (f.GetString() ?? "").ToUpperInvariant() : "";
+                var capacidad = item.TryGetProperty("Capacidad", out var c) ? c.GetString() ?? "" : "";
+                var boca = item.TryGetProperty("Boca", out var b) ? b.GetString() ?? "" : "";
+                var tipoCaja = item.TryGetProperty("Tipo_de_caja", out var tc) ? tc.GetString() ?? "" : "";
+
+                // Filtrar por forma, capacidad y boca
+                if (forma == boteForma && capacidad == boteCapacidad && boca == boteBoca)
+                {
+                    var option = new TipoCajaOption
+                    {
+                        Id = id++,
+                        Forma = forma,
+                        Capacidad = capacidad,
+                        Boca = boca,
+                        Tipo_de_caja = tipoCaja,
+                        Unidades_por_caja = item.TryGetProperty("Unidades_por_caja", out var upc) ? upc.GetInt32() : 0,
+                        Pallet_EU_Alturas = item.TryGetProperty("Pallet_EU_Alturas", out var euA) ? euA.GetInt32() : 0,
+                        Pallet_EU_Base = item.TryGetProperty("Pallet_EU_Base", out var euB) ? euB.GetInt32() : 0,
+                        Pallet_Americano_Alturas = item.TryGetProperty("Pallet_Americano_Alturas", out var amA) ? amA.GetInt32() : 0,
+                        Pallet_Americano_Base = item.TryGetProperty("Pallet_Americano_Base", out var amB) ? amB.GetInt32() : 0
+                    };
+
+                    TiposCajaOptions.Add(option);
+                    Console.WriteLine($"Caja añadida: {tipoCaja} - {upc} unidades");
+                }
+            }
+
+            // Establecer el valor seleccionado actual si existe
+            if (RG35 != null && !string.IsNullOrEmpty(RG35.Box_name))
+            {
+                SelectedTipoCaja = RG35.Box_name;
+            }
+            else if (TiposCajaOptions.Any())
+            {
+                SelectedTipoCaja = TiposCajaOptions.First().Tipo_de_caja;
+            }
+
+            Console.WriteLine($"Total de cajas filtradas: {TiposCajaOptions.Count}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading tipos de caja: {ex.Message}");
+        }
+    }
+    protected async Task OnTipoCajaChanged(ChangeEventArgs e)
+    {
+        if (e.Value == null) return;
+
+        var newTipoCaja = e.Value.ToString();
+        if (string.IsNullOrEmpty(newTipoCaja) || newTipoCaja == SelectedTipoCaja) return;
+
+        IsLoadingTipoCaja = true;
+        SelectedTipoCaja = newTipoCaja; // Actualizar el valor inmediatamente
+        StateHasChanged();
+
+        try
+        {
+            // Buscar los datos completos de la caja seleccionada
+            var selectedCaja = TiposCajaOptions.FirstOrDefault(c => c.Tipo_de_caja == newTipoCaja);
+            if (selectedCaja == null)
+            {
+                Console.WriteLine($"No se encontró la caja seleccionada: {newTipoCaja}");
+                return;
+            }
+
+            // Determinar si es pallet europeo o americano
+            var palletType = RG35?.Pallet_type ?? "";
+            var isEuropean = palletType.Contains("EUR", StringComparison.OrdinalIgnoreCase) ||
+                            palletType.Contains("Europeo", StringComparison.OrdinalIgnoreCase) ||
+                            palletType.Contains("European", StringComparison.OrdinalIgnoreCase);
+
+            // Seleccionar los valores correctos según el tipo de pallet
+            int alturas = isEuropean ? selectedCaja.Pallet_EU_Alturas : selectedCaja.Pallet_Americano_Alturas;
+            int cajasXAltura = isEuropean ? selectedCaja.Pallet_EU_Base : selectedCaja.Pallet_Americano_Base;
+
+            // Calcular cajas por pallet
+            int cajasPorPallet = alturas * cajasXAltura;
+
+            Console.WriteLine($"Caja seleccionada: {selectedCaja.Tipo_de_caja}");
+            Console.WriteLine($"Tipo de pallet: {palletType} (Europeo: {isEuropean})");
+            Console.WriteLine($"Alturas: {alturas}, Cajas x Altura: {cajasXAltura}, Total: {cajasPorPallet}");
+
+            // Preparar el payload para el PATCH
+            var payload = new
+            {
+                Box_name = selectedCaja.Tipo_de_caja,
+                Box_units_per = selectedCaja.Unidades_por_caja,
+                Pallet_layers = alturas,
+                Pallet_boxes_per_layer = cajasXAltura,
+                Pallet_boxes_per_pallet = cajasPorPallet
+            };
+
+            // Enviar PATCH
+            if (OnPatchRG35.HasDelegate)
+            {
+                await OnPatchRG35.InvokeAsync(payload);
+
+                // Actualizar valores locales
+                if (RG35 != null)
+                {
+                    RG35.Box_name = selectedCaja.Tipo_de_caja;
+                    RG35.Box_units_per = selectedCaja.Unidades_por_caja.ToString();
+                    RG35.Pallet_layers = alturas.ToString();
+                    RG35.Pallet_boxes_per_layer = cajasXAltura.ToString();
+                    RG35.Pallet_boxes_per_pallet = cajasPorPallet.ToString();
+                }
+
+                // Actualizar PalletInfo para reflejar los cambios en la UI
+                UpdatePalletInfo();
+                CalculatePalletizingPercentage();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cambiar tipo de caja: {ex.Message}");
+            // Podrías mostrar un mensaje de error al usuario aquí
+        }
+        finally
+        {
+            IsLoadingTipoCaja = false;
+            StateHasChanged();
+        }
+    }
+
+    private void UpdatePalletInfo()
+    {
+        if (RG35?.Box_label_config == "Standard")
+        {
+            PalletInfo = new List<InputItem>
+        {
+            new() { Label = Localization["orderView.Pallet[5]"], Value = RG35.Box_label_config ?? "-" },
+            new() { Label = Localization["orderView.Pallet[0]"], Value = RG35.Box_name ?? "-" },
+            new() { Label = Localization["orderView.Pallet[1]"], Value = FormatNumericValue(RG35.Box_units_per) },
+        };
+        }
+        else
+        {
+            PalletInfo = new List<InputItem>
+        {
+            new() { Label = Localization["orderView.Pallet[5]"], Value = RG35.Box_label_config ?? "-" },
+        };
+        }
+
+        PalletizingInfo = new List<InputItem>
+    {
+        new() { Label = Localization["orderView.PALLETIZINGINFORMATION[0]"], Value = RG35.Pallet_type ?? "-" },
+        new() { Label = Localization["orderView.PALLETIZINGINFORMATION[1]"], Value = FormatNumericValue(RG35.Pallet_layers) },
+        new() { Label = Localization["orderView.PALLETIZINGINFORMATION[2]"], Value = FormatNumericValue(RG35.Pallet_boxes_per_layer) },
+        new() { Label = Localization["orderView.PALLETIZINGINFORMATION[3]"], Value = FormatNumericValue(RG35.Pallet_boxes_per_pallet) }
+    };
     }
     private void LoadBoteAndCapData()
     {
@@ -1115,7 +1297,7 @@ public class OrdersComponentBase : ComponentBase
         else
             LabelImageUrl = null;
 
-
+        LoadTiposCajaOptions();
     }
     private static List<LabelOption> MapAttrToLabelOption(JsonElement valueArr, int idx)
     {
@@ -1951,7 +2133,19 @@ public class OrdersComponentBase : ComponentBase
         public string QuantityServing { get; set; } = "-";
         public string RdaEu { get; set; } = "-";
     }
-
+    public class TipoCajaOption
+    {
+        public int Id { get; set; }
+        public string Forma { get; set; } = "";
+        public string Capacidad { get; set; } = "";
+        public string Boca { get; set; } = "";
+        public string Tipo_de_caja { get; set; } = "";
+        public int Unidades_por_caja { get; set; }
+        public int Pallet_EU_Alturas { get; set; }
+        public int Pallet_EU_Base { get; set; }
+        public int Pallet_Americano_Alturas { get; set; }
+        public int Pallet_Americano_Base { get; set; }
+    }
     public class FormatOption
     {
         public string Format { get; set; } = "";
