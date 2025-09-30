@@ -111,13 +111,17 @@ namespace Nutris.BlazorApp.Features.Customize
             {
                 url = $"Atributos?$expand=valoresAtributos($filter=Family eq {user.Family.ToString().ToLower()})&tenant=nutris";
             }
-            if (user.Standard)
+            else if (user.Standard)
             {
                 url = $"Atributos?$expand=valoresAtributos($filter=Family eq {user.Standard.ToString().ToLower()})&tenant=nutris";
             }
-            if (user.Premium)
+            else if (user.Premium)
             {
                 url = $"Atributos?$expand=valoresAtributos($filter=Family eq {user.Premium.ToString().ToLower()})&tenant=nutris";
+            }
+            else
+            {
+                url = $"Atributos?$expand=valoresAtributos&tenant=nutris";
             }
             return await _api.GetAsync<JsonDocument>(url);
         }
