@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject IAuthService AuthService
 @inject ILocalizationService Localization
+@inject ICatalogLoaderService CatalogLoader
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 @using System.Text.RegularExpressions
@@ -354,6 +355,7 @@
         return string.IsNullOrEmpty(translation) || translation == key ? defaultValue : translation;
     }
 
+
     private async Task HandleSubmit()
     {
         showError = true;
@@ -378,7 +380,23 @@
             }
             else
             {
-                Console.WriteLine("Login successful, navigating to /home");
+                Console.WriteLine("Login successful");
+
+                // Cargar catálogos en segundo plano (no esperar)
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await CatalogLoader.LoadAndCacheCatalogsAsync();
+                        Console.WriteLine("Catalogs loaded in background");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error loading catalogs: {ex.Message}");
+                    }
+                });
+
+                // Navegar inmediatamente
                 Navigation.NavigateTo("/home", true);
             }
         }

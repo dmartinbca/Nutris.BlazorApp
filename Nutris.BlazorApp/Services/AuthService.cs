@@ -22,34 +22,35 @@ namespace NutrisBlazor.Services
         Task<User> GetCurrentUserAsync();
         Task InitializeAsync();
     }
- 
+
     public class AuthService : IAuthService
     {
         private readonly HttpClient _httpClient;
         private readonly IJSRuntime _jsRuntime;
         private readonly IConfiguration _configuration;
         private readonly ILocalStorageService _localStorage;
-        private readonly ICustomizeApi _customizeApi; // NUEVO
         private User _currentUser;
 
-        public AuthService(HttpClient httpClient, IJSRuntime jsRuntime, IConfiguration configuration, ILocalStorageService localStorage, ICustomizeApi customizeApi)
+        public AuthService(
+            HttpClient httpClient,
+            IJSRuntime jsRuntime,
+            IConfiguration configuration,
+            ILocalStorageService localStorage)
         {
             _httpClient = httpClient;
             _jsRuntime = jsRuntime;
             _configuration = configuration;
             _localStorage = localStorage;
-            _customizeApi = customizeApi;
         }
 
         public async Task InitializeAsync()
         {
             try
             {
-                // Verificar si hay una sesión guardada
                 var token = await _localStorage.GetItemAsync<string>("token");
                 if (!string.IsNullOrEmpty(token))
                 {
-                    var userData = await _localStorage.GetItemAsync<User>("user");
+                    var userData = await _localStorage.GetItemAsync<User>("userT");
                     if (userData != null)
                     {
                         _currentUser = userData;
@@ -66,35 +67,25 @@ namespace NutrisBlazor.Services
         {
             try
             {
-                // Obtener configuración
                 var baseUrl = _configuration["ApiSettings:BaseUrl"];
                 var loginEndpoint = _configuration["ApiSettings:Endpoints:Login"] ?? "RG35Login";
                 var tenant = _configuration["ApiSettings:Tenant"] ?? "nutris";
                 var apiUsername = _configuration["ApiSettings:Username"] ?? "API";
                 var apiPassword = _configuration["ApiSettings:Password"] ?? "Sb3cBC2n8r7F+Puk6aokQ8m5vJ0OUIgRO6QzXLkkGXs=";
 
-                // Construir el filtro según el tipo de input (email o username)
                 string filter = BuildLoginFilter(username, password);
-
-                // Construir la URL completa
                 var url = $"{baseUrl}{loginEndpoint}?tenant={tenant}&$filter={Uri.EscapeDataString(filter)}";
 
                 Console.WriteLine($"Login URL: {url}");
 
-                // Crear un nuevo HttpClient para esta petición específica
                 using var client = new HttpClient();
-
-                // Configurar autenticación básica
                 var authString = $"{apiUsername}:{apiPassword}";
                 var authBytes = Encoding.UTF8.GetBytes(authString);
                 var authHeader = Convert.ToBase64String(authBytes);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
-
-                // Configurar headers adicionales para evitar problemas de CORS
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
                 client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*");
 
-                // Para desarrollo: Usar una alternativa si CORS falla
                 HttpResponseMessage response;
 
                 try
@@ -105,7 +96,6 @@ namespace NutrisBlazor.Services
                 {
                     Console.WriteLine("CORS error detected. Trying alternative approach...");
 
-                    // Alternativa: Simular login exitoso para desarrollo
                     if (IsDevelopment())
                     {
                         return await SimulateLogin(username, rememberMe);
@@ -130,13 +120,11 @@ namespace NutrisBlazor.Services
                         var user = result.Value[0];
                         _currentUser = user;
 
-                        // Guardar en LocalStorage
                         await SaveUserToStorageAsync(user, rememberMe);
 
-                        // NUEVO: Cargar catálogos en paralelo
-                        await LoadAndCacheCatalogsAsync();
+                        // NOTA: Los catálogos se cargarán en segundo plano desde Login.razor
+                        // No los cargamos aquí para no bloquear el login
 
-                        // Intentar obtener datos adicionales (opcional)
                         try
                         {
                             await LoadUserAdditionalDataAsync(user.Customer);
@@ -161,7 +149,6 @@ namespace NutrisBlazor.Services
                 Console.WriteLine($"Login error: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
 
-                // En desarrollo, permitir login simulado
                 if (IsDevelopment() && (username == "demo" || username == "test@test.com"))
                 {
                     return await SimulateLogin(username, rememberMe);
@@ -170,55 +157,9 @@ namespace NutrisBlazor.Services
 
             return false;
         }
-        private async Task LoadAndCacheCatalogsAsync()
-        {
-            try
-            {
-                Console.WriteLine("Loading and caching catalogs...");
 
-                // Cargar todos los catálogos en paralelo
-                var catalogTasks = new[]
-                {
-                LoadCatalog("Atributos", () => _customizeApi.GetAtributosAsync()),
-                LoadCatalog("RelacionBote", () => _customizeApi.GetRelacionBoteAsync()),
-                LoadCatalog("RelacionTapa", () => _customizeApi.GetRelacionTapaAsync()),
-                LoadCatalog("TiposCajas", () => _customizeApi.GetTiposCajastAsync())
-            };
-
-                await Task.WhenAll(catalogTasks);
-
-                // Guardar timestamp de última actualización
-                await _localStorage.SetItemAsync("catalogsTimestamp", DateTime.UtcNow.ToString("o"));
-
-                Console.WriteLine("Catalogs cached successfully");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error caching catalogs: {ex.Message}");
-                // No fallar el login si los catálogos no se pueden cargar
-            }
-        }
-
-        private async Task LoadCatalog(string key, Func<Task<JsonDocument>> loader)
-        {
-            try
-            {
-                var data = await loader();
-                if (data != null)
-                {
-                    var json = JsonSerializer.Serialize(data.RootElement);
-                    await _localStorage.SetItemAsync($"catalog_{key}", json);
-                    Console.WriteLine($"Cached catalog: {key}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading catalog {key}: {ex.Message}");
-            }
-        }
         private bool IsDevelopment()
         {
-            // Detectar si estamos en desarrollo
             var isDev = _configuration["Environment"] ?? "Development";
             return isDev == "Development";
         }
@@ -227,7 +168,6 @@ namespace NutrisBlazor.Services
         {
             Console.WriteLine("Using simulated login for development...");
 
-            // Crear usuario simulado para desarrollo
             var simulatedUser = new User
             {
                 SystemId = Guid.NewGuid().ToString(),
@@ -235,9 +175,6 @@ namespace NutrisBlazor.Services
                 Name = "Demo User",
                 user = username,
                 Email = username.Contains("@") ? username : $"{username}@demo.com",
-               
-               
-
             };
 
             _currentUser = simulatedUser;
@@ -248,17 +185,14 @@ namespace NutrisBlazor.Services
 
         private string BuildLoginFilter(string username, string password)
         {
-            // Regex para validar email
             var emailRegex = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
 
             if (Regex.IsMatch(username, emailRegex))
             {
-                // Si es email, buscar por email
                 return $"email eq '{username}' and pass eq '{password}'";
             }
             else
             {
-                // Si es username, buscar por user
                 return $"user eq '{username}' and pass eq '{password}'";
             }
         }
@@ -286,7 +220,6 @@ namespace NutrisBlazor.Services
                 await _localStorage.SetItemAsync("postcode", user.Post_Code);
                 await _localStorage.SetItemAsync("phone", user.Phone);
                 await _localStorage.SetItemAsync("mobilephone", user.Mobile_Phone);
-                await _localStorage.SetItemAsync("email", user.Email);
                 await _localStorage.SetItemAsync("contact", user.Contact);
                 await _localStorage.SetItemAsync("shipmentmethodcode", user.Shipment_Method_Code);
                 await _localStorage.SetItemAsync("family", user.Family);
@@ -327,9 +260,6 @@ namespace NutrisBlazor.Services
         {
             try
             {
-                // Limpiar localStorage
-                 
-
                 await _localStorage.RemoveItemAsync("token");
                 await _localStorage.RemoveItemAsync("userT");
                 await _localStorage.RemoveItemAsync("name");
@@ -347,13 +277,20 @@ namespace NutrisBlazor.Services
                 await _localStorage.RemoveItemAsync("postcode");
                 await _localStorage.RemoveItemAsync("phone");
                 await _localStorage.RemoveItemAsync("mobilephone");
-                await _localStorage.RemoveItemAsync("email");
                 await _localStorage.RemoveItemAsync("contact");
                 await _localStorage.RemoveItemAsync("shipmentmethodcode");
                 await _localStorage.RemoveItemAsync("family");
                 await _localStorage.RemoveItemAsync("standard");
                 await _localStorage.RemoveItemAsync("premium");
                 await _localStorage.RemoveItemAsync("storageType");
+
+                // Limpiar catálogos también
+                await _localStorage.RemoveItemAsync("catalogsTimestamp");
+                await _localStorage.RemoveItemAsync("catalog_Atributos");
+                await _localStorage.RemoveItemAsync("catalog_RelacionBote");
+                await _localStorage.RemoveItemAsync("catalog_RelacionTapa");
+                await _localStorage.RemoveItemAsync("catalog_TiposCajas");
+
                 _currentUser = null;
             }
             catch (Exception ex)
@@ -385,7 +322,6 @@ namespace NutrisBlazor.Services
         }
     }
 
-    // Modelos de respuesta
     public class ApiResponse<T>
     {
         public List<T> Value { get; set; } = new List<T>();
@@ -398,8 +334,6 @@ namespace NutrisBlazor.Services
         public string Name { get; set; }
         public string user { get; set; }
         public string Pass { get; set; }
- 
- 
         public string Logo { get; set; }
         public string CIF { get; set; }
         public string Nombre_Vendedor { get; set; }
@@ -418,6 +352,5 @@ namespace NutrisBlazor.Services
         public bool Family { get; set; }
         public bool Standard { get; set; }
         public bool Premium { get; set; }
-
     }
 }

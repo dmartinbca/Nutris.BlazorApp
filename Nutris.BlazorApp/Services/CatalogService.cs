@@ -14,7 +14,7 @@ namespace NutrisBlazor.Services
     public class CatalogService : ICatalogService
     {
         private readonly ILocalStorageService _localStorage;
-        private readonly TimeSpan _cacheExpiration = TimeSpan.FromHours(24); // Catálogos válidos por 24 horas
+        private readonly TimeSpan _cacheExpiration = TimeSpan.FromHours(24);
 
         public CatalogService(ILocalStorageService localStorage)
         {
