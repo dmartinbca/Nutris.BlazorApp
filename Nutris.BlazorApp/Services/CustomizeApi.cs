@@ -18,6 +18,10 @@ namespace Nutris.BlazorApp.Features.Customize
         Task PatchFormulationAsync(string rg37, object payload);
         Task<JsonDocument> GetLotFormatAsync(string rg37);
         Task<JsonDocument> GetBbdFormatAsync(string rg37);
+
+        Task<JsonDocument> GetTiposCajastAsync();
+
+        
         Task<HttpResponseMessage> PostModificarImagenCabAsync(object payload);
     }
 
@@ -151,5 +155,10 @@ namespace Nutris.BlazorApp.Features.Customize
 
         public Task<HttpResponseMessage> PostModificarImagenCabAsync(object payload) =>
             _api.PostAsync("modificarImagen(1)/Microsoft.NAV.modificarCab", payload);
+
+        public Task<JsonDocument> GetTiposCajastAsync() =>
+           _api.GetAsync<JsonDocument>($"ApiTiposCaja?&tenant=nutris");
+
+
     }
 }

@@ -37,6 +37,9 @@ public class OrdersComponentBase : ComponentBase
     [Parameter] public JsonElement RelacionTapa { get; set; }
     [Parameter] public JsonElement LotFormat { get; set; }
     [Parameter] public JsonElement BbdFormat { get; set; }
+    [Parameter] public JsonElement TiposCajas { get; set; }
+
+
 
     // Callbacks hacia el padre
     [Parameter] public EventCallback OnApprove { get; set; }
@@ -136,8 +139,7 @@ public class OrdersComponentBase : ComponentBase
     protected bool IsSendingBbdOther { get; set; }
     protected List<FormatOption> BatchFormats { get; set; } = new();
     protected List<FormatOption> BbdFormats { get; set; } = new();
-
-    // LABEL
+     // LABEL
     protected int PercentFilledLabel { get; set; }
     protected bool NoLabel { get; set; }
  
@@ -1251,6 +1253,9 @@ public class OrdersComponentBase : ComponentBase
             if (BbdFormat.ValueKind == JsonValueKind.Object && BbdFormat.TryGetProperty("value", out var bbdValues))
                 BbdFormats = bbdValues.EnumerateArray().Select(i => new FormatOption { Format = i.GetProperty("Format").GetString() ?? "" }).ToList();
 
+           
+
+
             // ---- Atributos → opciones del modal ----
             if (!(Atributos.ValueKind == JsonValueKind.Object && Atributos.TryGetProperty("value", out var attrValues)))
                 return;
@@ -1950,6 +1955,11 @@ public class OrdersComponentBase : ComponentBase
     public class FormatOption
     {
         public string Format { get; set; } = "";
+    }
+
+    public class CajasOption
+    {
+        public string Caja { get; set; } = "";
     }
 
     public class AnalyticsRow

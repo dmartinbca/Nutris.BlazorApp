@@ -37,6 +37,7 @@
             RelacionTapa="@RelacionTapaRoot"
             LotFormat="@LotFormatRoot"
             BbdFormat="@BbdFormatRoot"
+            TiposCajas="@TiposCajas"
             OnApprove="ApproveFormulationAsync"
             OnSaveName="SaveProductCommercialNameAsync"
             OnSaveLotFormat="@(x => SaveLotFormatAsync(x.format, x.other))"
@@ -70,6 +71,7 @@
     JsonDocument? RelacionTapaDoc;
     JsonDocument? LotFormatDoc;
     JsonDocument? BbdFormatDoc;
+    JsonDocument? TiposCajasDoc;
 
     // Elementos JSON para pasar al componente
     JsonElement AtributosRoot;
@@ -77,6 +79,8 @@
     JsonElement RelacionTapaRoot;
     JsonElement LotFormatRoot;
     JsonElement BbdFormatRoot;
+    JsonElement TiposCajas;
+
     [Inject] protected IApiService Api { get; set; } = default!;
     // Estado
     bool IsLoading = true;
@@ -276,7 +280,8 @@
                 CustomizeApi.GetRelacionBoteAsync(),
                 CustomizeApi.GetRelacionTapaAsync(),
                 CustomizeApi.GetLotFormatAsync(Id),
-                CustomizeApi.GetBbdFormatAsync(Id)
+                CustomizeApi.GetBbdFormatAsync(Id),
+                CustomizeApi.GetTiposCajastAsync()
             };
 
             var results = await Task.WhenAll(catalogTasks);
@@ -286,13 +291,14 @@
             RelacionTapaDoc = results[2];
             LotFormatDoc = results[3];
             BbdFormatDoc = results[4];
-
+            TiposCajasDoc = results[5];
             // Asignar elementos root
             AtributosRoot = AtributosDoc?.RootElement ?? default;
             RelacionBoteRoot = RelacionBoteDoc?.RootElement ?? default;
             RelacionTapaRoot = RelacionTapaDoc?.RootElement ?? default;
             LotFormatRoot = LotFormatDoc?.RootElement ?? default;
             BbdFormatRoot = BbdFormatDoc?.RootElement ?? default;
+            TiposCajas = TiposCajasDoc?.RootElement ?? default;
 
             Console.WriteLine("All data loaded successfully");
             if (RG35Data is not null)
