@@ -22,21 +22,23 @@ namespace NutrisBlazor.Services
         Task<User> GetCurrentUserAsync();
         Task InitializeAsync();
     }
-
+ 
     public class AuthService : IAuthService
     {
         private readonly HttpClient _httpClient;
         private readonly IJSRuntime _jsRuntime;
         private readonly IConfiguration _configuration;
         private readonly ILocalStorageService _localStorage;
+        private readonly ICustomizeApi _customizeApi; // NUEVO
         private User _currentUser;
 
-        public AuthService(HttpClient httpClient, IJSRuntime jsRuntime, IConfiguration configuration, ILocalStorageService localStorage)
+        public AuthService(HttpClient httpClient, IJSRuntime jsRuntime, IConfiguration configuration, ILocalStorageService localStorage, ICustomizeApi customizeApi)
         {
             _httpClient = httpClient;
             _jsRuntime = jsRuntime;
             _configuration = configuration;
             _localStorage = localStorage;
+            _customizeApi = customizeApi;
         }
 
         public async Task InitializeAsync()
@@ -131,6 +133,9 @@ namespace NutrisBlazor.Services
                         // Guardar en LocalStorage
                         await SaveUserToStorageAsync(user, rememberMe);
 
+                        // NUEVO: Cargar catálogos en paralelo
+                        await LoadAndCacheCatalogsAsync();
+
                         // Intentar obtener datos adicionales (opcional)
                         try
                         {
@@ -165,7 +170,52 @@ namespace NutrisBlazor.Services
 
             return false;
         }
+        private async Task LoadAndCacheCatalogsAsync()
+        {
+            try
+            {
+                Console.WriteLine("Loading and caching catalogs...");
 
+                // Cargar todos los catálogos en paralelo
+                var catalogTasks = new[]
+                {
+                LoadCatalog("Atributos", () => _customizeApi.GetAtributosAsync()),
+                LoadCatalog("RelacionBote", () => _customizeApi.GetRelacionBoteAsync()),
+                LoadCatalog("RelacionTapa", () => _customizeApi.GetRelacionTapaAsync()),
+                LoadCatalog("TiposCajas", () => _customizeApi.GetTiposCajastAsync())
+            };
+
+                await Task.WhenAll(catalogTasks);
+
+                // Guardar timestamp de última actualización
+                await _localStorage.SetItemAsync("catalogsTimestamp", DateTime.UtcNow.ToString("o"));
+
+                Console.WriteLine("Catalogs cached successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error caching catalogs: {ex.Message}");
+                // No fallar el login si los catálogos no se pueden cargar
+            }
+        }
+
+        private async Task LoadCatalog(string key, Func<Task<JsonDocument>> loader)
+        {
+            try
+            {
+                var data = await loader();
+                if (data != null)
+                {
+                    var json = JsonSerializer.Serialize(data.RootElement);
+                    await _localStorage.SetItemAsync($"catalog_{key}", json);
+                    Console.WriteLine($"Cached catalog: {key}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading catalog {key}: {ex.Message}");
+            }
+        }
         private bool IsDevelopment()
         {
             // Detectar si estamos en desarrollo

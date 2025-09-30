@@ -3,7 +3,7 @@ using NutrisBlazor.Models.Converters;
 using NutrisBlazor.Services;
 using System.Text.Json;
  
-namespace Nutris.BlazorApp.Features.Customize
+namespace NutrisBlazor.Services
 {
    
     public interface ICustomizeApi
@@ -23,6 +23,9 @@ namespace Nutris.BlazorApp.Features.Customize
 
         
         Task<HttpResponseMessage> PostModificarImagenCabAsync(object payload);
+        
+        
+        
     }
 
     public sealed class CustomizeApi : ICustomizeApi

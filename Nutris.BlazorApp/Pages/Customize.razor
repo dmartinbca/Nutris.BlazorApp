@@ -1,13 +1,15 @@
 ﻿@page "/customize-edit/{Id}"
-@* @page "/customize/{Id}" *@
 @using System.Text.Json
 @using Nutris.BlazorApp.Components.Orders
-@using Nutris.BlazorApp.Features.Customize
+ 
 @using NutrisBlazor.Components.Shared
 @using NutrisBlazor.Models
+ 
 @inject ILocalizationService Localization
 @inject ICustomizeApi CustomizeApi
+@inject ICatalogService CatalogService
 @inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
 <link href="css/Customize.css" rel="stylesheet" />
 <PageTitle>Customize - @Id</PageTitle>
 
@@ -106,8 +108,10 @@
     {
         IsLoading = true;
         Error = null;
-        StateHasChanged(); // Mostrar loading inmediatamente
+        StateHasChanged();
+
         List<FileItem> Ficheros = new List<FileItem>();
+
         try
         {
             // Validar ID
@@ -128,194 +132,19 @@
             Prefix = parts[0].ToUpper();
             Console.WriteLine($"Loading data for ID: {Id}, Prefix: {Prefix}");
 
-            // Cargar datos según el prefijo
-            if (Prefix == "RG35")
+            // Cargar datos del pedido Y catálogos en paralelo
+            var loadTasks = new List<Task>
             {
-                Console.WriteLine("Loading RG35 data...");
-                RG35Data = await CustomizeApi.GetRG35Async(Id);
-
-                if (RG35Data == null)
-                {
-                    Error = $"No se encontraron datos RG35 para el ID: {Id}";
-                    return;
-                }
-                else
-                {
-                    // Transformamos Lotes y BBD  
-
-                    if(RG35Data.Box_Lote.Contains(":"))
-                    {
-                        RG35Data.Box_Lote = RG35Data.Box_Lote.Substring(RG35Data.Box_Lote.IndexOf(":") + 1);
-                    }
-                    if(RG35Data.Box_BBD.Contains(":"))
-                    {
-                        RG35Data.Box_BBD = RG35Data.Box_BBD.Substring(RG35Data.Box_BBD.IndexOf(":") + 1);
-                    }
-                    // Descargar ficha técnica si está cerrada
-                    // 1) payload como en Vue
-                    var payload = new { numeroRG = Id };
-
-                    // 2) POST al mismo endpoint (con tu prefijo api/)
-                    var resp = await Api.PostAsync(
-                        "dataSheet(1)/Microsoft.NAV.Download?tenant=nutris",
-                        payload
-                    );
-
-                    resp.EnsureSuccessStatusCode();
-
-                    // 3) Leer y extraer base64 (acepta dos formatos)
-                    var json = await resp.Content.ReadAsStringAsync();
-                    using var doc = JsonDocument.Parse(json);
-
-                    string? b64 = null;
-                    var root = doc.RootElement;
-
-                    if (root.TryGetProperty("data", out var dataEl) &&
-                        dataEl.ValueKind == JsonValueKind.Object &&
-                        dataEl.TryGetProperty("value", out var valueEl1))
-                    {
-                        b64 = valueEl1.GetString();
-                    }
-                    else if (root.TryGetProperty("value", out var valueEl2))
-                    {
-                        b64 = valueEl2.GetString();
-                    }
-                    try
-                    {
-                        if (!string.IsNullOrWhiteSpace(b64) && RG35Data.Status == "Cerrado cliente y calidad")
-                        {
-                            Ficheros.Add(new FileItem
-                            {
-                                Code = Id,
-                                Name = "TECHNICAL DATA SHEET " + RG35Data.Product_name_2 + ".pdf",
-                                File = b64
-                            });
-                            RG35Data.Files = Ficheros;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error processing base64 file: {ex}");
-                    }
-                    if(RG35Data.Status == "Cerrado cliente y calidad")
-                    {
-                        // Descargar Informe Cliente si está cerrada
-                        // 1) payload como en Vue
-                        var payloadCR = new { numeroRG = Id };
-
-                        // 2) POST al mismo endpoint (con tu prefijo api/)
-                        var respCR = await Api.PostAsync(
-                            "customReports(1)/Microsoft.NAV.GenerateReportWithLayout?tenant=nutris",
-                            payloadCR
-                        );
-
-                        resp.EnsureSuccessStatusCode();
-
-                        // 3) Leer y extraer base64 (acepta dos formatos)
-                        var jsonCR = await respCR.Content.ReadAsStringAsync();
-                        using var docCR = JsonDocument.Parse(jsonCR);
-
-                        string? b64CR = null;
-                        var rootCR = docCR.RootElement;
-
-                        if (rootCR.TryGetProperty("data", out var dataElCR) &&
-                            dataElCR.ValueKind == JsonValueKind.Object &&
-                            dataElCR.TryGetProperty("value", out var valueEl1CR))
-                        {
-                            b64CR = valueEl1CR.GetString();
-                        }
-                        else if (rootCR.TryGetProperty("value", out var valueEl2CR))
-                        {
-                            b64CR = valueEl2CR.GetString();
-                        }
-                        try
-                        {
-                            if (!string.IsNullOrWhiteSpace(b64) && RG35Data.Status == "Cerrado cliente y calidad")
-                            {
-                                Ficheros.Add(new FileItem
-                                {
-                                    Code = Id,
-                                    Name = "CUSTOMER RG REPORT " + RG35Data.Code+ ".pdf",
-                                    File = b64CR
-                                });
-                                RG35Data.Files = Ficheros;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error processing base64 file: {ex}");
-                        }
-                    }
-                
-
-                }
-
-                Console.WriteLine($"RG35 data loaded: Code={RG35Data.Code}, Product={RG35Data.Product_name}");
-            }
-            else if (Prefix == "RG37")
-            {
-                Console.WriteLine("Loading RG37 data...");
-                RG37Data = await CustomizeApi.GetRG37Async(Id);
-
-                if (RG37Data == null)
-                {
-                    Error = $"No se encontraron datos RG37 para el ID: {Id}";
-                    return;
-                }
-
-                Console.WriteLine($"RG37 data loaded: Code={RG37Data.Code}, Product={RG37Data.Product_name}");
-            }
-            else
-            {
-                Error = $"Prefijo de ID no reconocido: {Prefix}. Se esperaba RG35 o RG37.";
-                return;
-            }
-
-            // Cargar catálogos (común para ambos tipos)
-            Console.WriteLine("Loading catalogs...");
-
-            var catalogTasks = new[]
-            {
-                CustomizeApi.GetAtributosAsync(),
-                CustomizeApi.GetRelacionBoteAsync(),
-                CustomizeApi.GetRelacionTapaAsync(),
-                CustomizeApi.GetLotFormatAsync(Id),
-                CustomizeApi.GetBbdFormatAsync(Id),
-                CustomizeApi.GetTiposCajastAsync()
+                LoadOrderDataAsync(), // Cargar RG35/RG37
+                LoadCatalogsAsync()   // Cargar catálogos desde cache
             };
 
-            var results = await Task.WhenAll(catalogTasks);
+            await Task.WhenAll(loadTasks);
 
-            AtributosDoc = results[0];
-            RelacionBoteDoc = results[1];
-            RelacionTapaDoc = results[2];
-            LotFormatDoc = results[3];
-            BbdFormatDoc = results[4];
-            TiposCajasDoc = results[5];
-            // Asignar elementos root
-            AtributosRoot = AtributosDoc?.RootElement ?? default;
-            RelacionBoteRoot = RelacionBoteDoc?.RootElement ?? default;
-            RelacionTapaRoot = RelacionTapaDoc?.RootElement ?? default;
-            LotFormatRoot = LotFormatDoc?.RootElement ?? default;
-            BbdFormatRoot = BbdFormatDoc?.RootElement ?? default;
-            TiposCajas = TiposCajasDoc?.RootElement ?? default;
+            // Cargar formatos específicos del pedido (dependen del ID)
+            await LoadOrderSpecificFormatsAsync();
 
             Console.WriteLine("All data loaded successfully");
-            if (RG35Data is not null)
-            {
-                if (RG35Data.Estimated_date == "0001-01-01")
-                {
-                    RG35Data.Estimated_date = "";
-
-                }
-                if (RG35Data.Deadline_date == "0001-01-01")
-                {
-                    RG35Data.Deadline_date = "";
-
-                }
-            }
-            
-             
         }
         catch (HttpRequestException httpEx)
         {
@@ -339,6 +168,283 @@
         }
     }
 
+    private async Task LoadOrderDataAsync()
+    {
+        if (Prefix == "RG35")
+        {
+            Console.WriteLine("Loading RG35 data...");
+            RG35Data = await CustomizeApi.GetRG35Async(Id);
+
+            if (RG35Data == null)
+            {
+                Error = $"No se encontraron datos RG35 para el ID: {Id}";
+                return;
+            }
+
+            // Transformar lotes y BBD
+            if (RG35Data.Box_Lote?.Contains(":") == true)
+            {
+                RG35Data.Box_Lote = RG35Data.Box_Lote.Substring(RG35Data.Box_Lote.IndexOf(":") + 1);
+            }
+            if (RG35Data.Box_BBD?.Contains(":") == true)
+            {
+                RG35Data.Box_BBD = RG35Data.Box_BBD.Substring(RG35Data.Box_BBD.IndexOf(":") + 1);
+            }
+
+            // Cargar archivos si está cerrada
+            await LoadRG35FilesAsync();
+
+            // Limpiar fechas inválidas
+            if (RG35Data.Estimated_date == "0001-01-01")
+                RG35Data.Estimated_date = "";
+            if (RG35Data.Deadline_date == "0001-01-01")
+                RG35Data.Deadline_date = "";
+
+            Console.WriteLine($"RG35 data loaded: Code={RG35Data.Code}");
+        }
+        else if (Prefix == "RG37")
+        {
+            Console.WriteLine("Loading RG37 data...");
+            RG37Data = await CustomizeApi.GetRG37Async(Id);
+
+            if (RG37Data == null)
+            {
+                Error = $"No se encontraron datos RG37 para el ID: {Id}";
+                return;
+            }
+
+            Console.WriteLine($"RG37 data loaded: Code={RG37Data.Code}");
+        }
+        else
+        {
+            Error = $"Prefijo de ID no reconocido: {Prefix}";
+        }
+    }
+
+    private async Task LoadCatalogsAsync()
+    {
+        try
+        {
+            Console.WriteLine("Loading catalogs from cache...");
+
+            // Verificar si los catálogos son válidos
+            var areCatalogsValid = await CatalogService.AreCatalogsValidAsync();
+
+            if (!areCatalogsValid)
+            {
+                Console.WriteLine("Catalogs cache is invalid or expired, loading from API...");
+                await LoadCatalogsFromApiAsync();
+                return;
+            }
+
+            // Cargar catálogos desde cache en paralelo
+            var catalogTasks = new[]
+            {
+                CatalogService.GetCachedCatalogAsync("Atributos"),
+                CatalogService.GetCachedCatalogAsync("RelacionBote"),
+                CatalogService.GetCachedCatalogAsync("RelacionTapa"),
+                CatalogService.GetCachedCatalogAsync("TiposCajas")
+            };
+
+            var results = await Task.WhenAll(catalogTasks);
+
+            AtributosDoc = results[0];
+            RelacionBoteDoc = results[1];
+            RelacionTapaDoc = results[2];
+            TiposCajasDoc = results[3];
+
+            // Si algún catálogo no está en cache, cargar todos desde API
+            if (results.Any(r => r == null))
+            {
+                Console.WriteLine("Some catalogs missing from cache, reloading from API...");
+                await LoadCatalogsFromApiAsync();
+                return;
+            }
+
+            // Asignar elementos root
+            AtributosRoot = AtributosDoc?.RootElement ?? default;
+            RelacionBoteRoot = RelacionBoteDoc?.RootElement ?? default;
+            RelacionTapaRoot = RelacionTapaDoc?.RootElement ?? default;
+            TiposCajas = TiposCajasDoc?.RootElement ?? default;
+
+            Console.WriteLine("Catalogs loaded from cache successfully ✓");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading catalogs from cache: {ex.Message}");
+            // Fallback: cargar desde API
+            await LoadCatalogsFromApiAsync();
+        }
+    }
+
+    private async Task LoadCatalogsFromApiAsync()
+    {
+        Console.WriteLine("Loading catalogs from API...");
+
+        var catalogTasks = new[]
+        {
+            CustomizeApi.GetAtributosAsync(),
+            CustomizeApi.GetRelacionBoteAsync(),
+            CustomizeApi.GetRelacionTapaAsync(),
+            CustomizeApi.GetTiposCajastAsync()
+        };
+
+        var results = await Task.WhenAll(catalogTasks);
+
+        AtributosDoc = results[0];
+        RelacionBoteDoc = results[1];
+        RelacionTapaDoc = results[2];
+        TiposCajasDoc = results[3];
+
+        // Asignar elementos root
+        AtributosRoot = AtributosDoc?.RootElement ?? default;
+        RelacionBoteRoot = RelacionBoteDoc?.RootElement ?? default;
+        RelacionTapaRoot = RelacionTapaDoc?.RootElement ?? default;
+        TiposCajas = TiposCajasDoc?.RootElement ?? default;
+
+        // Guardar en cache para futuras cargas
+        await CacheCatalogsAsync();
+
+        Console.WriteLine("Catalogs loaded from API and cached ✓");
+    }
+    private async Task CacheCatalogsAsync()
+    {
+        try
+        {
+            if (AtributosDoc != null)
+            {
+                var json = JsonSerializer.Serialize(AtributosDoc.RootElement);
+                await LocalStorage.SetItemAsync("catalog_Atributos", json);
+            }
+            if (RelacionBoteDoc != null)
+            {
+                var json = JsonSerializer.Serialize(RelacionBoteDoc.RootElement);
+                await LocalStorage.SetItemAsync("catalog_RelacionBote", json);
+            }
+            if (RelacionTapaDoc != null)
+            {
+                var json = JsonSerializer.Serialize(RelacionTapaDoc.RootElement);
+                await LocalStorage.SetItemAsync("catalog_RelacionTapa", json);
+            }
+            if (TiposCajasDoc != null)
+            {
+                var json = JsonSerializer.Serialize(TiposCajasDoc.RootElement);
+                await LocalStorage.SetItemAsync("catalog_TiposCajas", json);
+            }
+
+            await LocalStorage.SetItemAsync("catalogsTimestamp", DateTime.UtcNow.ToString("o"));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error caching catalogs: {ex.Message}");
+        }
+    }
+    private async Task LoadOrderSpecificFormatsAsync()
+    {
+        try
+        {
+            var formatTasks = new[]
+            {
+                CustomizeApi.GetLotFormatAsync(Id),
+                CustomizeApi.GetBbdFormatAsync(Id)
+            };
+
+            var results = await Task.WhenAll(formatTasks);
+
+            LotFormatDoc = results[0];
+            BbdFormatDoc = results[1];
+
+            LotFormatRoot = LotFormatDoc?.RootElement ?? default;
+            BbdFormatRoot = BbdFormatDoc?.RootElement ?? default;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading order formats: {ex.Message}");
+        }
+    }
+    private async Task LoadRG35FilesAsync()
+    {
+        if (RG35Data == null) return;
+
+        List<FileItem> Ficheros = new List<FileItem>();
+
+        try
+        {
+            // Cargar Technical Data Sheet
+            var payload = new { numeroRG = Id };
+            var resp = await Api.PostAsync("dataSheet(1)/Microsoft.NAV.Download?tenant=nutris", payload);
+
+            if (resp.IsSuccessStatusCode)
+            {
+                var json = await resp.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+
+                string? b64 = null;
+                if (root.TryGetProperty("data", out var dataEl) &&
+                    dataEl.TryGetProperty("value", out var valueEl))
+                {
+                    b64 = valueEl.GetString();
+                }
+                else if (root.TryGetProperty("value", out var valueEl2))
+                {
+                    b64 = valueEl2.GetString();
+                }
+
+                if (!string.IsNullOrWhiteSpace(b64) && RG35Data.Status == "Cerrado cliente y calidad")
+                {
+                    Ficheros.Add(new FileItem
+                    {
+                        Code = Id,
+                        Name = $"TECHNICAL DATA SHEET {RG35Data.Product_name_2}.pdf",
+                        File = b64
+                    });
+                }
+            }
+
+            // Cargar Customer Report si está cerrada
+            if (RG35Data.Status == "Cerrado cliente y calidad")
+            {
+                var respCR = await Api.PostAsync(
+                    "customReports(1)/Microsoft.NAV.GenerateReportWithLayout?tenant=nutris",
+                    payload);
+
+                if (respCR.IsSuccessStatusCode)
+                {
+                    var jsonCR = await respCR.Content.ReadAsStringAsync();
+                    using var docCR = JsonDocument.Parse(jsonCR);
+                    var rootCR = docCR.RootElement;
+
+                    string? b64CR = null;
+                    if (rootCR.TryGetProperty("data", out var dataElCR) &&
+                        dataElCR.TryGetProperty("value", out var valueElCR))
+                    {
+                        b64CR = valueElCR.GetString();
+                    }
+                    else if (rootCR.TryGetProperty("value", out var valueEl2CR))
+                    {
+                        b64CR = valueEl2CR.GetString();
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(b64CR))
+                    {
+                        Ficheros.Add(new FileItem
+                        {
+                            Code = Id,
+                            Name = $"CUSTOMER RG REPORT {RG35Data.Code}.pdf",
+                            File = b64CR
+                        });
+                    }
+                }
+            }
+
+            RG35Data.Files = Ficheros;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading files: {ex.Message}");
+        }
+    }
     // ===== Callbacks para OrdersComponent =====
 
     private async Task ApproveFormulationAsync()

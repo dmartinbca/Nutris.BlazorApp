@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
 using Nutris.BlazorApp;
 using Nutris.BlazorApp.Components.Layout;
-using Nutris.BlazorApp.Features.Customize;
+ 
 using NutrisBlazor;
 using NutrisBlazor.Services;
 using System.Net.Http;
@@ -95,7 +95,7 @@ builder.Services.AddScoped<IApiService>(sp =>
     sp.GetRequiredService<SimpleApiService>());
 
 builder.Services.AddScoped<ICustomizeApi, CustomizeApi>();
-
+builder.Services.AddScoped<ICatalogService, CatalogService>();
 // Registrar AuthService con factory para usar el HttpClient correcto
 builder.Services.AddScoped<IAuthService>(sp =>
 {
@@ -104,8 +104,9 @@ builder.Services.AddScoped<IAuthService>(sp =>
     var jsRuntime = sp.GetRequiredService<IJSRuntime>();
     var configuration = sp.GetRequiredService<IConfiguration>();
     var localStorage = sp.GetRequiredService<ILocalStorageService>();
+    var icustomizeApi = sp.GetRequiredService<ICustomizeApi>();
 
-    return new AuthService(apiClient, jsRuntime, configuration, localStorage);
+    return new AuthService(apiClient, jsRuntime, configuration, localStorage, icustomizeApi);
 });
 builder.Services.AddScoped<IBoteCapService, BoteCapApiService>();
 // Agregar soporte para autorización
