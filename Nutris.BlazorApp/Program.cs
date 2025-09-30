@@ -144,7 +144,7 @@ try
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"❌ Error initializing services: {ex.Message}");
+    Console.WriteLine($"x Error initializing services: {ex.Message}");
     Console.WriteLine($"Stack trace: {ex.StackTrace}");
 }
 
