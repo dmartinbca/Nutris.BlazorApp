@@ -1,15 +1,15 @@
-﻿@page "/customize-edit/{Id}"
+﻿// Customize.razor - VERSIÓN CORREGIDA COMPLETA
+@page "/customize-edit/{Id}"
 @using System.Text.Json
 @using Nutris.BlazorApp.Components.Orders
- 
 @using NutrisBlazor.Components.Shared
 @using NutrisBlazor.Models
- 
 @inject ILocalizationService Localization
 @inject ICustomizeApi CustomizeApi
 @inject ICatalogService CatalogService
 @inject NavigationManager Navigation
 @inject ILocalStorageService LocalStorage
+
 <link href="css/Customize.css" rel="stylesheet" />
 <PageTitle>Customize - @Id</PageTitle>
 
@@ -28,25 +28,24 @@
     }
     else if (RG35Data is not null || RG37Data is not null)
     {
-        <OrdersComponent 
-            Id="@Id"
-            RG35="@RG35Data"
-            RG37="@RG37Data"
-            HasRG35="@(RG35Data is not null)"
-            HasRG37="@(RG37Data is not null)"
-            Atributos="@AtributosRoot"
-            RelacionBote="@RelacionBoteRoot"
-            RelacionTapa="@RelacionTapaRoot"
-            LotFormat="@LotFormatRoot"
-            BbdFormat="@BbdFormatRoot"
-            TiposCajas="@TiposCajas"
-            OnApprove="ApproveFormulationAsync"
-            OnSaveName="SaveProductCommercialNameAsync"
-            OnSaveLotFormat="@(x => SaveLotFormatAsync(x.format, x.other))"
-            OnSaveBbdFormat="@(x => SaveBbdFormatAsync(x.format, x.other))"
-            OnPatchRG35="PatchRG35Async"
-            OnPatchRG37="PatchRG37Async"
-            OnUploadBoxOrPallet="PostModificarImagenCabAsync" />
+        <OrdersComponent Id="@Id"
+                         RG35="@RG35Data"
+                         RG37="@RG37Data"
+                         HasRG35="@(RG35Data is not null)"
+                         HasRG37="@(RG37Data is not null)"
+                         Atributos="@AtributosRoot"
+                         RelacionBote="@RelacionBoteRoot"
+                         RelacionTapa="@RelacionTapaRoot"
+                         LotFormat="@LotFormatRoot"
+                         BbdFormat="@BbdFormatRoot"
+                         TiposCajas="@TiposCajas"
+                         OnApprove="ApproveFormulationAsync"
+                         OnSaveName="SaveProductCommercialNameAsync"
+                         OnSaveLotFormat="@(x => SaveLotFormatAsync(x.format, x.other))"
+                         OnSaveBbdFormat="@(x => SaveBbdFormatAsync(x.format, x.other))"
+                         OnPatchRG35="PatchRG35Async"
+                         OnPatchRG37="PatchRG37Async"
+                         OnUploadBoxOrPallet="PostModificarImagenCabAsync" />
     }
     else
     {
@@ -57,8 +56,6 @@
         </div>
     }
 </div>
-
- 
 
 @code {
     [Parameter] public string Id { get; set; } = string.Empty;
@@ -84,33 +81,65 @@
     JsonElement TiposCajas;
 
     [Inject] protected IApiService Api { get; set; } = default!;
+
     // Estado
     bool IsLoading = true;
     string? Error;
     string Prefix = "";
 
+    // Caché para evitar recargas innecesarias
+    private string _lastLoadedId = "";
+    private bool _catalogsLoaded = false;
+
     protected override async Task OnInitializedAsync()
     {
-        //  await LoadAllAsync();
+        // Precargar catálogos solo una vez
+        await PreloadCatalogsAsync();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        // Si el ID cambia, recargar datos
-        await LoadAllAsync();
+        // Solo recargar si el ID cambió
+        if (_lastLoadedId != Id)
+        {
+            await LoadAllAsync();
+        }
     }
+
     private string GetTranslation(string key, string defaultValue)
     {
         var translation = Localization[key];
         return string.IsNullOrEmpty(translation) || translation == key ? defaultValue : translation;
     }
+
+    private async Task PreloadCatalogsAsync()
+    {
+        try
+        {
+            var areCatalogsValid = await CatalogService.AreCatalogsValidAsync();
+
+            if (!areCatalogsValid)
+            {
+                await LoadCatalogsFromApiAsync();
+            }
+            else
+            {
+                await LoadCatalogsAsync();
+            }
+
+            _catalogsLoaded = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error preloading catalogs: {ex.Message}");
+        }
+    }
+
     private async Task LoadAllAsync()
     {
         IsLoading = true;
         Error = null;
         StateHasChanged();
-
-        List<FileItem> Ficheros = new List<FileItem>();
 
         try
         {
@@ -132,18 +161,19 @@
             Prefix = parts[0].ToUpper();
             Console.WriteLine($"Loading data for ID: {Id}, Prefix: {Prefix}");
 
-            // Cargar datos del pedido Y catálogos en paralelo
-            var loadTasks = new List<Task>
+            // Cargar catálogos solo si no están cargados
+            if (!_catalogsLoaded)
             {
-                LoadOrderDataAsync(), // Cargar RG35/RG37
-                LoadCatalogsAsync()   // Cargar catálogos desde cache
-            };
+                await PreloadCatalogsAsync();
+            }
 
-            await Task.WhenAll(loadTasks);
+            // Cargar datos del pedido
+            await LoadOrderDataAsync();
 
-            // Cargar formatos específicos del pedido (dependen del ID)
+            // Cargar formatos específicos del pedido
             await LoadOrderSpecificFormatsAsync();
 
+            _lastLoadedId = Id;
             Console.WriteLine("All data loaded successfully");
         }
         catch (HttpRequestException httpEx)
@@ -227,16 +257,6 @@
         {
             Console.WriteLine("Loading catalogs from cache...");
 
-            // Verificar si los catálogos son válidos
-            var areCatalogsValid = await CatalogService.AreCatalogsValidAsync();
-
-            if (!areCatalogsValid)
-            {
-                Console.WriteLine("Catalogs cache is invalid or expired, loading from API...");
-                await LoadCatalogsFromApiAsync();
-                return;
-            }
-
             // Cargar catálogos desde cache en paralelo
             var catalogTasks = new[]
             {
@@ -272,7 +292,6 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading catalogs from cache: {ex.Message}");
-            // Fallback: cargar desde API
             await LoadCatalogsFromApiAsync();
         }
     }
@@ -307,38 +326,44 @@
 
         Console.WriteLine("Catalogs loaded from API and cached ✓");
     }
+
     private async Task CacheCatalogsAsync()
     {
         try
         {
+            var cacheTasks = new List<Task>();
+
             if (AtributosDoc != null)
             {
                 var json = JsonSerializer.Serialize(AtributosDoc.RootElement);
-                await LocalStorage.SetItemAsync("catalog_Atributos", json);
+                cacheTasks.Add(LocalStorage.SetItemAsync("catalog_Atributos", json));
             }
             if (RelacionBoteDoc != null)
             {
                 var json = JsonSerializer.Serialize(RelacionBoteDoc.RootElement);
-                await LocalStorage.SetItemAsync("catalog_RelacionBote", json);
+                cacheTasks.Add(LocalStorage.SetItemAsync("catalog_RelacionBote", json));
             }
             if (RelacionTapaDoc != null)
             {
                 var json = JsonSerializer.Serialize(RelacionTapaDoc.RootElement);
-                await LocalStorage.SetItemAsync("catalog_RelacionTapa", json);
+                cacheTasks.Add(LocalStorage.SetItemAsync("catalog_RelacionTapa", json));
             }
             if (TiposCajasDoc != null)
             {
                 var json = JsonSerializer.Serialize(TiposCajasDoc.RootElement);
-                await LocalStorage.SetItemAsync("catalog_TiposCajas", json);
+                cacheTasks.Add(LocalStorage.SetItemAsync("catalog_TiposCajas", json));
             }
 
-            await LocalStorage.SetItemAsync("catalogsTimestamp", DateTime.UtcNow.ToString("o"));
+            cacheTasks.Add(LocalStorage.SetItemAsync("catalogsTimestamp", DateTime.UtcNow.ToString("o")));
+
+            await Task.WhenAll(cacheTasks);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error caching catalogs: {ex.Message}");
         }
     }
+
     private async Task LoadOrderSpecificFormatsAsync()
     {
         try
@@ -362,6 +387,7 @@
             Console.WriteLine($"Error loading order formats: {ex.Message}");
         }
     }
+
     private async Task LoadRG35FilesAsync()
     {
         if (RG35Data == null) return;
@@ -402,7 +428,7 @@
                 }
             }
 
-            // Cargar Customer Report si está cerrada
+            // Cargar Customer Report si está cerrada (SECUENCIAL, no paralelo)
             if (RG35Data.Status == "Cerrado cliente y calidad")
             {
                 var respCR = await Api.PostAsync(
@@ -445,6 +471,7 @@
             Console.WriteLine($"Error loading files: {ex.Message}");
         }
     }
+
     // ===== Callbacks para OrdersComponent =====
 
     private async Task ApproveFormulationAsync()
@@ -472,7 +499,9 @@
                 });
                 Console.WriteLine($"RG37 {RG35Data.RG37} approved successfully");
             }
-            
+
+            // Forzar recarga
+            _lastLoadedId = "";
             await LoadAllAsync();
         }
         catch (Exception ex)
@@ -493,8 +522,7 @@
         {
             Console.WriteLine($"Saving product name: {newName}");
             await CustomizeApi.PatchRG35Async(Id, new { Product_name_2 = newName });
-            
-            // Actualizar el valor local sin recargar todo
+
             if (RG35Data != null)
             {
                 RG35Data.Product_name_2 = newName;
@@ -514,15 +542,14 @@
         {
             var value = string.IsNullOrWhiteSpace(other) ? format : other;
             Console.WriteLine($"Saving lot format: {value}");
-            
+
             var payload = new Dictionary<string, object?>
             {
                 ["Filling_batch"] = value
             };
-            
+
             await CustomizeApi.PatchRG35Async(Id, payload);
-            
-            // Actualizar el valor local
+
             if (RG35Data != null)
             {
                 RG35Data.Filling_batch = value;
@@ -546,15 +573,14 @@
         {
             var value = string.IsNullOrWhiteSpace(other) ? format : other;
             Console.WriteLine($"Saving BBD format: {value}");
-            
+
             var payload = new Dictionary<string, object?>
             {
                 ["Filling_exp_date"] = value
             };
-            
+
             await CustomizeApi.PatchRG35Async(Id, payload);
-            
-            // Actualizar el valor local
+
             if (RG35Data != null)
             {
                 RG35Data.Filling_exp_date = value;
@@ -578,7 +604,9 @@
         {
             Console.WriteLine($"Patching RG35 with payload: {JsonSerializer.Serialize(payload)}");
             await CustomizeApi.PatchRG35Async(Id, payload);
-            await LoadAllAsync();
+
+            // Recarga parcial solo del pedido
+            await LoadOrderDataAsync();
         }
         catch (Exception ex)
         {
@@ -592,16 +620,18 @@
         try
         {
             var targetId = Prefix == "RG37" ? Id : RG35Data?.RG37;
-            
+
             if (string.IsNullOrEmpty(targetId))
             {
                 Error = "No se pudo determinar el ID de RG37 para actualizar.";
                 return;
             }
-            
+
             Console.WriteLine($"Patching RG37 ({targetId}) with payload: {JsonSerializer.Serialize(payload)}");
             await CustomizeApi.PatchRG37Async(targetId, payload);
-            await LoadAllAsync();
+
+            // Recarga parcial solo del pedido
+            await LoadOrderDataAsync();
         }
         catch (Exception ex)
         {
@@ -616,11 +646,13 @@
         {
             Console.WriteLine($"Uploading image with payload: {JsonSerializer.Serialize(payload)}");
             var response = await CustomizeApi.PostModificarImagenCabAsync(payload);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine("Image uploaded successfully");
-                await LoadAllAsync();
+
+                // Recarga parcial solo del pedido
+                await LoadOrderDataAsync();
             }
             else
             {

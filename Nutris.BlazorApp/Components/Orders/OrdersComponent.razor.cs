@@ -1,32 +1,31 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿// OrdersComponent.razor.cs - VERSIÓN CORREGIDA COMPLETA - PARTE 1
+
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Nutris.BlazorApp.Components.Modals;
 using NutrisBlazor.Components.Modals;
 using NutrisBlazor.Models;
 using NutrisBlazor.Services;
 using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using static Nutris.BlazorApp.Components.Modals.BoteCapDataModal;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Nutris.BlazorApp.Components.Orders;
 
 public class OrdersComponentBase : ComponentBase
 {
     [Inject] private HttpClient Http { get; set; } = default!;
-    [Inject] protected IJSRuntime JS { get; set; } = default!; // Agregar esta línea
+    [Inject] protected IJSRuntime JS { get; set; } = default!;
     [Inject] public ILocalStorageService LocalStorage { get; set; } = default!;
     [Inject] protected IApiService Api { get; set; } = default!;
     [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] protected ILocalizationService Localization { get; set; } = default!;
     [Inject] public NavigationManager Navigation { get; set; } = default!;
-    // Parámetros desde el padre (Customize.razor)
+
+    // Parámetros desde el padre
     [Parameter] public string Id { get; set; } = string.Empty;
     [Parameter] public CustomizeRG35Response? RG35 { get; set; }
     [Parameter] public CustomizeRG37Response? RG37 { get; set; }
@@ -39,9 +38,7 @@ public class OrdersComponentBase : ComponentBase
     [Parameter] public JsonElement BbdFormat { get; set; }
     [Parameter] public JsonElement TiposCajas { get; set; }
 
-
-
-    // Callbacks hacia el padre
+    // Callbacks
     [Parameter] public EventCallback OnApprove { get; set; }
     [Parameter] public EventCallback<string> OnSaveName { get; set; }
     [Parameter] public EventCallback<(string format, string? other)> OnSaveLotFormat { get; set; }
@@ -49,19 +46,32 @@ public class OrdersComponentBase : ComponentBase
     [Parameter] public EventCallback<object> OnPatchRG35 { get; set; }
     [Parameter] public EventCallback<object> OnPatchRG37 { get; set; }
     [Parameter] public EventCallback<object> OnUploadBoxOrPallet { get; set; }
-    protected bool isLabelModalOpen { get; set; }
-    protected List<LabelOptionMX> LabelOptionsSize { get; set; } = new();
-    protected List<LabelOption> LabelOptionsFinish { get; set; } = new();
-    protected List<LabelOption> LabelOptionsMaterial { get; set; } = new();
-    protected List<LabelOption> LabelOptionsColor { get; set; } = new();
-    protected SelectedLabelOptions selectedLabelOptions { get; set; } = new();
-    public string? LabelImageUrl { get; set; } // 
-    // Estado de carga
+
+    // ===== CACHÉ OPTIMIZADA (sin hashing costoso) =====
+    private string? _lastProcessedId;
+    private bool _catalogsProcessed = false;
+
+    // Caché de datos procesados
+    private List<BoteCapDataModal.BoteDataItem>? _cachedBoteData;
+    private List<BoteCapDataModal.CapDataItem>? _cachedCapData;
+    private List<BoteCapDataModal.ColorOption>? _cachedBoteColors;
+    private List<BoteCapDataModal.ColorOption>? _cachedCapColors;
+    private List<string>? _cachedCapacidades;
+    private Dictionary<string, List<string>>? _cachedCapacidadToDiametros;
+    private List<string>? _cachedMateriales;
+
+    // Estado
     protected bool IsLoading { get; set; } = false;
+    protected bool IsProcessingNoAnalytics { get; set; } = false;
+    protected bool IsProcessingNoLabel { get; set; } = false;
+    protected bool isConfirmModalVisible = false;
+    protected bool isThankYouModalVisible = false;
+    protected bool isLabelModalOpen { get; set; }
     private bool isBoteCapOpen;
     private bool accordionOpen;
-    // Propiedades del Header
-    protected bool IsProcessingNoAnalytics { get; set; } = false;
+    protected bool showLanguageMenu = false;
+
+    // Header
     protected string Prefix => Id?.Split('-')[0]?.ToUpper() ?? "";
     protected string Code { get; set; } = "-";
     protected string Name { get; set; } = "-";
@@ -78,7 +88,6 @@ public class OrdersComponentBase : ComponentBase
     protected string RG37Code { get; set; } = "-";
     protected string ProductType { get; set; } = "Bote";
 
-    protected BoteCapDataModal modalRef;
     // Países y logos
     protected string CustomerLogoUrl { get; set; } = "";
     protected string Country1 { get; set; } = "-";
@@ -87,17 +96,19 @@ public class OrdersComponentBase : ComponentBase
     protected string CountryFlag1 { get; set; } = "";
     protected string CountryFlag2 { get; set; } = "";
     protected string CountryFlag3 { get; set; } = "";
+    public string Logo { get; set; } = string.Empty;
+    public string currentLanguage = "es";
 
-    // Archivos para descargar
+    // Archivos
     protected List<FileItem> ReportFiles { get; set; } = new();
     protected bool ShowReports { get; set; }
 
-    // Control de secciones abiertas
+    // Secciones
     protected Dictionary<int, bool> IsOpen { get; set; } = new()
     {
         { 1, false }, { 2, false }, { 3, false }, { 4, false }, { 5, false }
     };
-    private bool isDataLoaded = false;
+
     // FORMULATION
     protected int PercentFilledFormulation { get; set; }
     protected bool CustomerAccepted { get; set; }
@@ -112,21 +123,13 @@ public class OrdersComponentBase : ComponentBase
     protected string GummyShapeImg_2 { get; set; } = "";
     protected string Shape_3 { get; set; } = "-";
     protected string GummyShapeImg_3 { get; set; } = "";
-
-    // Features (vegetarian, vegan, etc.)
     protected bool SuitableVegetarians { get; set; }
     protected bool SuitableVegans { get; set; }
     protected bool NaturalColors { get; set; }
     protected bool NaturalFlavor { get; set; }
-    protected bool isConfirmModalVisible = false;
-    // Listas de Gummy DNA
     protected List<InputItem> GummyListBn { get; set; } = new();
     protected List<InputItem> GummyListB { get; set; } = new();
     protected List<RecipeRow> RecipeRows { get; set; } = new();
-
-    protected List<TipoCajaOption> TiposCajaOptions { get; set; } = new();
-    protected string SelectedTipoCaja { get; set; } = "-";
-    protected bool IsLoadingTipoCaja { get; set; } = false;
 
     // PACKAGING
     protected int PercentFilledBottle { get; set; }
@@ -143,11 +146,20 @@ public class OrdersComponentBase : ComponentBase
     protected bool IsSendingBbdOther { get; set; }
     protected List<FormatOption> BatchFormats { get; set; } = new();
     protected List<FormatOption> BbdFormats { get; set; } = new();
-     // LABEL
+    protected List<TipoCajaOption> TiposCajaOptions { get; set; } = new();
+    protected string SelectedTipoCaja { get; set; } = "-";
+    protected bool IsLoadingTipoCaja { get; set; } = false;
+
+    // LABEL
     protected int PercentFilledLabel { get; set; }
     protected bool NoLabel { get; set; }
- 
     protected List<InputItem> LabelInfo { get; set; } = new();
+    public string? LabelImageUrl { get; set; }
+    protected List<LabelOptionMX> LabelOptionsSize { get; set; } = new();
+    protected List<LabelOption> LabelOptionsFinish { get; set; } = new();
+    protected List<LabelOption> LabelOptionsMaterial { get; set; } = new();
+    protected List<LabelOption> LabelOptionsColor { get; set; } = new();
+    protected SelectedLabelOptions selectedLabelOptions { get; set; } = new();
 
     // PALLETIZING
     protected int PercentFilledPalettizing { get; set; }
@@ -164,557 +176,234 @@ public class OrdersComponentBase : ComponentBase
     protected decimal SumAnalytics { get; set; }
     protected string SumAnalyticsFormatted => $"{SumAnalytics:F2}€";
 
-    // Opciones de catálogos
+    // Opciones
     protected List<AtributoOption> OptionsSize { get; set; } = new();
     protected List<AtributoOption> OptionsSizeLabel { get; set; } = new();
     protected List<AtributoOption> OptionsFinish { get; set; } = new();
     protected List<AtributoOption> OptionsLabelMaterial { get; set; } = new();
     protected List<AtributoOption> OptionsColorLabel { get; set; } = new();
     protected List<AtributoOption> OptionsColorBote { get; set; } = new();
-    public string Logo { get; set; } = string.Empty;
-    public bool showLanguageMenu = false;
-    public string currentLanguage = "es";
 
-    public int i = 0;
+    // Bote y Cap
     public List<string> capacidades = new();
     public Dictionary<string, List<string>> capacidadToDiametros = new();
     public List<string> materiales = new();
-
     protected List<BoteCapDataModal.BoteDataItem> boteDataList = new();
     protected List<BoteCapDataModal.CapDataItem> capDataList = new();
     protected List<BoteCapDataModal.ColorOption> boteColorOptions = new();
     protected List<BoteCapDataModal.ColorOption> capColorOptions = new();
-    private const string NO_IMAGE_AVAILABLE = "data:image/png;base64,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";
-    private const string NO_IMAGE_AVAILABLE_BASE64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+CiAgPHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNmMGYwZjAiLz4KICA8ZyBmaWxsPSIjYWFhIj4KICAgIDxwYXRoIGQ9Ik0xMDAgNjBjLTIyLjEgMC00MCAzNS44LTQwIDgwczE3LjkgODAgNDAgODAgNDAtMzUuOCA0MC04MC0xNy45LTgwLTQwLTgwem0wIDE0MGMtMTEgMC0yMC0yNi45LTIwLTYwczktNjAgMjAtNjAgMjAgMjYuOSAyMCA2MC05IDYwLTIwIDYweiIvPgogICAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iODUiIHI9IjgiLz4KICAgIDxwYXRoIGQ9Ik05NSAxMDBoMTB2NjBoLTEweiIvPgogIDwvZz4KPC9zdmc+";
-
     protected BoteCapDataModal.BoteDataItem? selectedBoteOption;
     protected BoteCapDataModal.CapDataItem? selectedCapOption;
     protected string characteristics = "";
-    protected bool isLabelOpen;
-    private string? _boteResumen;
-    private string? _tapaResumen;
+    protected BoteCapDataModal modalRef;
     public readonly OptionLookups _opts = new();
-    protected bool IsProcessingNoLabel { get; set; } = false;
-    protected bool isThankYouModalVisible = false;
-    private sealed class LabelOptionsDto
-    {
-        public string? Label_size { get; set; }
-        public string? Label_material { get; set; }
-        public string? Label_finish { get; set; }
-        public string? Label_Color { get; set; }
-    }
-    public class LabelOptionsPatch // mismo DTO de arriba
-    {
-        [JsonPropertyName("Label_size")] public string? LabelSize { get; set; }
-        [JsonPropertyName("Label_material")] public string? LabelMaterial { get; set; }
-        [JsonPropertyName("Label_finish")] public string? LabelFinish { get; set; }
-        [JsonPropertyName("Label_type")] public string? LabelColors { get; set; }
-    }
-    protected List<NutrisBlazor.Components.Modals.ModalLabel.OptionMX> MapSizeMx(List<AtributoOption> src) =>
-    src.Select((x, i) => new NutrisBlazor.Components.Modals.ModalLabel.OptionMX
-    {
-        ID = i + 1,
-        Value = x.Value ?? "",
-        Imagen = ""
-    }).ToList();
 
-    protected List<NutrisBlazor.Components.Modals.ModalLabel.Option> MapSimple(List<AtributoOption> src) =>
-    src.Select((x, i) => new NutrisBlazor.Components.Modals.ModalLabel.Option
-    {
-        ID = i + 1,
-        Value = x.Value ?? ""
-    }).ToList();
+    private const string NO_IMAGE_AVAILABLE = "data:image/png;base64,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";
 
-    protected Task OpenLabelModal() { isLabelModalOpen = true; StateHasChanged(); return Task.CompletedTask; }
-    protected Task CloseLabelModal() { isLabelModalOpen = false; StateHasChanged(); return Task.CompletedTask; }
-    private async Task OpenLabelModalAsync()
-    {
-        await ReloadLabelPreviewAsync();
-        isLabelOpen = true;
-    }
-    protected void ShowConfirmModal()
-    {
-        isConfirmModalVisible = true;
-        StateHasChanged();
-    }
-    protected async Task DownloadImage()
-    {
-        if (string.IsNullOrEmpty(LabelImageUrl))
-        {
-            await ShowAlert("No image available to download");
-            return;
-        }
+    // ===== LIFECYCLE METHODS =====
 
-        try
-        {
-            // Create download link using JavaScript
-            await JSRuntime.InvokeVoidAsync("downloadBase64File",
-                LabelImageUrl,
-                $"Label-Imagen-{Id}.png",
-                "image/png");
-        }
-        catch (Exception ex)
-        {
-         
-            await ShowAlert("Error downloading image. Please try again.");
-        }
-    }
-    private async Task ShowAlert(string message)
+    protected override async Task OnInitializedAsync()
     {
-        await JSRuntime.InvokeVoidAsync("alert", message);
+        await Task.CompletedTask;
     }
 
-
-    private async Task ReloadLabelPreviewAsync()
-    {
-        // Si tu API devuelve bytes:
-        var bytes = await Http.GetByteArrayAsync(
-            $"api/CustomizeRG35('{Code}')/Label?tenant=nutris");
-        LabelImageUrl = "data:image/png;base64," + Convert.ToBase64String(bytes);
-
-        // Si tu API devuelve una URL directa, simplemente asigna esa URL:
-        // LabelImageUrl = await Http.GetStringAsync(...);
-    }
-    public async Task OnLabelSave()
-    {
-        // Aquí no hace nada especial: ya actualizaste en Upload/Delete.
-        // Si quieres, fuerza un reload de los datos de la orden.
-        await ReloadOrderAsync();
-    }
-    public Task OnLabelImageChanged(string? newUrl)
-    {
-        LabelImageUrl = newUrl; // refleja lo que devuelva el modal
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-    protected async Task UploadLabelAsync(IBrowserFile file)
-    {
-        // Límite razonable (ajusta a tu necesidad)
-        const long maxSize = 20 * 1024 * 1024;
-
-        using var content = new MultipartFormDataContent();
-        var stream = file.OpenReadStream(maxSize);
-        var sc = new StreamContent(stream);
-        sc.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
-        content.Add(sc, "file", file.Name);
-
-        // ENDPOINT de subida que ya tengas en OrdersComponent (ajústalo al tuyo real)
-        var resp = await Http.PostAsync(
-            $"api/CustomizeRG35('{Code}')/Label/Upload?tenant=nutris", content);
-
-        resp.EnsureSuccessStatusCode();
-        await ReloadLabelPreviewAsync();   // refresca la miniatura
-    }
-
-    protected async Task<Stream> DownloadLabelAsync()
-    {
-        // ENDPOINT de descarga (ajústalo)
-        var resp = await Http.GetAsync(
-            $"api/CustomizeRG35('{Code}')/Label/Download?tenant=nutris",
-            HttpCompletionOption.ResponseHeadersRead);
-
-        resp.EnsureSuccessStatusCode();
-        return await resp.Content.ReadAsStreamAsync();
-    }
-
-
-    protected async Task DeleteLabelAsync()
-    {
-        // ENDPOINT de borrado (ajústalo si existe)
-        var resp = await Http.DeleteAsync(
-            $"api/CustomizeRG35('{Code}')/Label?tenant=nutris");
-
-        resp.EnsureSuccessStatusCode();
-
-        LabelImageUrl = null;
-        StateHasChanged();
-    }
-    
-    private async Task ReloadOrderAsync()
-    {
-        // vuelve a pedir los datos y refresca UI
-        // ...
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private void LoadTiposCajaOptions()
-    {
-        try
-        {
-            TiposCajaOptions.Clear();
-
-            if (TiposCajas.ValueKind != JsonValueKind.Object) return;
-            if (!TiposCajas.TryGetProperty("value", out var cajasArray)) return;
-            if (cajasArray.ValueKind != JsonValueKind.Array) return;
-
-            // Obtener los datos del bote seleccionado del RG35
-            var boteForma = RG35?.Bote_forma?.ToUpperInvariant() ?? "";
-            var boteCapacidad = RG35?.Bote_capacidad ?? "";
-            var boteBoca = RG35?.Bote_boca ?? "";
-
-            if (string.IsNullOrEmpty(boteForma) || string.IsNullOrEmpty(boteCapacidad) || string.IsNullOrEmpty(boteBoca))
-            {
-                Console.WriteLine("No hay datos de bote para filtrar tipos de caja");
-                return;
-            }
-
-            Console.WriteLine($"Filtrando cajas por: Forma={boteForma}, Capacidad={boteCapacidad}, Boca={boteBoca}");
-
-            int id = 1;
-            foreach (var item in cajasArray.EnumerateArray())
-            {
-                var forma = item.TryGetProperty("Forma", out var f) ? (f.GetString() ?? "").ToUpperInvariant() : "";
-                var capacidad = item.TryGetProperty("Capacidad", out var c) ? c.GetString() ?? "" : "";
-                var boca = item.TryGetProperty("Boca", out var b) ? b.GetString() ?? "" : "";
-                var tipoCaja = item.TryGetProperty("Tipo_de_caja", out var tc) ? tc.GetString() ?? "" : "";
-
-                // Filtrar por forma, capacidad y boca
-                if (forma == boteForma && capacidad == boteCapacidad && boca == boteBoca)
-                {
-                    var option = new TipoCajaOption
-                    {
-                        Id = id++,
-                        Forma = forma,
-                        Capacidad = capacidad,
-                        Boca = boca,
-                        Tipo_de_caja = tipoCaja,
-                        Unidades_por_caja = item.TryGetProperty("Unidades_por_caja", out var upc) ? upc.GetInt32() : 0,
-                        Pallet_EU_Alturas = item.TryGetProperty("Pallet_EU_Alturas", out var euA) ? euA.GetInt32() : 0,
-                        Pallet_EU_Base = item.TryGetProperty("Pallet_EU_Base", out var euB) ? euB.GetInt32() : 0,
-                        Pallet_Americano_Alturas = item.TryGetProperty("Pallet_Americano_Alturas", out var amA) ? amA.GetInt32() : 0,
-                        Pallet_Americano_Base = item.TryGetProperty("Pallet_Americano_Base", out var amB) ? amB.GetInt32() : 0
-                    };
-
-                    TiposCajaOptions.Add(option);
-                    Console.WriteLine($"Caja añadida: {tipoCaja} - {upc} unidades");
-                }
-            }
-
-            // Establecer el valor seleccionado actual si existe
-            if (RG35 != null && !string.IsNullOrEmpty(RG35.Box_name))
-            {
-                SelectedTipoCaja = RG35.Box_name;
-            }
-            else if (TiposCajaOptions.Any())
-            {
-                SelectedTipoCaja = TiposCajaOptions.First().Tipo_de_caja;
-            }
-
-            Console.WriteLine($"Total de cajas filtradas: {TiposCajaOptions.Count}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error loading tipos de caja: {ex.Message}");
-        }
-    }
-    protected async Task OnTipoCajaChanged(ChangeEventArgs e)
-    {
-        if (e.Value == null) return;
-
-        var newTipoCaja = e.Value.ToString();
-        if (string.IsNullOrEmpty(newTipoCaja) || newTipoCaja == SelectedTipoCaja) return;
-
-        IsLoadingTipoCaja = true;
-        SelectedTipoCaja = newTipoCaja; // Actualizar el valor inmediatamente
-        StateHasChanged();
-
-        try
-        {
-            // Buscar los datos completos de la caja seleccionada
-            var selectedCaja = TiposCajaOptions.FirstOrDefault(c => c.Tipo_de_caja == newTipoCaja);
-            if (selectedCaja == null)
-            {
-                Console.WriteLine($"No se encontró la caja seleccionada: {newTipoCaja}");
-                return;
-            }
-
-            // Determinar si es pallet europeo o americano
-            var palletType = RG35?.Pallet_type ?? "";
-            var isEuropean = palletType.Contains("EUR", StringComparison.OrdinalIgnoreCase) ||
-                            palletType.Contains("Europeo", StringComparison.OrdinalIgnoreCase) ||
-                            palletType.Contains("European", StringComparison.OrdinalIgnoreCase);
-
-            // Seleccionar los valores correctos según el tipo de pallet
-            int alturas = isEuropean ? selectedCaja.Pallet_EU_Alturas : selectedCaja.Pallet_Americano_Alturas;
-            int cajasXAltura = isEuropean ? selectedCaja.Pallet_EU_Base : selectedCaja.Pallet_Americano_Base;
-
-            // Calcular cajas por pallet
-            int cajasPorPallet = alturas * cajasXAltura;
-
-            Console.WriteLine($"Caja seleccionada: {selectedCaja.Tipo_de_caja}");
-            Console.WriteLine($"Tipo de pallet: {palletType} (Europeo: {isEuropean})");
-            Console.WriteLine($"Alturas: {alturas}, Cajas x Altura: {cajasXAltura}, Total: {cajasPorPallet}");
-
-            // Preparar el payload para el PATCH
-            var payload = new
-            {
-                Box_name = selectedCaja.Tipo_de_caja,
-                Box_units_per = selectedCaja.Unidades_por_caja,
-                Pallet_layers = alturas,
-                Pallet_boxes_per_layer = cajasXAltura,
-                Pallet_boxes_per_pallet = cajasPorPallet
-            };
-
-            // Enviar PATCH
-            if (OnPatchRG35.HasDelegate)
-            {
-                await OnPatchRG35.InvokeAsync(payload);
-
-                // Actualizar valores locales
-                if (RG35 != null)
-                {
-                    RG35.Box_name = selectedCaja.Tipo_de_caja;
-                    RG35.Box_units_per = selectedCaja.Unidades_por_caja.ToString();
-                    RG35.Pallet_layers = alturas.ToString();
-                    RG35.Pallet_boxes_per_layer = cajasXAltura.ToString();
-                    RG35.Pallet_boxes_per_pallet = cajasPorPallet.ToString();
-                }
-
-                // Actualizar PalletInfo para reflejar los cambios en la UI
-                UpdatePalletInfo();
-                CalculatePalletizingPercentage();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error al cambiar tipo de caja: {ex.Message}");
-            // Podrías mostrar un mensaje de error al usuario aquí
-        }
-        finally
-        {
-            IsLoadingTipoCaja = false;
-            StateHasChanged();
-        }
-    }
-
-    private void UpdatePalletInfo()
-    {
-        if (RG35?.Box_label_config == "Standard")
-        {
-            PalletInfo = new List<InputItem>
-        {
-            new() { Label = Localization["orderView.Pallet[5]"], Value = RG35.Box_label_config ?? "-" },
-            new() { Label = Localization["orderView.Pallet[0]"], Value = RG35.Box_name ?? "-" },
-            new() { Label = Localization["orderView.Pallet[1]"], Value = FormatNumericValue(RG35.Box_units_per) },
-        };
-        }
-        else
-        {
-            PalletInfo = new List<InputItem>
-        {
-            new() { Label = Localization["orderView.Pallet[5]"], Value = RG35.Box_label_config ?? "-" },
-        };
-        }
-
-        PalletizingInfo = new List<InputItem>
-    {
-        new() { Label = Localization["orderView.PALLETIZINGINFORMATION[0]"], Value = RG35.Pallet_type ?? "-" },
-        new() { Label = Localization["orderView.PALLETIZINGINFORMATION[1]"], Value = FormatNumericValue(RG35.Pallet_layers) },
-        new() { Label = Localization["orderView.PALLETIZINGINFORMATION[2]"], Value = FormatNumericValue(RG35.Pallet_boxes_per_layer) },
-        new() { Label = Localization["orderView.PALLETIZINGINFORMATION[3]"], Value = FormatNumericValue(RG35.Pallet_boxes_per_pallet) }
-    };
-    }
-    private void LoadBoteAndCapData()
-    {
-        // Convertir RelacionBote a List<BoteDataItem>
-        if (RelacionBote.TryGetProperty("value", out var boteArray) &&
-            boteArray.ValueKind == JsonValueKind.Array)
-        {
-            boteDataList = boteArray.EnumerateArray()
-                .Select(item => new BoteCapDataModal.BoteDataItem
-                {
-                    Forma = item.TryGetProperty("Forma", out var f) ? f.GetString() : null,
-                    Capacidad = item.TryGetProperty("Capacidad", out var c) ? c.GetString() : null,
-                    Diametro = item.TryGetProperty("Diametro", out var d) ? d.GetString() : null,
-                    Material = item.TryGetProperty("Material", out var m) ? m.GetString() : null,
-                    Color = item.TryGetProperty("Color", out var col) ? col.GetString() : null,
-                    ImagenBote = item.TryGetProperty("ImagenBote", out var img) ? img.GetString() : null,
-                    PesoMaximo  = item.TryGetProperty("Peso_Maximo", out var pm) ? pm.GetUInt16(): 0
-                })
-                .Where(b => b.Forma != null)
-                .ToList();
-        }
-
-        // Convertir RelacionTapa a List<CapDataItem>
-        if (RelacionTapa.TryGetProperty("value", out var tapaArray) &&
-            tapaArray.ValueKind == JsonValueKind.Array)
-        {
-            capDataList = tapaArray.EnumerateArray()
-                .Select(item => new BoteCapDataModal.CapDataItem
-                {
-                    Forma = item.TryGetProperty("Forma", out var f) ? f.GetString() : null,
-                    Diametro = item.TryGetProperty("Diametro", out var d) ? d.GetString() : null,
-                    Color = item.TryGetProperty("Color", out var c) ? c.GetString() : null,
-                    Sleeve = item.TryGetProperty("Sleeve", out var s) && s.ValueKind == JsonValueKind.True,
-                    ImagenCap = item.TryGetProperty("ImagenCap", out var img) ? img.GetString() : null
-                })
-                .Where(c => c.Forma != null)
-                .ToList();
-        }
-    }
-
-    private void InitializeSelectedOptions()
-    {
-        if (HasRG35 && RG35 != null)
-        {
-            selectedBoteOption = new BoteCapDataModal.BoteDataItem
-            {
-                Forma = RG35.Bote_forma,
-                Capacidad = RG35.Bote_capacidad,
-                Diametro = RG35.Bote_boca,
-                Material = RG35.Bote_material,
-                Color = RG35.Bote_color,
-                ImagenBote = $"data:image/png;base64,{RG35.Bote_imagen}" 
-
-            };
-
-            selectedCapOption = new BoteCapDataModal.CapDataItem
-            {
-                Forma = RG35.Cap_tapa,
-                Diametro = RG35.Cap_Boca,
-                Color = RG35.Cap_color,
-                Sleeve = RG35.Cap_sleever ?? false,
-                ImagenCap = $"data:image/png;base64,{RG35.Cap_imagen}" 
-            };
-
-            characteristics = RG35.Characteristics ?? "";
-        }
-    }
-    public void HandlePackagingUpdated(BoteCapDataModal.UpdatedOptions u)
-    {
-        // Si quieres reflejar la selección en la pantalla antes del reload:
-        selectedBoteOption = new BoteCapDataModal.BoteDataItem
-        {
-            Forma = u.BoteOption?.BoteForma,
-            Capacidad = u.BoteOption?.BoteCapacidad,
-            Diametro = u.BoteOption?.BoteBoca,
-            Material = u.BoteOption?.BoteMaterial,
-            Color = u.BoteOption?.BoteColor
-        };
-
-        selectedCapOption = new BoteCapDataModal.CapDataItem
-        {
-            Forma = u.CapOption?.CapTapa,
-            Diametro = u.CapOption?.CapBoca,
-            Color = u.CapOption?.CapColor,
-            Sleeve = u.CapOption?.CapSleever ?? false
-        };
-
-        characteristics = u.Characteristics;
-
-        StateHasChanged();
-    }
-
-    protected Task HandleSave(BoteDataItem bote, CapDataItem tapa)
-    {
-        // lo que necesites al guardar
-        return Task.CompletedTask;
-    }
-    protected async Task HandleSaveData(BoteCapDataModal.BoteDataItem bote,
-                                      BoteCapDataModal.CapDataItem cap)
-    {
-        selectedBoteOption = bote;
-        selectedCapOption = cap;
-
-        // TODO: persistir en tu modelo si aplica
-        await InvokeAsync(StateHasChanged);
-    }
- 
-    protected Task HandleAccordionOpen((int tabIndex, int stepIndex) indexes)
-    {
-        // Lógica para manejar el accordion
-        Console.WriteLine($"Accordion: Tab {indexes.tabIndex}, Step {indexes.stepIndex}");
-        return Task.CompletedTask;
-    }
-    protected async Task HandleClose()
-    {
-        isBoteCapOpen = false;
-        if (modalRef != null) await modalRef.HideModal();
-    }
-
-   
     protected override async Task OnParametersSetAsync()
     {
-        
         currentLanguage = Localization.CurrentLanguage ?? "es";
-         BuildBoteLookups(RelacionBote, out capacidades, out capacidadToDiametros, out materiales);
-        LoadBoteAndCapData();  // <-- NUEVA LÍNEA
-        InitializeSelectedOptions();
-        boteColorOptions = BuildColorOptionsFromRelacion(RelacionBote, isCap: false);
-        capColorOptions = BuildColorOptionsFromRelacion(RelacionTapa, isCap: true);
-        if (boteColorOptions.Count == 0)
-            boteColorOptions = new()
-        {
-            new() { ID=1, Value="Clear",  ColorHex="#CCCCCC" },
-            new() { ID=2, Value="Amber",  ColorHex="#FFBF00" },
-            new() { ID=3, Value="Black",  ColorHex="#000000" },
-            new() { ID=4, Value="White",  ColorHex="#FFFFFF" },
-            new() { ID=5, Value="Blue",   ColorHex="#0D6EFD" },
-        };
-        if (capColorOptions.Count == 0)
-            capColorOptions = new()
-        {
-            new() { ID=1, Value="White",  ColorHex="#FFFFFF" },
-            new() { ID=2, Value="Black",  ColorHex="#000000" },
-            new() { ID=3, Value="Gold",   ColorHex="#D4AF37" },
-            new() { ID=4, Value="Silver", ColorHex="#C0C0C0" },
-        };
-        // Suscribirse a cambios de idioma
         Localization.OnLanguageChanged += OnLanguageChanged;
-        await LoadDataAsync();
-    }
-    private  void BuildBoteLookups(
-    JsonElement relacionBote,
-    out List<string> caps,
-    out Dictionary<string, List<string>> capToDia,
-    out List<string> mats)
-    {
-        caps = new(); mats = new(); capToDia = new();
 
-        if (!relacionBote.TryGetProperty("value", out var arr) || arr.ValueKind != JsonValueKind.Array)
-            return;
+        // Solo verificar cambio de ID (simple y rápido)
+        bool idChanged = _lastProcessedId != Id;
 
-        var capSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var matSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var map = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var it in arr.EnumerateArray())
+        if (!idChanged && _catalogsProcessed)
         {
-            if (TryGetString(it, "Capacidad", out var cap) && !string.IsNullOrWhiteSpace(cap))
-            {
-                capSet.Add(cap);
-
-                if (!map.TryGetValue(cap, out var dias))
-                {
-                    dias = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                    map[cap] = dias;
-                }
-
-                if (TryGetString(it, "Diametro", out var dia) && !string.IsNullOrWhiteSpace(dia))
-                    dias.Add(dia);
-            }
-
-            if (TryGetString(it, "Material", out var mat) && !string.IsNullOrWhiteSpace(mat))
-                matSet.Add(mat);
+            Console.WriteLine("Skipping data processing - no changes detected");
+            return;
         }
 
-        // Ordena capacidades por número si es posible
-        caps = capSet
+        Console.WriteLine($"Processing data for ID: {Id}");
+
+        // Procesar catálogos solo la primera vez
+        if (!_catalogsProcessed && RelacionBote.ValueKind != JsonValueKind.Undefined)
+        {
+            ProcessCatalogsOnce(); // Síncrono, sin Task.Run
+            _catalogsProcessed = true;
+        }
+
+        // Cargar datos
+        await LoadDataAsync();
+
+        _lastProcessedId = Id;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.initializeTooltips");
+            await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.restoreContainerStates");
+        }
+    }
+
+    // ===== PROCESAMIENTO DE CATÁLOGOS (OPTIMIZADO) =====
+
+    private void ProcessCatalogsOnce()
+    {
+        ProcessRelacionBoteOnce();
+        ProcessRelacionTapaOnce();
+
+        if (Atributos.ValueKind == JsonValueKind.Object)
+        {
+            BuildOptionLookupsFromAtributos(Atributos);
+        }
+
+        // Guardar en caché
+        _cachedBoteData = boteDataList;
+        _cachedCapData = capDataList;
+        _cachedBoteColors = boteColorOptions;
+        _cachedCapColors = capColorOptions;
+        _cachedCapacidades = capacidades;
+        _cachedCapacidadToDiametros = capacidadToDiametros;
+        _cachedMateriales = materiales;
+    }
+
+    private void ProcessRelacionBoteOnce()
+    {
+        if (RelacionBote.ValueKind != JsonValueKind.Object) return;
+        if (!RelacionBote.TryGetProperty("value", out var boteArray)) return;
+        if (boteArray.ValueKind != JsonValueKind.Array) return;
+
+        var capsSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var diasDict = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        var matsSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var boteList = new List<BoteCapDataModal.BoteDataItem>();
+        var boteColors = new List<BoteCapDataModal.ColorOption>();
+        var colorsSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        int colorId = 1;
+
+        foreach (var item in boteArray.EnumerateArray())
+        {
+            // Procesar capacidades y diámetros
+            if (TryGetString(item, "Capacidad", out var cap) && !string.IsNullOrWhiteSpace(cap))
+            {
+                capsSet.Add(cap);
+                if (!diasDict.ContainsKey(cap))
+                    diasDict[cap] = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                if (TryGetString(item, "Diametro", out var dia) && !string.IsNullOrWhiteSpace(dia))
+                    diasDict[cap].Add(dia);
+            }
+
+            // Procesar materiales
+            if (TryGetString(item, "Material", out var mat) && !string.IsNullOrWhiteSpace(mat))
+                matsSet.Add(mat);
+
+            // Procesar BoteDataItem
+            var forma = TryGetString(item, "Forma", out var f) ? f : null;
+            if (forma != null)
+            {
+                boteList.Add(new BoteCapDataModal.BoteDataItem
+                {
+                    Forma = forma,
+                    Capacidad = cap,
+                    Diametro = TryGetString(item, "Diametro", out var d) ? d : null,
+                    Material = TryGetString(item, "Material", out var m) ? m : null,
+                    Color = TryGetString(item, "Color", out var col) ? col : null,
+                    ImagenBote = TryGetString(item, "ImagenBote", out var img) ? img : null,
+                    PesoMaximo = item.TryGetProperty("Peso_Maximo", out var pm) ? pm.GetUInt16() : (ushort)0
+                });
+            }
+
+            // Procesar colores
+            if (TryGetString(item, "Color", out var color) && !string.IsNullOrWhiteSpace(color))
+            {
+                var norm = NormalizeColorName(color);
+                if (colorsSeen.Add(norm))
+                {
+                    boteColors.Add(new BoteCapDataModal.ColorOption
+                    {
+                        ID = colorId++,
+                        Value = ToTitle(color),
+                        ColorHex = ColorToHex(norm, "#CCCCCC")
+                    });
+                }
+            }
+        }
+
+        // Asignar resultados
+        capacidades = capsSet
             .OrderBy(c => int.TryParse(c, out var n) ? n : int.MaxValue)
             .ThenBy(c => c, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        mats = matSet.OrderBy(m => m, StringComparer.OrdinalIgnoreCase).ToList();
+        materiales = matsSet.OrderBy(m => m, StringComparer.OrdinalIgnoreCase).ToList();
 
-        capToDia = map.ToDictionary(
+        capacidadToDiametros = diasDict.ToDictionary(
             kv => kv.Key,
             kv => kv.Value.OrderBy(d => d, StringComparer.OrdinalIgnoreCase).ToList(),
             StringComparer.OrdinalIgnoreCase);
 
-        if (Atributos.ValueKind == JsonValueKind.Object)
-            BuildOptionLookupsFromAtributos(Atributos);
+        boteDataList = boteList;
+        boteColorOptions = boteColors.OrderBy(o => o.Value, StringComparer.CurrentCultureIgnoreCase).ToList();
 
+        for (int i = 0; i < boteColorOptions.Count; i++)
+            boteColorOptions[i].ID = i + 1;
     }
+
+    // Continúo con la parte 2...
+
+    // OrdersComponent.razor.cs - PARTE 2
+
+    private void ProcessRelacionTapaOnce()
+    {
+        if (RelacionTapa.ValueKind != JsonValueKind.Object) return;
+        if (!RelacionTapa.TryGetProperty("value", out var tapaArray)) return;
+        if (tapaArray.ValueKind != JsonValueKind.Array) return;
+
+        var capList = new List<BoteCapDataModal.CapDataItem>();
+        var capColors = new List<BoteCapDataModal.ColorOption>();
+        var colorsSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        int colorId = 1;
+
+        foreach (var item in tapaArray.EnumerateArray())
+        {
+            var forma = TryGetString(item, "Forma", out var f) ? f : null;
+            if (forma != null)
+            {
+                capList.Add(new BoteCapDataModal.CapDataItem
+                {
+                    Forma = forma,
+                    Diametro = TryGetString(item, "Diametro", out var d) ? d : null,
+                    Color = TryGetString(item, "Color", out var c) ? c : null,
+                    Sleeve = item.TryGetProperty("Sleeve", out var s) && s.ValueKind == JsonValueKind.True,
+                    ImagenCap = TryGetString(item, "ImagenCap", out var img) ? img : null
+                });
+            }
+
+            if (TryGetString(item, "Color", out var color) && !string.IsNullOrWhiteSpace(color))
+            {
+                var norm = NormalizeColorName(color);
+                if (colorsSeen.Add(norm))
+                {
+                    capColors.Add(new BoteCapDataModal.ColorOption
+                    {
+                        ID = colorId++,
+                        Value = ToTitle(color),
+                        ColorHex = ColorToHex(norm, "#FFFFFF")
+                    });
+                }
+            }
+        }
+
+        capDataList = capList;
+        capColorOptions = capColors.OrderBy(o => o.Value, StringComparer.CurrentCultureIgnoreCase).ToList();
+
+        for (int i = 0; i < capColorOptions.Count; i++)
+            capColorOptions[i].ID = i + 1;
+    }
+
     private void BuildOptionLookupsFromAtributos(JsonElement atributos)
     {
         try
@@ -722,7 +411,6 @@ public class OrdersComponentBase : ComponentBase
             if (!atributos.TryGetProperty("value", out var valueArr) || valueArr.ValueKind != JsonValueKind.Array)
                 return;
 
-            // Helpers
             List<string> ListFromIndex(int idx)
             {
                 if (idx < 0 || idx >= valueArr.GetArrayLength()) return new();
@@ -749,24 +437,12 @@ public class OrdersComponentBase : ComponentBase
                     var hex = v.TryGetProperty("Color_HEX", out var he) ? (he.GetString() ?? "") : "";
                     if (string.IsNullOrWhiteSpace(hex)) hex = ColorToHexFallback(label);
 
-                    // Imagenes
                     var Round = v.TryGetProperty("Round", out var ro) ? (ro.GetString() ?? "") : "";
-                    if (string.IsNullOrWhiteSpace(Round)) Round = "";
-
                     var Square = v.TryGetProperty("Square", out var sq) ? (sq.GetString() ?? "") : "";
-                    if (string.IsNullOrWhiteSpace(Square)) Square = "";
-
                     var Cylindrical = v.TryGetProperty("Cylindrical", out var cy) ? (cy.GetString() ?? "") : "";
-                    if (string.IsNullOrWhiteSpace(Cylindrical)) Cylindrical = "";
-
                     var Simple = v.TryGetProperty("Simple", out var si) ? (si.GetString() ?? "") : "";
-                    if (string.IsNullOrWhiteSpace(Simple)) Simple = "";
-
                     var Metal = v.TryGetProperty("Metal", out var me) ? (me.GetString() ?? "") : "";
-                    if (string.IsNullOrWhiteSpace(Metal)) Metal = "";
-
                     var Childproof = v.TryGetProperty("Childproof", out var ch) ? (ch.GetString() ?? "") : "";
-                    if (string.IsNullOrWhiteSpace(Childproof)) Childproof = "";
 
                     list.Add(new BoteCapDataModal.ColorOption
                     {
@@ -779,45 +455,31 @@ public class OrdersComponentBase : ComponentBase
                         Simple = !string.IsNullOrWhiteSpace(Simple) ? $"data:image/png;base64,{Simple}" : NO_IMAGE_AVAILABLE,
                         Metal = !string.IsNullOrWhiteSpace(Metal) ? $"data:image/png;base64,{Metal}" : NO_IMAGE_AVAILABLE,
                         Childproof = !string.IsNullOrWhiteSpace(Childproof) ? $"data:image/png;base64,{Childproof}" : NO_IMAGE_AVAILABLE
-
                     });
                 }
 
-                // distinct por Value
                 return list.GroupBy(c => c.Value, StringComparer.OrdinalIgnoreCase)
                            .Select(g => g.First())
                            .ToList();
             }
 
-            // Índices iguales a tu VUE (fetchOptions)
-            //   optionsSize            = value[23]
-            //   optionsSizeLabel       = value[16]  (no lo usamos aquí)
-            //   optionsDiameter        = value[5]
-            //   optionsMaterial        = value[21]
-            //   optionsBoca / DThread  = value[22]  (si lo necesitas, úsalo igual)
-            //   optionsForma (bote)    = value[24]
-            //   optionsFinish          = value[8]   (no lo usamos aquí)
-            //   optionsLabelMaterial   = value[9]   (no lo usamos aquí)
-            //   optionsColorLabel      = value[10]  (no lo usamos aquí)
-            //   optionsColorBote       = value[20]  + Color_HEX
-            //   optionsShapecover      = value[19]  (formas tapa)
-            //   optionsColorcover      = value[18]
-
             _opts.Capacidades = ListFromIndex(23);
             _opts.Diametros = ListFromIndex(5);
             _opts.Materiales = ListFromIndex(21);
-            _opts.FormasBote = ListFromIndex(24);     // por si quieres usarlas
-            _opts.Bocas = ListFromIndex(22);     // idem
+            _opts.FormasBote = ListFromIndex(24);
+            _opts.Bocas = ListFromIndex(22);
             _opts.FormasTapa = ListFromIndex(19);
-         
             _opts.ColorBote = ColorListFromIndex(20);
             _opts.ColorCover = ColorListFromIndex(18);
         }
-        catch
+        catch (Exception ex)
         {
-            // Silencioso: si algo falla dejamos listas vacías y el modal usa sus defaults.
+            Console.WriteLine($"Error building option lookups: {ex.Message}");
         }
     }
+
+    // ===== HELPERS DE COLOR =====
+
     private static string ColorToHexFallback(string name)
     {
         var n = (name ?? "").Trim().ToLowerInvariant();
@@ -841,20 +503,7 @@ public class OrdersComponentBase : ComponentBase
             _ => "#CCCCCC"
         };
     }
-   
-    public sealed class OptionLookups
-    {
-        public List<string> Capacidades { get; set; } = new();
-        public List<string> Diametros { get; set; } = new();
-        public List<string> Materiales { get; set; } = new();
 
-        public List<string> FormasBote { get; set; } = new();
-        public List<string> FormasTapa { get; set; } = new();
-        public List<string> Bocas { get; set; } = new();
-
-        public List<BoteCapDataModal.ColorOption> ColorBote { get; set; } = new();
-        public List<BoteCapDataModal.ColorOption> ColorCover { get; set; } = new();
-    }
     private static bool TryGetString(JsonElement obj, string prop, out string value)
     {
         value = "";
@@ -865,67 +514,22 @@ public class OrdersComponentBase : ComponentBase
         }
         return false;
     }
-    public void OnLanguageChanged()
-    {
-        currentLanguage = Localization.CurrentLanguage;
-        InvokeAsync(StateHasChanged);
-    }
-    private static List<BoteCapDataModal.ColorOption> BuildColorOptionsFromRelacion(JsonElement relacion, bool isCap)
-    {
-        var result = new List<BoteCapDataModal.ColorOption>();
-        if (relacion.ValueKind != JsonValueKind.Object) return result;
-        if (!relacion.TryGetProperty("value", out var arr) || arr.ValueKind != JsonValueKind.Array) return result;
 
-        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        int id = 1;
-
-        foreach (var item in arr.EnumerateArray())
-        {
-            if (!item.TryGetProperty("Color", out var colEl) || colEl.ValueKind != JsonValueKind.String) continue;
-            var raw = colEl.GetString() ?? "";
-            var norm = NormalizeColorName(raw);   // p.ej. "yellow (O)" -> "yellow"; "Purple/Violet" -> "purple"
-
-            // dedupe por nombre normalizado
-            if (!seen.Add(norm)) continue;
-
-            var hex = ColorToHex(norm, isCap ? "#FFFFFF" : "#CCCCCC"); // fallback diferente para tapa/bote
-            result.Add(new BoteCapDataModal.ColorOption
-            {
-                ID = id++,
-                Value = ToTitle(raw),   // mostramos el original bonito (con mayúsculas)
-                ColorHex = hex
-            });
-        }
-
-        // orden alfabético por etiqueta
-        result = result.OrderBy(o => o.Value, StringComparer.CurrentCultureIgnoreCase).ToList();
-        // re-asigna IDs consecutivos tras ordenar
-        for (int i = 0; i < result.Count; i++) result[i].ID = i + 1;
-
-        return result;
-    }
     private static string NormalizeColorName(string s)
     {
         if (string.IsNullOrWhiteSpace(s)) return "";
         s = s.Trim();
-
-        // quita paréntesis: "white (O)" -> "white"
         s = Regex.Replace(s, @"\s*\([^)]*\)\s*", "", RegexOptions.CultureInvariant);
-
-        // normaliza separadores y espacios
         s = s.Replace(" / ", "/").Replace("  ", " ");
         s = Regex.Replace(s, @"\s+", " ");
-
-        // normaliza variantes habituales
         s = s.Replace("LightBlue", "Light Blue", StringComparison.OrdinalIgnoreCase)
              .Replace("LightGreen", "Light Green", StringComparison.OrdinalIgnoreCase)
              .Replace("Purple/Violet", "Purple", StringComparison.OrdinalIgnoreCase);
-
         return s.Trim().ToLowerInvariant();
     }
+
     private static string ColorToHex(string name, string fallback)
     {
-        // mapa de colores que aparecen en tus JSON (puedes ampliar cuando quieras)
         var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["clear"] = "#CCCCCC",
@@ -963,96 +567,22 @@ public class OrdersComponentBase : ComponentBase
 
         if (map.TryGetValue(name, out var hex)) return hex;
 
-        // si venía "purple/violet", "orange/..." etc → prueba por partes
         if (name.Contains('/'))
             foreach (var part in name.Split('/'))
                 if (map.TryGetValue(part.Trim(), out hex)) return hex;
 
         return fallback;
     }
+
     private static string ToTitle(string s)
     {
         s = s?.Trim() ?? "";
         if (string.IsNullOrEmpty(s)) return s;
-        // deja tal cual si ya viene capitalizado con espacios; solo corrige todo minúscula
         return char.ToUpperInvariant(s[0]) + s.Substring(1);
     }
-    public void ToggleLanguageMenu()
-    {
-        showLanguageMenu = !showLanguageMenu;
-    }
-    public async void GoBack()
-    {
-        await JS.InvokeVoidAsync("history.back");
-    }
-    public async Task SelectLanguage(string language)
-    {
-        showLanguageMenu = false;
-        await Localization.ChangeLanguageAsync(language);
-    }
-    protected string GetListTranslation(string baseKey, int index)
-    {
-        // Construye la clave como "orderView.ListInputBn[0]" 
-        var key = $"{baseKey}[{index}]";
-        return Localization[key];
-    }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            // Inicializar tooltips y restaurar estados
-            await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.initializeTooltips");
-            await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.restoreContainerStates");
-           
-        }
-      //  await JSRuntime.InvokeVoidAsync("cleanupModals");
-    }
-    protected async Task OpenBoteCapModal()
-    {
-        isBoteCapOpen = true;
-        if (modalRef is not null)
-        {
-            await modalRef.ShowModal();
-        }
-    }
-    protected Task OnSetAccordionOpen(bool open)
-    {
-        accordionOpen = open;
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-    protected async Task CloseBoteCapModal()
-    {
-        isBoteCapOpen = false;
-        if (modalRef != null)
-            await modalRef.HideModal();
-    }
-    protected Task OnBoteCapClosed()
-{
-    isBoteCapOpen = false;
-    StateHasChanged();
-    return Task.CompletedTask;
-}
-    protected Task OnBoteCapSaved()
-    {
-        // lo que necesites tras guardar
-        return Task.CompletedTask;
-    }
-    protected async Task HandleFormulationApproved()
-    {
-        // Actualizar el estado local
-        CustomerAccepted = true;
-        Status = "Cerrado cliente";
 
-        // Limpiar modals
-        await JS.InvokeVoidAsync("modalHelper.cleanupModals");
+    // ===== CARGA DE DATOS =====
 
-        // Pequeño delay
-        await Task.Delay(200);
-         CalculateAllPercentages();
-        // Navegar a home
-        // Navigation.NavigateTo("/home", forceLoad: true);
-    }
     private async Task LoadDataAsync()
     {
         try
@@ -1066,13 +596,13 @@ public class OrdersComponentBase : ComponentBase
                 LoadFromRG37(RG37);
             }
 
-            // Cargar opciones de catálogos
             LoadCatalogOptions();
+            InitializeSelectedOptions();
 
-            // Calcular porcentajes
+            // Calcular porcentajes síncronamente (es rápido)
             CalculateAllPercentages();
-            var customerLogo = await LocalStorage.GetItemAsync<string>("logo");
 
+            var customerLogo = await LocalStorage.GetItemAsync<string>("logo");
             if (!string.IsNullOrEmpty(customerLogo))
             {
                 Logo = $"data:image/png;base64,{customerLogo}";
@@ -1082,10 +612,6 @@ public class OrdersComponentBase : ComponentBase
                 Logo = string.Empty;
             }
 
-
-
-
-            // Guardar logo del cliente si existe
             if (!string.IsNullOrEmpty(CustomerLogoUrl))
             {
                 await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.setCustomerLogo",
@@ -1097,7 +623,7 @@ public class OrdersComponentBase : ComponentBase
             Console.WriteLine($"Error loading data: {ex.Message}");
         }
     }
-     
+
     private void LoadFromRG35(CustomizeRG35Response data)
     {
         // Header
@@ -1112,16 +638,13 @@ public class OrdersComponentBase : ComponentBase
         RG37Code = data.RG37 ?? "-";
         ProductType = data.Tipo ?? "Bote";
 
-        // Fechas
         if (DateTime.TryParse(data.Estimated_date, out var est))
             EstimatedDate = est;
         if (DateTime.TryParse(data.Deadline_date, out var dead))
             DeadlineDate = dead;
 
-        // Logo del cliente (obtener de localStorage)
-        CustomerLogoUrl = ""; // Se cargará desde JS
+        CustomerLogoUrl = "";
 
-        // Países y banderas
         Country1 = data.Country ?? "-";
         Country2 = data.Country_2 ?? "-";
         Country3 = data.Country_3 ?? "-";
@@ -1133,7 +656,6 @@ public class OrdersComponentBase : ComponentBase
         if (!string.IsNullOrEmpty(data.Logo_Pais_3))
             CountryFlag3 = $"data:image/png;base64,{data.Logo_Pais_3}";
 
-        // Archivos
         ReportFiles = data.Files ?? new List<FileItem>();
 
         // Formulation
@@ -1162,7 +684,6 @@ public class OrdersComponentBase : ComponentBase
             if (!string.IsNullOrEmpty(form.Imagen_4))
                 GummyShapeImg_3 = $"data:image/png;base64,{form.Imagen_4}";
 
-            // Gummy DNA lists
             GummyListBn = new List<InputItem>
             {
                 new() { Label = Localization["orderView.ListInputBn[0]"], Value = form.Base ?? "-" },
@@ -1179,7 +700,6 @@ public class OrdersComponentBase : ComponentBase
             };
         }
 
-        // Recipe
         RecipeRows = data.Recipe?.Select(r => new RecipeRow
         {
             Active = r.Active ?? "-",
@@ -1191,7 +711,6 @@ public class OrdersComponentBase : ComponentBase
         // Packaging
         if (!string.IsNullOrEmpty(data.Bote_imagen))
             BottleImg = $"data:image/png;base64,{data.Bote_imagen}";
-
         if (!string.IsNullOrEmpty(data.Cap_imagen))
             CapImg = $"data:image/png;base64,{data.Cap_imagen}";
 
@@ -1209,13 +728,10 @@ public class OrdersComponentBase : ComponentBase
         FillingExpDateOther = data.Filling_exp_date_others ?? "";
 
         if (FillingBatchOther.Contains(":"))
-        {
             FillingBatchOther = FillingBatchOther.Substring(FillingBatchOther.IndexOf(":") + 1);
-        }
         if (FillingExpDateOther.Contains(":"))
-        {
             FillingExpDateOther = FillingExpDateOther.Substring(FillingExpDateOther.IndexOf(":") + 1);
-        }
+
         // Label
         NoLabel = data.Label_config == "No label";
         if (!string.IsNullOrEmpty(data.Label_imagen))
@@ -1227,7 +743,6 @@ public class OrdersComponentBase : ComponentBase
             new() { Label = Localization["orderView.GUMMYDNAL[3]"], Value = data.Label_type ?? "-" },
             new() { Label = Localization["orderView.GUMMYDNAL[1]"], Value = data.Label_material ?? "-" },
             new() { Label = Localization["orderView.GUMMYDNAL[2]"], Value = data.Label_finish ?? "-" },
-         
         };
 
         // Palletizing
@@ -1237,35 +752,30 @@ public class OrdersComponentBase : ComponentBase
             PalletLabelImg = $"data:image/png;base64,{data.Pallet_label_imagen}";
 
         PalletComments = data.Pallet_comments ?? "";
-        if(data?.Box_label_config=="Standard")
+
+        if (data?.Box_label_config == "Standard")
         {
             PalletInfo = new List<InputItem>
-        {
-            new() { Label = Localization["orderView.Pallet[5]"], Value = data.Box_label_config ?? "-" },
-            new() { Label = Localization["orderView.Pallet[0]"], Value = data.Box_name ?? "-" },
-            new() { Label = Localization["orderView.Pallet[1]"], Value = FormatNumericValue(data.Box_units_per) },
-
-
-        };
+            {
+                new() { Label = Localization["orderView.Pallet[5]"], Value = data.Box_label_config ?? "-" },
+                new() { Label = Localization["orderView.Pallet[0]"], Value = data.Box_name ?? "-" },
+                new() { Label = Localization["orderView.Pallet[1]"], Value = FormatNumericValue(data.Box_units_per) },
+            };
         }
         else
         {
             PalletInfo = new List<InputItem>
-        {
-            new() { Label = Localization["orderView.Pallet[5]"], Value = data.Box_label_config ?? "-" },
-          
-
-           
-        };
+            {
+                new() { Label = Localization["orderView.Pallet[5]"], Value = data.Box_label_config ?? "-" },
+            };
         }
-      
 
         PalletizingInfo = new List<InputItem>
         {
             new() { Label = Localization["orderView.PALLETIZINGINFORMATION[0]"], Value = data.Pallet_type ?? "-" },
             new() { Label = Localization["orderView.PALLETIZINGINFORMATION[1]"], Value = FormatNumericValue(data.Pallet_layers) },
-            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[2]"], Value =  FormatNumericValue(data.Pallet_boxes_per_layer ) },
-            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[3]"], Value = FormatNumericValue(data.Pallet_boxes_per_pallet)}
+            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[2]"], Value = FormatNumericValue(data.Pallet_boxes_per_layer) },
+            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[3]"], Value = FormatNumericValue(data.Pallet_boxes_per_pallet) }
         };
 
         // Analytics
@@ -1283,6 +793,7 @@ public class OrdersComponentBase : ComponentBase
 
         SumAnalytics = AnalyticsRows.FirstOrDefault()?.Price ?? 0;
         characteristics = data.Characteristics ?? "";
+
         selectedLabelOptions = new SelectedLabelOptions
         {
             LabelSize = data.Label_size ?? "",
@@ -1291,7 +802,6 @@ public class OrdersComponentBase : ComponentBase
             LabelColors = data.Label_color ?? ""
         };
 
-        // Imagen final de etiqueta (si existe)
         if (!string.IsNullOrEmpty(data.Label_imagen))
             LabelImageUrl = $"data:image/png;base64,{data.Label_imagen}";
         else
@@ -1299,75 +809,15 @@ public class OrdersComponentBase : ComponentBase
 
         LoadTiposCajaOptions();
     }
-    private static List<LabelOption> MapAttrToLabelOption(JsonElement valueArr, int idx)
-    {
-        var list = new List<LabelOption>();
-        if (idx < 0 || idx >= valueArr.GetArrayLength()) return list;
-
-        int id = 1;
-        foreach (var v in valueArr[idx].GetProperty("valoresAtributos").EnumerateArray())
-        {
-            var val = v.TryGetProperty("Value", out var ve) ? ve.GetString() ?? "" : "";
-            if (string.IsNullOrWhiteSpace(val)) continue;
-            list.Add(new LabelOption { ID = id++, Value = val.Trim() });
-        }
-        return list;
-    }
-
-    private static List<LabelOptionMX> MapAttrToLabelOptionMX(JsonElement valueArr, int idx)
-    {
-        var list = new List<LabelOptionMX>();
-        if (idx < 0 || idx >= valueArr.GetArrayLength()) return list;
-
-        int id = 1;
-        foreach (var v in valueArr[idx].GetProperty("valoresAtributos").EnumerateArray())
-        {
-            var val = v.TryGetProperty("Value", out var ve) ? ve.GetString() ?? "" : "";
-            var img = v.TryGetProperty("Imagen", out var im) ? (im.GetString() ?? "") : "";
-            if (string.IsNullOrWhiteSpace(val)) continue;
-            list.Add(new LabelOptionMX { ID = id++, Value = val.Trim(), Imagen = img });
-        }
-        return list;
-    }
-    private string FormatNumericValue(int? value)
-    {
-        return value == null || value == 0 ? "-" : value.ToString();
-    }
-    private string FormatNumericValue(decimal? value)
-    {
-        return value == null || value == 0 ? "-" : value.ToString();
-    }
-    private string FormatNumericValue(string? value)
-    {
-        return value == null || value == "0" ? "-" : value.ToString();
-    }
-    private void BuildLabelCatalogsFromAtributos(JsonElement atributos)
-    {
-        if (!atributos.TryGetProperty("value", out var valueArr) || valueArr.ValueKind != JsonValueKind.Array)
-            return;
-
-        // Índices (los mismos que usabas en tu VUE):
-        // optionsSizeLabel     -> value[16]  (usa MX)
-        // optionsFinish        -> value[8]
-        // optionsLabelMaterial -> value[9]
-        // optionsColorLabel    -> value[10]
-
-        LabelOptionsSize = MapAttrToLabelOptionMX(valueArr, 16);
-        LabelOptionsFinish = MapAttrToLabelOption(valueArr, 8);
-        LabelOptionsMaterial = MapAttrToLabelOption(valueArr, 9);
-        LabelOptionsColor = MapAttrToLabelOption(valueArr, 7);
-    }
 
     private void LoadFromRG37(CustomizeRG37Response data)
     {
-        // Header básico
         Code = data.Code ?? "-";
         Name = data.Product_name ?? "-";
         ProductName2 = data.Product_name_2 ?? "-";
         Status = data.Status ?? "-";
         RG37Code = data.Code ?? "-";
 
-        // Formulation
         SuitableVegetarians = data.Suitable_vegetarians;
         SuitableVegans = data.Suitable_vegans;
         NaturalColors = data.Natural_colors;
@@ -1381,7 +831,6 @@ public class OrdersComponentBase : ComponentBase
         if (!string.IsNullOrEmpty(data.Imagen))
             GummyShapeImg = $"data:image/png;base64,{data.Imagen}";
 
-        // Países y banderas
         Country1 = data.Country ?? "-";
         Country2 = data.Country_2 ?? "-";
         Country3 = data.Country_3 ?? "-";
@@ -1392,7 +841,7 @@ public class OrdersComponentBase : ComponentBase
             CountryFlag2 = $"data:image/png;base64,{data.Logo_Pais_2}";
         if (!string.IsNullOrEmpty(data.Logo_Pais_3))
             CountryFlag3 = $"data:image/png;base64,{data.Logo_Pais_3}";
-        // Gummy DNA lists
+
         GummyListBn = new List<InputItem>
         {
             new() { Label = Localization["orderView.ListInputBn[0]"], Value = data.Base ?? "-" },
@@ -1408,7 +857,6 @@ public class OrdersComponentBase : ComponentBase
             new() { Label = Localization["orderView.ListInputB[3]"], Value = FormatNumericValue(data.Serving) }
         };
 
-        // Recipe
         RecipeRows = data.Recipe?.Select(r => new RecipeRow
         {
             Active = r.Active ?? "-",
@@ -1424,26 +872,31 @@ public class OrdersComponentBase : ComponentBase
         PalletizingInfo = new List<InputItem>();
     }
 
+    // Continúo con la parte 3...
+
+    // OrdersComponent.razor.cs - PARTE 3
+
+    // ===== CARGA DE CATÁLOGOS Y OPCIONES =====
+
     private void LoadCatalogOptions()
     {
         try
         {
-            // ---- Lote / BBD (ya lo tenías) ----
             if (LotFormat.ValueKind == JsonValueKind.Object && LotFormat.TryGetProperty("value", out var lotValues))
-                BatchFormats = lotValues.EnumerateArray().Select(i => new FormatOption { Format = i.GetProperty("Format").GetString() ?? "" }).ToList();
+                BatchFormats = lotValues.EnumerateArray()
+                    .Select(i => new FormatOption { Format = i.GetProperty("Format").GetString() ?? "" })
+                    .ToList();
 
             if (BbdFormat.ValueKind == JsonValueKind.Object && BbdFormat.TryGetProperty("value", out var bbdValues))
-                BbdFormats = bbdValues.EnumerateArray().Select(i => new FormatOption { Format = i.GetProperty("Format").GetString() ?? "" }).ToList();
+                BbdFormats = bbdValues.EnumerateArray()
+                    .Select(i => new FormatOption { Format = i.GetProperty("Format").GetString() ?? "" })
+                    .ToList();
 
-           
-
-
-            // ---- Atributos → opciones del modal ----
             if (!(Atributos.ValueKind == JsonValueKind.Object && Atributos.TryGetProperty("value", out var attrValues)))
                 return;
 
             var arr = attrValues.EnumerateArray().ToList();
-            Console.WriteLine(arr);
+
             List<AtributoOption> FromIndex(int idx)
             {
                 if (idx < 0 || idx >= arr.Count) return new();
@@ -1458,8 +911,6 @@ public class OrdersComponentBase : ComponentBase
                            .ToList();
             }
 
-            // Índices iguales al proyecto Vue:
-            //   SizeLabel = [16],  Finish = [8],  LabelMaterial = [9],  ColorLabel = [10]
             OptionsSizeLabel = FromIndex(16);
             OptionsFinish = FromIndex(8);
             OptionsLabelMaterial = FromIndex(9);
@@ -1471,6 +922,102 @@ public class OrdersComponentBase : ComponentBase
         }
     }
 
+    private void LoadTiposCajaOptions()
+    {
+        try
+        {
+            TiposCajaOptions.Clear();
+
+            if (TiposCajas.ValueKind != JsonValueKind.Object) return;
+            if (!TiposCajas.TryGetProperty("value", out var cajasArray)) return;
+            if (cajasArray.ValueKind != JsonValueKind.Array) return;
+
+            var boteForma = RG35?.Bote_forma?.ToUpperInvariant() ?? "";
+            var boteCapacidad = RG35?.Bote_capacidad ?? "";
+            var boteBoca = RG35?.Bote_boca ?? "";
+
+            if (string.IsNullOrEmpty(boteForma) || string.IsNullOrEmpty(boteCapacidad) || string.IsNullOrEmpty(boteBoca))
+            {
+                Console.WriteLine("No hay datos de bote para filtrar tipos de caja");
+                return;
+            }
+
+            Console.WriteLine($"Filtrando cajas por: Forma={boteForma}, Capacidad={boteCapacidad}, Boca={boteBoca}");
+
+            int id = 1;
+            foreach (var item in cajasArray.EnumerateArray())
+            {
+                var forma = item.TryGetProperty("Forma", out var f) ? (f.GetString() ?? "").ToUpperInvariant() : "";
+                var capacidad = item.TryGetProperty("Capacidad", out var c) ? c.GetString() ?? "" : "";
+                var boca = item.TryGetProperty("Boca", out var b) ? b.GetString() ?? "" : "";
+                var tipoCaja = item.TryGetProperty("Tipo_de_caja", out var tc) ? tc.GetString() ?? "" : "";
+
+                if (forma == boteForma && capacidad == boteCapacidad && boca == boteBoca)
+                {
+                    var option = new TipoCajaOption
+                    {
+                        Id = id++,
+                        Forma = forma,
+                        Capacidad = capacidad,
+                        Boca = boca,
+                        Tipo_de_caja = tipoCaja,
+                        Unidades_por_caja = item.TryGetProperty("Unidades_por_caja", out var upc) ? upc.GetInt32() : 0,
+                        Pallet_EU_Alturas = item.TryGetProperty("Pallet_EU_Alturas", out var euA) ? euA.GetInt32() : 0,
+                        Pallet_EU_Base = item.TryGetProperty("Pallet_EU_Base", out var euB) ? euB.GetInt32() : 0,
+                        Pallet_Americano_Alturas = item.TryGetProperty("Pallet_Americano_Alturas", out var amA) ? amA.GetInt32() : 0,
+                        Pallet_Americano_Base = item.TryGetProperty("Pallet_Americano_Base", out var amB) ? amB.GetInt32() : 0
+                    };
+
+                    TiposCajaOptions.Add(option);
+                    Console.WriteLine($"Caja añadida: {tipoCaja} - {option.Unidades_por_caja} unidades");
+                }
+            }
+
+            if (RG35 != null && !string.IsNullOrEmpty(RG35.Box_name))
+            {
+                SelectedTipoCaja = RG35.Box_name;
+            }
+            else if (TiposCajaOptions.Any())
+            {
+                SelectedTipoCaja = TiposCajaOptions.First().Tipo_de_caja;
+            }
+
+            Console.WriteLine($"Total de cajas filtradas: {TiposCajaOptions.Count}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading tipos de caja: {ex.Message}");
+        }
+    }
+
+    private void InitializeSelectedOptions()
+    {
+        if (HasRG35 && RG35 != null)
+        {
+            selectedBoteOption = new BoteCapDataModal.BoteDataItem
+            {
+                Forma = RG35.Bote_forma,
+                Capacidad = RG35.Bote_capacidad,
+                Diametro = RG35.Bote_boca,
+                Material = RG35.Bote_material,
+                Color = RG35.Bote_color,
+                ImagenBote = $"data:image/png;base64,{RG35.Bote_imagen}"
+            };
+
+            selectedCapOption = new BoteCapDataModal.CapDataItem
+            {
+                Forma = RG35.Cap_tapa,
+                Diametro = RG35.Cap_Boca,
+                Color = RG35.Cap_color,
+                Sleeve = RG35.Cap_sleever ?? false,
+                ImagenCap = $"data:image/png;base64,{RG35.Cap_imagen}"
+            };
+
+            characteristics = RG35.Characteristics ?? "";
+        }
+    }
+
+    // ===== CÁLCULOS DE PORCENTAJES (SÍNCRONO) =====
 
     private void CalculateAllPercentages()
     {
@@ -1550,17 +1097,17 @@ public class OrdersComponentBase : ComponentBase
 
         if (!string.IsNullOrEmpty(BoxLabelImg)) fields.Add(BoxLabelImg);
         if (!string.IsNullOrEmpty(PalletLabelImg)) fields.Add(PalletLabelImg);
-        if(RG35?.Box_label_config=="Standard")
+
+        if (RG35?.Box_label_config == "Standard")
         {
             var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-");
             PercentFilledPalettizing = fields.Count > 0 ? (filled * 100 / fields.Count) : 0;
         }
         else
         {
-            var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-" && RG35.Box_label_imagen!="");
+            var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-" && !string.IsNullOrEmpty(RG35?.Box_label_imagen));
             PercentFilledPalettizing = fields.Count > 0 ? (filled * 100 / fields.Count) : 0;
         }
-       
     }
 
     private void CalculateAnalyticsPercentage()
@@ -1568,8 +1115,26 @@ public class OrdersComponentBase : ComponentBase
         PercentFilledAnalytics = (NoAnalytics || AnalyticsRows.Any()) ? 100 : 0;
     }
 
-    // UI Helpers
+    // ===== HELPERS DE FORMATO =====
+
     protected string FormatPercent(int value) => Math.Clamp(value, 0, 100).ToString();
+
+    private string FormatNumericValue(int? value)
+    {
+        return value == null || value == 0 ? "-" : value.ToString();
+    }
+
+    private string FormatNumericValue(decimal? value)
+    {
+        return value == null || value == 0 ? "-" : value.ToString();
+    }
+
+    private string FormatNumericValue(string? value)
+    {
+        return value == null || value == "0" ? "-" : value.ToString();
+    }
+
+    // ===== UI HELPERS =====
 
     protected void ToggleDownloadReports() => ShowReports = !ShowReports;
 
@@ -1578,8 +1143,6 @@ public class OrdersComponentBase : ComponentBase
         if (IsOpen.ContainsKey(idx))
         {
             IsOpen[idx] = !IsOpen[idx];
-
-            // Guardar estado en localStorage
             await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.toggleContainer", $"container-toggle-{idx}");
         }
     }
@@ -1609,7 +1172,6 @@ public class OrdersComponentBase : ComponentBase
             return gris;
         }
 
-        // RG35
         if (Prefix == "RG35" && step == 1 && Status37)
         {
             return verde;
@@ -1676,7 +1238,7 @@ public class OrdersComponentBase : ComponentBase
     {
         var bg = GetStepColor(step);
         if (bg == "#90EE90")
-            return "#228B22"; // Dark green border for soft green phases
+            return "#228B22";
         return "none";
     }
 
@@ -1735,21 +1297,8 @@ public class OrdersComponentBase : ComponentBase
         }
     }
 
-    private string GetConfirmButtonClass()
-    {
-        // Si el botón puede ser clickeado (está habilitado)
-        if (CanConfirmAndSign)
-        {
-            return "btn-save-confirm";
-        }
-        // Si el botón está deshabilitado
-        else
-        {
-            return "btn-save-confirm"; // Usamos la misma clase, el :disabled se encargará del estilo
-        }
-    }
+    // ===== ACCIONES =====
 
-    // Acciones
     protected async Task SaveName()
     {
         if (OnSaveName.HasDelegate)
@@ -1813,7 +1362,7 @@ public class OrdersComponentBase : ComponentBase
     protected async Task OnNoLabelChanged()
     {
         IsProcessingNoLabel = true;
-        StateHasChanged(); // Actualizar UI inmediatamente para deshabilitar el checkbox
+        StateHasChanged();
 
         try
         {
@@ -1823,13 +1372,12 @@ public class OrdersComponentBase : ComponentBase
                 await OnPatchRG35.InvokeAsync(new { Label_config = labelConfig });
             }
 
-            // Recalcular porcentajes después del cambio
             CalculateLabelPercentage();
         }
         finally
         {
             IsProcessingNoLabel = false;
-            StateHasChanged(); // Volver a habilitar el checkbox
+            StateHasChanged();
         }
     }
 
@@ -1862,73 +1410,140 @@ public class OrdersComponentBase : ComponentBase
         }
     }
 
+    protected async Task OnTipoCajaChanged(ChangeEventArgs e)
+    {
+        if (e.Value == null) return;
+
+        var newTipoCaja = e.Value.ToString();
+        if (string.IsNullOrEmpty(newTipoCaja) || newTipoCaja == SelectedTipoCaja) return;
+
+        IsLoadingTipoCaja = true;
+        SelectedTipoCaja = newTipoCaja;
+        StateHasChanged();
+
+        try
+        {
+            var selectedCaja = TiposCajaOptions.FirstOrDefault(c => c.Tipo_de_caja == newTipoCaja);
+            if (selectedCaja == null)
+            {
+                Console.WriteLine($"No se encontró la caja seleccionada: {newTipoCaja}");
+                return;
+            }
+
+            var palletType = RG35?.Pallet_type ?? "";
+            var isEuropean = palletType.Contains("EUR", StringComparison.OrdinalIgnoreCase) ||
+                            palletType.Contains("Europeo", StringComparison.OrdinalIgnoreCase) ||
+                            palletType.Contains("European", StringComparison.OrdinalIgnoreCase);
+
+            int alturas = isEuropean ? selectedCaja.Pallet_EU_Alturas : selectedCaja.Pallet_Americano_Alturas;
+            int cajasXAltura = isEuropean ? selectedCaja.Pallet_EU_Base : selectedCaja.Pallet_Americano_Base;
+            int cajasPorPallet = alturas * cajasXAltura;
+
+            Console.WriteLine($"Caja seleccionada: {selectedCaja.Tipo_de_caja}");
+            Console.WriteLine($"Tipo de pallet: {palletType} (Europeo: {isEuropean})");
+            Console.WriteLine($"Alturas: {alturas}, Cajas x Altura: {cajasXAltura}, Total: {cajasPorPallet}");
+
+            var payload = new
+            {
+                Box_name = selectedCaja.Tipo_de_caja,
+                Box_units_per = selectedCaja.Unidades_por_caja,
+                Pallet_layers = alturas,
+                Pallet_boxes_per_layer = cajasXAltura,
+                Pallet_boxes_per_pallet = cajasPorPallet
+            };
+
+            if (OnPatchRG35.HasDelegate)
+            {
+                await OnPatchRG35.InvokeAsync(payload);
+
+                if (RG35 != null)
+                {
+                    RG35.Box_name = selectedCaja.Tipo_de_caja;
+                    RG35.Box_units_per = selectedCaja.Unidades_por_caja.ToString();
+                    RG35.Pallet_layers = alturas.ToString();
+                    RG35.Pallet_boxes_per_layer = cajasXAltura.ToString();
+                    RG35.Pallet_boxes_per_pallet = cajasPorPallet.ToString();
+                }
+
+                UpdatePalletInfo();
+                CalculatePalletizingPercentage();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cambiar tipo de caja: {ex.Message}");
+        }
+        finally
+        {
+            IsLoadingTipoCaja = false;
+            StateHasChanged();
+        }
+    }
+
+    private void UpdatePalletInfo()
+    {
+        if (RG35?.Box_label_config == "Standard")
+        {
+            PalletInfo = new List<InputItem>
+            {
+                new() { Label = Localization["orderView.Pallet[5]"], Value = RG35.Box_label_config ?? "-" },
+                new() { Label = Localization["orderView.Pallet[0]"], Value = RG35.Box_name ?? "-" },
+                new() { Label = Localization["orderView.Pallet[1]"], Value = FormatNumericValue(RG35.Box_units_per) },
+            };
+        }
+        else
+        {
+            PalletInfo = new List<InputItem>
+            {
+                new() { Label = Localization["orderView.Pallet[5]"], Value = RG35.Box_label_config ?? "-" },
+            };
+        }
+
+        PalletizingInfo = new List<InputItem>
+        {
+            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[0]"], Value = RG35.Pallet_type ?? "-" },
+            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[1]"], Value = FormatNumericValue(RG35.Pallet_layers) },
+            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[2]"], Value = FormatNumericValue(RG35.Pallet_boxes_per_layer) },
+            new() { Label = Localization["orderView.PALLETIZINGINFORMATION[3]"], Value = FormatNumericValue(RG35.Pallet_boxes_per_pallet) }
+        };
+    }
+
     protected async Task DownloadBase64File(string base64, string name)
     {
         await JSRuntime.InvokeVoidAsync("OrdersComponentHelper.downloadBase64File", base64, name);
     }
-    protected async Task DownloadDataSheetAsync()
+
+    // Continúo con la parte 4 (modales y eventos finales)...
+
+    // OrdersComponent.razor.cs - PARTE 4 FINAL
+
+    // ===== MÉTODOS DE MODALES Y EVENTOS =====
+
+    protected async Task HandleFormulationApproved()
     {
-        try
-        {
-            // 1) payload como en Vue
-            var payload = new { numeroRG = Code };
+        CustomerAccepted = true;
+        Status = "Cerrado cliente";
 
-            // 2) POST al mismo endpoint (con tu prefijo api/)
-            var resp = await Api.PostAsync (
-                "dataSheet(1)/Microsoft.NAV.Download",
-                payload
-            );
+        await JS.InvokeVoidAsync("modalHelper.cleanupModals");
+        await Task.Delay(200);
 
-            resp.EnsureSuccessStatusCode();
-
-            // 3) Leer y extraer base64 (acepta dos formatos)
-            var json = await resp.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(json);
-
-            string? b64 = null;
-            var root = doc.RootElement;
-
-            if (root.TryGetProperty("data", out var dataEl) &&
-                dataEl.ValueKind == JsonValueKind.Object &&
-                dataEl.TryGetProperty("value", out var valueEl1))
-            {
-                b64 = valueEl1.GetString();
-            }
-            else if (root.TryGetProperty("value", out var valueEl2))
-            {
-                b64 = valueEl2.GetString();
-            }
-
-            if (string.IsNullOrWhiteSpace(b64))
-                return;
-
-            // 4) Normalizar: quitar prefijo si viene y espacios/nuevas líneas
-            const string prefix = "data:application/pdf;base64,";
-            if (b64.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                b64 = b64.Substring(prefix.Length);
-
-            b64 = Regex.Replace(b64, @"\s+", ""); // sin espacios/saltos
-
-            // 5) Descargar (reutilizamos tu helper de JS que ya usas en ReportFiles)
-            //    => Le pasamos con prefijo data: para que fuerce "download".
-            await DownloadBase64File($"{prefix}{b64}", $"DataSheet-{Code}.pdf");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error downloading datasheet: {ex.Message}");
-            // Si quieres, muestra un toast/alert aquí.
-        }
+        CalculateFormulationPercentage();
+        StateHasChanged();
     }
+
+    protected void ShowConfirmModal()
+    {
+        isConfirmModalVisible = true;
+        StateHasChanged();
+    }
+
     protected async Task HandleConfirm()
     {
-        // Cerrar el modal de confirmación
         isConfirmModalVisible = false;
         StateHasChanged();
 
-        // Esperar un momento para que se cierre el modal de confirmación
         await Task.Delay(300);
 
-        // Mostrar el modal de agradecimiento
         isThankYouModalVisible = true;
         StateHasChanged();
     }
@@ -1939,10 +1554,8 @@ public class OrdersComponentBase : ComponentBase
         {
             if (response != null)
             {
-                // Si el response tiene la imagen en base64
                 string? base64Image = null;
 
-                // Intentar obtener la imagen del response
                 if (response is IDictionary<string, object> dict)
                 {
                     if (dict.ContainsKey("Pallet_label_imagen"))
@@ -1952,7 +1565,6 @@ public class OrdersComponentBase : ComponentBase
                 }
                 else
                 {
-                    // Intentar deserializar si es un objeto anónimo
                     var json = JsonSerializer.Serialize(response);
                     var data = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
                     if (data?.ContainsKey("Pallet_label_imagen") == true)
@@ -1963,13 +1575,10 @@ public class OrdersComponentBase : ComponentBase
 
                 if (!string.IsNullOrEmpty(base64Image))
                 {
-                    // Actualizar la imagen del pallet
                     PalletLabelImg = $"data:image/png;base64,{base64Image}";
 
-                    // Actualizar la lista de palletizing info si es necesario
                     if (PalletizingInfo != null && PalletizingInfo.Count > 0)
                     {
-                        // Buscar el item de Pallet Label y actualizarlo
                         var palletLabelItem = PalletizingInfo.FirstOrDefault(p => p.Label == Localization["orderView.PalletLabel"]);
                         if (palletLabelItem != null)
                         {
@@ -1977,10 +1586,7 @@ public class OrdersComponentBase : ComponentBase
                         }
                     }
 
-                    // Recalcular porcentajes
                     CalculatePalletizingPercentage();
-
-                    // Forzar actualización de la UI
                     await InvokeAsync(StateHasChanged);
 
                     Console.WriteLine("Pallet label image updated successfully in UI");
@@ -1989,9 +1595,10 @@ public class OrdersComponentBase : ComponentBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message, "Error handling pallet label update");
+            Console.WriteLine($"Error handling pallet label update: {ex.Message}");
         }
     }
+
     protected async Task HandleBoxLabelUpdated(dynamic response)
     {
         try
@@ -2024,102 +1631,218 @@ public class OrdersComponentBase : ComponentBase
                     await InvokeAsync(StateHasChanged);
                     Console.WriteLine("Box label image updated successfully");
                 }
-                CalculateAllPercentages();
-                StateHasChanged();
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message, "Error handling box label update");
+            Console.WriteLine($"Error handling box label update: {ex.Message}");
         }
     }
+
     protected async Task HandleLabelOptionsUpdated(ModalLabel.LabelOptionsUpdatedEventArgs e)
     {
-        // Si quieres, puedes parsear e.Response o e.SentData para refrescar UI local
-        // Por simplicidad, recarga porcentajes y cierra el modal
         if (e.SentData is not null)
         {
-
-            
             var json = JsonSerializer.Serialize(e.SentData);
             var opts = JsonSerializer.Deserialize<LabelOptionsPatch>(json);
             if (opts is null) return;
 
             LabelInfo = new List<InputItem>
             {
-                new() { Label = Localization["orderView.GUMMYDNAL[0]"], Value = opts.LabelSize     ?? "-" },
-                new() { Label = Localization["orderView.GUMMYDNAL[3]"], Value =opts.LabelColors ?? "-" },
-                new() { Label = Localization["orderView.GUMMYDNAL[1]"], Value = opts.LabelMaterial   ?? "-" },
-                new() { Label = Localization["orderView.GUMMYDNAL[2]"], Value = opts.LabelFinish   ?? "-" },
-
-              
-            
+                new() { Label = Localization["orderView.GUMMYDNAL[0]"], Value = opts.LabelSize ?? "-" },
+                new() { Label = Localization["orderView.GUMMYDNAL[3]"], Value = opts.LabelColors ?? "-" },
+                new() { Label = Localization["orderView.GUMMYDNAL[1]"], Value = opts.LabelMaterial ?? "-" },
+                new() { Label = Localization["orderView.GUMMYDNAL[2]"], Value = opts.LabelFinish ?? "-" },
             };
-
         }
 
         CalculateLabelPercentage();
         await InvokeAsync(StateHasChanged);
         isLabelModalOpen = false;
     }
+
     protected async Task HandleDraftLabelUpdated(ModalLabel.DraftLabelUpdatedEventArgs e)
     {
         if (!string.IsNullOrEmpty(e.Base64))
         {
-            // construimos un data URL y lo mostramos en la UI
-            LabelImageUrl = e.DataUrl;   // p.ej. "data:image/png;base64,...."
-            CalculateLabelPercentage();  // si tu porcentaje depende de tener imagen
+            LabelImageUrl = e.DataUrl;
+            CalculateLabelPercentage();
             await InvokeAsync(StateHasChanged);
         }
     }
 
-
-
-    protected override async Task OnInitializedAsync()
+    protected Task OpenLabelModal()
     {
+        isLabelModalOpen = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    protected Task CloseLabelModal()
+    {
+        isLabelModalOpen = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    protected async Task DownloadImage()
+    {
+        if (string.IsNullOrEmpty(LabelImageUrl))
+        {
+            await ShowAlert("No image available to download");
+            return;
+        }
+
         try
         {
-            // Simular carga de datos
-            await Task.Delay(100); // Simular llamada API
-
-            // Inicializar con datos de ejemplo
-            //boteDataList = new List<BoteCapDataModal.BoteDataItem>
-            //{
-            //    new() { Forma = "ROUND", Capacidad = "150", Diametro = "D45", Material = "PET", Color = "Clear" },
-            //    new() { Forma = "SQUARE", Capacidad = "200", Diametro = "D45", Material = "PET", Color = "Amber" },
-            //    // Agregar más datos según necesites
-            //};
-
-            //capDataList = new List<BoteCapDataModal.CapDataItem>
-            //{
-            //    new() { Forma = "Simple", Diametro = "D45", Color = "White" },
-            //    new() { Forma = "Childproof", Diametro = "D45", Color = "Black" },
-            //    // Agregar más datos según necesites
-            //};
-
-            //boteColorOptions = new List<BoteCapDataModal.ColorOption>
-            //{
-            //    new() { ID = 1, Value = "Clear", ColorHex = "#FFFFFF" },
-            //    new() { ID = 2, Value = "Amber", ColorHex = "#FFBF00" },
-            //    // Agregar más colores
-            //};
-
-            //capColorOptions = new List<BoteCapDataModal.ColorOption>
-            //{
-            //    new() { ID = 1, Value = "White", ColorHex = "#FFFFFF" },
-            //    new() { ID = 2, Value = "Black", ColorHex = "#000000" },
-            //    // Agregar más colores
-            //};
-
-            isDataLoaded = true;
+            await JSRuntime.InvokeVoidAsync("downloadBase64File",
+                LabelImageUrl,
+                $"Label-Imagen-{Id}.png",
+                "image/png");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading data: {ex.Message}");
+            Console.WriteLine($"Error downloading image: {ex.Message}");
+            await ShowAlert("Error downloading image. Please try again.");
         }
     }
 
-    // Modelos internos
+    private async Task ShowAlert(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
+    }
+
+    protected async Task OpenBoteCapModal()
+    {
+        isBoteCapOpen = true;
+        if (modalRef is not null)
+        {
+            await modalRef.ShowModal();
+        }
+    }
+
+    protected Task OnSetAccordionOpen(bool open)
+    {
+        accordionOpen = open;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    protected async Task CloseBoteCapModal()
+    {
+        isBoteCapOpen = false;
+        if (modalRef != null)
+            await modalRef.HideModal();
+    }
+
+    protected Task OnBoteCapClosed()
+    {
+        isBoteCapOpen = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    protected async Task HandleSaveData(BoteCapDataModal.BoteDataItem bote, BoteCapDataModal.CapDataItem cap)
+    {
+        selectedBoteOption = bote;
+        selectedCapOption = cap;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void HandlePackagingUpdated(BoteCapDataModal.UpdatedOptions u)
+    {
+        selectedBoteOption = new BoteCapDataModal.BoteDataItem
+        {
+            Forma = u.BoteOption?.BoteForma,
+            Capacidad = u.BoteOption?.BoteCapacidad,
+            Diametro = u.BoteOption?.BoteBoca,
+            Material = u.BoteOption?.BoteMaterial,
+            Color = u.BoteOption?.BoteColor
+        };
+
+        selectedCapOption = new BoteCapDataModal.CapDataItem
+        {
+            Forma = u.CapOption?.CapTapa,
+            Diametro = u.CapOption?.CapBoca,
+            Color = u.CapOption?.CapColor,
+            Sleeve = u.CapOption?.CapSleever ?? false
+        };
+
+        characteristics = u.Characteristics;
+        StateHasChanged();
+    }
+
+    // ===== MÉTODOS DE LENGUAJE =====
+
+    public void OnLanguageChanged()
+    {
+        currentLanguage = Localization.CurrentLanguage;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void ToggleLanguageMenu()
+    {
+        showLanguageMenu = !showLanguageMenu;
+    }
+
+    public async void GoBack()
+    {
+        await JS.InvokeVoidAsync("history.back");
+    }
+
+    public async Task SelectLanguage(string language)
+    {
+        showLanguageMenu = false;
+        await Localization.ChangeLanguageAsync(language);
+    }
+
+    protected string GetListTranslation(string baseKey, int index)
+    {
+        var key = $"{baseKey}[{index}]";
+        return Localization[key];
+    }
+
+    // ===== MAPEO DE OPCIONES =====
+
+    protected List<NutrisBlazor.Components.Modals.ModalLabel.OptionMX> MapSizeMx(List<AtributoOption> src) =>
+        src.Select((x, i) => new NutrisBlazor.Components.Modals.ModalLabel.OptionMX
+        {
+            ID = i + 1,
+            Value = x.Value ?? "",
+            Imagen = ""
+        }).ToList();
+
+    protected List<NutrisBlazor.Components.Modals.ModalLabel.Option> MapSimple(List<AtributoOption> src) =>
+        src.Select((x, i) => new NutrisBlazor.Components.Modals.ModalLabel.Option
+        {
+            ID = i + 1,
+            Value = x.Value ?? ""
+        }).ToList();
+
+    // ===== CLASES AUXILIARES =====
+
+    private sealed class LabelOptionsPatch
+    {
+        [JsonPropertyName("Label_size")] public string? LabelSize { get; set; }
+        [JsonPropertyName("Label_material")] public string? LabelMaterial { get; set; }
+        [JsonPropertyName("Label_finish")] public string? LabelFinish { get; set; }
+        [JsonPropertyName("Label_type")] public string? LabelColors { get; set; }
+    }
+
+    public sealed class OptionLookups
+    {
+        public List<string> Capacidades { get; set; } = new();
+        public List<string> Diametros { get; set; } = new();
+        public List<string> Materiales { get; set; } = new();
+        public List<string> FormasBote { get; set; } = new();
+        public List<string> FormasTapa { get; set; } = new();
+        public List<string> Bocas { get; set; } = new();
+        public List<BoteCapDataModal.ColorOption> ColorBote { get; set; } = new();
+        public List<BoteCapDataModal.ColorOption> ColorCover { get; set; } = new();
+    }
+
+    // ===== MODELOS INTERNOS =====
+
     public class InputItem
     {
         public string Label { get; set; } = "";
@@ -2133,6 +1856,7 @@ public class OrdersComponentBase : ComponentBase
         public string QuantityServing { get; set; } = "-";
         public string RdaEu { get; set; } = "-";
     }
+
     public class TipoCajaOption
     {
         public int Id { get; set; }
@@ -2146,14 +1870,10 @@ public class OrdersComponentBase : ComponentBase
         public int Pallet_Americano_Alturas { get; set; }
         public int Pallet_Americano_Base { get; set; }
     }
+
     public class FormatOption
     {
         public string Format { get; set; } = "";
-    }
-
-    public class CajasOption
-    {
-        public string Caja { get; set; } = "";
     }
 
     public class AnalyticsRow
@@ -2171,5 +1891,26 @@ public class OrdersComponentBase : ComponentBase
     {
         public string Value { get; set; } = "";
         public string Display { get; set; } = "";
+    }
+
+    public class LabelOption
+    {
+        public int ID { get; set; }
+        public string Value { get; set; } = "";
+    }
+
+    public class LabelOptionMX
+    {
+        public int ID { get; set; }
+        public string Value { get; set; } = "";
+        public string Imagen { get; set; } = "";
+    }
+
+    public class SelectedLabelOptions
+    {
+        public string LabelSize { get; set; } = "";
+        public string LabelMaterial { get; set; } = "";
+        public string LabelFinish { get; set; } = "";
+        public string LabelColors { get; set; } = "";
     }
 }
