@@ -177,7 +177,8 @@ public class OrdersComponentBase : ComponentBase
     protected List<AnalyticsRow> AnalyticsRows { get; set; } = new();
     protected decimal SumAnalytics { get; set; }
     protected string SumAnalyticsFormatted => $"{SumAnalytics:F2}€";
-
+    protected bool IsSavingPalletComments { get; set; }
+    protected bool PalletCommentsSaved { get; set; }
     // Opciones
     protected List<AtributoOption> OptionsSize { get; set; } = new();
     protected List<AtributoOption> OptionsSizeLabel { get; set; } = new();
@@ -295,7 +296,7 @@ public class OrdersComponentBase : ComponentBase
 
         foreach (var item in boteArray.EnumerateArray())
         {
-            string? cap = null, dia = null, mat = null, forma = null, color = null;
+            string? cap = null, dia = null, mat = null, forma = null, color = null, imagenUrl = null;
 
             // ⚡ NO extraer ImagenBote (es lo que mata el rendimiento)
             if (item.TryGetProperty("Capacidad", out var capEl) && capEl.ValueKind == JsonValueKind.String)
@@ -312,7 +313,9 @@ public class OrdersComponentBase : ComponentBase
 
             if (item.TryGetProperty("Color", out var colEl) && colEl.ValueKind == JsonValueKind.String)
                 color = colEl.GetString();
-
+            // ⚡ NUEVO: Leer ImagenUrl en lugar de ImagenBote
+            if (item.TryGetProperty("ImagenUrl", out var imgUrlEl) && imgUrlEl.ValueKind == JsonValueKind.String)
+                imagenUrl = imgUrlEl.GetString();
             // Capacidades y diámetros
             if (!string.IsNullOrWhiteSpace(cap))
             {
@@ -345,6 +348,7 @@ public class OrdersComponentBase : ComponentBase
                     Diametro = dia,
                     Material = mat,
                     Color = color,
+                    ImagenUrl = imagenUrl,
                     ImagenBote = null,  // ⚡ NO cargar ahora
                     PesoMaximo = pesoMax
                 });
@@ -443,7 +447,7 @@ public class OrdersComponentBase : ComponentBase
 
         foreach (var item in tapaArray.EnumerateArray())
         {
-            string? forma = null, dia = null, color = null;
+            string? forma = null, dia = null, color = null, imagenUrl = null;
             bool sleeve = false;
 
             if (item.TryGetProperty("Forma", out var formaEl) && formaEl.ValueKind == JsonValueKind.String)
@@ -454,6 +458,9 @@ public class OrdersComponentBase : ComponentBase
 
             if (item.TryGetProperty("Color", out var colEl) && colEl.ValueKind == JsonValueKind.String)
                 color = colEl.GetString();
+            // ⚡ NUEVO: Leer ImagenUrl en lugar de ImagenCap
+            if (item.TryGetProperty("ImagenUrl", out var imgUrlEl) && imgUrlEl.ValueKind == JsonValueKind.String)
+                imagenUrl = imgUrlEl.GetString();
 
             if (item.TryGetProperty("Sleeve", out var slEl))
                 sleeve = slEl.ValueKind == JsonValueKind.True;
@@ -467,6 +474,7 @@ public class OrdersComponentBase : ComponentBase
                     Diametro = dia,
                     Color = color,
                     Sleeve = sleeve,
+                    ImagenUrl = imagenUrl,
                     ImagenCap = null  // ⚡ Lazy load
                 });
             }
@@ -511,9 +519,10 @@ public class OrdersComponentBase : ComponentBase
                 TryGetString(item, "Material", out var m) && m == material &&
                 TryGetString(item, "Color", out var col) && col == color)
             {
-                if (TryGetString(item, "ImagenBote", out var img) && !string.IsNullOrWhiteSpace(img))
+                // ⚡ NUEVO: Buscar ImagenUrl en lugar de ImagenBote base64
+                if (TryGetString(item, "ImagenUrl", out var imgUrl) && !string.IsNullOrWhiteSpace(imgUrl))
                 {
-                    return $"data:image/png;base64,{img}";
+                    return imgUrl;  // ⚡ Devolver URL directamente
                 }
 
 
@@ -540,9 +549,9 @@ public class OrdersComponentBase : ComponentBase
 
                 if (itemSleeve == sleeve)
                 {
-                    if (TryGetString(item, "ImagenCap", out var img) && !string.IsNullOrWhiteSpace(img))
+                    if (TryGetString(item, "ImagenUrl", out var imgUrl) && !string.IsNullOrWhiteSpace(imgUrl))
                     {
-                        return $"data:image/png;base64,{img}";
+                        return imgUrl;  // ⚡ Devolver URL directamente
                     }
                 }
             }
@@ -1724,10 +1733,45 @@ public class OrdersComponentBase : ComponentBase
 
     protected async Task SavePalletComments()
     {
-        StateHasChanged();
-        if (OnPatchRG35.HasDelegate)
+        if (string.IsNullOrWhiteSpace(PalletComments))
         {
-            await OnPatchRG35.InvokeAsync(new { Pallet_comments = PalletComments });
+            Console.WriteLine("⚠️ PalletComments is empty, skipping save");
+            return;
+        }
+
+        IsSavingPalletComments = true;
+        PalletCommentsSaved = false;
+        StateHasChanged();
+
+        try
+        {
+            Console.WriteLine($"💾 Saving pallet comments: {PalletComments}");
+
+            if (OnPatchRG35.HasDelegate)
+            {
+                await OnPatchRG35.InvokeAsync(new { Pallet_comments = PalletComments });
+
+                if (RG35 != null)
+                {
+                    RG35.Pallet_comments = PalletComments;
+                }
+
+                PalletCommentsSaved = true;
+                Console.WriteLine("✅ Pallet comments saved successfully");
+
+                await Task.Delay(150);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error saving pallet comments: {ex.Message}");
+            PalletCommentsSaved = false;
+        }
+        finally
+        {
+            IsSavingPalletComments = false;
+            StateHasChanged();
         }
     }
 

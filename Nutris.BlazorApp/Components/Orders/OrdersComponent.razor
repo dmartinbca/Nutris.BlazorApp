@@ -594,21 +594,16 @@
                                                    
                                                     <div class="bottle-container">
                                                     <div class="Cap-img">
-                                                       
-                                                       
                                                         @if (!string.IsNullOrEmpty(CapImg))
                                                         {
-                                                            <img alt="bottle" src="@CapImg">
+                                                            <img alt="cap" src="@CapImg">
                                                         }
                                                         else
                                                         {
                                                             <p>-</p>
                                                         }
-                                                       
                                                     </div>
                                                     <div class="bottle-img">
-
-
                                                         @if (!string.IsNullOrEmpty(BottleImg))
                                                         {
                                                             <img alt="bottle" src="@BottleImg">
@@ -617,7 +612,6 @@
                                                         {
                                                             <p>-</p>
                                                         }
-
                                                     </div>
 
 
@@ -1160,12 +1154,39 @@
                                             </svg>
                                         </div>
                                     </div>
-                                    <div class="comments-area row gap-4">
-                                        <textarea class="font-16 col-9" rows="10" @bind="PalletComments"></textarea>
-                                        <div class="col-2">
-                                            <button @onclick="SavePalletComments" class="btn-t font-20 RalewayMedium">
-                                                @Localization["orderView.Send"]
-                                            </button>
+                                   <div class="comments-area-wrapper">
+                                        <div class="comments-textarea-container">
+                                            <textarea class="font-16 comments-textarea" 
+                                                      rows="10" 
+                                                      @bind="PalletComments"
+                                                      @bind:event="oninput"
+                                                      placeholder="@Localization["orderView.CommentsPalePlaceholder"]"
+                                                      disabled="@(Status == "Cerrado cliente y calidad" || Status == "Cerrado cliente" || IsSavingPalletComments)"></textarea>
+                                        </div>
+                                        <div class="comments-button-container">
+                                            <button @onclick="SavePalletComments" 
+                                                    class="btn-send-comments" 
+                                                    type="button"
+                                                    disabled="@(Status == "Cerrado cliente y calidad" || Status == "Cerrado cliente" || IsSavingPalletComments || string.IsNullOrWhiteSpace(PalletComments))">
+                                                @if (IsSavingPalletComments)
+                                                {
+                                                    <span class="spinner-border spinner-border-sm"></span>
+                                                    <span>@Localization["Guardando"]</span>
+                                                }
+                                                else
+                                                {
+                                                <span>@Localization["orderView.Send"]</span>
+                                                }
+                                         </button>
+                                        @* 
+                                            @if (IsSavingPalletComments)
+                                            {
+                                            <small class="text-muted">@Localization["Guardando"]</small>
+                                            }
+                                            else if (PalletCommentsSaved)
+                                            {
+                                            <small class="text-success">✓ @Localization["Guardado"]</small>
+                                            } *@
                                         </div>
                                     </div>
                                 </div>

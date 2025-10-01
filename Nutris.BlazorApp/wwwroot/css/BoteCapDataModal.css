@@ -167,7 +167,6 @@
     font-family: 'MuseoSemiBold', sans-serif;
     margin: 0;
     line-height: 1.2;
-    /* Sin margen en desktop */
     margin-left: 0;
     max-width: calc(100% - 60px);
     word-wrap: break-word;
@@ -176,21 +175,21 @@
 /* Ajuste cuando aparece el menú hamburguesa */
 @media (max-width: 1366px) {
     .modal-title {
-        margin-left: 60px; /* Mayor espacio para el menú hamburguesa */
+        margin-left: 60px;
         max-width: calc(100% - 120px);
     }
 }
 
 @media (max-width: 834px) {
     .modal-title {
-        margin-left: 55px; /* Más espacio en tablet */
+        margin-left: 55px;
         max-width: calc(100% - 100px);
     }
 }
 
 @media (max-width: 480px) {
     .modal-title {
-        margin-left: 50px; /* Espacio consistente en móvil */
+        margin-left: 50px;
         max-width: calc(100% - 90px);
         font-size: 16px;
     }
@@ -432,7 +431,7 @@
 }
 
 /* ========================================
-   11. LÍNEAS DE DIMENSIÓN - RESPONSIVE
+   11. LÍNEAS DE DIMENSIÓN - BOTE
    ======================================== */
 
 .dimension-lines-container {
@@ -447,160 +446,203 @@
 
 .dimension-text {
     background: rgba(237, 233, 254, 0.95);
-    padding: 3px 8px;
+    padding: 4px 10px;
     color: #6B6B83;
-    font-size: clamp(10px, 1vw, 12px);
-    font-family: 'RalewayLight', sans-serif;
+    font-size: clamp(11px, 1vw, 13px);
+    font-weight: 600;
+    font-family: 'RalewayMedium', sans-serif;
     white-space: nowrap;
     z-index: 20;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     position: absolute;
 }
 
 .dimension-top,
 .dimension-bottom {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 25px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.dimension-left {
-    position: absolute;
-    width: 35px;
-    display: flex;
-    align-items: center;
+    .dimension-top .dimension-text,
+    .dimension-bottom .dimension-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+.dimension-top {
+    /* JavaScript establecerá: top, left, width, transform */
 }
 
-/* Líneas - elementos pseudo */
-.dimension-top::before,
+.dimension-bottom {
+    /* JavaScript establecerá: bottom, left, width, transform */
+}
+
+.dimension-left {
+    position: absolute;
+    width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* JavaScript establecerá: left, top, height */
+}
+
+/* Líneas horizontales - elementos pseudo */
+.dimension-top::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    background: var(--dimension-line-color);
+}
+
+.dimension-top::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(50% - 6px);
+    height: 12px;
+    border-left: 2px solid var(--dimension-line-color);
+    border-right: 2px solid var(--dimension-line-color);
+}
+
 .dimension-bottom::before {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
-    height: 1px;
+    bottom: 50%;
+    height: 2px;
     background: var(--dimension-line-color);
 }
 
-.dimension-top::after,
 .dimension-bottom::after {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
-    height: 10px;
-    border-left: 1px solid var(--dimension-line-color);
-    border-right: 1px solid var(--dimension-line-color);
+    bottom: calc(50% - 6px);
+    height: 12px;
+    border-left: 2px solid var(--dimension-line-color);
+    border-right: 2px solid var(--dimension-line-color);
 }
 
+/* Línea vertical izquierda */
 .dimension-left::before {
     content: '';
     position: absolute;
-    left: 15px;
+    right: 35px;
     top: 0;
     bottom: 0;
-    width: 1px;
+    width: 2px;
     background: var(--dimension-line-color);
 }
 
 .dimension-left::after {
     content: '';
     position: absolute;
-    left: 10px;
+    right: 29px;
     top: 0;
     bottom: 0;
-    width: 10px;
-    border-top: 1px solid var(--dimension-line-color);
-    border-bottom: 1px solid var(--dimension-line-color);
+    width: 14px;
+    border-top: 2px solid var(--dimension-line-color);
+    border-bottom: 2px solid var(--dimension-line-color);
 }
 
 .dimension-left .dimension-text {
     position: absolute;
-    left: 25px;
+    right: 0;
     top: 50%;
     transform: translateY(-50%) rotate(-90deg);
     transform-origin: center;
 }
 
-/* Dimensiones de tapa - CORREGIDO Y CENTRADO */
+/* ========================================
+   12. LÍNEAS DE DIMENSIÓN - TAPA
+   ======================================== */
+
 .cap-dimension-top {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 30px;
+    height: 40px;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
-    width: auto;
-    pointer-events: none; /* No interferir con la interacción */
+    pointer-events: none;
+    /* JavaScript establecerá: top, left, width */
 }
 
     .cap-dimension-top::before {
         content: '';
         position: absolute;
-        bottom: 15px;
         left: 0;
         right: 0;
-        height: 1px;
+        top: 50%;
+        height: 2px;
         background: var(--dimension-line-color);
     }
 
     .cap-dimension-top::after {
         content: '';
         position: absolute;
-        bottom: 10px;
         left: 0;
         right: 0;
-        height: 10px;
-        border-left: 1px solid var(--dimension-line-color);
-        border-right: 1px solid var(--dimension-line-color);
+        top: calc(50% - 7px);
+        height: 14px;
+        border-left: 2px solid var(--dimension-line-color);
+        border-right: 2px solid var(--dimension-line-color);
     }
 
     .cap-dimension-top .dimension-text {
-        position: relative;
-        bottom: -5px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         background: rgba(255, 232, 232, 0.95);
         z-index: 1;
     }
 
 .cap-dimension-left {
     position: absolute;
-    width: 40px;
+    width: 65px;
     display: flex;
     align-items: center;
-    height: auto;
-    pointer-events: none; /* No interferir con la interacción */
+    justify-content: center;
+    pointer-events: none;
+    /* JavaScript establecerá: left, top, height */
 }
 
     .cap-dimension-left::before {
         content: '';
         position: absolute;
-        left: 15px;
+        right: 30px;
         top: 0;
         bottom: 0;
-        width: 1px;
+        width: 2px;
         background: var(--dimension-line-color);
     }
 
     .cap-dimension-left::after {
         content: '';
         position: absolute;
-        left: 10px;
+        right: 24px;
         top: 0;
         bottom: 0;
-        width: 10px;
-        border-top: 1px solid var(--dimension-line-color);
-        border-bottom: 1px solid var(--dimension-line-color);
+        width: 14px;
+        border-top: 2px solid var(--dimension-line-color);
+        border-bottom: 2px solid var(--dimension-line-color);
     }
 
     .cap-dimension-left .dimension-text {
         position: absolute;
-        left: 25px;
+        right: 0;
         top: 50%;
         transform: translateY(-50%) rotate(-90deg);
         transform-origin: center;
@@ -609,7 +651,7 @@
     }
 
 /* ========================================
-   12. FORM SECTION - RESPONSIVE
+   13. FORM SECTION - RESPONSIVE
    ======================================== */
 
 .form-section {
@@ -665,7 +707,7 @@
     }
 
 /* ========================================
-   13. SEGMENTED CONTROLS - RESPONSIVE
+   14. SEGMENTED CONTROLS - RESPONSIVE
    ======================================== */
 
 .segmented {
@@ -734,7 +776,7 @@
 }
 
 /* ========================================
-   14. CHECKBOX
+   15. CHECKBOX
    ======================================== */
 
 .checkbox {
@@ -758,7 +800,7 @@
     }
 
 /* ========================================
-   15. HINT TEXT
+   16. HINT TEXT
    ======================================== */
 
 .hint {
@@ -771,7 +813,7 @@
 }
 
 /* ========================================
-   16. MODAL FOOTER - RESPONSIVE
+   17. MODAL FOOTER - RESPONSIVE
    ======================================== */
 
 .modal-footer {
@@ -832,7 +874,7 @@
     }
 
 /* ========================================
-   17. SPINNER
+   18. SPINNER
    ======================================== */
 
 .spinner-save {
@@ -854,7 +896,7 @@
 }
 
 /* ========================================
-   18. MEDIA QUERIES - DESKTOP A MOBILE
+   19. MEDIA QUERIES - DESKTOP A MOBILE
    ======================================== */
 
 /* LAPTOP GRANDE (1600px) */
@@ -906,7 +948,6 @@
 
 /* IPAD MINI Y TABLETS PORTRAIT (834px) */
 @media (max-width: 834px) {
-    /* Modal fullscreen */
     .modal-dialog-custom {
         width: 100%;
         height: 100vh;
@@ -920,7 +961,6 @@
         border-radius: 0;
     }
 
-    /* Header ajustado para evitar solapamiento */
     .modal-header {
         padding: 12px 20px;
         min-height: 56px;
@@ -930,7 +970,7 @@
     .modal-title {
         font-size: 18px;
         padding-right: 10px;
-        margin-left: 35px; /* Espacio para menú hamburguesa */
+        margin-left: 35px;
     }
 
     .btn-close {
@@ -939,13 +979,11 @@
         font-size: 24px;
     }
 
-    /* Body scrolleable */
     .modal-body {
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Tabs responsive */
     .tabs-wrapper {
         flex-direction: column;
         align-items: stretch;
@@ -975,7 +1013,6 @@
         justify-content: center;
     }
 
-    /* Layout vertical */
     .config-container {
         flex-direction: column;
         padding: 0;
@@ -995,7 +1032,6 @@
         padding: 15px;
     }
 
-    /* Imágenes adaptadas a tablet */
     .bottle-visual-wrapper,
     .cap-visual-wrapper {
         height: 100%;
@@ -1012,12 +1048,10 @@
         max-height: 140px;
     }
 
-    /* Form section con padding bottom para footer fijo */
     .form-section {
         padding: 20px 20px 100px 20px;
     }
 
-    /* Footer fijo abajo */
     .modal-footer {
         position: fixed;
         bottom: 0;
@@ -1029,7 +1063,6 @@
         z-index: 100;
     }
 
-    /* Mostrar líneas de dimensión en tablets (pero no en móviles) */
     .dimension-lines-container {
         display: block;
         opacity: 0.8;
@@ -1041,7 +1074,6 @@
         opacity: 0.8;
     }
 
-    /* Ocultar solo en móviles pequeños */
     @media (max-width: 600px) {
         .dimension-lines-container,
         .cap-dimension-top,
@@ -1081,7 +1113,6 @@
 
 /* MOBILE PORTRAIT (480px) */
 @media (max-width: 480px) {
-    /* Header más compacto */
     .modal-header {
         padding: 10px 15px;
         min-height: 48px;
@@ -1098,7 +1129,6 @@
         padding: 4px;
     }
 
-    /* Tabs más pequeñas */
     .tabs-wrapper {
         padding: 8px 15px;
     }
@@ -1114,7 +1144,6 @@
         padding: 6px 10px;
     }
 
-    /* Preview más pequeño */
     .preview-section {
         min-height: 280px;
         max-height: 320px;
@@ -1126,7 +1155,6 @@
         margin-bottom: 10px;
     }
 
-    /* Imágenes móvil */
     .bottle-svg-container img {
         max-width: 200px;
         max-height: 240px;
@@ -1137,7 +1165,6 @@
         max-height: 90px;
     }
 
-    /* Form más compacto */
     .form-section {
         padding: 15px 15px 90px 15px;
     }
@@ -1171,7 +1198,6 @@
         height: 12px;
     }
 
-    /* Footer móvil */
     .modal-footer {
         padding: 10px 15px;
         min-height: 48px;
@@ -1213,7 +1239,7 @@
 }
 
 /* ========================================
-   19. UTILIDADES DE ACCESIBILIDAD
+   20. UTILIDADES DE ACCESIBILIDAD
    ======================================== */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1224,14 +1250,6 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-}
-
-/* ========================================
-   20. MODO OSCURO (OPCIONAL)
-   ======================================== */
-
-@media (prefers-color-scheme: dark) {
-    /* Puedes agregar soporte para modo oscuro aquí si lo necesitas */
 }
 
 /* ========================================
@@ -1258,7 +1276,6 @@
    22. AJUSTES ESPECÍFICOS PARA SCROLL
    ======================================== */
 
-/* Scrollbar personalizado para webkit */
 .form-section::-webkit-scrollbar,
 .modal-body::-webkit-scrollbar {
     width: 8px;
@@ -1280,7 +1297,6 @@
         background: #555;
     }
 
-/* Firefox scrollbar */
 .form-section,
 .modal-body {
     scrollbar-width: thin;

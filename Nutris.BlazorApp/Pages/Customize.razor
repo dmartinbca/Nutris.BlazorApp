@@ -414,28 +414,27 @@
         }
     }
 
-    private async Task LoadRG35FilesAsync()
-    {
-        if (RG35Data == null) return;
-
-        List<FileItem> Ficheros = new List<FileItem>();
-        _ = Task.Run(async () => 
+   private async Task LoadRG35FilesAsync()
 {
+    if (RG35Data == null) return;
+    
+    List<FileItem> Ficheros = new List<FileItem>();
+    
     try
     {
         // Cargar Technical Data Sheet
         var payload = new { numeroRG = Id };
         var resp = await Api.PostAsync("dataSheet(1)/Microsoft.NAV.Download?tenant=nutris", payload);
-
+        
         if (resp.IsSuccessStatusCode)
         {
             var json = await resp.Content.ReadAsStringAsync();
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
-
             string? b64 = null;
+            
             if (root.TryGetProperty("data", out var dataEl) &&
-            dataEl.TryGetProperty("value", out var valueEl))
+                dataEl.TryGetProperty("value", out var valueEl))
             {
                 b64 = valueEl.GetString();
             }
@@ -443,34 +442,34 @@
             {
                 b64 = valueEl2.GetString();
             }
-
+            
             if (!string.IsNullOrWhiteSpace(b64) && RG35Data.Status == "Cerrado cliente y calidad")
             {
                 Ficheros.Add(new FileItem
-                    {
-                        Code = Id,
-                        Name = $"TECHNICAL DATA SHEET {RG35Data.Product_name_2}.pdf",
-                        File = b64
-                    });
+                {
+                    Code = Id,
+                    Name = $"TECHNICAL DATA SHEET {RG35Data.Product_name_2}.pdf",
+                    File = b64
+                });
             }
         }
-
-        // Cargar Customer Report si está cerrada (SECUENCIAL, no paralelo)
+        
+        // Cargar Customer Report si está cerrada
         if (RG35Data.Status == "Cerrado cliente y calidad")
         {
             var respCR = await Api.PostAsync(
-            "customReports(1)/Microsoft.NAV.GenerateReportWithLayout?tenant=nutris",
-            payload);
-
+                "customReports(1)/Microsoft.NAV.GenerateReportWithLayout?tenant=nutris",
+                payload);
+                
             if (respCR.IsSuccessStatusCode)
             {
                 var jsonCR = await respCR.Content.ReadAsStringAsync();
                 using var docCR = JsonDocument.Parse(jsonCR);
                 var rootCR = docCR.RootElement;
-
                 string? b64CR = null;
+                
                 if (rootCR.TryGetProperty("data", out var dataElCR) &&
-                dataElCR.TryGetProperty("value", out var valueElCR))
+                    dataElCR.TryGetProperty("value", out var valueElCR))
                 {
                     b64CR = valueElCR.GetString();
                 }
@@ -478,27 +477,32 @@
                 {
                     b64CR = valueEl2CR.GetString();
                 }
-
+                
                 if (!string.IsNullOrWhiteSpace(b64CR))
                 {
                     Ficheros.Add(new FileItem
-                        {
-                            Code = Id,
-                            Name = $"CUSTOMER RG REPORT {RG35Data.Code}.pdf",
-                            File = b64CR
-                        });
+                    {
+                        Code = Id,
+                        Name = $"CUSTOMER RG REPORT {RG35Data.Code}.pdf",
+                        File = b64CR
+                    });
                 }
             }
         }
-
+        
+        // ✅ Actualizar los archivos y el estado
         RG35Data.Files = Ficheros;
+        
+        // ✅ CRÍTICO: Notificar al componente hijo que se actualizaron los archivos
+        await InvokeAsync(StateHasChanged);
+        
+        Console.WriteLine($"✅ Archivos cargados: {Ficheros.Count}");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error loading files: {ex.Message}");
+        Console.WriteLine($"❌ Error loading files: {ex.Message}");
     }
-        });
-    }
+}
 
     // ===== Callbacks para OrdersComponent =====
 

@@ -842,63 +842,85 @@
     // ===== REEMPLAZAR EL MÉTODO AdjustDimensionLines =====
     // ===== 1. CORREGIR EL MÉTODO AdjustDimensionLines PARA POSICIONAR CORRECTAMENTE LA LÍNEA =====
 
-    private async Task AdjustDimensionLines()
+ private async Task AdjustDimensionLines()
     {
         try
         {
             var script = $@"
         (function() {{
             const container = document.getElementById('bottle-container-{ComponentId}');
-            if (!container) return;
+            if (!container) {{
+                console.log('Container no encontrado');
+                return;
+            }}
 
             const img = container.querySelector('img');
-            if (!img) return;
-
-            // Esperar a que la imagen esté completamente cargada
-            if (!img.complete) {{
-                img.onload = function() {{
-                    adjustDimensions();
-                }};
+            if (!img) {{
+                console.log('Imagen no encontrada');
                 return;
             }}
 
             function adjustDimensions() {{
                 const imgRect = img.getBoundingClientRect();
                 const containerRect = container.getBoundingClientRect();
+                const wrapperElement = document.querySelector('.bottle-visual-wrapper[data-size]');
+                const wrapperRect = wrapperElement ? wrapperElement.getBoundingClientRect() : containerRect;
 
-                // Calcular posiciones responsivas
-                const viewportWidth = window.innerWidth;
-                const scaleFactor = viewportWidth < 834 ? 0.8 : 1;
+                const imgTop = imgRect.top - wrapperRect.top;
+                const imgLeft = imgRect.left - wrapperRect.left;
+                const imgWidth = imgRect.width;
+                const imgHeight = imgRect.height;
 
-                // Línea superior (diámetro de boca)
+                // LÍNEA SUPERIOR (Diámetro de boca) - sobre el cuello
                 const dimTop = document.querySelector('#dimension-lines-{ComponentId} .dimension-top');
                 if (dimTop) {{
-                    dimTop.style.top = (imgRect.top - containerRect.top - 25) + 'px';
-                    dimTop.style.width = (imgRect.width * 0.3 * scaleFactor) + 'px';
+                    const neckWidth = imgWidth * 0.30;
+                    const topPosition = imgTop - 35;
+                    
+                    dimTop.style.top = topPosition + 'px';
+                    dimTop.style.width = neckWidth + 'px';
+                    dimTop.style.left = '50%';
+                    dimTop.style.transform = 'translateX(-50%)';
                 }}
 
-                // Línea izquierda (altura)
+                // LÍNEA IZQUIERDA (Altura del cuerpo)
                 const dimLeft = document.getElementById('dim-left-{ComponentId}');
                 if (dimLeft) {{
-                    const neckOffset = imgRect.height * 0.15;
-                    const bodyHeight = imgRect.height * 0.85;
-                    dimLeft.style.top = (imgRect.top - containerRect.top + neckOffset) + 'px';
+                    const neckHeight = imgHeight * 0.15;
+                    const baseHeight = imgHeight * 0.05;
+                    const bodyHeight = imgHeight - neckHeight - baseHeight;
+                    const leftPosition = imgLeft - 65; // Más separación
+                    const topPosition = imgTop + neckHeight;
+                    
+                    dimLeft.style.left = leftPosition + 'px';
+                    dimLeft.style.top = topPosition + 'px';
                     dimLeft.style.height = bodyHeight + 'px';
-                    dimLeft.style.left = (imgRect.left - containerRect.left - 40) + 'px';
                 }}
 
-                // Línea inferior (diámetro base)
+                // LÍNEA INFERIOR (Diámetro de base)
                 const dimBottom = document.querySelector('#dimension-lines-{ComponentId} .dimension-bottom');
                 if (dimBottom) {{
-                    dimBottom.style.bottom = (containerRect.height - imgRect.bottom + containerRect.top - 25) + 'px';
-                    dimBottom.style.width = (imgRect.width * 0.7 * scaleFactor) + 'px';
+                    const baseWidth = imgWidth * 0.75;
+                    const bottomPosition = (wrapperRect.height - imgRect.bottom + wrapperRect.top) + 30;
+                    
+                    dimBottom.style.bottom = bottomPosition + 'px';
+                    dimBottom.style.width = baseWidth + 'px';
+                    dimBottom.style.left = '50%';
+                    dimBottom.style.transform = 'translateX(-50%)';
                 }}
             }}
 
-            adjustDimensions();
+            if (!img.complete) {{
+                img.onload = adjustDimensions;
+            }} else {{
+                adjustDimensions();
+            }}
 
-            // Re-ajustar en cambio de tamaño
-            window.addEventListener('resize', adjustDimensions);
+            let resizeTimeout;
+            window.addEventListener('resize', function() {{
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(adjustDimensions, 150);
+            }});
         }})();
         ";
 
@@ -909,7 +931,6 @@
             Logger?.LogWarning("Error adjusting dimension lines: {Message}", ex.Message);
         }
     }
-
     private async Task AdjustDimensionLinesAlternative()
     {
         var jsCode = @"
@@ -1534,6 +1555,7 @@
         public string? Material { get; set; }
         public string? Color { get; set; }
         public string? ImagenBote { get; set; }
+        public string? ImagenUrl { get; set; }
         public int PesoMaximo { get; set; }
     }
 
@@ -1544,6 +1566,7 @@
         public string? Color { get; set; }
         public bool Sleeve { get; set; }
         public string? ImagenCap { get; set; }
+        public string? ImagenUrl { get; set; }
     }
 
     private sealed class BoteConfigModel
@@ -1728,9 +1751,9 @@
                 TryGetStringJson(item, "Material", out var m) && m == bote.Material &&
                 TryGetStringJson(item, "Color", out var col) && col == bote.Color)
             {
-                if (TryGetStringJson(item, "ImagenBote", out var img) && !string.IsNullOrWhiteSpace(img))
+                if (TryGetStringJson(item, "ImagenUrl", out var img) && !string.IsNullOrWhiteSpace(img))
                 {
-                    return $"data:image/png;base64,{img}";
+                    return img;
                 }
             }
         }
@@ -1755,9 +1778,9 @@
 
                 if (itemSleeve == cap.Sleeve)
                 {
-                    if (TryGetStringJson(item, "ImagenCap", out var img) && !string.IsNullOrWhiteSpace(img))
+                    if (TryGetStringJson(item, "ImagenUrl", out var img) && !string.IsNullOrWhiteSpace(img))
                     {
-                        return $"data:image/png;base64,{img}";
+                        return img;
                     }
                 }
             }
