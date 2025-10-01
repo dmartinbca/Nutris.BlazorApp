@@ -635,9 +635,9 @@
                                                                 @if (FillingBatch?.StartsWith("OTHER") == true)
                                                                 {
                                                                     <input type="text" class="font-20 RalewayRegular mt-2" maxlength="12"
-                                                                           @bind="FillingBatchOther" />
+                                                                       @bind="FillingBatchOther" disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBatchOther || Status == "Cerrado cliente")" />
                                                                     <button class="btn-t RalewayMedium font-16 ml-2" type="button"
-                                                                            @onclick="SaveBatchOther" disabled="@IsSendingBatchOther">
+                                                                        @onclick="SaveBatchOther" disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBatchOther || Status == "Cerrado cliente")">
                                                                         <span>@(IsSendingBatchOther ? "Enviando..." : "Enviar")</span>
                                                                     </button>
                                                                 }
@@ -666,9 +666,9 @@
                                                                 @if (FillingExpDate == "OTHER")
                                                                 {
                                                                     <input type="text" class="font-20 RalewayRegular mt-2" maxlength="12"
-                                                                           @bind="FillingExpDateOther" />
+                                                                       @bind="FillingExpDateOther" disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBbdOther || Status == "Cerrado cliente")" />
                                                                     <button class="btn-t RalewayMedium font-16 ml-2" type="button"
-                                                                            @onclick="SaveBbdOther" disabled="@IsSendingBbdOther">
+                                                                        @onclick="SaveBbdOther" disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBbdOther || Status == "Cerrado cliente")">
                                                                         <span>@(IsSendingBbdOther ? "Enviando..." : "Enviar")</span>
                                                                     </button>
                                                                 }
@@ -712,7 +712,7 @@
 
                                         @if (Status == "Desarrollo")
                                         {
-                                            <div class="d-none d-xl-flex btn-edit-bottle col-12 col-lg-2 content-t-button align-items-end" style="height:180px;">
+                                           <div class="d-block d-xl-none btn-edit-bottle col-12 col-lg-2 content-t-button align-items-end" style="height:180px;">
                                                 <button class="btn-t RalewayMedium font-20" type="button" data-bs-toggle="modal" data-bs-target="#sidebarRightModal3">
                                                     <img src="img/pencil-icon.svg" alt="edit">@Localization["Edit"]
                                                 </button>

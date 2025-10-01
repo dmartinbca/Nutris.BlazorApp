@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Components.Web;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
 using Nutris.BlazorApp;
@@ -125,7 +127,9 @@ builder.Logging.SetMinimumLevel(LogLevel.Information);
 // ==========================================
 
 var app = builder.Build();
+ 
 
+ 
 try
 {
     Console.WriteLine("Initializing services...");
