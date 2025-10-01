@@ -543,7 +543,6 @@
             StateHasChanged();
         }
     }
-
     private async Task SaveProductCommercialNameAsync(string newName)
     {
         try
@@ -554,7 +553,9 @@
             if (RG35Data != null)
             {
                 RG35Data.Product_name_2 = newName;
-                StateHasChanged();
+
+                // ✅ Forzar actualización de OrdersComponent
+                await RefreshOrdersComponentAsync(); // ← Aquí
             }
         }
         catch (Exception ex)
@@ -589,7 +590,9 @@
                 {
                     RG35Data.Filling_batch_others = other;
                 }
-                StateHasChanged();
+
+                // ✅ Forzar actualización
+                await RefreshOrdersComponentAsync(); // ← Aquí
             }
         }
         catch (Exception ex)
@@ -598,7 +601,12 @@
             Console.WriteLine($"Error in SaveLotFormatAsync: {ex}");
         }
     }
-
+    private async Task RefreshOrdersComponentAsync()
+    {
+        // Forzar que OrdersComponent detecte cambios
+        _lastLoadedId = ""; // Reset para forzar recarga
+        await InvokeAsync(StateHasChanged);
+    }
     private async Task SaveBbdFormatAsync(string format, string? other = null)
     {
         try
@@ -607,7 +615,7 @@
             {
                 other = "";
             }
-            Console.WriteLine($"Saving BBD format: : {format} {other}");
+            Console.WriteLine($"Saving BBD format: {format} {other}");
 
             var payload = new Dictionary<string, object?>
             {
@@ -624,7 +632,9 @@
                 {
                     RG35Data.Filling_exp_date_others = other;
                 }
-                StateHasChanged();
+
+                // ✅ Forzar actualización
+                await RefreshOrdersComponentAsync(); // ← Aquí
             }
         }
         catch (Exception ex)
@@ -633,6 +643,7 @@
             Console.WriteLine($"Error in SaveBbdFormatAsync: {ex}");
         }
     }
+ 
 
     private async Task PatchRG35Async(object payload)
     {

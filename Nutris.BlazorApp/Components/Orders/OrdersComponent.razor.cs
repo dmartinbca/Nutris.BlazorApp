@@ -1424,18 +1424,21 @@ public class OrdersComponentBase : ComponentBase
 
     protected async Task SaveName()
     {
+        StateHasChanged();
         if (OnSaveName.HasDelegate)
             await OnSaveName.InvokeAsync(ProductName2);
     }
 
     protected async Task SaveBatch()
     {
+        StateHasChanged();
         if (OnSaveLotFormat.HasDelegate)
             await OnSaveLotFormat.InvokeAsync((FillingBatch, null));
     }
 
     protected async Task SaveBatchOther()
     {
+        StateHasChanged();
         if (string.IsNullOrWhiteSpace(FillingBatchOther)) return;
 
         IsSendingBatchOther = true;
@@ -1453,12 +1456,14 @@ public class OrdersComponentBase : ComponentBase
 
     protected async Task SaveBbd()
     {
+        StateHasChanged();
         if (OnSaveBbdFormat.HasDelegate)
             await OnSaveBbdFormat.InvokeAsync((FillingExpDate, null));
     }
 
     protected async Task SaveBbdOther()
     {
+        StateHasChanged();
         if (string.IsNullOrWhiteSpace(FillingExpDateOther)) return;
 
         IsSendingBbdOther = true;
@@ -1476,6 +1481,7 @@ public class OrdersComponentBase : ComponentBase
 
     protected async Task OnTakeSampleChanged()
     {
+        StateHasChanged();
         if (OnPatchRG37.HasDelegate)
         {
             await OnPatchRG37.InvokeAsync(new { Tomar_muestra = TakeSample });
@@ -1484,6 +1490,7 @@ public class OrdersComponentBase : ComponentBase
 
     protected async Task OnNoLabelChanged()
     {
+        StateHasChanged();
         IsProcessingNoLabel = true;
         StateHasChanged();
 
@@ -1527,6 +1534,7 @@ public class OrdersComponentBase : ComponentBase
 
     protected async Task SavePalletComments()
     {
+        StateHasChanged();
         if (OnPatchRG35.HasDelegate)
         {
             await OnPatchRG35.InvokeAsync(new { Pallet_comments = PalletComments });
