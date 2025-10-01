@@ -569,36 +569,34 @@
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(other))
-            {
-                other = "";
-            }
-            Console.WriteLine($"Saving lot format: {format} {other}");
+            Console.WriteLine($"💾 Saving lot format: {format} | other: {other}");
 
             var payload = new Dictionary<string, object?>
             {
                 ["Filling_batch"] = format,
-                ["Filling_batch_others"] = other
+                ["Filling_batch_others"] = other ?? ""
             };
 
             await CustomizeApi.PatchRG35Async(Id, payload);
 
+            // ✅ Actualizar RG35Data con los nuevos valores
             if (RG35Data != null)
             {
                 RG35Data.Filling_batch = format;
-                if (!string.IsNullOrWhiteSpace(other))
-                {
-                    RG35Data.Filling_batch_others = other;
-                }
+                RG35Data.Filling_batch_others = other ?? "";
 
-                // ✅ Forzar actualización
-                await RefreshOrdersComponentAsync(); // ← Aquí
+                Console.WriteLine($"✅ RG35Data updated: Filling_batch={format}, Filling_batch_others={other}");
             }
+
+            // ✅ Forzar actualización completa del componente
+            StateHasChanged();
+
+            Console.WriteLine("✅ Lot format saved successfully");
         }
         catch (Exception ex)
         {
             Error = $"Error al guardar formato de lote: {ex.Message}";
-            Console.WriteLine($"Error in SaveLotFormatAsync: {ex}");
+            Console.WriteLine($"❌ Error in SaveLotFormatAsync: {ex}");
         }
     }
     private async Task RefreshOrdersComponentAsync()
@@ -611,40 +609,36 @@
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(other))
-            {
-                other = "";
-            }
-            Console.WriteLine($"Saving BBD format: {format} {other}");
+            Console.WriteLine($"💾 Saving BBD format: {format} | other: {other}");
 
             var payload = new Dictionary<string, object?>
             {
                 ["Filling_exp_date"] = format,
-                ["Filling_exp_date_others"] = other
+                ["Filling_exp_date_others"] = other ?? ""
             };
 
             await CustomizeApi.PatchRG35Async(Id, payload);
 
+            // ✅ Actualizar RG35Data con los nuevos valores
             if (RG35Data != null)
             {
                 RG35Data.Filling_exp_date = format;
-                if (!string.IsNullOrWhiteSpace(other))
-                {
-                    RG35Data.Filling_exp_date_others = other;
-                }
+                RG35Data.Filling_exp_date_others = other ?? "";
 
-                // ✅ Forzar actualización
-                await RefreshOrdersComponentAsync(); // ← Aquí
+                Console.WriteLine($"✅ RG35Data updated: Filling_exp_date={format}, Filling_exp_date_others={other}");
             }
+
+            // ✅ Forzar actualización completa del componente
+            StateHasChanged();
+
+            Console.WriteLine("✅ BBD format saved successfully");
         }
         catch (Exception ex)
         {
             Error = $"Error al guardar formato BBD: {ex.Message}";
-            Console.WriteLine($"Error in SaveBbdFormatAsync: {ex}");
+            Console.WriteLine($"❌ Error in SaveBbdFormatAsync: {ex}");
         }
     }
- 
-
     private async Task PatchRG35Async(object payload)
     {
         try

@@ -839,7 +839,11 @@ public class OrdersComponentBase : ComponentBase
             FillingBatchOther = FillingBatchOther.Substring(FillingBatchOther.IndexOf(":") + 1);
         if (FillingExpDateOther.Contains(":"))
             FillingExpDateOther = FillingExpDateOther.Substring(FillingExpDateOther.IndexOf(":") + 1);
-
+        Console.WriteLine($"📋 Loaded from RG35:");
+        Console.WriteLine($"   FillingBatch: {FillingBatch}");
+        Console.WriteLine($"   FillingBatchOther: {FillingBatchOther}");
+        Console.WriteLine($"   FillingExpDate: {FillingExpDate}");
+        Console.WriteLine($"   FillingExpDateOther: {FillingExpDateOther}");
         // Label
         NoLabel = data.Label_config == "No label";
         if (!string.IsNullOrEmpty(data.Label_imagen))
@@ -1431,51 +1435,125 @@ public class OrdersComponentBase : ComponentBase
 
     protected async Task SaveBatch()
     {
-        StateHasChanged();
-        if (OnSaveLotFormat.HasDelegate)
-            await OnSaveLotFormat.InvokeAsync((FillingBatch, null));
+        try
+        {
+            Console.WriteLine($"💾 SaveBatch called: {FillingBatch}");
+
+            if (OnSaveLotFormat.HasDelegate)
+            {
+                await OnSaveLotFormat.InvokeAsync((FillingBatch, null));
+
+                // ✅ Esperar un poco para que el padre actualice
+                await Task.Delay(100);
+
+                // ✅ Forzar re-render
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error in SaveBatch: {ex.Message}");
+        }
     }
 
     protected async Task SaveBatchOther()
     {
-        StateHasChanged();
-        if (string.IsNullOrWhiteSpace(FillingBatchOther)) return;
+        if (string.IsNullOrWhiteSpace(FillingBatchOther))
+        {
+            Console.WriteLine("⚠️ FillingBatchOther is empty, skipping save");
+            return;
+        }
 
         IsSendingBatchOther = true;
+        StateHasChanged();
+
         try
         {
+            Console.WriteLine($"💾 SaveBatchOther: format={FillingBatch}, other={FillingBatchOther}");
+
             if (OnSaveLotFormat.HasDelegate)
+            {
+                // ✅ Enviar AMBOS valores: el formato del dropdown Y el texto custom
                 await OnSaveLotFormat.InvokeAsync((FillingBatch, FillingBatchOther));
-            FillingBatchOther = "";
+
+                // ✅ NO limpiar el campo aquí - mantener el valor visible
+                Console.WriteLine($"✅ Batch other saved: {FillingBatchOther}");
+
+                // Esperar actualización del padre
+                await Task.Delay(150);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error in SaveBatchOther: {ex.Message}");
         }
         finally
         {
             IsSendingBatchOther = false;
+            StateHasChanged();
         }
     }
 
     protected async Task SaveBbd()
     {
-        StateHasChanged();
-        if (OnSaveBbdFormat.HasDelegate)
-            await OnSaveBbdFormat.InvokeAsync((FillingExpDate, null));
+        try
+        {
+            Console.WriteLine($"💾 SaveBbd called: {FillingExpDate}");
+
+            if (OnSaveBbdFormat.HasDelegate)
+            {
+                await OnSaveBbdFormat.InvokeAsync((FillingExpDate, null));
+
+                // ✅ Esperar un poco para que el padre actualice
+                await Task.Delay(100);
+
+                // ✅ Forzar re-render
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error in SaveBbd: {ex.Message}");
+        }
     }
 
     protected async Task SaveBbdOther()
     {
-        StateHasChanged();
-        if (string.IsNullOrWhiteSpace(FillingExpDateOther)) return;
+        if (string.IsNullOrWhiteSpace(FillingExpDateOther))
+        {
+            Console.WriteLine("⚠️ FillingExpDateOther is empty, skipping save");
+            return;
+        }
 
         IsSendingBbdOther = true;
+        StateHasChanged();
+
         try
         {
+            Console.WriteLine($"💾 SaveBbdOther: format={FillingExpDate}, other={FillingExpDateOther}");
+
             if (OnSaveBbdFormat.HasDelegate)
+            {
+                // ✅ Enviar AMBOS valores: el formato del dropdown Y el texto custom
                 await OnSaveBbdFormat.InvokeAsync((FillingExpDate, FillingExpDateOther));
-            FillingExpDateOther = "";
+
+                // ✅ NO limpiar el campo aquí - mantener el valor visible
+                Console.WriteLine($"✅ BBD other saved: {FillingExpDateOther}");
+
+                // Esperar actualización del padre
+                await Task.Delay(150);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error in SaveBbdOther: {ex.Message}");
         }
         finally
         {
             IsSendingBbdOther = false;
+            StateHasChanged();
         }
     }
 
