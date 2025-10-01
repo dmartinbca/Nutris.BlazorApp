@@ -21,5 +21,13 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
+<ItemGroup>
+  <Content Update="web.config">
+    <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+  </Content>
+  <None Include="web.custom.config">
+    <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    <TargetPath>web.config</TargetPath>
+  </None>
+</ItemGroup>
 </Project>
