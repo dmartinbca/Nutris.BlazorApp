@@ -515,6 +515,8 @@ public class OrdersComponentBase : ComponentBase
                 {
                     return $"data:image/png;base64,{img}";
                 }
+
+
             }
         }
 
