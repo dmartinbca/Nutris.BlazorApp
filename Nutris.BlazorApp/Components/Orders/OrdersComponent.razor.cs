@@ -199,7 +199,8 @@ public class OrdersComponentBase : ComponentBase
     protected string characteristics = "";
     protected BoteCapDataModal modalRef;
     public readonly OptionLookups _opts = new();
-
+    // Junto con las otras propiedades de estado (IsSavingBatch, etc.)
+    protected bool IsSavingProductName { get; set; }
     private const string NO_IMAGE_AVAILABLE = "data:image/png;base64,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";
 
     // ===== LIFECYCLE METHODS =====
@@ -389,7 +390,42 @@ public class OrdersComponentBase : ComponentBase
     // Continúo con la parte 2...
 
     // OrdersComponent.razor.cs - PARTE 2
+    // Justo después de las propiedades FillingBatch, FillingExpDate, etc.
+    protected string CleanBatchForDisplay
+    {
+        get
+        {
+            // Si se eligió OTHER, usar el campo de texto personalizado
+            if (FillingBatch?.StartsWith("OTHER") == true && !string.IsNullOrWhiteSpace(FillingBatchOther))
+            {
+                return FillingBatchOther.Trim();
+            }
 
+            // Si no es OTHER, usar el valor del select limpiando los ":"
+            var value = RG35?.Box_Lote ?? FillingBatch ?? "-";
+            if (value.Contains(":"))
+                return value.Substring(value.IndexOf(":") + 1).Trim();
+            return value;
+        }
+    }
+
+    protected string CleanBbdForDisplay
+    {
+        get
+        {
+            // Si se eligió OTHER, usar el campo de texto personalizado
+            if (FillingExpDate?.StartsWith("OTHER") == true && !string.IsNullOrWhiteSpace(FillingExpDateOther))
+            {
+                return FillingExpDateOther.Trim();
+            }
+
+            // Si no es OTHER, usar el valor del select limpiando los ":"
+            var value = RG35?.Box_BBD ?? FillingExpDate ?? "-";
+            if (value.Contains(":"))
+                return value.Substring(value.IndexOf(":") + 1).Trim();
+            return value;
+        }
+    }
     private void ProcessRelacionTapaOnce()
     {
         if (RelacionTapa.ValueKind != JsonValueKind.Object) return;
@@ -1430,9 +1466,45 @@ public class OrdersComponentBase : ComponentBase
 
     protected async Task SaveName()
     {
+        if (string.IsNullOrWhiteSpace(ProductName2))
+        {
+            Console.WriteLine("⚠️ ProductName2 is empty, skipping save");
+            return;
+        }
+
+        IsSavingProductName = true;
         StateHasChanged();
-        if (OnSaveName.HasDelegate)
-            await OnSaveName.InvokeAsync(ProductName2);
+
+        try
+        {
+            Console.WriteLine($"💾 SaveName: {ProductName2}");
+
+            if (OnSaveName.HasDelegate)
+            {
+                await OnSaveName.InvokeAsync(ProductName2);
+
+                // ✅ Actualizar RG35 local
+                if (RG35 != null)
+                {
+                    RG35.Product_name_2 = ProductName2;
+                    RG35.Box_Nombre_Producto = ProductName2; // Para el ProductLabel
+                }
+
+                Console.WriteLine($"✅ Product name saved: {ProductName2}");
+
+                await Task.Delay(150);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error in SaveName: {ex.Message}");
+        }
+        finally
+        {
+            IsSavingProductName = false;
+            StateHasChanged();
+        }
     }
     protected async Task SaveBatchOther()
     {
@@ -1456,11 +1528,7 @@ public class OrdersComponentBase : ComponentBase
                 // ✅ NUEVO: Actualizar RG35 local también
                 if (RG35 != null)
                 {
-                    if (FillingBatchOther.Contains(":"))
-                        FillingBatchOther = FillingBatchOther.Substring(FillingBatchOther.IndexOf(":") + 1);
-                    if (FillingBatch.Contains(":"))
-                        FillingBatch = FillingBatch.Substring(FillingBatch.IndexOf(":") + 1);
-
+                  
 
                     RG35.Filling_batch_others = FillingBatchOther;
                     RG35.Box_Lote = FillingBatch; // Actualizar para ProductLabel
@@ -1505,12 +1573,7 @@ public class OrdersComponentBase : ComponentBase
                 // ✅ NUEVO: Actualizar RG35 local también
                 if (RG35 != null)
                 {
-                    if (FillingExpDateOther.Contains(":"))
-                        FillingExpDateOther = FillingExpDateOther.Substring(FillingExpDateOther.IndexOf(":") + 1);
-
-                    if (FillingExpDate.Contains(":"))
-                        FillingExpDate = FillingExpDate.Substring(FillingExpDate.IndexOf(":") + 1);
-
+            
                     RG35.Filling_exp_date_others = FillingExpDateOther;
                     RG35.Box_BBD = FillingExpDate; // Actualizar para ProductLabel
                 }
@@ -1548,12 +1611,7 @@ public class OrdersComponentBase : ComponentBase
                 // ✅ NUEVO: Actualizar RG35 local también
                 if (RG35 != null)
                 {
-                    if (FillingBatch.Contains(":"))
-                        FillingBatch = FillingBatch.Substring(FillingBatch.IndexOf(":") + 1);
-
-                    if (FillingBatch.Contains(":"))
-                        FillingBatch = FillingBatch.Substring(FillingBatch.IndexOf(":") + 1);
-
+             
 
                     RG35.Filling_batch = FillingBatch;
                     RG35.Box_Lote = FillingBatch; // Actualizar para ProductLabel
@@ -1590,12 +1648,7 @@ public class OrdersComponentBase : ComponentBase
                 // ✅ NUEVO: Actualizar RG35 local también
                 if (RG35 != null)
                 {
-                    if (FillingExpDate.Contains(":"))
-                        FillingExpDate = FillingExpDate.Substring(FillingExpDate.IndexOf(":") + 1);
-
-                    if (FillingExpDate.Contains(":"))
-                        FillingExpDate = FillingExpDate.Substring(FillingExpDate.IndexOf(":") + 1);
-
+                 
                     RG35.Filling_exp_date = FillingExpDate;
                     RG35.Box_BBD = FillingExpDate; // Actualizar para ProductLabel
                 }

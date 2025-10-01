@@ -509,39 +509,58 @@
                             {
                                 <div id="container-toggle-2" class="container-toggle active">
                                     <div class="content-t content-t-pdb">
-                                        <div class="body-t">
-                                            <div class="body-td">
-                                                <div class="d-flex gap-1">
-                                                    <p class="font-18 RalewayRegular">@Localization["orderView.TraddeName"]</p>
-                                                     <div data-bs-toggle="tooltip" data-bs-placement="top" title="@Localization["orderView.TraddeNameToltip"]">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" style="width:24px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-                                                        </svg>
-                                                    </div>
-                                                   
-                                                </div>
-                                                <div class="data-t">
-                                                    <input class="font-14 RalewayRegular custom-input" type="text" @bind="ProductName2" />
-
-                                                    @if (!CustomerAccepted && Status == "Desarrollo")
-                                                    {
-                                                        <button @onclick="SaveName" class="btn-t RalewayMedium font-14" type="button">
-                                                            @Localization["orderView.Save"]
-                                                        </button>
-                                                    }
-                                                    <div class="line-from d-none d-xl-block"></div>
-                                                    @if (ProductName2 != "-")
-                                                    {
-                                                        <img src="img/check-icon.svg" alt="check" class="d-none d-xl-block">
-                                                    }
-                                                    else
-                                                    {
-                                                        <div class="line-from"></div>
-                                                        <img src="img/cancelar.svg" alt="check">
-                                                    }
-                                                </div>
+                                    <div class="body-td body-td-product-name">
+                                        <div class="product-name-label">
+                                            <p class="font-18 RalewayRegular">@Localization["orderView.TraddeName"]</p>
+                                            <div data-bs-toggle="tooltip" data-bs-placement="top" title="@Localization["orderView.TraddeNameToltip"]">
+                                                <svg xmlns="http://www.w3.org/2000/svg" style="width:24px" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                                                </svg>
                                             </div>
                                         </div>
+
+                                        <div class="product-name-content">
+                                            <div class="product-name-input-group">
+                                                <input class="font-14 RalewayRegular product-name-input"
+                                                       type="text"
+                                                       @bind="ProductName2"
+                                                       @bind:event="oninput"
+                                                       placeholder="Nombre comercial del producto"
+                                                       disabled="@(Status == "Cerrado cliente y calidad" || Status == "Cerrado cliente" || IsSavingProductName)" />
+
+                                                @if (Status == "Desarrollo")
+                                                {
+                                                    <button @onclick="SaveName"
+                                                            class="btn-save-name"
+                                                            type="button"
+                                                            disabled="@(IsSavingProductName || string.IsNullOrWhiteSpace(ProductName2))">
+                                                        @if (IsSavingProductName)
+                                                        {
+                                                            <span class="spinner-border spinner-border-sm"></span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@Localization["orderView.Save"]</span>
+                                                        }
+                                                    </button>
+                                                }
+                                            </div>
+
+                                            <div class="product-name-feedback">
+                                                @if (!string.IsNullOrWhiteSpace(ProductName2) && ProductName2 != "-" && !IsSavingProductName)
+                                                {
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <small class="text-success">✓ Guardado</small>
+                                                        <img src="img/check-icon.svg" alt="check" style="width: 20px; height: 20px;">
+                                                    </div>
+                                                }
+                                                else if (ProductName2 == "-" || string.IsNullOrWhiteSpace(ProductName2))
+                                                {
+                                                    <img src="img/cancelar.svg" alt="no guardado" style="width: 20px; height: 20px;">
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
                                     </div>
 
                                     <div class="row content-t justify-content-center">
@@ -641,7 +660,7 @@
                                                                 @if (IsSavingBatch)
                                                                 {
                                                                     <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                                                        <span class="visually-hidden">Guardando...</span>
+                                                                        <span class="visually-hidden">@Localization["Guardando"]</span>
                                                                     </div>
                                                                 }
                                                             </div>
@@ -652,7 +671,7 @@
                                                                     <input type="text"
                                                                            class="font-20 RalewayRegular"
                                                                            maxlength="12"
-                                                                           placeholder="Ingrese formato de lote"
+                                                                           placeholder=@Localization["PlaceholderLot"]
                                                                            @bind="FillingBatchOther"
                                                                            @bind:event="oninput"
                                                                            disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBatchOther || Status == "Cerrado cliente")" />
@@ -664,14 +683,14 @@
                                                                         {
                                                                             <span class="spinner-border spinner-border-sm me-2"></span>
                                                                         }
-                                                                        <span>@(IsSendingBatchOther ? "Enviando..." : "Enviar")</span>
+                                                                        <span>@(IsSendingBatchOther? @Localization["Guardando"] : "Enviar")</span>
                                                                     </button>
                                                                 </div>
 
                                                                 @if (!string.IsNullOrWhiteSpace(FillingBatchOther) && !IsSendingBatchOther)
                                                                 {
                                                                     <small class="text-success d-block mt-1">
-                                                                        ✓ Formato guardado: @FillingBatchOther
+                                                                        ✓ @Localization["Guardado"]: @FillingBatchOther
                                                                     </small>
                                                                 }
                                                             }
@@ -721,7 +740,7 @@
                                                                 @if (IsSavingBbd)
                                                                 {
                                                                     <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                                                        <span class="visually-hidden">Guardando...</span>
+                                                                        <span class="visually-hidden">@Localization["Guardando"]</span>
                                                                     </div>
                                                                 }
                                                             </div>
@@ -732,7 +751,7 @@
                                                                     <input type="text"
                                                                            class="font-20 RalewayRegular"
                                                                            maxlength="12"
-                                                                           placeholder="Ingrese formato de caducidad"
+                                                                           placeholder=@Localization["PlaceholderFecha"]
                                                                            @bind="FillingExpDateOther"
                                                                            @bind:event="oninput"
                                                                            disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBbdOther || Status == "Cerrado cliente")" />
@@ -744,14 +763,14 @@
                                                                         {
                                                                             <span class="spinner-border spinner-border-sm me-2"></span>
                                                                         }
-                                                                        <span>@(IsSendingBbdOther ? "Enviando..." : "Enviar")</span>
+                                                                        <span>@(IsSendingBbdOther? @Localization["Guardando"] : "Enviar")</span>
                                                                     </button>
                                                                 </div>
 
                                                                 @if (!string.IsNullOrWhiteSpace(FillingExpDateOther) && !IsSendingBbdOther)
                                                                 {
                                                                     <small class="text-success d-block mt-1">
-                                                                        ✓ Formato guardado: @FillingExpDateOther
+                                                                        ✓ @Localization["Guardado"]: @FillingExpDateOther
                                                                     </small>
                                                                 }
                                                             }
@@ -1042,9 +1061,9 @@
                                                             {
                                                                 @if (RG35?.Box_label_config == "Standard")
                                                                 {
-                                                                    <ProductLabel ProductName=@RG35?.Box_Nombre_Producto
-                                                                              BatchNumber=   "@(RG35?.Box_Lote?.StartsWith("OTHER") == true ? FillingBatchOther : RG35?.Box_Lote)"
-                                                                              ExpirationDate="@(RG35?.Box_BBD?.StartsWith("OTHER") == true  ? FillingExpDateOther :RG35?.Box_BBD)"
+                                                                <ProductLabel ProductName=@RG35?.Box_Nombre_Producto
+                                                                              BatchNumber="@CleanBatchForDisplay"
+                                                                              ExpirationDate="@CleanBbdForDisplay"
                                                                               Quantity=@RG35?.Box_Quantity />
                                                                 }
                                                                 else

@@ -1752,3 +1752,287 @@ textarea {
         transform: rotate(360deg);
     }
 }
+
+/* ========================================
+   PRODUCT NAME SECTION - FIXED
+   ======================================== */
+
+.body-td-product-name {
+    display: flex;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem;
+    padding: 1.4rem 0;
+    border-bottom: dotted 1px;
+}
+
+.product-name-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+    .product-name-label p {
+        margin: 0;
+        font-weight: 400;
+    }
+
+.product-name-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.product-name-input-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.product-name-input {
+    flex: 1;
+    background-color: #F1F1F1;
+    border: 1px solid #e0e0e0;
+    padding: 0.75rem 1.2rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    height: 44px;
+    transition: all 0.3s ease;
+    min-width: 0;
+}
+
+    .product-name-input:focus {
+        outline: none;
+        border-color: var(--text-button);
+        background-color: #fff;
+    }
+
+    .product-name-input:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background-color: #f5f5f5;
+    }
+
+.btn-save-name {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid var(--text-button);
+    background-color: var(--text-button);
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    height: 44px;
+    min-width: 100px;
+}
+
+    .btn-save-name:hover:not(:disabled) {
+        background-color: #234171;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(47, 84, 150, 0.3);
+    }
+
+    .btn-save-name:disabled {
+        background-color: #cccccc;
+        border-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .btn-save-name .spinner-border-sm {
+        width: 16px;
+        height: 16px;
+        border-width: 2px;
+    }
+
+.product-name-feedback {
+    display: flex;
+    align-items: center;
+    min-height: 24px;
+    padding-left: 0.5rem;
+}
+
+    .product-name-feedback .text-success {
+        color: #28a745;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+/* Responsive para móvil */
+@media (max-width: 768px) {
+    .product-name-input-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .btn-save-name {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .product-name-input {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   PRODUCT NAME SECTION - OVERRIDE INHERITED STYLES
+   ======================================== */
+
+/* Anular estilos del .data-t cuando está dentro de product-name */
+.body-td-product-name .data-t {
+    display: block !important;
+    gap: 0 !important;
+    width: 100%;
+}
+
+.body-td-product-name {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+    padding: 1.4rem 0;
+    border-bottom: dotted 1px;
+}
+
+.product-name-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+    .product-name-label p {
+        margin: 0;
+        font-weight: 400;
+    }
+
+.product-name-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.product-name-input-group {
+    display: flex !important;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.product-name-input {
+    flex: 1 1 auto;
+    background-color: #F1F1F1;
+    border: 1px solid #e0e0e0;
+    padding: 0.75rem 1.2rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    height: 44px;
+    transition: all 0.3s ease;
+    min-width: 200px;
+    max-width: none;
+}
+
+    .product-name-input:focus {
+        outline: none;
+        border-color: var(--text-button);
+        background-color: #fff;
+    }
+
+    .product-name-input:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background-color: #f5f5f5;
+    }
+
+.btn-save-name {
+    flex: 0 0 auto;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid var(--text-button);
+    background-color: var(--text-button);
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    height: 44px;
+    min-width: 100px;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+    .btn-save-name:hover:not(:disabled) {
+        background-color: #234171;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(47, 84, 150, 0.3);
+    }
+
+    .btn-save-name:disabled {
+        background-color: #cccccc;
+        border-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .btn-save-name .spinner-border-sm {
+        width: 16px;
+        height: 16px;
+        border-width: 2px;
+    }
+
+.product-name-feedback {
+    display: flex;
+    align-items: center;
+    min-height: 24px;
+    padding-left: 0.5rem;
+}
+
+    .product-name-feedback .text-success {
+        color: #28a745;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+/* Asegurar que no hay líneas o elementos ocultos que empujen el botón */
+.body-td-product-name .line-from {
+    display: none !important;
+}
+
+/* Responsive para móvil */
+@media (max-width: 768px) {
+    .product-name-input-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .btn-save-name {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .product-name-input {
+        width: 100%;
+        min-width: auto;
+    }
+}
