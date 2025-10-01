@@ -1223,7 +1223,7 @@ public class OrdersComponentBase : ComponentBase
 
         if (RG35?.Box_label_config == "Standard")
         {
-            var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-");
+            var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-" && TiposCajaOptions.Any());
             PercentFilledPalettizing = fields.Count > 0 ? (filled * 100 / fields.Count) : 0;
         }
         else

@@ -735,7 +735,7 @@
                                         <input type="checkbox"
                                                @bind="NoLabel"
                                                @bind:after="OnNoLabelChanged"
-                                               disabled="@(Status == "Cerrado cliente y calidad" || IsProcessingNoLabel)" />
+                                               disabled="@(Status == "Cerrado cliente y calidad" || IsProcessingNoLabel || Status == "Cerrado cliente")" />
                                         <label class="RalewayBold font-18">
                                             @if (IsProcessingNoLabel)
                                             {
@@ -910,7 +910,7 @@
                                                     <input class="RalewayRegular font-20" type="text" readonly value="@item.Value">
                                                 }
 
-                                                @if (item.Value != "-")
+                                                @if (item.Value != "-" && TiposCajaOptions.Any())
                                                 {
                                                     <div class="line-from"></div>
                                                     <img src="img/check-icon.svg" alt="check">
@@ -1066,7 +1066,8 @@
                                     <input type="checkbox" 
                                            @bind="NoAnalytics" 
                                            @bind:after="OnNoAnalyticsChanged"
-                                           disabled="@(Status == "Cerrado cliente y calidad" || IsProcessingNoAnalytics)" />
+                                           disabled="@(Status == "Cerrado cliente y calidad" || IsProcessingNoAnalytics || Status == "Cerrado cliente")" />
+                                         
                                     <label class="RalewayBold font-18">
                                         @if (IsProcessingNoAnalytics)
                                         {

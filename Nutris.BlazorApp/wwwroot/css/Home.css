@@ -13,7 +13,7 @@
     overflow: hidden;
 }
 
-/* Home Content - Estilos originales */
+/* Home Content */
 #home {
     overflow: hidden !important;
     margin: 0 !important;
@@ -23,30 +23,119 @@
     width: 100%;
 }
 
-    /* Imagen de fondo con opacidad */
-    #home::before {
+/* ========================================
+   SLIDESHOW DE IMÁGENES
+   ======================================== */
+
+.slideshow-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 2s ease-in-out; /* Transición suave de 2 segundos */
+}
+
+    .slide.active {
+        opacity: 1;
+    }
+
+    /* Capa de oscurecimiento opcional sobre las imágenes */
+    .slide::after {
         content: "";
         position: absolute;
         top: 0;
         left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: url('https://static.wixstatic.com/media/869cb8_116297d94cf5407f9bc661c97c35a039f000.jpg/v1/fill/w_1288,h_815,al_c,q_85,usm_0.33_1.00_0.00,enc_avif,quality_auto/869cb8_116297d94cf5407f9bc661c97c35a039f000.jpg');
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center center;
-        background-attachment: fixed; /* Mantener fija al hacer scroll */
-        opacity: 0.3;
-        z-index: 1;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3); /* Oscurece ligeramente las imágenes para mejor legibilidad del texto */
         pointer-events: none;
     }
 
-    #home > * {
-        position: relative;
-        z-index: 2;
+/* ========================================
+   INDICADORES DEL SLIDESHOW
+   ======================================== */
+
+.slideshow-indicators {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    gap: 10px;
+}
+
+.indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+    .indicator:hover {
+        background: rgba(255, 255, 255, 0.7);
     }
 
-/* Language Selector */
+    .indicator.active {
+        background: white;
+        border-color: var(--blackBlue);
+        transform: scale(1.2);
+    }
+
+/* ========================================
+   TEXTOS DEL HOME
+   ======================================== */
+
+.text-home {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    color: white; /* Cambio a blanco para mejor contraste sobre imágenes */
+    padding: 3.96rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Sombra para mejorar legibilidad */
+}
+
+    .text-home h1 {
+        font-size: 5.16em;
+        font-weight: 700;
+        margin: 0;
+        color: white;
+    }
+
+.pagraph-home {
+    margin-top: 1.5rem;
+}
+
+    .pagraph-home span {
+        display: block;
+        margin-bottom: 0.8rem;
+        font-size: 1.25rem;
+        line-height: 1.6;
+        color: white;
+    }
+
+/* ========================================
+   LANGUAGE SELECTOR
+   ======================================== */
+
 .language-selector-home {
     position: absolute;
     top: 20px;
@@ -55,8 +144,8 @@
 }
 
 .language-button {
-    background: white;
-    border: 1px solid #dee2e6;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 50px;
     padding: 10px 24px;
     font-size: 14px;
@@ -68,22 +157,24 @@
     gap: 8px;
     min-width: 140px;
     justify-content: space-between;
+    backdrop-filter: blur(10px);
 }
 
     .language-button:hover {
-        background: #f8f9fa;
+        background: rgba(255, 255, 255, 1);
     }
 
 .language-dropdown {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    background: white;
-    border: 1px solid #dee2e6;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     min-width: 150px;
     overflow: hidden;
+    backdrop-filter: blur(10px);
 }
 
 .dropdown-item {
@@ -99,47 +190,14 @@
 }
 
     .dropdown-item:hover {
-        background-color: #f8f9fa;
+        background-color: rgba(0, 0, 0, 0.05);
     }
 
-/* Posicionamiento Bootstrap-like */
-.position-absolute {
-    position: absolute !important;
-}
+/* ========================================
+   RESPONSIVE
+   ======================================== */
 
-.z-10 {
-    z-index: 10 !important;
-}
-
-.top-0 {
-    top: 0 !important;
-}
-
-/* Textos del Home - Estilos originales */
-.text-home {
-    color: var(--blackBlue);
-    padding: 3.96rem;
-}
-
-    .text-home h1 {
-        font-size: 5.16em;
-        font-weight: 700;
-        margin: 0;
-    }
-
-.pagraph-home {
-    margin-top: 1.5rem;
-}
-
-    .pagraph-home span {
-        display: block;
-        margin-bottom: 0.8rem;
-        font-size: 1.25rem;
-        line-height: 1.6;
-        color: var(--blackBlue);
-    }
-
-/* RESPONSIVE - Tablet Landscape (mantiene diseño casi original) */
+/* Tablet Landscape */
 @media (min-width: 1025px) and (max-width: 1366px) and (orientation: landscape) {
     .text-home h1 {
         font-size: 4.5rem;
@@ -154,12 +212,12 @@
     }
 }
 
-/* RESPONSIVE - Tablet Portrait */
+/* Tablet Portrait */
 @media (max-width: 1024px) and (orientation: portrait) {
     .text-home {
         padding: 2.5rem;
-        padding-top: 90px; /* Espacio para el hamburger menu */
-        text-align: center; /* Centrar texto en tablets */
+        padding-top: 90px;
+        text-align: center;
     }
 
         .text-home h1 {
@@ -176,20 +234,12 @@
             line-height: 1.5;
         }
 
-    /* Ajustar language selector para no interferir con hamburger */
-    .language-selector-home {
-        top: 20px;
-        right: 20px;
-    }
-
-    .language-button {
-        padding: 10px 20px;
-        font-size: 14px;
-        min-width: 130px;
+    .slideshow-indicators {
+        bottom: 20px;
     }
 }
 
-/* RESPONSIVE - Tablet pequeño y móvil grande */
+/* Tablet pequeño y móvil grande */
 @media (max-width: 768px) {
     .text-home {
         padding: 2rem;
@@ -215,9 +265,14 @@
         font-size: 13px;
         min-width: 120px;
     }
+
+    .indicator {
+        width: 10px;
+        height: 10px;
+    }
 }
 
-/* RESPONSIVE - Móvil */
+/* Móvil */
 @media (max-width: 480px) {
     .text-home {
         padding: 1.5rem;
@@ -243,26 +298,16 @@
         font-size: 12px;
         min-width: 100px;
     }
-}
 
-/* Ajuste especial para iPad Pro Portrait */
-@media (min-width: 834px) and (max-width: 1024px) and (orientation: portrait) {
-    .text-home {
-        padding: 3rem;
-        padding-top: 100px;
+    .slideshow-indicators {
+        bottom: 15px;
+        gap: 8px;
     }
 
-        .text-home h1 {
-            font-size: 4rem;
-        }
-
-    .pagraph-home {
-        max-width: 700px;
+    .indicator {
+        width: 8px;
+        height: 8px;
     }
-
-        .pagraph-home span {
-            font-size: 1.2rem;
-        }
 }
 
 /* Landscape móvil */
@@ -289,6 +334,10 @@
             font-size: 0.9rem;
             margin-bottom: 0;
         }
+
+    .slideshow-indicators {
+        bottom: 10px;
+    }
 }
 
 /* Clases de fuentes responsivas */
@@ -300,7 +349,7 @@
     font-size: 1.25rem;
 }
 
-@media (max-width: 1024px) and (orientation: portrait) {
+@media (max-width: 1024px) {
     .font-82 {
         font-size: 3.5rem;
     }
@@ -328,133 +377,4 @@
     .font-20 {
         font-size: 0.9rem;
     }
-}
-/* Textos del Home - Estilos originales */
-.text-home {
-    color: var(--blackBlue);
-    padding: 3.96rem;
-}
-
-/* RESPONSIVE - Cuando el sidebar está oculto */
-@media screen and (max-width: 1024px) and (orientation: landscape) and (max-height: 768px), screen and (max-width: 1024px) and (orientation: portrait), screen and (max-width: 768px) {
-
-    .text-home {
-        padding: 2.5rem;
-        padding-top: 90px; /* Espacio para el hamburger menu */
-        margin-left: 0; /* Eliminar cualquier margen izquierdo */
-        text-align: left; /* Mantener texto alineado a la izquierda */
-    }
-
-    /* Asegurar que el contenedor principal esté centrado */
-    .main-content {
-        margin: 0 auto !important;
-        padding: 0 !important;
-        width: 100%;
-    }
-
-    #home {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100%;
-    }
-}
-
-/* Tablet Portrait específico */
-@media (max-width: 1024px) and (orientation: portrait) {
-    .text-home {
-        padding: 2.5rem;
-        padding-top: 90px;
-        margin: 0 auto;
-        max-width: 800px; /* Limitar ancho máximo para mejor lectura */
-    }
-
-        .text-home h1 {
-            font-size: 3.5rem;
-        }
-
-    .pagraph-home {
-        max-width: 600px;
-    }
-}
-
-/* Móvil */
-@media (max-width: 768px) {
-    .text-home {
-        padding: 2rem;
-        padding-top: 80px;
-        margin: 0 auto;
-        text-align: left;
-    }
-}
-
-/* Móvil pequeño */
-@media (max-width: 480px) {
-    .text-home {
-        padding: 1.5rem;
-        padding-top: 70px;
-        margin: 0 auto;
-    }
-}
-
- 
-
-/* Ajustes responsive para la imagen de fondo */
-@media screen and (max-width: 1024px) and (orientation: landscape) {
-    #home::before {
-        background-size: cover;
-        background-position: center center;
-        background-attachment: scroll; /* En tablets mejor scroll */
-    }
-}
-
-@media screen and (max-width: 1024px) and (orientation: portrait) {
-    #home::before {
-        background-size: cover;
-        background-position: center top; /* Mejor posición para portrait */
-    }
-}
-
-@media screen and (max-width: 768px) {
-    #home::before {
-        background-size: cover;
-        background-position: center center;
-        min-height: 100vh; /* Asegurar cobertura completa */
-    }
-}
-
-/* Para móviles pequeños */
-@media screen and (max-width: 480px) {
-    #home::before {
-        background-size: cover;
-        background-position: center center;
-    }
-}
-
-/* Landscape móvil - ajuste especial */
-@media (max-height: 600px) and (orientation: landscape) {
-    #home::before {
-        background-size: cover;
-        background-position: center center;
-    }
-}
-
-/* Asegurar que el contenedor principal ocupe toda la pantalla */
-#home {
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    position: relative;
-    height: 100vh; /* Altura completa de la ventana */
-    width: 100%;
-    min-height: 100vh; /* Mínimo altura de ventana */
-}
-
-.main-content {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100%;
-    height: 100vh;
-    min-height: 100vh;
-    position: relative;
-    overflow: hidden;
 }

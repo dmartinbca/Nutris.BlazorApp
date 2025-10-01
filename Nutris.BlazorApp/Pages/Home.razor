@@ -38,10 +38,31 @@
     }
 </div>
 
-<!-- Home Content -->
+<!-- Home Content con Slideshow -->
 <div class="main-content" id="home">
+    <!-- Slideshow de imágenes -->
+    <div class="slideshow-container">
+        @for (int i = 1; i <= 5; i++)
+        {
+            var imageIndex = i;
+            <div class="slide @(currentImageIndex == imageIndex ? "active" : "")"
+                 style="background-image: url('/img/@(imageIndex).avif');">
+            </div>
+        }
+    </div>
 
-     <div class="text-home position-absolute z-10 top-0">
+    <!-- Indicadores opcionales -->
+    <div class="slideshow-indicators">
+        @for (int i = 1; i <= 5; i++)
+        {
+            var imageIndex = i;
+            <span class="indicator @(currentImageIndex == imageIndex ? "active" : "")"
+                  @onclick="() => GoToSlide(imageIndex)"></span>
+        }
+    </div>
+
+    <!-- Texto superpuesto -->
+    <div class="text-home">
         <h1 class="font-82 MuseoSemiBold">@Localization["Home.Welcome"]</h1>
         <div class="pagraph-home font-20 RalewayRegular">
             <span>@Localization["Home.Text1"]</span>
@@ -52,11 +73,13 @@
     </div>
 </div>
 
-
-
 @code {
     private bool showLanguageMenu = false;
     private string currentLanguage = "en";
+    private int currentImageIndex;
+    private System.Threading.Timer? slideshowTimer;
+    private const int TOTAL_SLIDES = 5;
+    private Random random = new Random();
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,6 +96,44 @@
 
         // Suscribirse a cambios de idioma
         Localization.OnLanguageChanged += OnLanguageChanged;
+
+        // Iniciar con una imagen aleatoria
+        currentImageIndex = random.Next(1, TOTAL_SLIDES + 1); // Genera un número entre 1 y 5
+
+        // Iniciar el slideshow
+        StartSlideshow();
+    }
+
+    private void StartSlideshow()
+    {
+        slideshowTimer = new System.Threading.Timer(
+            callback: _ => NextSlide(),
+            state: null,
+            dueTime: TimeSpan.FromSeconds(5), // Primera transición después de 5 segundos
+            period: TimeSpan.FromSeconds(5)   // Cambiar cada 5 segundos
+        );
+    }
+
+    private void NextSlide()
+    {
+        InvokeAsync(() =>
+        {
+            currentImageIndex++;
+            if (currentImageIndex > TOTAL_SLIDES)
+            {
+                currentImageIndex = 1;
+            }
+            StateHasChanged();
+        });
+    }
+
+    private void GoToSlide(int index)
+    {
+        currentImageIndex = index;
+
+        // Reiniciar el timer cuando el usuario selecciona manualmente una imagen
+        slideshowTimer?.Dispose();
+        StartSlideshow();
     }
 
     private void OnLanguageChanged()
@@ -95,5 +156,6 @@
     public void Dispose()
     {
         Localization.OnLanguageChanged -= OnLanguageChanged;
+        slideshowTimer?.Dispose();
     }
 }

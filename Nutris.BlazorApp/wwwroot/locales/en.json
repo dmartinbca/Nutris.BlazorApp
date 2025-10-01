@@ -110,6 +110,7 @@
   "units_per_container": "Units per container",
   "status": "Status",
   "Edit": "Edit",
+  "NoOptionsAvailable": "No boxes available for this bottle",
   "Atention": "Atention",
   "AtentionMsg": "No bottle available for this weight",
   "Returntoyourproductspage": "Return to your products page",
