@@ -114,6 +114,7 @@
   "Guardado": "Saved",
   "PlaceholderLot": "Enter batch format",
   "PlaceholderFecha": "Enter BBD format",
+  "PlaceholderName": "Enter product name",
   "NoOptionsAvailable": "No boxes available for this bottle",
   "Atention": "Atention",
   "AtentionMsg": "No bottle available for this weight",
