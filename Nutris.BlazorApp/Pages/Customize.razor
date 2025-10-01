@@ -564,7 +564,12 @@
             Console.WriteLine($"Error in SaveProductCommercialNameAsync: {ex}");
         }
     }
-
+    private async Task RefreshOrdersComponentAsync()
+    {
+        // Forzar que OrdersComponent detecte cambios
+        _lastLoadedId = ""; // Reset para forzar recarga
+        await InvokeAsync(StateHasChanged);
+    }
     private async Task SaveLotFormatAsync(string format, string? other = null)
     {
         try
@@ -585,12 +590,13 @@
                 RG35Data.Filling_batch = format;
                 RG35Data.Filling_batch_others = other ?? "";
 
-                Console.WriteLine($"✅ RG35Data updated: Filling_batch={format}, Filling_batch_others={other}");
+                // ✅ NUEVO: Actualizar Box_Lote también
+                RG35Data.Box_Lote = format;
+
+                Console.WriteLine($"✅ RG35Data updated: Filling_batch={format}, Box_Lote={format}");
             }
 
-            // ✅ Forzar actualización completa del componente
             StateHasChanged();
-
             Console.WriteLine("✅ Lot format saved successfully");
         }
         catch (Exception ex)
@@ -599,12 +605,7 @@
             Console.WriteLine($"❌ Error in SaveLotFormatAsync: {ex}");
         }
     }
-    private async Task RefreshOrdersComponentAsync()
-    {
-        // Forzar que OrdersComponent detecte cambios
-        _lastLoadedId = ""; // Reset para forzar recarga
-        await InvokeAsync(StateHasChanged);
-    }
+
     private async Task SaveBbdFormatAsync(string format, string? other = null)
     {
         try
@@ -625,12 +626,13 @@
                 RG35Data.Filling_exp_date = format;
                 RG35Data.Filling_exp_date_others = other ?? "";
 
-                Console.WriteLine($"✅ RG35Data updated: Filling_exp_date={format}, Filling_exp_date_others={other}");
+                // ✅ NUEVO: Actualizar Box_BBD también
+                RG35Data.Box_BBD = format;
+
+                Console.WriteLine($"✅ RG35Data updated: Filling_exp_date={format}, Box_BBD={format}");
             }
 
-            // ✅ Forzar actualización completa del componente
             StateHasChanged();
-
             Console.WriteLine("✅ BBD format saved successfully");
         }
         catch (Exception ex)
@@ -639,6 +641,8 @@
             Console.WriteLine($"❌ Error in SaveBbdFormatAsync: {ex}");
         }
     }
+
+
     private async Task PatchRG35Async(object payload)
     {
         try

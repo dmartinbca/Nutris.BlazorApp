@@ -61,6 +61,8 @@ public class OrdersComponentBase : ComponentBase
     private List<string>? _cachedMateriales;
 
     // Estado
+    protected bool IsSavingBatch { get; set; }
+    protected bool IsSavingBbd { get; set; }
     protected bool IsLoading { get; set; } = false;
     protected bool IsProcessingNoAnalytics { get; set; } = false;
     protected bool IsProcessingNoLabel { get; set; } = false;
@@ -1432,30 +1434,6 @@ public class OrdersComponentBase : ComponentBase
         if (OnSaveName.HasDelegate)
             await OnSaveName.InvokeAsync(ProductName2);
     }
-
-    protected async Task SaveBatch()
-    {
-        try
-        {
-            Console.WriteLine($"💾 SaveBatch called: {FillingBatch}");
-
-            if (OnSaveLotFormat.HasDelegate)
-            {
-                await OnSaveLotFormat.InvokeAsync((FillingBatch, null));
-
-                // ✅ Esperar un poco para que el padre actualice
-                await Task.Delay(100);
-
-                // ✅ Forzar re-render
-                await InvokeAsync(StateHasChanged);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"❌ Error in SaveBatch: {ex.Message}");
-        }
-    }
-
     protected async Task SaveBatchOther()
     {
         if (string.IsNullOrWhiteSpace(FillingBatchOther))
@@ -1473,13 +1451,23 @@ public class OrdersComponentBase : ComponentBase
 
             if (OnSaveLotFormat.HasDelegate)
             {
-                // ✅ Enviar AMBOS valores: el formato del dropdown Y el texto custom
                 await OnSaveLotFormat.InvokeAsync((FillingBatch, FillingBatchOther));
 
-                // ✅ NO limpiar el campo aquí - mantener el valor visible
+                // ✅ NUEVO: Actualizar RG35 local también
+                if (RG35 != null)
+                {
+                    if (FillingBatchOther.Contains(":"))
+                        FillingBatchOther = FillingBatchOther.Substring(FillingBatchOther.IndexOf(":") + 1);
+                    if (FillingBatch.Contains(":"))
+                        FillingBatch = FillingBatch.Substring(FillingBatch.IndexOf(":") + 1);
+
+
+                    RG35.Filling_batch_others = FillingBatchOther;
+                    RG35.Box_Lote = FillingBatch; // Actualizar para ProductLabel
+                }
+
                 Console.WriteLine($"✅ Batch other saved: {FillingBatchOther}");
 
-                // Esperar actualización del padre
                 await Task.Delay(150);
                 await InvokeAsync(StateHasChanged);
             }
@@ -1492,29 +1480,6 @@ public class OrdersComponentBase : ComponentBase
         {
             IsSendingBatchOther = false;
             StateHasChanged();
-        }
-    }
-
-    protected async Task SaveBbd()
-    {
-        try
-        {
-            Console.WriteLine($"💾 SaveBbd called: {FillingExpDate}");
-
-            if (OnSaveBbdFormat.HasDelegate)
-            {
-                await OnSaveBbdFormat.InvokeAsync((FillingExpDate, null));
-
-                // ✅ Esperar un poco para que el padre actualice
-                await Task.Delay(100);
-
-                // ✅ Forzar re-render
-                await InvokeAsync(StateHasChanged);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"❌ Error in SaveBbd: {ex.Message}");
         }
     }
 
@@ -1535,13 +1500,23 @@ public class OrdersComponentBase : ComponentBase
 
             if (OnSaveBbdFormat.HasDelegate)
             {
-                // ✅ Enviar AMBOS valores: el formato del dropdown Y el texto custom
                 await OnSaveBbdFormat.InvokeAsync((FillingExpDate, FillingExpDateOther));
 
-                // ✅ NO limpiar el campo aquí - mantener el valor visible
+                // ✅ NUEVO: Actualizar RG35 local también
+                if (RG35 != null)
+                {
+                    if (FillingExpDateOther.Contains(":"))
+                        FillingExpDateOther = FillingExpDateOther.Substring(FillingExpDateOther.IndexOf(":") + 1);
+
+                    if (FillingExpDate.Contains(":"))
+                        FillingExpDate = FillingExpDate.Substring(FillingExpDate.IndexOf(":") + 1);
+
+                    RG35.Filling_exp_date_others = FillingExpDateOther;
+                    RG35.Box_BBD = FillingExpDate; // Actualizar para ProductLabel
+                }
+
                 Console.WriteLine($"✅ BBD other saved: {FillingExpDateOther}");
 
-                // Esperar actualización del padre
                 await Task.Delay(150);
                 await InvokeAsync(StateHasChanged);
             }
@@ -1557,6 +1532,88 @@ public class OrdersComponentBase : ComponentBase
         }
     }
 
+    protected async Task SaveBatch()
+    {
+        try
+        {
+            IsSavingBatch = true;
+            StateHasChanged();
+
+            Console.WriteLine($"💾 SaveBatch called: {FillingBatch}");
+
+            if (OnSaveLotFormat.HasDelegate)
+            {
+                await OnSaveLotFormat.InvokeAsync((FillingBatch, null));
+
+                // ✅ NUEVO: Actualizar RG35 local también
+                if (RG35 != null)
+                {
+                    if (FillingBatch.Contains(":"))
+                        FillingBatch = FillingBatch.Substring(FillingBatch.IndexOf(":") + 1);
+
+                    if (FillingBatch.Contains(":"))
+                        FillingBatch = FillingBatch.Substring(FillingBatch.IndexOf(":") + 1);
+
+
+                    RG35.Filling_batch = FillingBatch;
+                    RG35.Box_Lote = FillingBatch; // Actualizar para ProductLabel
+                }
+
+                await Task.Delay(100);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error in SaveBatch: {ex.Message}");
+        }
+        finally
+        {
+            IsSavingBatch = false;
+            StateHasChanged();
+        }
+    }
+
+    protected async Task SaveBbd()
+    {
+        try
+        {
+            IsSavingBbd = true;
+            StateHasChanged();
+
+            Console.WriteLine($"💾 SaveBbd called: {FillingExpDate}");
+
+            if (OnSaveBbdFormat.HasDelegate)
+            {
+                await OnSaveBbdFormat.InvokeAsync((FillingExpDate, null));
+
+                // ✅ NUEVO: Actualizar RG35 local también
+                if (RG35 != null)
+                {
+                    if (FillingExpDate.Contains(":"))
+                        FillingExpDate = FillingExpDate.Substring(FillingExpDate.IndexOf(":") + 1);
+
+                    if (FillingExpDate.Contains(":"))
+                        FillingExpDate = FillingExpDate.Substring(FillingExpDate.IndexOf(":") + 1);
+
+                    RG35.Filling_exp_date = FillingExpDate;
+                    RG35.Box_BBD = FillingExpDate; // Actualizar para ProductLabel
+                }
+
+                await Task.Delay(100);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error in SaveBbd: {ex.Message}");
+        }
+        finally
+        {
+            IsSavingBbd = false;
+            StateHasChanged();
+        }
+    }
     protected async Task OnTakeSampleChanged()
     {
         StateHasChanged();

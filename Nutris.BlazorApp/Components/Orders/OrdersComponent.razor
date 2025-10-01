@@ -621,54 +621,65 @@
                                                 <div class="head-t">
                                                     <h3 class="font-18 RalewayExtraBold">@Localization["orderView.FillingInstructions"]</h3>
                                                 </div>
-                                                <div class="d-lg-flex gap-4 justify-content-center">
-                                                    <div class="body-t body-t-filling body-t-bottle">
-                                                      <div class="body-t body-t-filling body-t-bottle">
-                                                        <!-- BATCH / LOTE -->
-                                                        <div class="body-td">
-                                                            <p class="font-18 RalewayRegular">@Localization["orderView.Batch"]</p>
-                                                            <div class="data-t">
+                                            <div class="d-lg-flex gap-4 justify-content-center">
+                                                <div class="body-t body-t-filling body-t-bottle">
+                                                    <!-- BATCH / LOTE -->
+                                                    <div class="body-td">
+                                                        <p class="font-18 RalewayRegular">@Localization["orderView.Batch"]</p>
+                                                        <div class="data-t">
+                                                            <div class="position-relative d-flex align-items-center gap-2">
                                                                 <select class="font-20 RalewayRegular form-select"
                                                                         @bind="FillingBatch"
                                                                         @bind:after="SaveBatch"
-                                                                        disabled="@(Status == "Cerrado cliente y calidad" || Status == "Cerrado cliente")">
+                                                                        disabled="@(Status == "Cerrado cliente y calidad" || Status == "Cerrado cliente" || IsSavingBatch)">
                                                                     @foreach (var opt in BatchFormats)
                                                                     {
                                                                         <option value="@opt.Format">@opt.Format</option>
                                                                     }
                                                                 </select>
 
-                                                                @if (FillingBatch?.StartsWith("OTHER") == true)
+                                                                @if (IsSavingBatch)
                                                                 {
-                                                                    <div class="d-flex gap-2 mt-2 align-items-center">
-                                                                        <input type="text"
-                                                                               class="font-20 RalewayRegular"
-                                                                               maxlength="12"
-                                                                               placeholder="Ingrese formato de lote"
-                                                                               @bind="FillingBatchOther"
-                                                                               @bind:event="oninput"
-                                                                               disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBatchOther || Status == "Cerrado cliente")" />
-                                                                        <button class="btn-t RalewayMedium font-16"
-                                                                                type="button"
-                                                                                @onclick="SaveBatchOther"
-                                                                                disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBatchOther || Status == "Cerrado cliente" || string.IsNullOrWhiteSpace(FillingBatchOther))">
-                                                                            @if (IsSendingBatchOther)
-                                                                            {
-                                                                                <span class="spinner-border spinner-border-sm me-2"></span>
-                                                                            }
-                                                                            <span>@(IsSendingBatchOther ? "Enviando..." : "Enviar")</span>
-                                                                        </button>
+                                                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                                        <span class="visually-hidden">Guardando...</span>
                                                                     </div>
-
-                                                                    @if (!string.IsNullOrWhiteSpace(FillingBatchOther) && !IsSendingBatchOther)
-                                                                    {
-                                                                        <small class="text-success d-block mt-1">
-                                                                            ✓ Formato guardado: @FillingBatchOther
-                                                                        </small>
-                                                                    }
                                                                 }
+                                                            </div>
 
-                                                                @if (FillingBatch != "-")
+                                                            @if (FillingBatch?.StartsWith("OTHER") == true)
+                                                            {
+                                                                <div class="d-flex gap-2 mt-2 align-items-center">
+                                                                    <input type="text"
+                                                                           class="font-20 RalewayRegular"
+                                                                           maxlength="12"
+                                                                           placeholder="Ingrese formato de lote"
+                                                                           @bind="FillingBatchOther"
+                                                                           @bind:event="oninput"
+                                                                           disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBatchOther || Status == "Cerrado cliente")" />
+                                                                    <button class="btn-t RalewayMedium font-16"
+                                                                            type="button"
+                                                                            @onclick="SaveBatchOther"
+                                                                            disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBatchOther || Status == "Cerrado cliente" || string.IsNullOrWhiteSpace(FillingBatchOther))">
+                                                                        @if (IsSendingBatchOther)
+                                                                        {
+                                                                            <span class="spinner-border spinner-border-sm me-2"></span>
+                                                                        }
+                                                                        <span>@(IsSendingBatchOther ? "Enviando..." : "Enviar")</span>
+                                                                    </button>
+                                                                </div>
+
+                                                                @if (!string.IsNullOrWhiteSpace(FillingBatchOther) && !IsSendingBatchOther)
+                                                                {
+                                                                    <small class="text-success d-block mt-1">
+                                                                        ✓ Formato guardado: @FillingBatchOther
+                                                                    </small>
+                                                                }
+                                                            }
+
+                                                            @* Validación: si es OTHER, verificar que tenga texto en el campo libre *@
+                                                            @if (FillingBatch?.StartsWith("OTHER") == true)
+                                                            {
+                                                                @if (!string.IsNullOrWhiteSpace(FillingBatchOther))
                                                                 {
                                                                     <div class="line-from"></div>
                                                                     <img src="img/check-icon.svg" alt="check">
@@ -678,54 +689,77 @@
                                                                     <div class="line-from"></div>
                                                                     <img src="img/cancelar.svg" alt="check">
                                                                 }
-                                                            </div>
+                                                            }
+                                                            else if (FillingBatch != "-")
+                                                            {
+                                                                <div class="line-from"></div>
+                                                                <img src="img/check-icon.svg" alt="check">
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="line-from"></div>
+                                                                <img src="img/cancelar.svg" alt="check">
+                                                            }
                                                         </div>
+                                                    </div>
 
-                                                        <!-- EXPIRATION DATE / FECHA DE CADUCIDAD -->
-                                                        <div class="body-td">
-                                                            <p class="font-18 RalewayRegular">@Localization["orderView.ExpDate"]</p>
-                                                            <div class="data-t">
+                                                    <!-- EXPIRATION DATE / FECHA DE CADUCIDAD -->
+                                                    <div class="body-td">
+                                                        <p class="font-18 RalewayRegular">@Localization["orderView.ExpDate"]</p>
+                                                        <div class="data-t">
+                                                            <div class="position-relative d-flex align-items-center gap-2">
                                                                 <select class="font-20 RalewayRegular form-select"
                                                                         @bind="FillingExpDate"
                                                                         @bind:after="SaveBbd"
-                                                                        disabled="@(Status == "Cerrado cliente y calidad" || Status == "Cerrado cliente")">
+                                                                        disabled="@(Status == "Cerrado cliente y calidad" || Status == "Cerrado cliente" || IsSavingBbd)">
                                                                     @foreach (var opt in BbdFormats)
                                                                     {
                                                                         <option value="@opt.Format">@opt.Format</option>
                                                                     }
                                                                 </select>
 
-                                                                @if (FillingExpDate?.StartsWith("OTHER") == true)
+                                                                @if (IsSavingBbd)
                                                                 {
-                                                                    <div class="d-flex gap-2 mt-2 align-items-center">
-                                                                        <input type="text"
-                                                                               class="font-20 RalewayRegular"
-                                                                               maxlength="12"
-                                                                               placeholder="Ingrese formato de caducidad"
-                                                                               @bind="FillingExpDateOther"
-                                                                               @bind:event="oninput"
-                                                                               disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBbdOther || Status == "Cerrado cliente")" />
-                                                                        <button class="btn-t RalewayMedium font-16"
-                                                                                type="button"
-                                                                                @onclick="SaveBbdOther"
-                                                                                disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBbdOther || Status == "Cerrado cliente" || string.IsNullOrWhiteSpace(FillingExpDateOther))">
-                                                                            @if (IsSendingBbdOther)
-                                                                            {
-                                                                                <span class="spinner-border spinner-border-sm me-2"></span>
-                                                                            }
-                                                                            <span>@(IsSendingBbdOther ? "Enviando..." : "Enviar")</span>
-                                                                        </button>
+                                                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                                        <span class="visually-hidden">Guardando...</span>
                                                                     </div>
-
-                                                                    @if (!string.IsNullOrWhiteSpace(FillingExpDateOther) && !IsSendingBbdOther)
-                                                                    {
-                                                                        <small class="text-success d-block mt-1">
-                                                                            ✓ Formato guardado: @FillingExpDateOther
-                                                                        </small>
-                                                                    }
                                                                 }
+                                                            </div>
 
-                                                                @if (FillingExpDate != "-")
+                                                            @if (FillingExpDate?.StartsWith("OTHER") == true)
+                                                            {
+                                                                <div class="d-flex gap-2 mt-2 align-items-center">
+                                                                    <input type="text"
+                                                                           class="font-20 RalewayRegular"
+                                                                           maxlength="12"
+                                                                           placeholder="Ingrese formato de caducidad"
+                                                                           @bind="FillingExpDateOther"
+                                                                           @bind:event="oninput"
+                                                                           disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBbdOther || Status == "Cerrado cliente")" />
+                                                                    <button class="btn-t RalewayMedium font-16"
+                                                                            type="button"
+                                                                            @onclick="SaveBbdOther"
+                                                                            disabled="@(Status == "Cerrado cliente y calidad" || IsSendingBbdOther || Status == "Cerrado cliente" || string.IsNullOrWhiteSpace(FillingExpDateOther))">
+                                                                        @if (IsSendingBbdOther)
+                                                                        {
+                                                                            <span class="spinner-border spinner-border-sm me-2"></span>
+                                                                        }
+                                                                        <span>@(IsSendingBbdOther ? "Enviando..." : "Enviar")</span>
+                                                                    </button>
+                                                                </div>
+
+                                                                @if (!string.IsNullOrWhiteSpace(FillingExpDateOther) && !IsSendingBbdOther)
+                                                                {
+                                                                    <small class="text-success d-block mt-1">
+                                                                        ✓ Formato guardado: @FillingExpDateOther
+                                                                    </small>
+                                                                }
+                                                            }
+
+                                                            @* Validación: si es OTHER, verificar que tenga texto en el campo libre *@
+                                                            @if (FillingExpDate?.StartsWith("OTHER") == true)
+                                                            {
+                                                                @if (!string.IsNullOrWhiteSpace(FillingExpDateOther))
                                                                 {
                                                                     <div class="line-from"></div>
                                                                     <img src="img/check-icon.svg" alt="check">
@@ -735,49 +769,42 @@
                                                                     <div class="line-from"></div>
                                                                     <img src="img/cancelar.svg" alt="check">
                                                                 }
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- LOCATION (sin cambios) -->
-                                                        <div class="body-td">
-                                                            <p class="font-18 RalewayRegular">@Localization["orderView.Location"]</p>
-                                                            <div class="data-t">
-                                                                <input type="text" readonly class="font-20 RalewayRegular" value="@FillingLocation">
-                                                                @if (FillingLocation != "-")
-                                                                {
-                                                                    <div class="line-from"></div>
-                                                                    <img src="img/check-icon.svg" alt="check">
-                                                                }
-                                                                else
-                                                                {
-                                                                    <div class="line-from"></div>
-                                                                    <img src="img/cancelar.svg" alt="check">
-                                                                }
-                                                            </div>
+                                                            }
+                                                            else if (FillingExpDate != "-")
+                                                            {
+                                                                <div class="line-from"></div>
+                                                                <img src="img/check-icon.svg" alt="check">
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="line-from"></div>
+                                                                <img src="img/cancelar.svg" alt="check">
+                                                            }
                                                         </div>
                                                     </div>
-                                                        <div class="body-td">
-                                                            <p class="font-18 RalewayRegular">@Localization["orderView.Location"]</p>
-                                                            <div class="data-t">
-                                                                <input type="text" readonly class="font-20 RalewayRegular" value="@FillingLocation">
-                                                                @if (FillingLocation != "-")
-                                                                {
-                                                                    <div class="line-from"></div>
-                                                                    <img src="img/check-icon.svg" alt="check">
-                                                                }
-                                                                else
-                                                                {
-                                                                    <div class="line-from"></div>
-                                                                    <img src="img/cancelar.svg" alt="check">
-                                                                }
-                                                            </div>
+                                                    <!-- LOCATION (sin cambios) - SOLO UNA VEZ -->
+                                                    <div class="body-td">
+                                                        <p class="font-18 RalewayRegular">@Localization["orderView.Location"]</p>
+                                                        <div class="data-t">
+                                                            <input type="text" readonly class="font-20 RalewayRegular" value="@FillingLocation">
+                                                            @if (FillingLocation != "-")
+                                                            {
+                                                                <div class="line-from"></div>
+                                                                <img src="img/check-icon.svg" alt="check">
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="line-from"></div>
+                                                                <img src="img/cancelar.svg" alt="check">
+                                                            }
                                                         </div>
-                                                    </div>
-
-                                                    <div class="bottle-img-1">
-                                                        <img src="img/bottle-instructions.png" alt="instructions">
                                                     </div>
                                                 </div>
+
+                                                <div class="bottle-img-1">
+                                                    <img src="img/bottle-instructions.png" alt="instructions">
+                                                </div>
+                                            </div>
                                             </div>
                                         </div>
 
