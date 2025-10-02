@@ -1,10 +1,17 @@
-﻿* {
+﻿/* ========================================
+   MAINLAYOUT - NUTRIS BLAZOR
+   ======================================== */
+
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Layout principal - DESKTOP PRIMERO */
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
+
 .page-layout {
     display: flex;
     width: 100%;
@@ -14,7 +21,10 @@
     overflow: hidden;
 }
 
-/* Sidebar - Diseño original preservado */
+/* ========================================
+   SIDEBAR
+   ======================================== */
+
 .sidebar {
     width: 300px;
     height: 100vh;
@@ -34,19 +44,32 @@
     justify-content: space-between;
 }
 
+/* Logo - IGUAL QUE CUSTOMER PROFILE */
 .logo {
-    padding: 1rem;
+    padding: 20px;
     margin: 25px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-    .logo img {
+    .logo a {
         display: block;
-        margin: auto;
+        width: 100%;
+        max-width: 200px;
     }
 
-.w-75 {
-    width: 75%;
-}
+    .logo img {
+        width: 100%;
+        height: auto;
+        max-height: 70px;
+        object-fit: contain;
+        display: block;
+    }
+
+/* ========================================
+   NAVEGACIÓN
+   ======================================== */
 
 .navgrid {
     display: grid;
@@ -63,11 +86,18 @@
     font-size: 1.125rem;
     font-weight: 300;
     color: #2F5496;
+    transition: all 0.3s ease;
 }
 
     .nav-container nav a.active {
         background-color: #C5D9EC;
         font-weight: 700;
+        border-radius: 30px;
+        padding: 10px 20px;
+    }
+
+    .nav-container nav a:hover:not(.active) {
+        background-color: rgba(197, 217, 236, 0.5);
         border-radius: 30px;
         padding: 10px 20px;
     }
@@ -81,29 +111,54 @@
     border-top: 1px dashed #2F5496;
 }
 
+/* ========================================
+   PERFIL Y AVATAR
+   ======================================== */
+
+.perfil-container {
+    padding-bottom: 20px;
+}
+
 .avatar-container {
     width: 90%;
-    margin: 0 auto;
+    margin: 0 auto 10px;
     background: white;
     border-radius: 20px;
     padding: 15px;
-    margin-bottom: 10px;
     text-align: center;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
 }
 
+    .avatar-container:hover {
+        background-color: rgba(47, 84, 150, 0.05);
+    }
+
+/* Avatar - IGUAL QUE CUSTOMER PROFILE */
 .avatar {
-    width: auto;
-    height: 120px;
+    width: 100px;
+    height: 100px;
+    max-width: 100%;
     object-fit: contain;
     border-radius: 10px;
+    padding: 8px;
+    background: var(--spaceWrite, #f5f5f5);
+    border: 1px solid #dee2e6;
+    margin: 0 auto 10px;
+    display: block;
 }
 
 .text-titles h2 {
     font-weight: 700;
     font-size: 14px;
-    margin: 12px 0 0;
+    margin: 0;
     color: #2c3e50;
+    word-wrap: break-word;
 }
+
+/* ========================================
+   ICONOS DE CUENTA
+   ======================================== */
 
 .icons-acount {
     display: grid;
@@ -116,9 +171,14 @@
 
     .icons-acount img {
         cursor: pointer;
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
+        transition: transform 0.2s ease;
     }
+
+        .icons-acount img:hover {
+            transform: scale(1.1);
+        }
 
 .tooltip-custom {
     position: absolute;
@@ -126,19 +186,37 @@
     left: 50%;
     transform: translateX(-50%);
     background: white;
-    padding: 8px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    padding: 10px 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     font-size: 12px;
     width: 200px;
     margin-bottom: 10px;
     z-index: 1000;
+    animation: tooltipFadeIn 0.2s ease;
 }
 
     .tooltip-custom p {
         margin: 0;
         text-align: center;
+        color: #374151;
     }
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* ========================================
+   ÁREA DE CONTENIDO
+   ======================================== */
 
 .content-area {
     flex: 1;
@@ -149,7 +227,10 @@
     padding: 0;
 }
 
-/* Hamburger menu - Oculto por defecto */
+/* ========================================
+   HAMBURGER MENU
+   ======================================== */
+
 .hamburger-menu {
     display: none !important;
     position: fixed;
@@ -168,7 +249,12 @@
     justify-content: center;
     align-items: center;
     gap: 4px;
+    transition: transform 0.2s ease;
 }
+
+    .hamburger-menu:active {
+        transform: scale(0.95);
+    }
 
     .hamburger-menu span {
         display: block;
@@ -194,7 +280,10 @@
         transform: rotate(-45deg) translate(7px, -6px);
     }
 
-/* Botón de cierre X en el sidebar */
+/* ========================================
+   SIDEBAR MÓVIL
+   ======================================== */
+
 .sidebar-close-btn {
     display: none;
     position: absolute;
@@ -204,17 +293,16 @@
     border: none;
     cursor: pointer;
     z-index: 10;
-    padding: 5px;
-    transition: transform 0.2s ease;
+    padding: 8px;
+    transition: all 0.2s ease;
+    border-radius: 50%;
 }
 
     .sidebar-close-btn:hover {
         transform: scale(1.1);
         background: rgba(47, 84, 150, 0.1);
-        border-radius: 50%;
     }
 
-/* Overlay mejorado con animación */
 .sidebar-overlay {
     display: none !important;
     position: fixed;
@@ -226,7 +314,7 @@
     z-index: 998;
     opacity: 0;
     pointer-events: none;
-    transition: background-color 0.3s ease, opacity 0.3s ease;
+    transition: opacity 0.3s ease;
 }
 
     .sidebar-overlay.active {
@@ -235,7 +323,10 @@
         pointer-events: auto;
     }
 
-/* MODAL DE LOGOUT MEJORADO */
+/* ========================================
+   MODAL DE LOGOUT
+   ======================================== */
+
 .logout-modal-backdrop {
     position: fixed;
     top: 0;
@@ -384,7 +475,10 @@
     animation: spin 0.8s linear infinite;
 }
 
-/* Animaciones mejoradas */
+/* ========================================
+   ANIMACIONES
+   ======================================== */
+
 @keyframes spin {
     to {
         transform: rotate(360deg);
@@ -413,16 +507,21 @@
     }
 }
 
-/* RESPONSIVE - TABLET LANDSCAPE (mantiene sidebar) */
+/* ========================================
+   RESPONSIVE - TABLET LANDSCAPE GRANDE
+   ======================================== */
+
 @media (min-width: 1025px) and (max-width: 1366px) and (orientation: landscape) {
     .sidebar {
         width: 280px;
     }
 }
 
-/* RESPONSIVE - TABLET PORTRAIT Y LANDSCAPE PEQUEÑO */
-@media (max-width: 1024px) and (orientation: landscape) and (max-height: 768px), (max-width: 1024px) and (orientation: portrait) {
+/* ========================================
+   RESPONSIVE - TABLET
+   ======================================== */
 
+@media (max-width: 1024px) {
     .hamburger-menu {
         display: flex !important;
     }
@@ -445,32 +544,11 @@
 
     .sidebar-overlay {
         display: block !important;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 998;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
     }
-
-        .sidebar.mobile-active ~ .sidebar-overlay,
-        .sidebar-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
 
     .content-area {
         width: 100%;
         margin-left: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .sidebar.mobile-active ~ .content-area {
-        opacity: 0.4;
     }
 
     .sidebar-close-btn {
@@ -478,77 +556,55 @@
     }
 
     .sidebar .logo {
-        margin-top: 50px;
+        margin-top: 60px;
     }
 }
 
-/* RESPONSIVE - MÓVIL */
+/* ========================================
+   RESPONSIVE - MÓVIL
+   ======================================== */
+
 @media (max-width: 768px) {
     .hamburger-menu {
         display: flex !important;
         width: 35px;
         height: 30px;
-        top: 20px;
-        left: 20px;
+        top: 15px;
+        left: 15px;
     }
 
     .sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        transform: translateX(-100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 999;
         width: 280px;
     }
 
-        .sidebar.mobile-active {
-            transform: translateX(0) !important;
+    .logo {
+        padding: 15px;
+        margin: 20px 0;
+    }
+
+        .logo a {
+            max-width: 160px;
         }
 
-    .sidebar-overlay {
-        display: block !important;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 998;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-    }
-
-        .sidebar-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
+        .logo img {
+            max-height: 60px;
         }
-
-    .content-area {
-        width: 100%;
-        margin-left: 0;
-    }
-
-    .avatar-container {
-        padding: 10px;
-    }
 
     .avatar {
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
+    }
+
+    .text-titles h2 {
+        font-size: 13px;
     }
 
     .nav-container nav a {
         margin: 15px 0;
         padding: 8px 1rem;
+        font-size: 1rem;
     }
 
-    .sidebar-close-btn {
-        display: block !important;
-    }
-
-    /* Ajuste del modal en móvil */
     .logout-modal-wrapper {
         width: 95%;
         max-width: 400px;
@@ -574,7 +630,10 @@
     }
 }
 
-/* RESPONSIVE - MÓVIL PEQUEÑO */
+/* ========================================
+   RESPONSIVE - MÓVIL PEQUEÑO
+   ======================================== */
+
 @media (max-width: 480px) {
     .sidebar {
         width: 100%;
@@ -582,19 +641,46 @@
     }
 
     .hamburger-menu {
-        top: 15px;
-        left: 15px;
-        width: 30px;
-        height: 25px;
+        top: 12px;
+        left: 12px;
+        width: 32px;
+        height: 28px;
     }
 
-    .nav-container nav a {
-        font-size: 1rem;
+    .logo {
+        padding: 10px 15px;
+        margin: 15px 0;
+    }
+
+        .logo a {
+            max-width: 140px;
+        }
+
+        .logo img {
+            max-height: 50px;
+        }
+
+    .avatar {
+        width: 70px;
+        height: 70px;
     }
 
     .text-titles h2 {
         font-size: 12px;
     }
+
+    .nav-container nav a {
+        font-size: 0.95rem;
+    }
+
+    .icons-acount {
+        padding: 1.2rem;
+    }
+
+        .icons-acount img {
+            width: 20px;
+            height: 20px;
+        }
 
     .logout-modal-wrapper {
         width: 90%;
@@ -610,7 +696,10 @@
     }
 }
 
-/* Desktop - Asegurar comportamiento correcto */
+/* ========================================
+   DESKTOP - COMPORTAMIENTO FORZADO
+   ======================================== */
+
 @media screen and (min-width: 1025px) {
     .hamburger-menu {
         display: none !important;
@@ -633,30 +722,3 @@
         display: none !important;
     }
 }
-
-/* Para tablets grandes en landscape que SÍ deben mostrar el sidebar */
-@media screen and (min-width: 1025px) and (max-width: 1366px) and (orientation: landscape) {
-    .sidebar {
-        width: 280px;
-    }
-
-    .hamburger-menu {
-        display: none !important;
-    }
-}
-
-/* Prevenir scroll del body cuando el sidebar está abierto en móvil */
-@media screen and (max-width: 1024px) {
-    body.sidebar-open {
-        overflow: hidden;
-    }
-}
-
-/* Animación más suave del hamburger menu */
-.hamburger-menu {
-    transition: transform 0.2s ease;
-}
-
-    .hamburger-menu:active {
-        transform: scale(0.95);
-    }
