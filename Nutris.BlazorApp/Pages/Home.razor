@@ -61,7 +61,7 @@
         }
     </div>
 
-    <!-- Texto superpuesto -->
+    <!-- Texto superpuesto (SIN text-shadow) -->
     <div class="text-home">
         <h1 class="font-82 MuseoSemiBold">@Localization["Home.Welcome"]</h1>
         <div class="pagraph-home font-20 RalewayRegular">
@@ -70,6 +70,13 @@
             <span>@Localization["Home.Text3"]</span>
             <span>@Localization["Home.Text4"]</span>
         </div>
+    </div>
+
+    <!-- Enlace al Canal Ético (abajo a la derecha) -->
+    <div class="whistleblower-link-container">
+        <a href="@GetWhistleblowerPolicyUrl()" class="whistleblower-link">
+            <span>@GetWhistleblowerLinkText()</span>
+        </a>
     </div>
 </div>
 
@@ -83,7 +90,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Verificar autenticación
         var isAuthenticated = await AuthService.IsAuthenticatedAsync();
         if (!isAuthenticated)
         {
@@ -91,16 +97,9 @@
             return;
         }
 
-        // Obtener idioma actual
         currentLanguage = Localization.CurrentLanguage ?? "en";
-
-        // Suscribirse a cambios de idioma
         Localization.OnLanguageChanged += OnLanguageChanged;
-
-        // Iniciar con una imagen aleatoria
-        currentImageIndex = random.Next(1, TOTAL_SLIDES + 1); // Genera un número entre 1 y 5
-
-        // Iniciar el slideshow
+        currentImageIndex = random.Next(1, TOTAL_SLIDES + 1);
         StartSlideshow();
     }
 
@@ -109,8 +108,8 @@
         slideshowTimer = new System.Threading.Timer(
             callback: _ => NextSlide(),
             state: null,
-            dueTime: TimeSpan.FromSeconds(5), // Primera transición después de 5 segundos
-            period: TimeSpan.FromSeconds(5)   // Cambiar cada 5 segundos
+            dueTime: TimeSpan.FromSeconds(5),
+            period: TimeSpan.FromSeconds(5)
         );
     }
 
@@ -130,8 +129,6 @@
     private void GoToSlide(int index)
     {
         currentImageIndex = index;
-
-        // Reiniciar el timer cuando el usuario selecciona manualmente una imagen
         slideshowTimer?.Dispose();
         StartSlideshow();
     }
@@ -151,6 +148,18 @@
     {
         showLanguageMenu = false;
         await Localization.ChangeLanguageAsync(language);
+    }
+
+    private string GetWhistleblowerPolicyUrl()
+    {
+        return currentLanguage == "es" ? "/politica-canal-etico" : "/whistleblower-policy";
+    }
+
+    private string GetWhistleblowerLinkText()
+    {
+        return currentLanguage == "es"
+            ? "Canal Ético"
+            : "Whistleblower Channel";
     }
 
     public void Dispose()

@@ -1,0 +1,410 @@
+﻿@page "/whistleblower-policy"
+@inject ILocalizationService Localization
+@inject NavigationManager Navigation
+
+<PageTitle>Whistleblower Policy | Nutris</PageTitle>
+
+<link href="/css/LegalPages.css" rel="stylesheet" />
+
+<!-- Back Button -->
+<div class="legal-back-button-container">
+    <button class="legal-back-button" @onclick="GoBack">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+    </button>
+</div>
+
+<div class="legal-page-container">
+    <!-- Header with logo -->
+    <div class="legal-header">
+        <!-- ... resto del contenido ... -->
+        <img src="/img/logo-nutris_xl.jpg" alt="Nutris Logo" class="legal-logo" />
+        <h1 class="legal-title">Internal Reporting System Policy</h1>
+        <p class="legal-subtitle">Whistleblower Channel - Nutris Group</p>
+    </div>
+
+    <!-- Main content -->
+    <div class="legal-content">
+
+        <!-- 1. PURPOSE -->
+        <section class="legal-section">
+            <h2 class="section-title">1. PURPOSE</h2>
+            <p>
+                In order to foster a culture of information and communication as a mechanism to prevent and detect conduct constituting
+                crimes, and in compliance with Law 2/2023 of February 20, regulating the protection of persons who report regulatory
+                infringements and combating corruption, <strong>NUTRIS INGREDIENTES, S.L.</strong> and <strong>ROYPAS BY NUTRIS, S.A.U.</strong>
+                (hereinafter <strong>NUTRIS GROUP</strong>) have established an Internal Reporting System.
+            </p>
+            <p>
+                The purpose of this Policy is to regulate the NUTRIS GROUP's Internal Reporting System, and together with its Ethical
+                Channel Management Procedure, to guarantee professional, confidential, impartial, and maximum protection management
+                throughout the process, thereby generating a climate of trust for its stakeholders.
+            </p>
+        </section>
+
+        <!-- 2. SCOPE -->
+        <section class="legal-section">
+            <h2 class="section-title">2. SCOPE</h2>
+
+            <h3 class="subsection-title">2.1. Material Scope</h3>
+            <p>
+                Information processed through the Internal Reporting System will refer to serious misconduct or suspected corruption,
+                which may constitute serious or very serious criminal or administrative offenses related to NUTRIS GROUP's activities,
+                which the informant has observed or about which they have received information in the course of their work or professional
+                relationship with NUTRIS GROUP.
+            </p>
+
+            <div class="info-box">
+                <h4>Information will refer to:</h4>
+                <ul class="legal-list">
+                    <li>
+                        <strong>a) Infringements within the scope of application of European Union acts:</strong>
+                        <ul class="nested-list">
+                            <li>Public procurement</li>
+                            <li>Financial services, products and markets, and prevention of money laundering and terrorist financing</li>
+                            <li>Product safety and compliance</li>
+                            <li>Transport safety</li>
+                            <li>Environmental protection</li>
+                            <li>Protection against radiation and nuclear safety</li>
+                            <li>Food and feed safety, animal health and welfare</li>
+                            <li>Public health</li>
+                            <li>Consumer protection</li>
+                            <li>Protection of privacy and personal data, and security of network and information systems</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>b) Infringements affecting the financial interests of the European Union</strong>
+                        as contemplated in Article 325 of the Treaty on the Functioning of the European Union (TFEU).
+                    </li>
+                    <li>
+                        <strong>c) Infringements affecting the internal market</strong>, as contemplated in Article 26, paragraph 2
+                        of the TFEU, including infringements of European Union rules on competition and State aid.
+                    </li>
+                    <li>
+                        <strong>d) Actions or omissions</strong> that may constitute serious or very serious criminal or administrative
+                        offenses, including those offenses that imply economic damage to the Public Treasury and Social Security.
+                    </li>
+                    <li>
+                        <strong>e) Infringements of labor law</strong> regarding health and safety at work reported by workers.
+                    </li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-title">2.2. Personal Scope</h3>
+            <p>
+                The Internal Reporting System will allow communications to be made by persons who, in a work or professional context,
+                are aware of the infringements provided for in section 2.1., including in all cases:
+            </p>
+            <ul class="legal-list">
+                <li>Employees, volunteers, interns, and workers in training periods</li>
+                <li>Self-employed persons</li>
+                <li>Shareholders, partners, and persons belonging to the administration, management, or supervision body of the company</li>
+                <li>Anyone working for or under the supervision and direction of contractors, subcontractors, and suppliers</li>
+                <li>Persons whose employment relationship has not yet begun, when information was obtained during the selection process</li>
+            </ul>
+
+            <h3 class="subsection-title">2.3. Corporate Scope</h3>
+            <p>
+                This Policy applies to the companies of NUTRIS GROUP:
+                <strong>NUTRIS INGREDIENTS, S.L.</strong> and <strong>ROYPAS BY NUTRIS, S.A.U.</strong>
+            </p>
+        </section>
+
+        <!-- 3. DEFINITIONS -->
+        <section class="legal-section">
+            <h2 class="section-title">3. DEFINITIONS</h2>
+            <dl class="definitions-list">
+                <dt>Internal Reporting System</dt>
+                <dd>
+                    System composed of the internal communication channel (Ethical Channel), the system manager, a policy that sets out
+                    the general principles of the system, and procedures establishing how to manage and follow up on received information.
+                </dd>
+
+                <dt>Information on infringements</dt>
+                <dd>
+                    Information, including reasonable suspicions, about actual or potential infringements that have occurred or are very
+                    likely to occur in the organization.
+                </dd>
+
+                <dt>Report</dt>
+                <dd>The communication of information on infringements.</dd>
+
+                <dt>Reporting person or informant</dt>
+                <dd>
+                    Natural person who communicates information on infringements obtained in the context of their work or professional activities.
+                </dd>
+
+                <dt>Affected person</dt>
+                <dd>
+                    Natural or legal person referred to in the report as the person to whom the infringement is attributed or with whom
+                    it is associated.
+                </dd>
+
+                <dt>Work context</dt>
+                <dd>
+                    Present or past work activities through which persons can obtain information on infringements and in which these persons
+                    could suffer retaliation if they communicate such information.
+                </dd>
+
+                <dt>Act of retaliation</dt>
+                <dd>
+                    Any acts or omissions prohibited by law that involve unfavorable treatment for persons because of their status as informants.
+                </dd>
+
+                <dt>Competent authority</dt>
+                <dd>
+                    Independent Authority for the Protection of the Informant (A.A.I.) or competent regional authorities or bodies.
+                </dd>
+            </dl>
+        </section>
+
+        <!-- 4. GUIDING PRINCIPLES -->
+        <section class="legal-section">
+            <h2 class="section-title">4. GUIDING PRINCIPLES</h2>
+            <p>
+                The procedure for receiving, processing, resolving, and recording reports received in NUTRIS GROUP's Internal Reporting
+                System will be governed by the following principles:
+            </p>
+
+            <div class="principles-grid">
+                <div class="principle-card">
+                    <h4>Anonymity</h4>
+                    <p>
+                        The informant may request anonymity when submitting their report, while maintaining the possibility of two-way
+                        communication with the Channel Manager.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Good Faith</h4>
+                    <p>
+                        Communications will be made honestly, with conviction regarding the truth or accuracy of their subject matter,
+                        providing all available data and documents.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Information</h4>
+                    <p>
+                        The informant will have the right to know the processing status of their report and the investigation results.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Confidentiality</h4>
+                    <p>
+                        Actions will be carried out with the utmost prudence and discretion to guarantee confidentiality regarding
+                        the informant's identity.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Data Protection</h4>
+                    <p>
+                        Mechanisms comply with current data protection regulations and information security standards.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Diligence</h4>
+                    <p>
+                        Investigation and resolution must be carried out without undue delay, in the shortest possible time while
+                        respecting due guarantees.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Prevention of Conflict of Interest</h4>
+                    <p>
+                        The process is carried out by an independent, impartial, and objective team, removing conflicted members.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Contradiction</h4>
+                    <p>
+                        The procedure guarantees an impartial hearing and fair treatment for all affected persons.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Prohibition of Retaliation</h4>
+                    <p>
+                        Acts constituting retaliation against persons who submit a report are expressly prohibited.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Independence</h4>
+                    <p>
+                        The System Manager performs their functions independently and autonomously, without receiving instructions.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Presumption of Innocence</h4>
+                    <p>
+                        Affected persons will have the presumption of innocence and the right of defense throughout the process.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Proportionality</h4>
+                    <p>
+                        All notifications will be treated equally, regardless of who the sender is.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. RIGHTS AND GUARANTEES -->
+        <section class="legal-section">
+            <h2 class="section-title">5. RIGHTS AND GUARANTEES OF THE INFORMANT AND REPORTED PERSON</h2>
+
+            <div class="two-columns">
+                <div class="column">
+                    <h3 class="subsection-title">5.1. Informant's Rights</h3>
+                    <ul class="legal-list">
+                        <li>To submit information in writing and decide whether to do so anonymously</li>
+                        <li>To have anonymity maintained throughout the procedure</li>
+                        <li>To have their identity not revealed to the reported person or third parties</li>
+                        <li>To indicate an address or email to receive communications</li>
+                        <li>To appear on their own initiative</li>
+                        <li>To know the processing status and investigation results</li>
+                        <li>To confidentiality of communications</li>
+                        <li>To protection measures against retaliation</li>
+                        <li>To choose the reporting channel, being able to go to external channels</li>
+                        <li>To deletion or anonymization of data after legal deadlines</li>
+                    </ul>
+                </div>
+
+                <div class="column">
+                    <h3 class="subsection-title">5.2. Rights of the Affected Person</h3>
+                    <ul class="legal-list">
+                        <li>To be informed that they are under investigation</li>
+                        <li>To honor and privacy</li>
+                        <li>To presumption of innocence and to use all valid means for their defense</li>
+                        <li>To be heard at any time</li>
+                        <li>To submit written allegations</li>
+                        <li>To access proceedings, without revealing the informant's identity</li>
+                        <li>To rectification of their personal data</li>
+                        <li>To protection of their personal data</li>
+                        <li>To confidentiality of communications</li>
+                        <li>To legal assistance</li>
+                        <li>To be informed of the resolution or dismissal of the report</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. SYSTEM MANAGER -->
+        <section class="legal-section">
+            <h2 class="section-title">6. INTERNAL REPORTING SYSTEM MANAGER</h2>
+            <p>
+                The Management Body of NUTRIS GROUP has appointed a collegiate body as Manager of the Internal Reporting System
+                (Ethical Channel) composed of the following positions:
+            </p>
+            <ul class="legal-list highlight-list">
+                <li>Chief Executive Officer</li>
+                <li>Chief Financial Officer</li>
+                <li>Quality Director</li>
+                <li>Commercial Director</li>
+            </ul>
+            <p>
+                The System Manager will carry out their functions independently and autonomously from the rest of the organization's
+                bodies and will not receive any instructions in the exercise of their functions.
+            </p>
+        </section>
+
+        <!-- 7. COMMUNICATION CHANNELS -->
+        <section class="legal-section">
+            <h2 class="section-title">7. COMMUNICATION CHANNELS</h2>
+            <p>The Ethical Channel will be accessible through a specific and separate section on each company's website:</p>
+            <div class="contact-links">
+                <a href="https://www.nutris.es" target="_blank" class="link-button">
+                    <span>www.nutris.es</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z" />
+                        <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z" />
+                    </svg>
+                </a>
+                <a href="https://www.roypas.com" target="_blank" class="link-button">
+                    <span>www.roypas.com</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z" />
+                        <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z" />
+                    </svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- 8. EXTERNAL CHANNELS -->
+        <section class="legal-section">
+            <h2 class="section-title">8. EXTERNAL REPORTING CHANNELS</h2>
+            <p>
+                Any natural person may report to the <strong>Independent Authority for the Protection of the Informant (A.A.I.)</strong>
+                or to the corresponding regional authorities or bodies, the commission of any actions or omissions that may constitute
+                infringements of European Union law, as well as serious and very serious criminal and administrative offenses.
+            </p>
+        </section>
+
+        <!-- 9. RESPONSIBLE USE -->
+        <section class="legal-section">
+            <h2 class="section-title">9. RESPONSIBLE USE OF THE ETHICAL CHANNEL</h2>
+            <div class="warning-box">
+                <p>
+                    It is the informant's obligation to make <strong>responsible use of the Ethical Channel</strong>. Under no circumstances
+                    should unfounded or malicious reports be made, which may result in legal and/or disciplinary action.
+                </p>
+                <p>
+                    The informant must guarantee, with appropriate evidence, that the data provided is <strong>
+                        truthful, accurate,
+                        and as complete as possible
+                    </strong>.
+                </p>
+                <p>
+                    Under no circumstances will the Channel be used for purposes other than those established herein.
+                </p>
+            </div>
+        </section>
+
+        <!-- 10. DISSEMINATION -->
+        <section class="legal-section">
+            <h2 class="section-title">10. DISSEMINATION</h2>
+            <p>
+                The Information System Manager will ensure proper dissemination of this Policy and the existence of the Ethical Channel.
+                This Policy is available on the websites of NUTRIS INGREDIENTS and ROYPAS BY NUTRIS along with the respective Ethical Channel.
+            </p>
+        </section>
+
+        <!-- 11. REVIEW -->
+        <section class="legal-section">
+            <h2 class="section-title">11. REVIEW</h2>
+            <p>
+                This Policy will be reviewed annually or when significant changes warrant it, and will be submitted again for approval
+                by the Executive Management.
+            </p>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="legal-footer">
+        <div class="footer-content">
+            <p class="footer-text">
+                <strong>Nutris Ingredients, S.L.</strong> | <strong>Roypas by Nutris, S.A.U.</strong>
+            </p>
+            <p class="footer-text-small">
+                Last updated: @DateTime.Now.ToString("MMMM yyyy")
+            </p>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/home");
+    }
+}

@@ -378,3 +378,111 @@
         font-size: 0.9rem;
     }
 }
+/* ========================================
+   TEXTOS DEL HOME (SIN TEXT-SHADOW)
+   ======================================== */
+
+.text-home {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    color: white;
+    padding: 3.96rem;
+}
+
+    .text-home h1 {
+        font-size: 5.16em;
+        font-weight: 700;
+        margin: 0;
+        color: white;
+    }
+
+.pagraph-home {
+    margin-top: 1.5rem;
+}
+
+    .pagraph-home span {
+        display: block;
+        margin-bottom: 0.8rem;
+        font-size: 1.25rem;
+        line-height: 1.6;
+        color: white;
+    }
+
+/* ========================================
+   WHISTLEBLOWER LINK (ABAJO DERECHA, DISCRETO)
+   ======================================== */
+
+.whistleblower-link-container {
+    position: absolute;
+    bottom: 60px;
+    right: 30px;
+    z-index: 100;
+}
+
+.whistleblower-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    background: transparent;
+}
+
+    .whistleblower-link:hover {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(5px);
+    }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .whistleblower-link-container {
+        bottom: 50px;
+        right: 20px;
+    }
+
+    .whistleblower-link {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .whistleblower-link-container {
+        bottom: 40px;
+        right: 15px;
+    }
+
+    .whistleblower-link {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .whistleblower-link-container {
+        bottom: 30px;
+        right: 10px;
+    }
+
+    .whistleblower-link {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+    .whistleblower-link-container {
+        bottom: 20px;
+        right: 15px;
+    }
+
+    .whistleblower-link {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+}

@@ -1,0 +1,417 @@
+﻿@page "/politica-canal-etico"
+@inject ILocalizationService Localization
+@inject NavigationManager Navigation
+
+<PageTitle>Política del Sistema Interno de Información | Nutris</PageTitle>
+
+<link href="/css/LegalPages.css" rel="stylesheet" />
+
+<!-- Back Button -->
+<div class="legal-back-button-container">
+    <button class="legal-back-button" @onclick="GoBack">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+    </button>
+</div>
+
+<div class="legal-page-container">
+    <!-- Header con logo -->
+    <div class="legal-header">
+        <!-- ... resto del contenido ... -->
+        <img src="/img/logo-nutris_xl.jpg" alt="Nutris Logo" class="legal-logo" />
+        <h1 class="legal-title">Política del Sistema Interno de Información</h1>
+        <p class="legal-subtitle">Canal Ético de Grupo Nutris</p>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="legal-content">
+
+        <!-- 1. OBJETO -->
+        <section class="legal-section">
+            <h2 class="section-title">1. OBJETO</h2>
+            <p>
+                En aras de fomentar la cultura de la información o comunicación como mecanismo para prevenir y detectar
+                conductas constitutivas de delitos, y en cumplimiento de la Ley 2/2023, de 20 de febrero, reguladora de
+                la protección de las personas que informen sobre infracciones normativas y de lucha contra la corrupción,
+                <strong>NUTRIS INGREDIENTES, S.L.</strong> y <strong>ROYPAS BY NUTRIS, S.A.U.</strong> (en adelante
+                <strong>GRUPO NUTRIS</strong>) han establecido un Sistema Interno de Información.
+            </p>
+            <p>
+                La presente Política tiene por objeto regular el Sistema Interno de Información de GRUPO NUTRIS, y junto
+                con su Procedimiento de Gestión del Canal Ético, garantizar una gestión profesional, confidencial, imparcial
+                y de máxima protección durante todo el proceso, generando con ello un clima de confianza a sus partes interesadas.
+            </p>
+        </section>
+
+        <!-- 2. ALCANCE -->
+        <section class="legal-section">
+            <h2 class="section-title">2. ALCANCE</h2>
+
+            <h3 class="subsection-title">2.1. Material</h3>
+            <p>
+                Las informaciones tramitadas a través del Sistema Interno de Información se referirán a conductas indebidas
+                graves o de presunta corrupción, que puedan ser constitutivas de infracciones penales o administrativas graves
+                o muy graves relacionadas con las actividades de GRUPO NUTRIS, que el informante haya observado o sobre las
+                que haya recibido información en el curso de su trabajo o de su relación profesional con GRUPO NUTRIS.
+            </p>
+
+            <div class="info-box">
+                <h4>Las informaciones se referirán a:</h4>
+                <ul class="legal-list">
+                    <li>
+                        <strong>a) Infracciones que entren dentro del ámbito de aplicación de los actos de la Unión Europea:</strong>
+                        <ul class="nested-list">
+                            <li>Contratación pública</li>
+                            <li>Servicios, productos y mercados financieros, y prevención del blanqueo de capitales y la financiación del terrorismo</li>
+                            <li>Seguridad de los productos y conformidad</li>
+                            <li>Seguridad del transporte</li>
+                            <li>Protección del medio ambiente</li>
+                            <li>Protección frente a las radiaciones y seguridad nuclear</li>
+                            <li>Seguridad de los alimentos y los piensos, sanidad animal y bienestar de los animales</li>
+                            <li>Salud pública</li>
+                            <li>Protección de los consumidores</li>
+                            <li>Protección de la privacidad y de los datos personales, y seguridad de las redes y los sistemas de información</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>b) Infracciones que afecten a los intereses financieros de la Unión Europea</strong>
+                        tal y como se contemplan en el artículo 325 del Tratado de Funcionamiento de la Unión Europea (TFUE).
+                    </li>
+                    <li>
+                        <strong>c) Infracciones que incidan en el mercado interior</strong>, tal y como se contemplan en el artículo 26,
+                        apartado 2 del TFUE, incluidas las infracciones de las normas de la Unión Europea en materia de competencia y
+                        ayudas otorgadas por los Estados.
+                    </li>
+                    <li>
+                        <strong>d) Acciones u omisiones</strong> que puedan ser constitutivas de infracción penal o administrativa grave
+                        o muy grave, incluidas aquellas infracciones que impliquen quebranto económico para la Hacienda Pública y para
+                        la Seguridad Social.
+                    </li>
+                    <li>
+                        <strong>e) Infracciones del derecho laboral</strong> en materia de seguridad y salud en el trabajo de las que
+                        informen los trabajadores.
+                    </li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-title">2.2. Personal</h3>
+            <p>
+                El Sistema Interno de Información permitirá realizar comunicaciones a las personas que, en un contexto laboral o
+                profesional, tengan conocimiento de las infracciones previstas en el apartado 2.1., comprendiendo en todo caso:
+            </p>
+            <ul class="legal-list">
+                <li>Los empleados, voluntarios, becarios y trabajadores en periodos de formación</li>
+                <li>Los autónomos</li>
+                <li>Los accionistas, partícipes y personas pertenecientes al órgano de administración, dirección o supervisión de la empresa</li>
+                <li>Cualquier persona que trabaje para o bajo la supervisión y la dirección de contratistas, subcontratistas y proveedores</li>
+                <li>Personas cuya relación laboral aún no haya comenzado, cuando la información haya sido obtenida durante el proceso de selección</li>
+            </ul>
+
+            <h3 class="subsection-title">2.3. Societario</h3>
+            <p>
+                La presente Política resulta de aplicación a las empresas del GRUPO NUTRIS:
+                <strong>NUTRIS INGREDIENTS, S.L.</strong> y <strong>ROYPAS BY NUTRIS, S.A.U.</strong>
+            </p>
+        </section>
+
+        <!-- 3. DEFINICIONES -->
+        <section class="legal-section">
+            <h2 class="section-title">3. DEFINICIONES</h2>
+            <dl class="definitions-list">
+                <dt>Sistema Interno de Información</dt>
+                <dd>
+                    Sistema compuesto por el canal interno de comunicación (Canal Ético), el responsable del sistema, una política
+                    que enuncie los principios generales del sistema y los procedimientos que establecen cómo gestionar y hacer
+                    seguimiento de la información recibida.
+                </dd>
+
+                <dt>Información sobre infracciones</dt>
+                <dd>
+                    La información, incluidas las sospechas razonables, sobre infracciones reales o potenciales, que se hayan producido
+                    o que muy probablemente puedan producirse en la organización.
+                </dd>
+
+                <dt>Denuncia</dt>
+                <dd>La comunicación de información sobre infracciones.</dd>
+
+                <dt>Denunciante o informante</dt>
+                <dd>
+                    Persona física que comunica información sobre infracciones obtenida en el contexto de sus actividades laborales
+                    o profesionales.
+                </dd>
+
+                <dt>Persona afectada</dt>
+                <dd>
+                    Persona física o jurídica a la que se haga referencia en la denuncia como la persona a la que se atribuye o con
+                    la que se asocia la infracción.
+                </dd>
+
+                <dt>Contexto laboral</dt>
+                <dd>
+                    Las actividades de trabajo presentes o pasadas a través de las cuales las personas pueden obtener información sobre
+                    infracciones y en el que estas personas podrían sufrir represalias si comunicasen dicha información.
+                </dd>
+
+                <dt>Acto de represalia</dt>
+                <dd>
+                    Cualesquiera actos u omisiones prohibidos por la ley que supongan un trato desfavorable para las personas por su
+                    condición de informantes.
+                </dd>
+
+                <dt>Autoridad competente</dt>
+                <dd>
+                    Autoridad Independiente de Protección del Informante (A.A.I.) o autoridades u órganos autonómicos competentes.
+                </dd>
+            </dl>
+        </section>
+
+        <!-- 4. PRINCIPIOS RECTORES -->
+        <section class="legal-section">
+            <h2 class="section-title">4. PRINCIPIOS RECTORES</h2>
+            <p>
+                El procedimiento de recepción, tratamiento, resolución y registro de comunicaciones de denuncias recibidas en el
+                Sistema Interno de Información de GRUPO NUTRIS se regirá por los siguientes principios:
+            </p>
+
+            <div class="principles-grid">
+                <div class="principle-card">
+                    <h4>Anonimato</h4>
+                    <p>
+                        El informante puede solicitar el anonimato cuando formule su denuncia, manteniendo la posibilidad de comunicación
+                        bidireccional con el Gestor del Canal.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Buena Fe</h4>
+                    <p>
+                        Las comunicaciones serán realizadas desde la honradez, con convicción en cuanto a la verdad o exactitud de su objeto,
+                        aportando todos los datos y documentos disponibles.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Información</h4>
+                    <p>
+                        El informante tendrá derecho a conocer el estado de tramitación de su denuncia y los resultados de la investigación.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Confidencialidad</h4>
+                    <p>
+                        Las actuaciones se realizarán con la mayor prudencia y discreción para garantizar la confidencialidad respecto
+                        a la identidad del informante.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Protección de datos</h4>
+                    <p>
+                        Los mecanismos se ajustan a las normas de protección de datos vigentes y a las normas de seguridad de la información.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Diligencia</h4>
+                    <p>
+                        La investigación y resolución deben ser realizadas sin demoras indebidas, en el menor tiempo posible respetando
+                        las garantías debidas.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Prevención de conflicto de intereses</h4>
+                    <p>
+                        El proceso es realizado por un equipo independiente, imparcial y objetivo, apartando a miembros conflictuados.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Contradicción</h4>
+                    <p>
+                        El procedimiento garantiza una audiencia imparcial y un tratamiento justo para todas las personas afectadas.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Prohibición de represalias</h4>
+                    <p>
+                        Se prohíben expresamente los actos constitutivos de represalia contra las personas que presenten una comunicación.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Independencia</h4>
+                    <p>
+                        El Responsable del Sistema desarrolla sus funciones de forma independiente y autónoma, sin recibir instrucciones.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Presunción de inocencia</h4>
+                    <p>
+                        Las personas afectadas tendrán la presunción de inocencia y el derecho de defensa durante todo el proceso.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <h4>Proporcionalidad</h4>
+                    <p>
+                        Todas las notificaciones serán tratadas de forma equivalente, con independencia de quién sea el remitente.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. DERECHOS Y GARANTÍAS -->
+        <section class="legal-section">
+            <h2 class="section-title">5. DERECHOS Y GARANTÍAS DEL INFORMANTE Y DENUNCIADO</h2>
+
+            <div class="two-columns">
+                <div class="column">
+                    <h3 class="subsection-title">5.1. Derechos del informante</h3>
+                    <ul class="legal-list">
+                        <li>A presentar informaciones por escrito y decidir si lo hace o no de forma anónima</li>
+                        <li>A que se mantenga el anonimato durante todo el procedimiento</li>
+                        <li>A que su identidad no sea revelada al denunciado ni a terceras personas</li>
+                        <li>A indicar un domicilio o correo electrónico para recibir comunicaciones</li>
+                        <li>A comparecer por iniciativa propia</li>
+                        <li>A conocer el estado de tramitación y los resultados de la investigación</li>
+                        <li>A la confidencialidad de las comunicaciones</li>
+                        <li>A las medidas de protección frente a represalias</li>
+                        <li>A elegir el cauce de la denuncia, pudiendo acudir a canales externos</li>
+                        <li>A la supresión o anonimización de los datos transcurridos los plazos legales</li>
+                    </ul>
+                </div>
+
+                <div class="column">
+                    <h3 class="subsection-title">5.2. Derechos de la persona afectada</h3>
+                    <ul class="legal-list">
+                        <li>A que se le comunique que se encuentra en un proceso de investigación</li>
+                        <li>Al honor y a la intimidad</li>
+                        <li>A la presunción de inocencia y a usar todos los medios válidos para su defensa</li>
+                        <li>A ser oída en cualquier momento</li>
+                        <li>A presentar alegaciones por escrito</li>
+                        <li>Al acceso a las actuaciones, sin revelar la identidad del denunciante</li>
+                        <li>A la rectificación de sus datos personales</li>
+                        <li>A la protección de sus datos personales</li>
+                        <li>A la confidencialidad de las comunicaciones</li>
+                        <li>A la asistencia letrada</li>
+                        <li>A que se le informe de la resolución o archivo de la denuncia</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. RESPONSABLE DEL SISTEMA -->
+        <section class="legal-section">
+            <h2 class="section-title">6. RESPONSABLE DEL SISTEMA INTERNO DE INFORMACIÓN</h2>
+            <p>
+                El Órgano de Administración de GRUPO NUTRIS ha procedido a la designación de un órgano colegiado como Responsable
+                del Sistema Interno de Información (Canal Ético) compuesto por los siguientes cargos:
+            </p>
+            <ul class="legal-list highlight-list">
+                <li>Director Ejecutivo</li>
+                <li>Director Financiero</li>
+                <li>Directora de Calidad</li>
+                <li>Directora Comercial</li>
+            </ul>
+            <p>
+                El Responsable del Sistema desarrollará sus funciones de forma independiente y autónoma respecto del resto de órganos
+                de la organización y no recibirá instrucciones de ningún tipo en el ejercicio de sus funciones.
+            </p>
+        </section>
+
+        <!-- 7. MEDIOS DE COMUNICACIÓN -->
+        <section class="legal-section">
+            <h2 class="section-title">7. MEDIOS DE COMUNICACIÓN</h2>
+            <p>El Canal Ético será accesible a través de un apartado específico y separado en la página web de cada una de las empresas:</p>
+            <div class="contact-links">
+                <a href="https://www.nutris.es" target="_blank" class="link-button">
+                    <span>www.nutris.es</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z" />
+                        <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z" />
+                    </svg>
+                </a>
+                <a href="https://www.roypas.com" target="_blank" class="link-button">
+                    <span>www.roypas.com</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z" />
+                        <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z" />
+                    </svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- 8. CANALES EXTERNOS -->
+        <section class="legal-section">
+            <h2 class="section-title">8. CANALES EXTERNOS DE INFORMACIÓN</h2>
+            <p>
+                Toda persona física podrá informar ante la <strong>Autoridad Independiente de Protección del Informante (A.A.I.)</strong>
+                o ante las autoridades u órganos autonómicos correspondientes, de la comisión de cualesquiera acciones u omisiones que
+                puedan constituir infracciones del Derecho de la Unión Europea, así como infracciones penales y administrativas graves
+                y muy graves.
+            </p>
+        </section>
+
+        <!-- 9. USO RESPONSABLE -->
+        <section class="legal-section">
+            <h2 class="section-title">9. USO RESPONSABLE DEL CANAL ÉTICO</h2>
+            <div class="warning-box">
+                <p>
+                    Es obligación del informante hacer un <strong>uso responsable del Canal Ético</strong>. En ningún caso debe realizar
+                    denuncias infundadas o de mala fe, pudiendo derivarse acciones legales y/o disciplinarias.
+                </p>
+                <p>
+                    El informante debe garantizar, con las pruebas oportunas, que los datos proporcionados son <strong>
+                        veraces, exactos
+                        y lo más completos posible
+                    </strong>.
+                </p>
+                <p>
+                    En ningún caso, el Canal será utilizado para la consecución de objetivos distintos de los establecidos en el mismo.
+                </p>
+            </div>
+        </section>
+
+        <!-- 10. DIFUSIÓN -->
+        <section class="legal-section">
+            <h2 class="section-title">10. DIFUSIÓN</h2>
+            <p>
+                El Responsable del Sistema de Información velará por la debida difusión de esta Política y de la existencia del Canal Ético.
+                Esta Política está disponible en las páginas web de NUTRIS INGREDIENTS y de ROYPAS BY NUTRIS junto con el respectivo Canal Ético.
+            </p>
+        </section>
+
+        <!-- 11. REVISIÓN -->
+        <section class="legal-section">
+            <h2 class="section-title">11. REVISIÓN</h2>
+            <p>
+                Esta Política se revisará anualmente o cuando haya cambios significativos que así lo aconsejen, y se someterá de nuevo
+                a aprobación por la Dirección Ejecutiva.
+            </p>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="legal-footer">
+        <div class="footer-content">
+            <p class="footer-text">
+                <strong>Nutris Ingredients, S.L.</strong> | <strong>Roypas by Nutris, S.A.U.</strong>
+            </p>
+            <p class="footer-text-small">
+                Última actualización: @DateTime.Now.ToString("MMMM yyyy")
+            </p>
+        </div>
+    </div>
+</div>
+@code {
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/home");
+    }
+}
