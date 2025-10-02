@@ -202,6 +202,22 @@
     "Sending": "Enviando",
     "Send": "Enviar"
   },
+
+  "ForgotPassword": {
+    "TittleFP": "Recuperar contraseña",
+    "TittleFP2": "¿Olvidaste tu contraseña?",
+    "Subtittle": "No te preocupes, te ayudaremos a recuperarla",
+    "Text": "Ingresa tu nombre de usuario. Buscaremos tu cuenta y si tiene un correo electrónico asociado,te enviaremos las instrucciones para restablecer tu contraseña.",
+    "UserReq": "El nombre de usuario es obligatorio",
+    "Searching": "Buscando...",
+    "Send": "Enviar",
+    "EmailSent": "¡Correo enviado!",
+    "Successtext1": "Si encontramos una cuenta asociada a ",
+    "Successtext2": "con un correo electrónico registrado,te hemos enviado las instrucciones para restablecer tu contraseña.",
+    "Successsubtext": "Por favor, revisa tu bandeja de entrada y la carpeta de spam. El correo puede tardar unos minutos en llegar.",
+    "Button": "Volver al inicio de sesión",
+    "UsernamePlaceholder": "Nombre de usuario"
+  },
   "orderView": {
     "Type": "Tipo",
     "Quantity": "Cantidad",

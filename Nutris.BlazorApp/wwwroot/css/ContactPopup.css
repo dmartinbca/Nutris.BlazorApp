@@ -1,174 +1,201 @@
-﻿/* ContactPopup.css */
+﻿/* ========================================
+   CONTACT POPUP - ESTILO LOGIN/FORGOT PASSWORD
+   ======================================== */
 
 /* Backdrop */
-.contact-popup-backdrop {
+.contact-backdrop {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
     z-index: 9998;
-    animation: fadeIn 0.3s ease;
-}
-
-/* Wrapper */
-.contact-popup-wrapper {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-    animation: slideUp 0.3s ease;
-}
-
-/* Container */
-.contact-popup-container {
-    background: white;
-    border-radius: 20px;
-    width: 450px;
-    max-width: 90vw;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-/* Header */
-.popup-header {
-    background: linear-gradient(135deg, #2F5496 0%, #3d5fa8 100%);
-    color: white;
-    padding: 20px 25px;
-    border-radius: 20px 20px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-    .popup-header h3 {
-        margin: 0;
-        font-size: 1.3rem;
-    }
-
-.popup-close-btn {
-    background: transparent;
-    border: none;
-    color: white;
-    cursor: pointer;
-    padding: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.3s ease;
+    animation: fadeIn 0.3s ease;
 }
 
-    .popup-close-btn:hover {
-        opacity: 0.8;
+.contact-fondo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/img/fondo.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+.contact-backdrop::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+/* Container Wrapper */
+.contact-container-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: slideUp 0.3s ease;
+}
+
+/* Card */
+.contact-card {
+    background: white;
+    border-radius: 15px;
+    width: 53rem;
+    height: auto;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.contact-card-body {
+    padding: 20px;
+    min-height: 400px;
+}
+
+/* Back Button */
+.contact-back-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.3s ease;
+    color: var(--textButton);
+}
+
+    .contact-back-button:hover {
+        transform: scale(1.1);
     }
 
-/* Body */
-.popup-body {
-    padding: 30px 25px 20px;
+    .contact-back-button svg {
+        width: 24px;
+        height: 24px;
+    }
+
+/* Title & Subtitle */
+.contact-title {
+    color: var(--textButton);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.contact-subtitle {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 0;
 }
 
 /* Form Groups */
-.form-group {
-    margin-bottom: 20px;
+.contact-form-group {
+    margin-bottom: 15px;
 }
 
-    .form-group label {
-        display: block;
-        color: #333;
-        font-size: 0.95rem;
-        margin-bottom: 8px;
-    }
-
-        .form-group label .required {
-            color: #D91515;
-            font-weight: bold;
-        }
-
-        .form-group label .optional {
-            color: #999;
-            font-size: 0.85rem;
-        }
-
-/* Form Controls */
-.form-control {
+/* Input & Textarea */
+.contact-input,
+.contact-textarea {
     width: 100%;
+    background: var(--spaceWrite);
+    border: 1px solid transparent;
     padding: 12px 15px;
-    border: 1px solid #D2D2D2;
-    border-radius: 10px;
+    border-radius: 8px;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: #F8F9FA;
 }
 
-    .form-control:focus {
+    .contact-input:focus,
+    .contact-textarea:focus {
         outline: none;
-        border-color: #2F5496;
+        border-color: var(--textButton);
         background: white;
-        box-shadow: 0 0 0 3px rgba(47, 84, 150, 0.1);
     }
 
-    .form-control.error {
-        border-color: #D91515;
-        background: #fff5f5;
-    }
-
-    .form-control::placeholder {
+    .contact-input::placeholder,
+    .contact-textarea::placeholder {
         color: #999;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
     }
 
-textarea.form-control {
+.contact-textarea {
     resize: vertical;
-    min-height: 120px;
+    min-height: 100px;
     font-family: inherit;
 }
 
-/* Error Messages */
-.error-message {
-    color: #D91515;
-    font-size: 0.85rem;
+/* Clear Icon */
+.contact-clear-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+    .contact-clear-icon:hover {
+        color: var(--textButton);
+    }
+
+/* Error State */
+.contact-form-group.has-error .contact-input,
+.contact-form-group.has-error .contact-textarea {
+    border-color: red;
+    background: #fff5f5;
+}
+
+.contact-error-message {
+    color: red;
+    font-size: 0.8rem;
     margin-top: 5px;
     display: block;
 }
 
-/* Form Actions */
-.form-actions {
-    margin-top: 25px;
-    display: flex;
-    justify-content: center;
-}
-
-/* Send Button */
-.btn-send {
-    background: #2F5496;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 12px 40px;
-    font-size: 1.1rem;
-    cursor: pointer;
+/* Submit Button */
+.contact-button {
+    background: var(--textButton);
+    color: #fff;
+    border-radius: 50px;
+    width: 10.188rem;
+    height: 3.375rem;
+    border: 0;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
+    cursor: pointer;
 }
 
-    .btn-send:hover:not(:disabled) {
-        background: #1e3a6b;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(47, 84, 150, 0.3);
+    .contact-button:hover:not(:disabled) {
+        background: transparent;
+        color: var(--textButton);
+        border: 1px solid var(--textButton);
     }
 
-    .btn-send:disabled {
+    .contact-button:disabled {
         opacity: 0.7;
         cursor: not-allowed;
     }
 
 /* Spinner */
-.spinner-small {
+.contact-spinner {
     width: 16px;
     height: 16px;
     border: 2px solid rgba(255, 255, 255, 0.3);
@@ -177,37 +204,27 @@ textarea.form-control {
     animation: spin 0.8s linear infinite;
 }
 
-/* Footer */
-.popup-footer {
-    padding: 15px 25px;
-    border-top: 1px solid #e5e5e5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #f8f9fa;
-    border-radius: 0 0 20px 20px;
+/* Success Container */
+.contact-success-container {
+    padding: 2rem 0;
 }
 
-.zendesk-logo {
-    height: 24px;
-    opacity: 0.6;
+.contact-success-icon {
+    color: #8ED300;
+    margin-bottom: 1.5rem;
 }
 
-/* Success Toast */
-.success-toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #8ED300;
-    color: white;
-    padding: 15px 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 10000;
-    animation: slideInRight 0.3s ease;
+.contact-success-title {
+    color: var(--textButton);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.contact-success-text {
+    color: #333;
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
 /* Animations */
@@ -223,24 +240,12 @@ textarea.form-control {
 
 @keyframes slideUp {
     from {
-        transform: translate(-50%, -40%);
+        transform: translateY(50px);
         opacity: 0;
     }
 
     to {
-        transform: translate(-50%, -50%);
-        opacity: 1;
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0);
+        transform: translateY(0);
         opacity: 1;
     }
 }
@@ -251,62 +256,76 @@ textarea.form-control {
     }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .contact-popup-container {
-        width: 95vw;
-        max-height: 85vh;
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media screen and (max-width: 1280px) {
+    .contact-card {
+        width: 45rem !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .contact-card {
+        width: 95% !important;
+        height: auto !important;
+        max-height: 95vh;
     }
 
-    .popup-header {
-        padding: 15px 20px;
+    .contact-card-body {
+        padding: 15px;
     }
 
-        .popup-header h3 {
-            font-size: 1.1rem;
-        }
-
-    .popup-body {
-        padding: 20px 15px;
+    .px-sm-5 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
     }
 
-    .form-group {
-        margin-bottom: 15px;
+    .mx-5 {
+        margin-left: 0.5rem !important;
+        margin-right: 0.5rem !important;
     }
 
-    .form-control {
+    .contact-title {
+        font-size: 1.3rem;
+    }
+
+    .contact-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .contact-input,
+    .contact-textarea {
         padding: 10px 12px;
         font-size: 0.95rem;
     }
 
-    .btn-send {
-        padding: 10px 30px;
-        font-size: 1rem;
-    }
-
-    .success-toast {
-        right: 10px;
-        left: 10px;
-        width: auto;
+    .contact-button {
+        width: 100%;
     }
 }
 
-@media (max-width: 480px) {
-    .contact-popup-wrapper {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        transform: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+@media screen and (max-width: 480px) {
+    .contact-container-wrapper {
         padding: 10px;
     }
 
-    .contact-popup-container {
-        width: 100%;
-        max-height: 100%;
+    .contact-card {
+        width: 100% !important;
+        border-radius: 10px;
+    }
+
+    .contact-form-group {
+        margin-bottom: 12px;
+    }
+
+    .contact-title {
+        font-size: 1.2rem;
+    }
+
+    .contact-input,
+    .contact-textarea {
+        font-size: 0.9rem;
     }
 }

@@ -2,114 +2,138 @@
 @using NutrisBlazor.Services
 @inject ILocalizationService Localization
 @inject IJSRuntime JSRuntime
+@inject IApiService Http
+@inject ICustomizeApi Api
 <link href="css/ContactPopup.css" rel="stylesheet" />
 <link href="css/fonts.css" rel="stylesheet" />
 
-
 @if (IsVisible)
 {
-    <!-- Backdrop -->
-    <div class="contact-popup-backdrop" @onclick="Close"></div>
+    <!-- Fondo con imagen -->
+    <div class="contact-backdrop">
+        <div class="contact-fondo"></div>
 
-    <!-- Popup Container -->
-    <div class="contact-popup-wrapper">
-        <div class="contact-popup-container">
-            <!-- Header -->
-            <div class="popup-header">
-                <h3 class="RalewayBold">@Localization["contact.SendMessage"]</h3>
-                <button class="popup-close-btn" @onclick="Close">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
-                </button>
-            </div>
+        <!-- Container centrado -->
+        <div class="contact-container-wrapper">
+            <div class="contact-card shadow-sm">
+                <div class="contact-card-body">
+                    <div class="d-flex flex-column justify-content-center h-100">
+                        <!-- Back button -->
+                        <div class="mb-3">
+                            <button @onclick="Close" class="contact-back-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
 
-            <!-- Body -->
-            <div class="popup-body">
-                <form @onsubmit="HandleSubmit" @onsubmit:preventDefault="true">
-                    <!-- Nombre -->
-                    <div class="form-group">
-                        <label class="RalewayRegular">@Localization["contact.Name"] <span class="optional">(@Localization["contact.Optional"])</span></label>
-                        <input type="text"
-                               class="form-control"
-                               @bind="formData.Name"
-                               placeholder="@Localization["contact.EnterName"]" />
-                    </div>
-
-                    <!-- Email -->
-                    <div class="form-group">
-                        <label class="RalewayRegular">@Localization["contact.Email"] <span class="required">*</span></label>
-                        <input type="email"
-                               class="form-control @(emailError ? "error" : "")"
-                               @bind="formData.Email"
-                               @oninput="ClearEmailError"
-                               placeholder="@Localization["contact.EnterEmail"]"
-                               required />
-                        @if (emailError)
+                        @if (!showSuccess)
                         {
-                            <span class="error-message">@Localization["contact.EmailRequired"]</span>
+                            <!-- Icon -->
+                            <div class="mb-3 d-flex justify-content-center">
+                                <img src="/img/users.png" alt="contact">
+                            </div>
+
+                            <!-- Title -->
+                            <div class="text-center mb-4">
+                                <h3 class="contact-title">@Localization["contact.SendMessage"]</h3>
+                                <p class="contact-subtitle">@Localization["contact.HowCanWeHelp"]</p>
+                            </div>
+
+                            <!-- Form -->
+                            <form @onsubmit="HandleSubmit" @onsubmit:preventDefault="true" class="px-sm-5 mx-5">
+                                <!-- Nombre -->
+                                <div class="contact-form-group">
+                                    <div class="position-relative">
+                                        <input type="text"
+                                               class="contact-input"
+                                               @bind="formData.Name"
+                                               placeholder="@Localization["contact.Name"] (@Localization["contact.Optional"])" />
+                                    </div>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="contact-form-group @(emailError ? "has-error" : "")">
+                                    <div class="position-relative">
+                                        <input type="email"
+                                               class="contact-input"
+                                               @bind="formData.Email"
+                                               @oninput="ClearEmailError"
+                                               placeholder="@Localization["contact.Email"] *"
+                                               required />
+                                        @if (!string.IsNullOrEmpty(formData.Email))
+                                        {
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="contact-clear-icon" @onclick="@(() => { formData.Email = ""; emailError = false; })">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                            </svg>
+                                        }
+                                    </div>
+                                    @if (emailError)
+                                    {
+                                        <span class="contact-error-message">@Localization["contact.EmailRequired"]</span>
+                                    }
+                                </div>
+
+                                <!-- Teléfono -->
+                                <div class="contact-form-group">
+                                    <div class="position-relative">
+                                        <input type="tel"
+                                               class="contact-input"
+                                               @bind="formData.Phone"
+                                               placeholder="@Localization["contact.Phone"] (@Localization["contact.Optional"])" />
+                                    </div>
+                                </div>
+
+                                <!-- Mensaje -->
+                                <div class="contact-form-group @(messageError ? "has-error" : "")">
+                                    <div class="position-relative">
+                                        <textarea class="contact-textarea"
+                                                  @bind="formData.Message"
+                                                  @oninput="ClearMessageError"
+                                                  rows="4"
+                                                  placeholder="@Localization["contact.EnterMessage"] *"
+                                                  required></textarea>
+                                    </div>
+                                    @if (messageError)
+                                    {
+                                        <span class="contact-error-message">@Localization["contact.MessageRequired"]</span>
+                                    }
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="d-flex justify-content-center mt-4">
+                                    <button type="submit" class="contact-button" disabled="@isSubmitting">
+                                        @if (isSubmitting)
+                                        {
+                                            <span class="contact-spinner"></span>
+                                            <span>@Localization["contact.Sending"]...</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@Localization["contact.Send"]</span>
+                                        }
+                                    </button>
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <!-- Success Message -->
+                            <div class="contact-success-container text-center px-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" viewBox="0 0 16 16" class="contact-success-icon">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                                </svg>
+                                <h3 class="contact-success-title">@Localization["contact.MessageSentSuccess"]</h3>
+                                <p class="contact-success-text">Tu mensaje ha sido enviado correctamente. Nos pondremos en contacto contigo pronto.</p>
+                                <button type="button" class="contact-button mt-3" @onclick="Close">
+                                    Cerrar
+                                </button>
+                            </div>
                         }
                     </div>
-
-                    <!-- Teléfono -->
-                    <div class="form-group">
-                        <label class="RalewayRegular">@Localization["contact.Phone"] <span class="optional">(@Localization["contact.Optional"])</span></label>
-                        <input type="tel"
-                               class="form-control"
-                               @bind="formData.Phone"
-                               placeholder="@Localization["contact.EnterPhone"]" />
-                    </div>
-
-                    <!-- Mensaje -->
-                    <div class="form-group">
-                        <label class="RalewayRegular">@Localization["contact.HowCanWeHelp"] <span class="required">*</span></label>
-                        <textarea class="form-control @(messageError ? "error" : "")"
-                                  @bind="formData.Message"
-                                  @oninput="ClearMessageError"
-                                  rows="5"
-                                  placeholder="@Localization["contact.EnterMessage"]"
-                                  required></textarea>
-                        @if (messageError)
-                        {
-                            <span class="error-message">@Localization["contact.MessageRequired"]</span>
-                        }
-                    </div>
-
-                    <!-- Botón Enviar -->
-                    <div class="form-actions">
-                        <button type="submit"
-                                class="btn-send RalewayBold"
-                                disabled="@isSubmitting">
-                            @if (isSubmitting)
-                            {
-                                <span class="spinner-small"></span>
-                                <span>@Localization["contact.Sending"]...</span>
-                            }
-                            else
-                            {
-                                <span>@Localization["contact.Send"]</span>
-                            }
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Footer -->
-            <div class="popup-footer">
-                <img src="/img/logo-nutris.jpg" alt="zendesk" class="zendesk-logo" />
+                </div>
             </div>
         </div>
-    </div>
-}
-
-<!-- Success Message -->
-@if (showSuccess)
-{
-    <div class="success-toast">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" />
-        </svg>
-        <span>@Localization["contact.MessageSentSuccess"]</span>
     </div>
 }
 
@@ -137,7 +161,17 @@
         IsVisible = false;
         IsVisibleChanged.InvokeAsync(false);
         OnClose.InvokeAsync();
-        ResetForm();
+
+        // Pequeño delay antes de resetear para la animación
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(300);
+            await InvokeAsync(() =>
+            {
+                ResetForm();
+                StateHasChanged();
+            });
+        });
     }
 
     private void ClearEmailError(ChangeEventArgs e)
@@ -154,7 +188,6 @@
 
     private async Task HandleSubmit()
     {
-        // Validación
         emailError = string.IsNullOrWhiteSpace(formData.Email);
         messageError = string.IsNullOrWhiteSpace(formData.Message);
 
@@ -168,18 +201,25 @@
 
         try
         {
-            // Simular envío (aquí iría la llamada real a la API)
-            await Task.Delay(1500);
+            var usr = await Api.GetCurrentUserAsync();
+            // Cargar Technical Data Sheet
+            var payload = new { 
+                usuario = usr.user, 
+                nombre = formData.Name, 
+                emailcontacto = formData.Email,
+                telefono = formData.Phone,
+                mensaje = formData.Message
+            };
+            var resp = await Http.PostAsync("customReports(1)/Microsoft.NAV.solicitudAyuda?tenant=nutris", payload);
 
-            // Mostrar mensaje de éxito
-            showSuccess = true;
-            StateHasChanged();
+                if (resp.IsSuccessStatusCode)
+                {
+                    isSubmitting = false;
+                }
 
-            // Cerrar popup después de 2 segundos
-            await Task.Delay(2000);
-
-            Close();
-            showSuccess = false;
+                // Auto-cerrar después de 3 segundos
+                await Task.Delay(3000);
+                Close();
         }
         catch (Exception ex)
         {
@@ -190,6 +230,11 @@
             isSubmitting = false;
             StateHasChanged();
         }
+            await Task.Delay(1500);
+
+            showSuccess = true;
+            StateHasChanged();
+       
     }
 
     private void ResetForm()
@@ -198,5 +243,6 @@
         emailError = false;
         messageError = false;
         isSubmitting = false;
+        showSuccess = false;
     }
 }

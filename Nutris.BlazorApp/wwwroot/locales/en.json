@@ -201,6 +201,21 @@
     "Sending": "Sending",
     "Send": "Send"
   },
+  "ForgotPassword": {
+    "TittleFP": "Recover your password",
+    "TittleFP2": "Forgot your password?",
+    "Subtittle": "Don’t worry, we’ll help you recover it",
+    "Text": "Enter your username. We will search for your account and, if it has an associated email address, we’ll send you instructions to reset your password.",
+    "UserReq": "Username is required",
+    "Searching": "Searching...",
+    "Send": "Send",
+    "EmailSent": "Email sent!",
+    "Successtext1": "If we found an account associated with ",
+    "Successtext2": "that has a registered email address, we’ve sent you the instructions to reset your password.",
+    "Successsubtext": "Please check your inbox and spam folder. The email may take a few minutes to arrive.",
+    "Button": "Back to login",
+    "UsernamePlaceholder": "User name"
+  },
   "orderView": {
     "Type": "Type",
     "Quantity": "Quantity",

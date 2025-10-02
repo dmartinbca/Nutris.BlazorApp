@@ -1,6 +1,5 @@
 ﻿@page "/customer-profile"
 @using NutrisBlazor.Services
- 
 @inject IAuthService AuthService
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager Navigation
@@ -16,183 +15,163 @@
     </div>
 }
 
-<!-- Language Selector -->
-<div class="language-selector-products">
-    <button class="language-button" type="button" @onclick="@ToggleLanguageMenu">
-        @if (currentLanguage == "es")
+<!-- Fondo similar al login -->
+<div class="customer-profile-fondo">
+
+    <!-- Language Selector -->
+    <div class="language-selector-customer">
+        <button class="language-button" type="button" @onclick="@ToggleLanguageMenu">
+            @if (currentLanguage == "es")
+            {
+                <span>Español</span>
+            }
+            else
+            {
+                <span>English</span>
+            }
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+            </svg>
+        </button>
+
+        @if (showLanguageMenu)
         {
-            <span>Español</span>
-        }
-        else
-        {
-            <span>English</span>
-        }
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-        </svg>
-    </button>
-
-    @if (showLanguageMenu)
-    {
-        <div class="language-dropdown">
-            <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("en"))">
-                English
-            </button>
-            <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("es"))">
-                Español
-            </button>
-        </div>
-    }
-</div>
-
-<!-- Back Button -->
-@* <div class="back-button-container">
-    <button class="back-button" @onclick="@GoBack">
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="32" r="32" fill="#2F5496" />
-            <path d="M47 32.126H18.608M25.7061 23L17.297 31.409C16.901 31.805 16.901 32.447 17.297 32.843L25.7061 41.252"
-                  stroke="white" stroke-width="2.3" stroke-linecap="round" />
-        </svg>
-    </button>
-</div> *@
-
-<section class="customer-profile-section">
-    <!-- Header con logo y nombre -->
-    <div class="profile-header">
-        <div class="header-content">
-            <div class="logo-section">
-                @if (!string.IsNullOrEmpty(CustomerData?.Logo))
-                {
-                    <img src="data:image/png;base64,@CustomerData.Logo" alt="@CustomerData.Name" class="company-logo" />
-                }
-                else
-                {
-                    <div class="logo-placeholder">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-                        </svg>
-                    </div>
-                }
+            <div class="language-dropdown">
+                <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("en"))">
+                    English
+                </button>
+                <button class="dropdown-item" type="button" @onclick="@(() => SelectLanguage("es"))">
+                    Español
+                </button>
             </div>
-            <div class="header-info">
-                <h1 class="company-name RalewayBold">@CustomerData?.Name</h1>
-                <p class="customer-code RalewayRegular">@Localization["customerProfile.Code"]: @CustomerData?.Customer</p>
-            </div>
-        </div>
+        }
     </div>
 
-    <!-- Información Principal -->
-    <div class="info-cards-container">
-        <!-- Tarjeta de Información de Empresa -->
-        <div class="info-card">
-            <div class="card-header">
-                <h3 class="RalewayBold">@Localization["customerProfile.CompanyInfo"]</h3>
-            </div>
-            <div class="card-body">
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.VAT"]:</span>
-                    <span class="info-value RalewayBold">@(CustomerData?.CIF ?? "-")</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.Contact"]:</span>
-                    <span class="info-value RalewayBold">@(CustomerData?.Contact ?? "-")</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.ShipmentMethod"]:</span>
-                    <span class="info-value RalewayBold">@(CustomerData?.Shipment_Method_Code ?? "-")</span>
-                </div>
-            </div>
-        </div>
+    <!-- Container centrado -->
+    <div class="customer-profile-container">
+        <div class="profile-card shadow-sm">
+            <div class="profile-card-body">
 
-        <!-- Tarjeta de Dirección -->
-        <div class="info-card">
-            <div class="card-header">
-                <h3 class="RalewayBold">@Localization["customerProfile.Address"]</h3>
-            </div>
-            <div class="card-body">
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.Address1"]:</span>
-                    <span class="info-value">@(CustomerData?.Address ?? "-")</span>
+                <!-- Back Button -->
+                <div class="mb-3">
+                    <button @onclick="GoBack" class="profile-back-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                        </svg>
+                    </button>
                 </div>
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.Address2"]:</span>
-                    <span class="info-value">@(CustomerData?.Address_2 ?? "-")</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.City"]:</span>
-                    <span class="info-value">@(CustomerData?.City ?? "-")</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.County"]:</span>
-                    <span class="info-value">@(CustomerData?.County ?? "-")</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.Country"]:</span>
-                    <div class="country-info">
-                        <span class="info-value">@(CustomerData?.Country ?? "-")</span>
-                      @*   @if (!string.IsNullOrEmpty(CustomerData?.Country))
-                        {
-                            <img src="@GetCountryFlag(CustomerData.Country)" alt="@CustomerData.Country" class="country-flag" />
-                        } *@
-                    </div>
-                </div>
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.PostCode"]:</span>
-                    <span class="info-value">@(CustomerData?.Post_Code ?? "-")</span>
-                </div>
-            </div>
-        </div>
 
-        <!-- Tarjeta de Contacto -->
-        <div class="info-card">
-            <div class="card-header">
-                <h3 class="RalewayBold">@Localization["customerProfile.ContactInfo"]</h3>
-            </div>
-            <div class="card-body">
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.Email"]:</span>
-                    <span class="info-value email-link">
-                        @if (!string.IsNullOrEmpty(CustomerData?.Email))
+                <!-- Header con logo y nombre -->
+                <div class="profile-header-section">
+                    <div class="logo-wrapper">
+                        @if (!string.IsNullOrEmpty(CustomerData?.Logo))
                         {
-                            <a href="mailto:@CustomerData.Email">@CustomerData.Email</a>
+                            <img src="data:image/png;base64,@CustomerData.Logo" alt="@CustomerData.Name" class="company-logo" />
                         }
                         else
                         {
-                            <span>-</span>
+                            <div class="logo-placeholder">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                                </svg>
+                            </div>
                         }
-                    </span>
+                    </div>
+                    <div class="header-text">
+                        <h2 class="company-name RalewayBold">@CustomerData?.Name</h2>
+                        <p class="customer-code RalewayRegular">@Localization["customerProfile.Code"]: @CustomerData?.Customer</p>
+                    </div>
                 </div>
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.Phone"]:</span>
-                    <span class="info-value">@(CustomerData?.Phone ?? "-")</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.MobilePhone"]:</span>
-                    <span class="info-value">@(CustomerData?.Mobile_Phone ?? "-")</span>
+
+                <!-- Información en secciones compactas -->
+                <div class="profile-sections">
+
+                    <!-- Información de Empresa -->
+                    <div class="profile-section">
+                        <h3 class="section-title RalewayBold">@Localization["customerProfile.CompanyInfo"]</h3>
+                        <div class="section-content">
+                            <div class="info-item">
+                                <span class="info-label">@Localization["customerProfile.VAT"]:</span>
+                                <span class="info-value">@(CustomerData?.CIF ?? "-")</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">@Localization["customerProfile.Contact"]:</span>
+                                <span class="info-value">@(CustomerData?.Contact ?? "-")</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">@Localization["customerProfile.ShipmentMethod"]:</span>
+                                <span class="info-value">@(CustomerData?.Shipment_Method_Code ?? "-")</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="profile-section">
+                        <h3 class="section-title RalewayBold">@Localization["customerProfile.Address"]</h3>
+                        <div class="section-content">
+                            <div class="info-item">
+                                <span class="info-label">@Localization["customerProfile.Address1"]:</span>
+                                <span class="info-value">@(CustomerData?.Address ?? "-")</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">@Localization["customerProfile.City"]:</span>
+                                <span class="info-value">@(CustomerData?.City ?? "-")</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">@Localization["customerProfile.County"]:</span>
+                                <span class="info-value">@(CustomerData?.County ?? "-")</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">@Localization["customerProfile.PostCode"]:</span>
+                                <span class="info-value">@(CustomerData?.Post_Code ?? "-")</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contacto -->
+                    <div class="profile-section">
+                        <h3 class="section-title RalewayBold">@Localization["customerProfile.ContactInfo"]</h3>
+                        <div class="section-content">
+                            <div class="info-item">
+                                <span class="info-label">@Localization["customerProfile.Email"]:</span>
+                                <span class="info-value email-value">
+                                    @if (!string.IsNullOrEmpty(CustomerData?.Email))
+                                    {
+                                        <a href="mailto:@CustomerData.Email">@CustomerData.Email</a>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">@Localization["customerProfile.Phone"]:</span>
+                                <span class="info-value">@(CustomerData?.Phone ?? "-")</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipo Comercial -->
+                    <div class="profile-section">
+                        <h3 class="section-title RalewayBold">@Localization["customerProfile.SalesTeam"]</h3>
+                        <div class="section-content">
+                            <div class="info-item">
+                                <span class="info-label">@Localization["customerProfile.SalesRep"]:</span>
+                                <span class="info-value">@(CustomerData?.Nombre_Vendedor ?? "-")</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">@Localization["customerProfile.SalesSupport"]:</span>
+                                <span class="info-value">@(CustomerData?.Sales_Support ?? "-")</span>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
-
-        <!-- Tarjeta de Equipo Comercial -->
-        <div class="info-card">
-            <div class="card-header">
-                <h3 class="RalewayBold">@Localization["customerProfile.SalesTeam"]</h3>
-            </div>
-            <div class="card-body">
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.SalesRep"]:</span>
-                    <span class="info-value RalewayBold">@(CustomerData?.Nombre_Vendedor ?? "-")</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label RalewayRegular">@Localization["customerProfile.SalesSupport"]:</span>
-                    <span class="info-value RalewayBold">@(CustomerData?.Sales_Support ?? "-")</span>
-                </div>
-            </div>
-        </div>
-
-        
     </div>
-</section>
+</div>
 
 @code {
     private bool IsLoading = false;
@@ -207,12 +186,10 @@
 
         try
         {
-            // Obtener datos del usuario actual
             CustomerData = await AuthService.GetCurrentUserAsync();
 
             if (CustomerData == null)
             {
-                // Si no hay usuario, redirigir al login
                 Navigation.NavigateTo("/");
             }
         }
@@ -242,20 +219,5 @@
     private void GoBack()
     {
         Navigation.NavigateTo("/home");
-    }
-
-    private string GetCountryFlag(string countryCode)
-    {
-        return countryCode?.ToUpper() switch
-        {
-            "ES" => "/img/flags/spain.png",
-            "FR" => "/img/flags/france.png",
-            "GB" => "/img/flags/uk.png",
-            "UK" => "/img/flags/uk.png",
-            "DE" => "/img/flags/germany.png",
-            "IT" => "/img/flags/italy.png",
-            "PT" => "/img/flags/portugal.png",
-            _ => "/img/flags/default.png"
-        };
     }
 }

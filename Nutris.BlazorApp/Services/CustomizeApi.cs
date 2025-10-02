@@ -19,6 +19,7 @@ namespace NutrisBlazor.Services
         Task<JsonDocument> GetBbdFormatAsync(string rg37);
         Task<JsonDocument> GetTiposCajastAsync();
         Task<HttpResponseMessage> PostModificarImagenCabAsync(object payload);
+        Task<User> GetCurrentUserAsync();
     }
 
     public sealed class CustomizeApi : ICustomizeApi
@@ -49,7 +50,7 @@ namespace NutrisBlazor.Services
             };
         }
 
-        private async Task<User> GetCurrentUserAsync()
+        public async Task<User> GetCurrentUserAsync()
         {
             _currentUser ??= await _authService.GetCurrentUserAsync();
             return _currentUser;
@@ -107,20 +108,27 @@ namespace NutrisBlazor.Services
             if (user.Family)
                 url = $"Atributos?$expand=valoresAtributos($filter=Family eq {user.Family.ToString().ToLower()})&tenant=nutris";
             else if (user.Standard)
-                url = $"Atributos?$expand=valoresAtributos($filter=Family eq {user.Standard.ToString().ToLower()})&tenant=nutris";
+                url = $"Atributos?$expand=valoresAtributos($filter=Standard eq {user.Standard.ToString().ToLower()})&tenant=nutris";
             else if (user.Premium)
-                url = $"Atributos?$expand=valoresAtributos($filter=Family eq {user.Premium.ToString().ToLower()})&tenant=nutris";
+                url = $"Atributos?$expand=valoresAtributos($filter=Premium eq {user.Premium.ToString().ToLower()})&tenant=nutris";
             else
                 url = $"Atributos?$expand=valoresAtributos&tenant=nutris";
 
             return await _api.GetAsync<JsonDocument>(url);
         }
 
-        public Task<JsonDocument> GetRelacionBoteAsync() =>
-            _api.GetAsync<JsonDocument>("RelacionBote?tenant=nutris");
+        public async Task<JsonDocument> GetRelacionBoteAsync() 
+        {
+            
+            return await _api.GetAsync<JsonDocument>("RelacionBote?tenant=nutris");
+        }
+            
 
-        public Task<JsonDocument> GetRelacionTapaAsync() =>
-            _api.GetAsync<JsonDocument>("RelacionTapa?tenant=nutris");
+        public async Task<JsonDocument> GetRelacionTapaAsync()
+        {
+            return await _api.GetAsync<JsonDocument>("RelacionTapa?tenant=nutris");
+        }
+          
 
         public Task<JsonDocument> GetLotFormatAsync(string rg37) =>
             _api.GetAsync<JsonDocument>("LotFormat?tenant=nutris");
