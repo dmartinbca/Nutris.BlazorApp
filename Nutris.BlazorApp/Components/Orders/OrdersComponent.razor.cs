@@ -559,6 +559,151 @@ public class OrdersComponentBase : ComponentBase
 
         return NO_IMAGE_AVAILABLE;
     }
+    // ===== FILTRADO COHERENTE CON RELACIONES =====
+
+    private (List<BoteCapDataModal.BoteDataItem> botes, List<BoteCapDataModal.CapDataItem> tapas) GetFilteredAndRelatedData()
+    {
+        if (boteDataList == null || capDataList == null)
+            return (new List<BoteCapDataModal.BoteDataItem>(), new List<BoteCapDataModal.CapDataItem>());
+
+        // PASO 1: Obtener atributos válidos desde _opts (vienen filtrados del backend)
+        var formasBoteValidas = _opts.FormasBote?.Select(f => f.ToUpperInvariant()).ToHashSet(StringComparer.OrdinalIgnoreCase)
+                                ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var capacidadesValidas = _opts.Capacidades?.ToHashSet(StringComparer.OrdinalIgnoreCase)
+                                 ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var materialesValidos = _opts.Materiales?.ToHashSet(StringComparer.OrdinalIgnoreCase)
+                                ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var coloresBoteValidos = _opts.ColorBote?.Select(c => NormalizeColorName(c.Value)).ToHashSet(StringComparer.OrdinalIgnoreCase)
+                                 ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var formasTapaValidas = _opts.FormasTapa?.ToHashSet(StringComparer.OrdinalIgnoreCase)
+                                ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var bocasValidas = _opts.Bocas?.ToHashSet(StringComparer.OrdinalIgnoreCase)
+                           ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var coloresTapaValidos = _opts.ColorCover?.Select(c => NormalizeColorName(c.Value)).ToHashSet(StringComparer.OrdinalIgnoreCase)
+                                 ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        Console.WriteLine($"🔍 Atributos válidos del backend:");
+        Console.WriteLine($"   Formas bote: {string.Join(", ", formasBoteValidas)}");
+        Console.WriteLine($"   Capacidades: {string.Join(", ", capacidadesValidas)}");
+        Console.WriteLine($"   Materiales: {string.Join(", ", materialesValidos)}");
+        Console.WriteLine($"   Colores bote: {string.Join(", ", coloresBoteValidos)}");
+        Console.WriteLine($"   Formas tapa: {string.Join(", ", formasTapaValidas)}");
+        Console.WriteLine($"   Bocas: {string.Join(", ", bocasValidas)}");
+        Console.WriteLine($"   Colores tapa: {string.Join(", ", coloresTapaValidos)}");
+
+        // PASO 2: Filtrar botes por atributos válidos
+        var botesPreFiltrados = boteDataList.Where(b =>
+        {
+            var formaMatch = string.IsNullOrEmpty(b.Forma) || formasBoteValidas.Count == 0 ||
+                             formasBoteValidas.Contains(b.Forma.ToUpperInvariant());
+            var capMatch = string.IsNullOrEmpty(b.Capacidad) || capacidadesValidas.Count == 0 ||
+                           capacidadesValidas.Contains(b.Capacidad);
+            var matMatch = string.IsNullOrEmpty(b.Material) || materialesValidos.Count == 0 ||
+                           materialesValidos.Contains(b.Material);
+            var colorMatch = string.IsNullOrEmpty(b.Color) || coloresBoteValidos.Count == 0 ||
+                             coloresBoteValidos.Contains(NormalizeColorName(b.Color));
+
+            return formaMatch && capMatch && matMatch && colorMatch;
+        }).ToList();
+
+        Console.WriteLine($"   Botes pre-filtrados: {botesPreFiltrados.Count}");
+
+        // PASO 3: Filtrar tapas por atributos válidos
+        var tapasPreFiltradas = capDataList.Where(c =>
+        {
+            var formaMatch = string.IsNullOrEmpty(c.Forma) || formasTapaValidas.Count == 0 ||
+                             formasTapaValidas.Contains(c.Forma);
+            var bocaMatch = string.IsNullOrEmpty(c.Diametro) || bocasValidas.Count == 0 ||
+                            bocasValidas.Contains(c.Diametro);
+            var colorMatch = string.IsNullOrEmpty(c.Color) || coloresTapaValidos.Count == 0 ||
+                             coloresTapaValidos.Contains(NormalizeColorName(c.Color));
+
+            return formaMatch && bocaMatch && colorMatch;
+        }).ToList();
+
+        Console.WriteLine($"   Tapas pre-filtradas: {tapasPreFiltradas.Count}");
+
+        // PASO 4: Extraer bocas/diámetros disponibles de tapas pre-filtradas
+        var bocasDisponiblesDesdeTapas = tapasPreFiltradas
+            .Where(t => !string.IsNullOrEmpty(t.Diametro))
+            .Select(t => t.Diametro)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        Console.WriteLine($"   Bocas disponibles desde tapas: {string.Join(", ", bocasDisponiblesDesdeTapas)}");
+
+        // PASO 5: Filtrar botes que tengan tapas compatibles
+        var botesFiltrados = botesPreFiltrados.Where(b =>
+        {
+            // Un bote es válido si su diámetro/boca tiene al menos una tapa compatible
+            if (string.IsNullOrEmpty(b.Diametro))
+                return false;
+
+            return bocasDisponiblesDesdeTapas.Contains(b.Diametro);
+        }).ToList();
+
+        Console.WriteLine($"   Botes con tapas compatibles: {botesFiltrados.Count}");
+
+        // PASO 6: Extraer bocas/diámetros disponibles de botes filtrados
+        var bocasDisponiblesDesdeBotes = botesFiltrados
+            .Where(b => !string.IsNullOrEmpty(b.Diametro))
+            .Select(b => b.Diametro)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        Console.WriteLine($"   Bocas disponibles desde botes: {string.Join(", ", bocasDisponiblesDesdeBotes)}");
+
+        // PASO 7: Filtrar tapas que sean compatibles con los botes filtrados
+        var tapasFiltradas = tapasPreFiltradas.Where(t =>
+        {
+            if (string.IsNullOrEmpty(t.Diametro))
+                return false;
+
+            return bocasDisponiblesDesdeBotes.Contains(t.Diametro);
+        }).ToList();
+
+        Console.WriteLine($"✅ RESULTADO FINAL:");
+        Console.WriteLine($"   Botes coherentes: {botesFiltrados.Count}");
+        Console.WriteLine($"   Tapas coherentes: {tapasFiltradas.Count}");
+
+        return (botesFiltrados, tapasFiltradas);
+    }
+    protected List<BoteCapDataModal.BoteDataItem> GetFilteredBoteData()
+    {
+        var (botes, _) = GetFilteredAndRelatedData();
+        return botes;
+    }
+
+    protected List<BoteCapDataModal.CapDataItem> GetFilteredCapData()
+    {
+        var (_, tapas) = GetFilteredAndRelatedData();
+        return tapas;
+    }
+    protected List<string> GetFilteredCapacidades()
+    {
+        var (botes, _) = GetFilteredAndRelatedData();
+
+        var capacidadesDisponibles = botes
+            .Where(b => !string.IsNullOrEmpty(b.Capacidad))
+            .Select(b => b.Capacidad)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(c => {
+                if (int.TryParse(c, out var n)) return n;
+                return int.MaxValue;
+            })
+            .ThenBy(c => c, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        Console.WriteLine($"📊 Capacidades disponibles: {string.Join(", ", capacidadesDisponibles)}");
+
+        return capacidadesDisponibles;
+    }
     private void BuildOptionLookupsFromAtributos(JsonElement atributos)
     {
         try
