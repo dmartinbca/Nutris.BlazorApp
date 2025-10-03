@@ -109,7 +109,7 @@
                                 <!-- Forma -->
                                 <div class="field">
                                     <label class="form-label">@Localization["modalContainer.Shape"]</label>
-                                    <div class="segmented">
+@*                                     <div class="segmented">
                                         <button type="button"
                                                 class="segmented-item @(BoteConfig.Forma == "ROUND" ? "active" : "")"
                                                 disabled="@(!AvailableBottleForms.Contains("ROUND"))"
@@ -130,6 +130,19 @@
                                                 @onclick='() => SetFormaBote("CYLINDRICAL")'>
                                             <span class="radio-icon"></span> Cylindrical
                                         </button>
+                                    </div> *@
+                                    <!-- FORMAS DE BOTE - DINÁMICO -->
+                                    <div class="segmented">
+                                        @foreach (var forma in GetAvailableBottleShapes())
+                                        {
+                                            <button type="button"
+                                                    class="segmented-item @(IsBottleShapeSelected(forma.Key) ? "active" : "")"
+                                                    @onclick="() => OnBottleShapeChange(forma.Key)"
+                                                    disabled="@IsSaving">
+                                                <span class="radio-icon"></span>
+                                                @forma.Value
+                                            </button>
+                                        }
                                     </div>
                                 </div>
 
@@ -229,7 +242,7 @@
                                 <!-- Forma -->
                                 <div class="field">
                                     <label class="form-label">@Localization["modalContainer.Shape"]</label>
-                                    <div class="segmented">
+@*                                     <div class="segmented">
                                         <button type="button"
                                                 class="segmented-item @(CapConfig.Forma == "SIMPLE" ? "active" : "")"
                                                 disabled="@(!AvailableCapForms.Contains("SIMPLE"))"
@@ -250,6 +263,19 @@
                                                 @onclick='() => SetFormaCap("CHILDPROFF")'>
                                             <span class="radio-icon"></span> Childproff
                                         </button>
+                                    </div> *@
+                                    <!-- FORMAS DE TAPA - DINÁMICO -->
+                                    <div class="segmented">
+                                        @foreach (var forma in GetAvailableCapShapes())
+                                        {
+                                            <button type="button"
+                                                    class="segmented-item @(IsCapShapeSelected(forma.Key) ? "active" : "")"
+                                                    @onclick="() => OnCapShapeChange(forma.Key)"
+                                                    disabled="@IsSaving">
+                                                <span class="radio-icon"></span>
+                                                @forma.Value
+                                            </button>
+                                        }
                                     </div>
                                 </div>
 
@@ -363,7 +389,7 @@
             ["D63"] = (66.0, 13.5),
             ["D70"] = (73.0, 14.0)
         },
-        ["CHILDPROFF"] = new()
+        ["CHILDPROOF"] = new()
         {
             ["D38"] = (45.21, 17.3),
             ["D45"] = (51.99, 17.306),
@@ -476,7 +502,8 @@
         public string? BoteMaterial { get; set; }
     }
     // Props opcionales (fallbacks externos)
-
+    private string SelectedBottleShape { get; set; } = "";
+    private string SelectedCapShape { get; set; } = "";
     // Formas habilitadas según los filtros actuales
     private HashSet<string> AvailableBottleForms = new(StringComparer.OrdinalIgnoreCase);
     private HashSet<string> AvailableCapForms = new(StringComparer.OrdinalIgnoreCase);
@@ -526,7 +553,7 @@
         {
             "BASIC" => "SIMPLE",
             "METÁLICA" or "METALICA" => "METAL",
-            "CHILDPROOF" or "NIÑOS" or "NINOS" => "CHILDPROFF",
+            "CHILDPROOF" or "NIÑOS" or "NINOS" => "CHILDPROOF",
             "" => "SIMPLE",
             _ => f
         };
@@ -1109,7 +1136,93 @@
         UpdateBoteImage(); // Actualizar la imagen después de recomputar filtros
         UpdateCurrentDimensions();
     }
+    // ===== MÉTODOS PARA FORMAS DINÁMICAS =====
 
+    private Dictionary<string, string> GetAvailableBottleShapes()
+    {
+        var shapes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        // Obtener formas únicas de los botes filtrados
+        var availableShapes = BoteData
+            .Where(b => !string.IsNullOrEmpty(b.Forma))
+            .Select(b => b.Forma.ToUpperInvariant())
+            .Distinct()
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // Mapeo de formas con sus etiquetas
+        var shapeLabels = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["ROUND"] = "Round",
+            ["SQUARE"] = "Square",
+            ["CYLINDRICAL"] = "Cylindrical"
+        };
+
+        // Solo agregar las formas que existen en los datos filtrados
+        foreach (var kvp in shapeLabels)
+        {
+            if (availableShapes.Contains(kvp.Key))
+            {
+                shapes[kvp.Key] = kvp.Value;
+            }
+        }
+
+        return shapes;
+    }
+
+    private Dictionary<string, string> GetAvailableCapShapes()
+    {
+        var shapes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        // Obtener formas únicas de las tapas filtradas
+        var availableShapes = CapData
+            .Where(c => !string.IsNullOrEmpty(c.Forma))
+            .Select(c => c.Forma.ToUpperInvariant())
+            .Distinct()
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // Mapeo de formas con sus etiquetas
+        var shapeLabels = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["SIMPLE"] = "Simple",
+            ["METAL"] = "Metal",
+            ["CHILDPROOF"] = "Childproof"
+        };
+
+        // Solo agregar las formas que existen en los datos filtrados
+        foreach (var kvp in shapeLabels)
+        {
+            if (availableShapes.Contains(kvp.Key))
+            {
+                shapes[kvp.Key] = kvp.Value;
+            }
+        }
+
+        return shapes;
+    }
+
+    private bool IsBottleShapeSelected(string shape)
+    {
+        return string.Equals(SelectedBottleShape, shape, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool IsCapShapeSelected(string shape)
+    {
+        return string.Equals(SelectedCapShape, shape, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void OnBottleShapeChange(string shape)
+    {
+        SelectedBottleShape = shape;
+        RecomputeAllFilters();
+        StateHasChanged();
+    }
+
+    private void OnCapShapeChange(string shape)
+    {
+        SelectedCapShape = shape;
+        RecomputeAllFilters();
+        StateHasChanged();
+    }
     private void RecomputeCapFilters()
     {
         var diaSel = NormDiam(BoteConfig.Diametro);
@@ -1336,7 +1449,7 @@
         }
     }
     // ===== Ciclo de vida =====
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         if (string.IsNullOrWhiteSpace(BoteConfig.ImagenBote))
         {
@@ -1396,6 +1509,24 @@
         {
             CapConfig.ImagenCap = NO_IMAGE_AVAILABLE;
         }
+        if (string.IsNullOrEmpty(SelectedBottleShape))
+        {
+            var availableBottleShapes = GetAvailableBottleShapes();
+            if (availableBottleShapes.Any())
+            {
+                SelectedBottleShape = availableBottleShapes.First().Key;
+            }
+        }
+
+        if (string.IsNullOrEmpty(SelectedCapShape))
+        {
+            var availableCapShapes = GetAvailableCapShapes();
+            if (availableCapShapes.Any())
+            {
+                SelectedCapShape = availableCapShapes.First().Key;
+            }
+        }
+        await base.OnParametersSetAsync();
     }
 
     // ===== API pública =====
@@ -1730,7 +1861,7 @@
         {
             case "SIMPLE": return "Simple";
             case "METAL": return "Metal";
-            case "CHILDPROFF": return "Childproof";
+            case "CHILDPROOF": return "Childproof";
             default: return forma ?? "";
         }
     }

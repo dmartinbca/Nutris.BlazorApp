@@ -715,10 +715,11 @@
     gap: 4px;
     padding: 0 clamp(10px, 1.5vw, 20px);
     margin-top: clamp(15px, 2vh, 30px);
+    flex-wrap: wrap;
 }
 
 .segmented-item {
-    flex: 1;
+    flex: 1 1 auto; /* CAMBIO: de flex: 1 a flex: 1 1 auto */
     padding: clamp(8px, 1vh, 12px) 4px;
     border: 1px solid #A7BDE3;
     background: #F0E7F9;
@@ -735,6 +736,7 @@
     height: clamp(36px, 4vh, 44px);
     min-width: 0;
     white-space: nowrap;
+    min-width: 80px; /* NUEVO: ancho mínimo */
 }
 
     .segmented-item:hover:not(:disabled):not(.active) {
