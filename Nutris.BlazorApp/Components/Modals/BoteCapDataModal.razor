@@ -998,156 +998,157 @@
     private void RecomputeBottleFilters()
     {
         var all = (BoteData ?? Enumerable.Empty<BoteDataItem>()).ToList();
-        // NUEVO: Filtrar por peso máximo si hay PesoTotal
+        Console.WriteLine($"=== INICIO RecomputeBottleFilters ===");
+        Console.WriteLine($"Total botes: {all.Count}");
+
+        // FILTRO DE PESO
         if (!string.IsNullOrEmpty(PesoTotal) && decimal.TryParse(PesoTotal, out decimal pesoTotalDecimal))
         {
-            Console.WriteLine($"Filtrando botes por peso: PesoTotal = {pesoTotalDecimal}");
             all = all.Where(b => b.PesoMaximo >= pesoTotalDecimal).ToList();
-            Console.WriteLine($"Botes después del filtro de peso: {all.Count}");
+            Console.WriteLine($"Después de peso: {all.Count}");
         }
+
         string forma = NormFormaBote(BoteConfig.Forma);
         string capSel = N(BoteConfig.Capacidad);
         string diaSel = NormDiam(BoteConfig.Diametro);
         string matSel = N(BoteConfig.Material);
+        string colorSel = N(BoteConfig.Color);
 
-        // Formas disponibles con los filtros no vacíos
+        Console.WriteLine($"Color seleccionado: '{colorSel}'");
+
+        // ===== FORMAS DISPONIBLES =====
         AvailableBottleForms = new HashSet<string>(
             all.Where(b =>
                 (string.IsNullOrEmpty(capSel) || N(b.Capacidad) == capSel) &&
                 (string.IsNullOrEmpty(diaSel) || NormDiam(b.Diametro) == diaSel) &&
-                (string.IsNullOrEmpty(matSel) || N(b.Material) == matSel))
+                (string.IsNullOrEmpty(matSel) || N(b.Material) == matSel) &&
+                (string.IsNullOrEmpty(colorSel) || N(b.Color) == colorSel))
                .Select(b => NormFormaBote(b.Forma))
                .Distinct(StringComparer.OrdinalIgnoreCase),
             StringComparer.OrdinalIgnoreCase
         );
 
-        // Si hay forma seleccionada pero ya no es válida, solo entonces corrige; si está vacía, déjala vacía
         if (!string.IsNullOrEmpty(forma) && !AvailableBottleForms.Contains(forma))
-            BoteConfig.Forma = forma = AvailableBottleForms.FirstOrDefault() ?? "";
+            BoteConfig.Forma = forma = "";
 
-        // Dataset por forma (si no hay forma, usar todos)
-        var dataForma = string.IsNullOrEmpty(forma)
-            ? all
-            : all.Where(b => NormFormaBote(b.Forma) == forma).ToList();
-
-        // Capacidades válidas
-        CapacidadOptionsFiltered = dataForma
+        // ===== CAPACIDADES =====
+        CapacidadOptionsFiltered = all
+            .Where(b =>
+                (string.IsNullOrEmpty(forma) || NormFormaBote(b.Forma) == forma) &&
+                (string.IsNullOrEmpty(diaSel) || NormDiam(b.Diametro) == diaSel) &&
+                (string.IsNullOrEmpty(matSel) || N(b.Material) == matSel) &&
+                (string.IsNullOrEmpty(colorSel) || N(b.Color) == colorSel))
             .Select(b => N(b.Capacidad))
-            .Where(s => s != "")
+            .Where(s => !string.IsNullOrEmpty(s))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(c => int.TryParse(c, out var n) ? n : int.MaxValue)
-            .ThenBy(c => c, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        if (!string.IsNullOrEmpty(capSel) &&
-            !CapacidadOptionsFiltered.Contains(capSel, StringComparer.OrdinalIgnoreCase))
+        Console.WriteLine($"Capacidades: {string.Join(", ", CapacidadOptionsFiltered)}");
+
+        if (!string.IsNullOrEmpty(capSel) && !CapacidadOptionsFiltered.Contains(capSel, StringComparer.OrdinalIgnoreCase))
             BoteConfig.Capacidad = capSel = "";
 
-        // Diámetros válidos (condicionados por capacidad si la hay)
-        var dataCap = string.IsNullOrEmpty(capSel)
-            ? dataForma
-            : dataForma.Where(b => N(b.Capacidad) == capSel).ToList();
-
-        DiametroOptionsFiltered = dataCap
+        // ===== DIÁMETROS =====
+        DiametroOptionsFiltered = all
+            .Where(b =>
+                (string.IsNullOrEmpty(forma) || NormFormaBote(b.Forma) == forma) &&
+                (string.IsNullOrEmpty(capSel) || N(b.Capacidad) == capSel) &&
+                (string.IsNullOrEmpty(matSel) || N(b.Material) == matSel) &&
+                (string.IsNullOrEmpty(colorSel) || N(b.Color) == colorSel))
             .Select(b => NormDiam(b.Diametro))
-            .Where(s => s != "")
+            .Where(s => !string.IsNullOrEmpty(s))
             .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(d => d, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(d => d)
             .ToList();
 
-        if (!string.IsNullOrEmpty(diaSel) &&
-            !DiametroOptionsFiltered.Contains(diaSel, StringComparer.OrdinalIgnoreCase))
+        Console.WriteLine($"Diámetros filtrados: {string.Join(", ", DiametroOptionsFiltered)}");
+
+        if (!string.IsNullOrEmpty(diaSel) && !DiametroOptionsFiltered.Contains(diaSel, StringComparer.OrdinalIgnoreCase))
             BoteConfig.Diametro = diaSel = "";
 
-        // Materiales válidos (condicionados por cap/diámetro si existen)
-        var dataCapDia = string.IsNullOrEmpty(diaSel)
-            ? dataCap
-            : dataCap.Where(b => NormDiam(b.Diametro) == diaSel).ToList();
-
-        MaterialOptionsFiltered = dataCapDia
+        // ===== MATERIALES =====
+        MaterialOptionsFiltered = all
+            .Where(b =>
+                (string.IsNullOrEmpty(forma) || NormFormaBote(b.Forma) == forma) &&
+                (string.IsNullOrEmpty(capSel) || N(b.Capacidad) == capSel) &&
+                (string.IsNullOrEmpty(diaSel) || NormDiam(b.Diametro) == diaSel) &&
+                (string.IsNullOrEmpty(colorSel) || N(b.Color) == colorSel))
             .Select(b => N(b.Material))
-            .Where(s => s != "")
+            .Where(s => !string.IsNullOrEmpty(s))
             .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(m => m, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(m => m)
             .ToList();
 
-        if (!string.IsNullOrEmpty(matSel) &&
-            !MaterialOptionsFiltered.Contains(matSel, StringComparer.OrdinalIgnoreCase))
+        Console.WriteLine($"Materiales: {string.Join(", ", MaterialOptionsFiltered)}");
+
+        if (!string.IsNullOrEmpty(matSel) && !MaterialOptionsFiltered.Contains(matSel, StringComparer.OrdinalIgnoreCase))
             BoteConfig.Material = matSel = "";
-        // ===== Colores válidos =====
-        // Tomamos el conjunto más específico disponible, igual que en VUE:
-        // 1) (forma, capacidad, diámetro, material)
-        // 2) si material vacío -> (forma, capacidad, diámetro)
-        // 3) si diámetro vacío -> (forma, capacidad)
-        // 4) si capacidad vacía -> (forma)
-        // 5) si forma vacía -> todo
-        IEnumerable<BoteDataItem> baseSet;
 
-        if (!string.IsNullOrEmpty(matSel) && dataCapDia.Any())
-        {
-            baseSet = dataCapDia.Where(b => N(b.Material) == matSel);
-        }
-        else if (dataCapDia.Any())
-        {
-            baseSet = dataCapDia;
-        }
-        else if (dataCap.Any())
-        {
-            baseSet = dataCap;
-        }
-        else if (dataForma.Any())
-        {
-            baseSet = dataForma;
-        }
-        else
-        {
-            baseSet = all;
-        }
-
-        var colorNames = baseSet
+        // ===== COLORES =====
+        var colorNames = all
+            .Where(b =>
+                (string.IsNullOrEmpty(forma) || NormFormaBote(b.Forma) == forma) &&
+                (string.IsNullOrEmpty(capSel) || N(b.Capacidad) == capSel) &&
+                (string.IsNullOrEmpty(diaSel) || NormDiam(b.Diametro) == diaSel) &&
+                (string.IsNullOrEmpty(matSel) || N(b.Material) == matSel))
             .Select(b => N(b.Color))
-            .Where(s => s != "")
+            .Where(s => !string.IsNullOrEmpty(s))
             .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(c => c, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(c => c)
             .ToList();
 
-        // Si no hay colores en catálogo de datos, no dejes la lista vacía: usa catálogo UI como fallback
-        OptionsColorBoteFiltered = colorNames.Count > 0
+        OptionsColorBoteFiltered = colorNames.Any()
             ? MapNamesToColorOptions(colorNames, OptionsColorBote ?? OptionsColorBoteUI)
             : (OptionsColorBote?.ToList() ?? OptionsColorBoteUI.ToList());
 
-        // Si el color seleccionado ya no existe, vacíalo (para que se vea el placeholder)
-        if (!string.IsNullOrEmpty(BoteConfig.Color) &&
-            !OptionsColorBoteFiltered.Any(o => string.Equals((o.Label ?? o.Value), BoteConfig.Color, StringComparison.OrdinalIgnoreCase)))
+        if (!string.IsNullOrEmpty(colorSel) &&
+            !OptionsColorBoteFiltered.Any(o => string.Equals((o.Label ?? o.Value), colorSel, StringComparison.OrdinalIgnoreCase)))
         {
             BoteConfig.Color = "";
         }
 
-        // ===== Sincroniza diámetro de tapa cuando exista
+        // SINCRONIZAR TAPA
         var previousCapDiameter = CapConfig.Diametro;
         CapConfig.Diametro = string.IsNullOrEmpty(BoteConfig.Diametro) ? "" : BoteConfig.Diametro;
 
-        // Si el diámetro de la tapa cambió, actualizar su imagen
         if (previousCapDiameter != CapConfig.Diametro)
-        {
             UpdateCapImage();
-        }
-        UpdateCapImage();
-        UpdateBoteImage(); // Actualizar la imagen después de recomputar filtros
-        UpdateCurrentDimensions();
-    }
-    // ===== MÉTODOS PARA FORMAS DINÁMICAS =====
 
+        UpdateCapImage();
+        UpdateBoteImage();
+        UpdateCurrentDimensions();
+        Console.WriteLine($"=== FIN ===");
+    }
     private Dictionary<string, string> GetAvailableBottleShapes()
     {
         var shapes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        // Obtener formas únicas de los botes filtrados
-        var availableShapes = BoteData
-            .Where(b => !string.IsNullOrEmpty(b.Forma))
+        // Obtener filtros activos (excluyendo forma)
+        string capSel = N(BoteConfig.Capacidad);
+        string diaSel = NormDiam(BoteConfig.Diametro);
+        string matSel = N(BoteConfig.Material);
+        string colorSel = N(BoteConfig.Color);
+
+        // Aplicar filtro de peso
+        var all = (BoteData ?? Enumerable.Empty<BoteDataItem>()).ToList();
+        if (!string.IsNullOrEmpty(PesoTotal) && decimal.TryParse(PesoTotal, out decimal pesoTotalDecimal))
+        {
+            all = all.Where(b => b.PesoMaximo >= pesoTotalDecimal).ToList();
+        }
+
+        // Obtener formas disponibles según los filtros activos
+        var availableShapes = all
+            .Where(b =>
+                (string.IsNullOrEmpty(capSel) || N(b.Capacidad) == capSel) &&
+                (string.IsNullOrEmpty(diaSel) || NormDiam(b.Diametro) == diaSel) &&
+                (string.IsNullOrEmpty(matSel) || N(b.Material) == matSel) &&
+                (string.IsNullOrEmpty(colorSel) || N(b.Color) == colorSel))
             .Select(b => b.Forma.ToUpperInvariant())
             .Distinct()
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        Console.WriteLine($"GetAvailableBottleShapes - Formas disponibles: {string.Join(", ", availableShapes)}");
 
         // Mapeo de formas con sus etiquetas
         var shapeLabels = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -1157,7 +1158,7 @@
             ["CYLINDRICAL"] = "Cylindrical"
         };
 
-        // Solo agregar las formas que existen en los datos filtrados
+        // Solo agregar las formas que existen con los filtros actuales
         foreach (var kvp in shapeLabels)
         {
             if (availableShapes.Contains(kvp.Key))
@@ -1168,17 +1169,24 @@
 
         return shapes;
     }
-
     private Dictionary<string, string> GetAvailableCapShapes()
     {
         var shapes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        // Obtener formas únicas de las tapas filtradas
-        var availableShapes = CapData
-            .Where(c => !string.IsNullOrEmpty(c.Forma))
+        // Obtener filtros activos (excluyendo forma de tapa)
+        var diaSel = NormDiam(BoteConfig.Diametro);
+        string colorCapSel = N(CapConfig.Color);
+
+        // Filtrar tapas por diámetro sincronizado con el bote
+        var availableShapes = (CapData ?? Enumerable.Empty<CapDataItem>())
+            .Where(c =>
+                (string.IsNullOrEmpty(diaSel) || NormDiam(c.Diametro) == diaSel) &&
+                (string.IsNullOrEmpty(colorCapSel) || N(c.Color) == colorCapSel))
             .Select(c => c.Forma.ToUpperInvariant())
             .Distinct()
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        Console.WriteLine($"GetAvailableCapShapes - Formas disponibles: {string.Join(", ", availableShapes)}");
 
         // Mapeo de formas con sus etiquetas
         var shapeLabels = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -1188,7 +1196,7 @@
             ["CHILDPROOF"] = "Childproof"
         };
 
-        // Solo agregar las formas que existen en los datos filtrados
+        // Solo agregar las formas que cumplen los filtros
         foreach (var kvp in shapeLabels)
         {
             if (availableShapes.Contains(kvp.Key))
@@ -1199,108 +1207,165 @@
 
         return shapes;
     }
-
     private bool IsBottleShapeSelected(string shape)
     {
-        return string.Equals(SelectedBottleShape, shape, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(BoteConfig.Forma, shape, StringComparison.OrdinalIgnoreCase);
     }
 
     private bool IsCapShapeSelected(string shape)
     {
-        return string.Equals(SelectedCapShape, shape, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(CapConfig.Forma, shape, StringComparison.OrdinalIgnoreCase);
     }
 
-    private void OnBottleShapeChange(string shape)
+    private async Task OnBottleShapeChange(string shape)
     {
-        SelectedBottleShape = shape;
-        RecomputeAllFilters();
-        StateHasChanged();
-    }
+        Console.WriteLine($"OnBottleShapeChange llamado: {shape}");
 
-    private void OnCapShapeChange(string shape)
-    {
-        SelectedCapShape = shape;
-        RecomputeAllFilters();
-        StateHasChanged();
-    }
-    private void RecomputeCapFilters()
-    {
-        var diaSel = NormDiam(BoteConfig.Diametro);
+        BoteConfig.Forma = shape; // ⚡ CRÍTICO: Actualizar el modelo
 
-        var capsAll = (CapData ?? Enumerable.Empty<CapDataItem>())
-            .Where(c => string.IsNullOrEmpty(diaSel) || NormDiam(c.Diametro) == diaSel)
-            .ToList();
+        RecomputeAllFilters(); // Recalcular cascada completa
+        UpdateBoteImage();     // Actualizar imagen
+        UpdateCurrentDimensions(); // Actualizar dimensiones
 
-        AvailableCapForms = new HashSet<string>(
-            capsAll.Select(c => NormFormaCap(c.Forma))
-                   .Distinct(StringComparer.OrdinalIgnoreCase),
-            StringComparer.OrdinalIgnoreCase
-        );
-
-        var forma = NormFormaCap(CapConfig.Forma);
-        if (!string.IsNullOrEmpty(forma) && !AvailableCapForms.Contains(forma))
-            CapConfig.Forma = forma = AvailableCapForms.FirstOrDefault() ?? "";
-
-        var usable = string.IsNullOrEmpty(forma)
-            ? capsAll
-            : capsAll.Where(c => NormFormaCap(c.Forma) == forma).ToList();
-
-        var colorNames = usable
-            .Select(c => N(c.Color))
-            .Where(s => s != "")
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(c => c, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        OptionsColorCoverFiltered = MapNamesToColorOptions(colorNames, OptionsColorCover ?? OptionsColorCoverUI);
-        if (!string.IsNullOrEmpty(CapConfig.Color) &&
-            !OptionsColorCoverFiltered.Any(o => string.Equals((o.Label ?? o.Value), CapConfig.Color, StringComparison.OrdinalIgnoreCase)))
-            CapConfig.Color = "";
-        UpdateCapImage(); // Actualizar la imagen después de recomputar filtros
-        UpdateCapDimensions();
-    }
-
-    private void RecomputeAllFilters()
-    {
-        RecomputeBottleFilters();
-        RecomputeCapFilters();
-        UpdateCurrentDimensions();
-        UpdateBoteImage(); // Agregar si no está
-        UpdateCapImage();  // Agregar si no está
-        StateHasChanged();
-    }
-
-
-
-    // ===== Handlers =====
-    private async void SetFormaBote(string forma)
-    {
-        BoteConfig.Forma = forma;
-        UpdateBoteImage(); // Ya existe esta llamada
-        RecomputeAllFilters();
-        await OnBottleConfigChanged();
-        await Task.Delay(100);
-        await AdjustDimensionLines();
-    }
-
-    private async void OnCapacityChanged(ChangeEventArgs e) { BoteConfig.Capacidad = e?.Value?.ToString() ?? BoteConfig.Capacidad; RecomputeAllFilters(); await OnBottleConfigChanged(); }
-    private async void OnDiametroChanged(ChangeEventArgs e) { BoteConfig.Diametro = e?.Value?.ToString() ?? BoteConfig.Diametro; RecomputeAllFilters(); await OnBottleConfigChanged(); }
-    private async void OnMaterialChanged(ChangeEventArgs e) { BoteConfig.Material = e?.Value?.ToString() ?? BoteConfig.Material; RecomputeAllFilters(); await OnBottleConfigChanged(); }
-
-    private async void SetFormaCap(string forma)
-    {
-        CapConfig.Forma = forma;
-        UpdateCapImage(); // Ya existe esta llamada
-        RecomputeCapFilters();
-        UpdateCapDimensions();
         await InvokeAsync(StateHasChanged);
         await Task.Delay(100);
+
+        if (IsBottleTab)
+        {
+            await AdjustDimensionLines();
+        }
+    }
+
+
+    private async Task OnCapShapeChange(string shape)
+    {
+        Console.WriteLine($"OnCapShapeChange llamado: {shape}");
+
+        CapConfig.Forma = shape; // ⚡ CRÍTICO: Actualizar el modelo
+
+        RecomputeCapFilters(); // Recalcular filtros de tapa
+        UpdateCapImage();      // Actualizar imagen
+        UpdateCapDimensions(); // Actualizar dimensiones
+
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(100);
+
         if (!IsBottleTab)
         {
             await AdjustCapDimensionLines();
         }
     }
+    private void RecomputeCapFilters()
+    {
+        Console.WriteLine($"=== INICIO RecomputeCapFilters ===");
 
+        var diaSel = NormDiam(BoteConfig.Diametro);
+        string formaCapSel = NormFormaCap(CapConfig.Forma);
+        string colorCapSel = N(CapConfig.Color);
+
+        Console.WriteLine($"Diámetro del bote (para sincronizar): '{diaSel}'");
+        Console.WriteLine($"Forma de tapa seleccionada: '{formaCapSel}'");
+        Console.WriteLine($"Color de tapa seleccionado: '{colorCapSel}'");
+
+        // Filtrar por diámetro sincronizado con el bote
+        var capsFiltered = (CapData ?? Enumerable.Empty<CapDataItem>())
+            .Where(c => string.IsNullOrEmpty(diaSel) || NormDiam(c.Diametro) == diaSel)
+            .ToList();
+
+        Console.WriteLine($"Tapas disponibles para diámetro {diaSel}: {capsFiltered.Count}");
+
+        // ===== FORMAS DE TAPA DISPONIBLES =====
+        AvailableCapForms = new HashSet<string>(
+            capsFiltered
+                .Where(c => string.IsNullOrEmpty(colorCapSel) || N(c.Color) == colorCapSel)
+                .Select(c => NormFormaCap(c.Forma))
+                .Where(f => !string.IsNullOrEmpty(f))
+                .Distinct(StringComparer.OrdinalIgnoreCase),
+            StringComparer.OrdinalIgnoreCase
+        );
+
+        Console.WriteLine($"Formas de tapa disponibles: {string.Join(", ", AvailableCapForms)}");
+
+        // Validar forma seleccionada
+        if (!string.IsNullOrEmpty(formaCapSel) && !AvailableCapForms.Contains(formaCapSel))
+        {
+            Console.WriteLine($"Forma '{formaCapSel}' no disponible, reseteando");
+            CapConfig.Forma = formaCapSel = "";
+        }
+
+        // ===== COLORES DE TAPA DISPONIBLES =====
+        var colorNames = capsFiltered
+            .Where(c => string.IsNullOrEmpty(formaCapSel) || NormFormaCap(c.Forma) == formaCapSel)
+            .Select(c => N(c.Color))
+            .Where(s => !string.IsNullOrEmpty(s))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(c => c, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        Console.WriteLine($"Colores de tapa disponibles: {string.Join(", ", colorNames)}");
+
+        OptionsColorCoverFiltered = colorNames.Any()
+            ? MapNamesToColorOptions(colorNames, OptionsColorCover ?? OptionsColorCoverUI)
+            : (OptionsColorCover?.ToList() ?? OptionsColorCoverUI.ToList());
+
+        if (!string.IsNullOrEmpty(colorCapSel) &&
+            !OptionsColorCoverFiltered.Any(o =>
+                string.Equals((o.Label ?? o.Value), colorCapSel, StringComparison.OrdinalIgnoreCase)))
+        {
+            Console.WriteLine($"Color '{colorCapSel}' no disponible, reseteando");
+            CapConfig.Color = "";
+        }
+
+        UpdateCapImage();
+        UpdateCapDimensions();
+
+        Console.WriteLine($"=== FIN RecomputeCapFilters ===");
+    }
+
+    private void RecomputeAllFilters()
+    {
+        // Guardar valores anteriores para detectar cambios
+        var oldForma = BoteConfig.Forma;
+        var oldCap = BoteConfig.Capacidad;
+        var oldDia = BoteConfig.Diametro;
+        var oldMat = BoteConfig.Material;
+        var oldColor = BoteConfig.Color;
+
+        var oldCapForma = CapConfig.Forma;
+        var oldCapColor = CapConfig.Color;
+
+        RecomputeBottleFilters();
+        RecomputeCapFilters();
+        UpdateCurrentDimensions();
+        UpdateBoteImage();
+        UpdateCapImage();
+
+        // Detectar si algún campo fue reseteado
+        bool wasReset =
+            (oldForma != BoteConfig.Forma) ||
+            (oldCap != BoteConfig.Capacidad) ||
+            (oldDia != BoteConfig.Diametro) ||
+            (oldMat != BoteConfig.Material) ||
+            (oldColor != BoteConfig.Color) ||
+            (oldCapForma != CapConfig.Forma) ||
+            (oldCapColor != CapConfig.Color);
+
+        if (wasReset)
+        {
+            Console.WriteLine("⚠️ Algunos campos fueron reseteados por incompatibilidad");
+            InvokeAsync(StateHasChanged); // Forzar refresco de UI
+        }
+        else
+        {
+            StateHasChanged();
+        }
+    }
+
+
+
+    
+
+   
     private async Task AdjustCapDimensionLines()
     {
         try
@@ -1392,11 +1457,14 @@
 
     private async Task OnBoteColorChangedAsync()
     {
-        UpdateBoteImage();
-        await InvokeAsync(StateHasChanged);
+        Console.WriteLine($"OnBoteColorChangedAsync - Color: {BoteConfig.Color}");
 
-        // Esperar a que el DOM se actualice y luego ajustar las líneas
+        RecomputeAllFilters(); // ⚡ AGREGAR ESTA LÍNEA
+        UpdateBoteImage();
+
+        await InvokeAsync(StateHasChanged);
         await Task.Delay(100);
+
         if (IsBottleTab)
         {
             await AdjustDimensionLines();
@@ -1405,35 +1473,22 @@
 
     private async Task OnCapColorChangedAsync()
     {
-        UpdateCapImage(); // Actualizar la imagen de la tapa
-        await InvokeAsync(StateHasChanged);
+        Console.WriteLine($"OnCapColorChangedAsync - Color: {CapConfig.Color}");
 
-        // Esperar a que el DOM se actualice y luego ajustar las líneas
+        RecomputeCapFilters(); // ⚡ Recalcular filtros
+        UpdateCapImage();
+        UpdateCapDimensions();
+
+        await InvokeAsync(StateHasChanged);
         await Task.Delay(100);
-        if (!IsBottleTab) // Solo si estamos en la pestaña de tapa
+
+        if (!IsBottleTab)
         {
             await AdjustCapDimensionLines();
         }
     }
-    private void OnBoteColorChanged(ChangeEventArgs e)
-    {
-        BoteConfig.Color = e?.Value?.ToString() ?? BoteConfig.Color;
-        UpdateBoteImage(); // Actualizar imagen del bote
-        InvokeAsync(StateHasChanged);
-    }
-    private async void OnCapColorChanged(ChangeEventArgs e)
-    {
-        CapConfig.Color = e?.Value?.ToString() ?? CapConfig.Color;
-        UpdateCapImage(); // Actualizar imagen de la tapa
-
-        var hexColor = GetCapHexColor();
-        Console.WriteLine($"Color tapa cambiado a: {CapConfig.Color}, Hex: {hexColor}");
-
-        await InvokeAsync(() =>
-        {
-            StateHasChanged();
-        });
-    }
+    
+     
     private async Task ForceAdjustDimensions()
     {
         await InvokeAsync(StateHasChanged);
@@ -1656,7 +1711,7 @@
             : "N/A";
     }
 
-    private void OnCapacityChangedCore() { /* ya no se usa; dejamos stub para compatibilidad */ }
+     
 
     // ===== Tipos =====
     public sealed class ColorOption
@@ -1725,11 +1780,7 @@
         RecomputeAllFilters();
         await InvokeAsync(StateHasChanged);
     }
-    private async Task OnDiametroChanged()
-    {
-        RecomputeAllFilters();
-        await InvokeAsync(StateHasChanged);
-    }
+    
     // Mapa sencillo para mostrar dimensiones aproximadas por capacidad/diámetro
 
     private static List<ColorOption> MapNamesToColorOptions(

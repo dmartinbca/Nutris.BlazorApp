@@ -1421,11 +1421,23 @@ public class OrdersComponentBase : ComponentBase
 
         if (RG35?.Box_label_config == "Standard")
         {
-            var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-" && TiposCajaOptions.Any());
-            PercentFilledPalettizing = fields.Count > 0 ? (filled * 100 / fields.Count) : 0;
+            // ✅ NUEVO: Si es Bulk, NO validar TiposCajaOptions
+            if (ProductType == "Bulk")
+            {
+                // Para Bulk con Standard, validar solo que los campos tengan valores
+                var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-");
+                PercentFilledPalettizing = fields.Count > 0 ? (filled * 100 / fields.Count) : 0;
+            }
+            else
+            {
+                // Para Bote con Standard, validar campos + TiposCajaOptions
+                var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-" && TiposCajaOptions.Any());
+                PercentFilledPalettizing = fields.Count > 0 ? (filled * 100 / fields.Count) : 0;
+            }
         }
         else
         {
+            // Personalizado: validar que exista imagen de caja
             var filled = fields.Count(f => !string.IsNullOrEmpty(f) && f != "-" && !string.IsNullOrEmpty(RG35?.Box_label_imagen));
             PercentFilledPalettizing = fields.Count > 0 ? (filled * 100 / fields.Count) : 0;
         }
@@ -2330,7 +2342,23 @@ public class OrdersComponentBase : ComponentBase
         }).ToList();
 
     // ===== CLASES AUXILIARES =====
+    protected string TranslatedProductType
+    {
+        get
+        {
+            // Normalizar el valor (por si viene con mayúsculas/minúsculas)
+            var normalizedType = ProductType?.Trim() ?? "Bote";
 
+            // Buscar la traducción
+            var key = $"ProductType.{normalizedType}";
+            var translated = Localization[key];
+
+            // Si no encuentra traducción, devolver el original
+            return !string.IsNullOrEmpty(translated) && translated != key
+                ? translated
+                : normalizedType;
+        }
+    }
     private sealed class LabelOptionsPatch
     {
         [JsonPropertyName("Label_size")] public string? LabelSize { get; set; }

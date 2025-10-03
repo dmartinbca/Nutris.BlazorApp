@@ -108,7 +108,7 @@ else
                                         <p>-</p>
                                     }
                                 </td>
-                                <td class="p-2"><p>@item.Container</p></td>
+                                <td class="p-2"><p>@GetTranslatedContainer(item.Container)</p></td>
                                 <td class="p-2">
                                     <p>@(item.Units_per_container == 0 ? "-" : item.Units_per_container.ToString())</p>
                                 </td>
@@ -148,7 +148,7 @@ else
                             <div class="product-card-info">
                                 <div class="product-info-item">
                                     <span class="product-info-label">@Localization["container"]</span>
-                                    <span class="product-info-value">@product.Container</span>
+                                    <span class="product-info-value">@GetTranslatedContainer(product.Container)</span>
                                 </div>
                                 <div class="product-info-item">
                                     <span class="product-info-label">@Localization["units_per_container"]</span>
@@ -383,18 +383,19 @@ else
                 item.Code.ToLower().Contains(search) ||
                 item.Product_name.ToLower().Contains(search) ||
                 item.Container.ToLower().Contains(search) ||
+                GetTranslatedContainer(item.Container).ToLower().Contains(search) || // ✅ NUEVO
                 item.Units_per_container.ToString().Contains(search) ||
                 GetStatusKey(item.Status).ToLower().Contains(search)
             );
         }
 
-        // Apply container filter
+        // Apply container filter (sin cambios)
         if (!string.IsNullOrEmpty(filter.Container))
         {
             filtered = filtered.Where(item => item.Container == filter.Container);
         }
 
-        // Apply status filter
+        // Apply status filter (sin cambios)
         if (!string.IsNullOrEmpty(filter.Status))
         {
             filtered = filtered.Where(item => item.Status == filter.Status);
@@ -482,5 +483,29 @@ else
     public void Dispose()
     {
         Localization.OnLanguageChanged -= OnLanguageChanged;
+    }
+    private string GetTranslatedContainer(string container)
+    {
+        if (string.IsNullOrWhiteSpace(container))
+            return "-";
+
+        // Normalizar el valor
+        // Normalizar el valor
+        var normalized = container.Trim();
+
+        // Intentar obtener traducción con la clave ProductType.{valor}
+        var key = $"ProductType.{normalized}";
+        var translated = Localization[key];
+
+        // Si no encuentra con ProductType, intentar directamente
+        if (string.IsNullOrEmpty(translated) || translated == key)
+        {
+            translated = Localization[normalized];
+        }
+
+        // Si aún no hay traducción, devolver el original
+        return !string.IsNullOrEmpty(translated) && translated != key && translated != normalized
+            ? translated
+            : normalized;
     }
 }

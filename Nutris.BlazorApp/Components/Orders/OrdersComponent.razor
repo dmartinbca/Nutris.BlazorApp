@@ -487,7 +487,7 @@
                         <div class="toggle-from m-top-toggle">
                             <div class="flex-elm-from row">
                                 <div class="left-from col-8 d-flex">
-                                    <h2 class="RalewayBold font-24">Packaging/Envasado</h2>
+                                <h2 class="RalewayBold font-24">@Localization["Packaging"]</h2>
                                 </div>
                                 <div class="right-from col-4 d-flex gap-1">
                                     <div class="line-from"></div>
@@ -550,13 +550,13 @@
                                                 @if (!string.IsNullOrWhiteSpace(ProductName2) && ProductName2 != "-" && !IsSavingProductName)
                                                 {
                                                     <div class="d-flex align-items-center gap-2">
-                                                        <small class="text-success">✓ Guardado</small>
+                                                        <small class="text-success">✓ @Localization["Guardado"]</small>
                                                         <img src="img/check-icon.svg" alt="check" style="width: 20px; height: 20px;">
                                                     </div>
                                                 }
                                                 else if (ProductName2 == "-" || string.IsNullOrWhiteSpace(ProductName2))
                                                 {
-                                                    <img src="img/cancelar.svg" alt="no guardado" style="width: 20px; height: 20px;">
+                                                    <img src="img/cancelar.svg" alt="@Localization["NoGuardado"]" style="width: 20px; height: 20px;">
                                                 }
                                             </div>
                                         </div>
@@ -567,7 +567,7 @@
                                         <div class="col-12 col-xl-12">
                                             <div class="content-t-pdb">
                                                 <div class="head-t">
-                                                    <h3 class="font-18 RalewayExtraBold">@ProductType</h3>
+                                                <h3 class="font-18 RalewayExtraBold">@TranslatedProductType</h3>
                                                 </div>
                                                 <div class="d-xl-flex gap-4 align-items-center w-100">
                                                     <div class="body-t body-t-bottle">
@@ -980,7 +980,6 @@
                                         <h3 class="font-18 RalewayBold">@Localization["orderView.BOXLABEL"]</h3>
                                     </div>
                                     <div class="body-t">
-
                                     @foreach (var item in PalletInfo)
                                     {
                                         <div class="body-td">
@@ -994,9 +993,10 @@
                                                                 value="@SelectedTipoCaja"
                                                                 @onchange="OnTipoCajaChanged"
                                                                 disabled="@IsLoadingTipoCaja">
-                                                            @if (!TiposCajaOptions.Any())
+                                                            @if (ProductType == "Bulk" || !TiposCajaOptions.Any())
                                                             {
-                                                                <option value="-">@Localization["NoOptionsAvailable"]</option>
+                                                                <!-- Para Bulk o sin opciones, mostrar valor actual -->
+                                                                <option value="@item.Value">@item.Value</option>
                                                             }
                                                             else
                                                             {
@@ -1020,10 +1020,29 @@
                                                     <input class="RalewayRegular font-20" type="text" readonly value="@item.Value">
                                                 }
 
-                                                @if (item.Value != "-" && TiposCajaOptions.Any())
+                                                @* ✅ VALIDACIÓN CORREGIDA *@
+                                                @if (item.Value != "-")
                                                 {
-                                                    <div class="line-from"></div>
-                                                    <img src="img/check-icon.svg" alt="check">
+                                                    @if (item.Label == Localization["orderView.Pallet[0]"])
+                                                    {
+                                                        @* Para el campo "Caja": validar según tipo de producto *@
+                                                        @if (ProductType == "Bulk" || TiposCajaOptions.Any())
+                                                        {
+                                                            <div class="line-from"></div>
+                                                            <img src="img/check-icon.svg" alt="check">
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="line-from"></div>
+                                                            <img src="img/cancelar.svg" alt="check">
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        @* Para otros campos (Tipo, Unidades): validar normalmente *@
+                                                        <div class="line-from"></div>
+                                                        <img src="img/check-icon.svg" alt="check">
+                                                    }
                                                 }
                                                 else
                                                 {
@@ -1033,10 +1052,7 @@
                                             </div>
                                         </div>
                                     }
-                                          
-
-                                           
-                                       
+                                         
                                         <div class="body-td" id="body-td-pallet">
                                          @*    <p class="font-18 RalewayRegular w-100">@Localization["orderView.BoxLabel"]</p>
                                          *@    <div class="data-t">

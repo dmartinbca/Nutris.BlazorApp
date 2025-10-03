@@ -104,7 +104,7 @@ else
                                         <p>-</p>
                                     }
                                 </td>
-                                <td><p>@item.Container</p></td>
+                                <td><p>@GetTranslatedContainer(item.Container)</p></td>
                                 <td>
                                     <p>@(item.UnitsPerContainer == 0 ? "" : item.UnitsPerContainer.ToString())</p>
                                 </td>
@@ -156,7 +156,7 @@ else
                     <div class="product-card-info">
                         <div class="product-info-item">
                             <span class="product-info-label">@Localization["container"]</span>
-                            <span class="product-info-value">@product.Container</span>
+                            <span class="product-info-value">@GetTranslatedContainer(product.Container)</span>
                         </div>
                         <div class="product-info-item">
                             <span class="product-info-label">@Localization["units_per_container"]</span>
@@ -382,6 +382,7 @@ else
                 item.Code.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 (item.ProductName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
                 item.Container.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                GetTranslatedContainer(item.Container).Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || // ✅ NUEVO
                 item.UnitsPerContainer.ToString().Contains(searchTerm) ||
                 item.Status.Contains(searchTerm, StringComparison.OrdinalIgnoreCase);
 
@@ -468,5 +469,23 @@ else
         public int Units_per_container { get; set; }
         public string? Status { get; set; }
         public string? Customer { get; set; }
+    }
+    private string GetTranslatedContainer(string container)
+    {
+        if (string.IsNullOrWhiteSpace(container))
+            return "-";
+
+        var normalized = container.Trim();
+        var key = $"ProductType.{normalized}";
+        var translated = Localization[key];
+
+        if (string.IsNullOrEmpty(translated) || translated == key)
+        {
+            translated = Localization[normalized];
+        }
+
+        return !string.IsNullOrEmpty(translated) && translated != key && translated != normalized
+            ? translated
+            : normalized;
     }
 }
