@@ -8,6 +8,7 @@ using NutrisBlazor.Components.Modals;
 using NutrisBlazor.Models;
 using NutrisBlazor.Services;
 using System.Net.Http;
+using System.Runtime.Intrinsics.X86;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -1282,6 +1283,21 @@ public class OrdersComponentBase : ComponentBase
             if (RG35 != null && !string.IsNullOrEmpty(RG35.Box_name))
             {
                 SelectedTipoCaja = RG35.Box_name;
+                var option = new TipoCajaOption
+                {
+                    Id = id++,
+                    Forma = RG35.Bote_forma,
+                    Capacidad = RG35.Bote_capacidad,
+                    Boca = RG35.Bote_boca,
+                    Tipo_de_caja = "Standard",
+                    Unidades_por_caja = Convert.ToInt32(RG35.Box_units_per),
+                    Pallet_EU_Alturas = Convert.ToInt32(RG35.Pallet_layers),
+                    Pallet_EU_Base = Convert.ToInt32(RG35.Pallet_boxes_per_layer),
+                    Pallet_Americano_Alturas = Convert.ToInt32(RG35.Box_units_per),
+                    Pallet_Americano_Base = Convert.ToInt32(RG35.Pallet_boxes_per_layer)
+                };
+
+                TiposCajaOptions.Add(option);
             }
             else if (TiposCajaOptions.Any())
             {
