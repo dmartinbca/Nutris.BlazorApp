@@ -901,7 +901,7 @@
                 // LÍNEA SUPERIOR (Diámetro de boca) - sobre el cuello
                 const dimTop = document.querySelector('#dimension-lines-{ComponentId} .dimension-top');
                 if (dimTop) {{
-                    const neckWidth = imgWidth * 0.30;
+                    const neckWidth = imgWidth * 0.50;
                     const topPosition = imgTop - 35;
                     
                     dimTop.style.top = topPosition + 'px';
@@ -928,7 +928,7 @@
                 const dimBottom = document.querySelector('#dimension-lines-{ComponentId} .dimension-bottom');
                 if (dimBottom) {{
                     const baseWidth = imgWidth * 0.75;
-                    const bottomPosition = (wrapperRect.height - imgRect.bottom + wrapperRect.top) + 30;
+                    const bottomPosition = (wrapperRect.height - imgRect.bottom + wrapperRect.top) - 20;
                     
                     dimBottom.style.bottom = bottomPosition + 'px';
                     dimBottom.style.width = baseWidth + 'px';
