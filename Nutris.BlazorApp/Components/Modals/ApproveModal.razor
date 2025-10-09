@@ -1,7 +1,7 @@
 ﻿@namespace NutrisBlazor.Components.Modals
 @using Microsoft.AspNetCore.Components
 @using Microsoft.JSInterop
-<link href="css/ApproveModal.css" rel="stylesheet" />
+<link href="/css/ApproveModal.css" rel="stylesheet" />
 @if (IsLoading)
 {
     <div class="loading-container">
@@ -75,7 +75,7 @@ else
             Logger.LogInformation($"Accepting formulation for RG37: {RG37}");
 
             // Llamada a la API para actualizar la formulación
-            var response = await ApiService.PatchAsync($"CustomizeRG37('{RG37}')", dataForFormulation);
+            var response = await ApiService.PatchAsync($"CustomizeRG37('{RG37}')?&tenant=nutris", dataForFormulation);
 
             if (response.IsSuccessStatusCode)
             {

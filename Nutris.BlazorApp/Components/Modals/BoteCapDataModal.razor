@@ -1770,7 +1770,9 @@
         public string Forma { get; set; } = "";
         public string Diametro { get; set; } = "";
         public string Color { get; set; } = "";
+        public string Material { get; set; } = "";
         public bool Sleeve { get; set; } = false;
+
         public string ImagenCap { get; set; } = NO_IMAGE_AVAILABLE; // Inicializar con imagen por defecto
     }
 
@@ -1827,7 +1829,7 @@
                 var capForma = MapCapFormaToApi(CapConfig.Forma);
                 var capColor = CapConfig.Color ?? "";
                 var capSleeve = CapConfig.Sleeve;
-
+                var capMaterial = CapConfig.Material = "PP+HDPE with liner";
                 // Igual que en ContainerPackagingModal.UpdateSelectedOption()
                 var data = new
                 {
@@ -1840,7 +1842,8 @@
                     Cap_tapa = capForma,
                     Cap_Boca = boca,       // sincronizado con el bote
                     Cap_color = capColor,
-                    Cap_sleever = capSleeve,
+                    Cap_sleever = capSleeve, 
+                    Cap_material = capMaterial,
 
                     Characteristics = $"{color} {capacidad}cc {material} {boca}"
                 };
